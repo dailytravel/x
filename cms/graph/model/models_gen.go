@@ -51,6 +51,8 @@ type Comment struct {
 	Reactions   []*Reaction            `json:"reactions,omitempty"`
 }
 
+func (Comment) IsEntity() {}
+
 type Comments struct {
 	Count int        `json:"count"`
 	Data  []*Comment `json:"data,omitempty"`

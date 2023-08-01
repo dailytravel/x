@@ -3,7 +3,6 @@ package graph
 import (
 	"github.com/dailytravel/x/service/graph/model"
 	"github.com/go-redis/redis"
-	"github.com/typesense/typesense-go/typesense"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -15,14 +14,12 @@ type Resolver struct {
 	model model.Model
 	db    *mongo.Database
 	redis *redis.Client
-	ts    *typesense.Client
 }
 
-func NewResolver(db *mongo.Database, rdb *redis.Client, client *typesense.Client) *Resolver {
+func NewResolver(db *mongo.Database, rdb *redis.Client) *Resolver {
 	return &Resolver{
 		db:    db,
 		redis: rdb,
-		ts:    client,
 		model: model.Model{},
 	}
 }

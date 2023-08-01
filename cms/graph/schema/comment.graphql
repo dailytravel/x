@@ -1,4 +1,4 @@
-type Comment {
+type Comment @key(fields: "id") {
   id: ID!
   locale: String!
   content: String!

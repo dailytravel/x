@@ -38,6 +38,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Entity() EntityResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -164,6 +165,10 @@ type ComplexityRoot struct {
 		Symbol    func(childComplexity int) int
 		Thousand  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
+	}
+
+	Entity struct {
+		FindCommentByID func(childComplexity int, id string) int
 	}
 
 	File struct {
@@ -351,6 +356,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type EntityResolver interface {
+	FindCommentByID(ctx context.Context, id string) (*model.Comment, error)
+}
 type MutationResolver interface {
 	CreateCategory(ctx context.Context, input model.NewCategory) (*model.Category, error)
 	UpdateCategory(ctx context.Context, id string, input model.UpdateCategory) (*model.Category, error)
@@ -1042,6 +1050,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Currency.UpdatedAt(childComplexity), true
+
+	case "Entity.findCommentByID":
+		if e.complexity.Entity.FindCommentByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findCommentByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindCommentByID(childComplexity, args["id"].(string)), true
 
 	case "File.created_at":
 		if e.complexity.File.CreatedAt == nil {
@@ -2478,7 +2498,13 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = User
+union _Entity = Comment | User
+
+# fake type to build resolver interfaces for users to implement
+type Entity {
+		findCommentByID(id: ID!,): Comment!
+
+}
 
 type _Service {
   sdl: String
@@ -2523,6 +2549,21 @@ func (ec *executionContext) dir_hasScope_args(ctx context.Context, rawArgs map[s
 		}
 	}
 	args["scope"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findCommentByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -7900,6 +7941,97 @@ func (ec *executionContext) fieldContext_Currency_updated_at(ctx context.Context
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Entity_findCommentByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findCommentByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindCommentByID(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Comment)
+	fc.Result = res
+	return ec.marshalNComment2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findCommentByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Comment_id(ctx, field)
+			case "locale":
+				return ec.fieldContext_Comment_locale(ctx, field)
+			case "content":
+				return ec.fieldContext_Comment_content(ctx, field)
+			case "rating":
+				return ec.fieldContext_Comment_rating(ctx, field)
+			case "status":
+				return ec.fieldContext_Comment_status(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Comment_metadata(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Comment_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Comment_updated_at(ctx, field)
+			case "parent":
+				return ec.fieldContext_Comment_parent(ctx, field)
+			case "children":
+				return ec.fieldContext_Comment_children(ctx, field)
+			case "object":
+				return ec.fieldContext_Comment_object(ctx, field)
+			case "owner":
+				return ec.fieldContext_Comment_owner(ctx, field)
+			case "reaction":
+				return ec.fieldContext_Comment_reaction(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Comment_created_by(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Comment_updated_by(ctx, field)
+			case "attachments":
+				return ec.fieldContext_Comment_attachments(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findCommentByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20229,6 +20361,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case model.Comment:
+		return ec._Comment(ctx, sel, &obj)
+	case *model.Comment:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Comment(ctx, sel, obj)
 	case model.User:
 		return ec._User(ctx, sel, &obj)
 	case *model.User:
@@ -20374,7 +20513,7 @@ func (ec *executionContext) _Category(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
-var commentImplementors = []string{"Comment"}
+var commentImplementors = []string{"Comment", "_Entity"}
 
 func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, obj *model.Comment) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, commentImplementors)
@@ -20898,6 +21037,70 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var entityImplementors = []string{"Entity"}
+
+func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, entityImplementors)
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Entity",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Entity")
+		case "findCommentByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findCommentByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -22771,6 +22974,20 @@ func (ec *executionContext) marshalNCategory2ᚖgithubᚗcomᚋdailytravelᚋx�
 		return graphql.Null
 	}
 	return ec._Category(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNComment2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v model.Comment) graphql.Marshaler {
+	return ec._Comment(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNComment2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v *model.Comment) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Comment(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
