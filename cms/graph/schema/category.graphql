@@ -1,4 +1,4 @@
-type Category {
+type Category @key(fields: "id") {
   id: ID!
   parent: Category
   children: [Category]

@@ -1,4 +1,4 @@
-type Response {
+type Response @key(fields: "id") {
   id: ID!
   reference: String
   campaign: Campaign!

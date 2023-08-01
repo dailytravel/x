@@ -1,4 +1,4 @@
-type Point {
+type Point @key(fields: "id") {
   id: ID!
   user: User!
   target: Map! #program, reward

@@ -1,4 +1,4 @@
-type Contact {
+type Contact @key(fields: "id") {
   id: ID!
   owner: User
   reference: String

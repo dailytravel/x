@@ -80,6 +80,86 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 		}()
 
 		switch typeName {
+		case "Contact":
+			resolverName, err := entityResolverNameForContact(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Contact": %w`, err)
+			}
+			switch resolverName {
+
+			case "findContactByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findContactByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindContactByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Contact": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Membership":
+			resolverName, err := entityResolverNameForMembership(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Membership": %w`, err)
+			}
+			switch resolverName {
+
+			case "findMembershipByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findMembershipByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindMembershipByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Membership": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Organization":
+			resolverName, err := entityResolverNameForOrganization(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Organization": %w`, err)
+			}
+			switch resolverName {
+
+			case "findOrganizationByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findOrganizationByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindOrganizationByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Organization": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Point":
+			resolverName, err := entityResolverNameForPoint(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Point": %w`, err)
+			}
+			switch resolverName {
+
+			case "findPointByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findPointByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindPointByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Point": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
 
 		}
 		return fmt.Errorf("%w: %s", ErrUnknownType, typeName)
@@ -147,4 +227,72 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 		g.Wait()
 		return list
 	}
+}
+
+func entityResolverNameForContact(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findContactByID", nil
+	}
+	return "", fmt.Errorf("%w for Contact", ErrTypeNotFound)
+}
+
+func entityResolverNameForMembership(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findMembershipByID", nil
+	}
+	return "", fmt.Errorf("%w for Membership", ErrTypeNotFound)
+}
+
+func entityResolverNameForOrganization(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findOrganizationByID", nil
+	}
+	return "", fmt.Errorf("%w for Organization", ErrTypeNotFound)
+}
+
+func entityResolverNameForPoint(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findPointByID", nil
+	}
+	return "", fmt.Errorf("%w for Point", ErrTypeNotFound)
 }

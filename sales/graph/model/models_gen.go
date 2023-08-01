@@ -62,6 +62,8 @@ type Contact struct {
 	Followers    []*Follow              `json:"followers,omitempty"`
 }
 
+func (Contact) IsEntity() {}
+
 type Contacts struct {
 	Count int        `json:"count"`
 	Data  []*Contact `json:"data,omitempty"`
@@ -200,6 +202,8 @@ type Membership struct {
 	CreatedAt    string                 `json:"created_at"`
 	UpdatedAt    string                 `json:"updated_at"`
 }
+
+func (Membership) IsEntity() {}
 
 type NewContact struct {
 	Organization *string                `json:"organization,omitempty"`
@@ -440,6 +444,8 @@ type Organization struct {
 	UpdatedBy      *User                  `json:"updated_by,omitempty"`
 }
 
+func (Organization) IsEntity() {}
+
 type Organizations struct {
 	Data  []*Organization `json:"data,omitempty"`
 	Count int             `json:"count"`
@@ -485,6 +491,8 @@ type Point struct {
 	CreatedBy *User                  `json:"created_by"`
 	UpdatedBy *User                  `json:"updated_by"`
 }
+
+func (Point) IsEntity() {}
 
 type Points struct {
 	Count int      `json:"count"`

@@ -70,7 +70,7 @@ while true; do
   fi
 done
 
-# node gateway/index.js
+node gateway/index.ts
 
 # Do any other necessary setup or start additional services here
 

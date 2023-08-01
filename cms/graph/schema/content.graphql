@@ -1,4 +1,4 @@
-type Content {
+type Content @key(fields: "id") {
   id: ID!
   locale: String!
   type: String! #post, page, template, hotel, restaurant, product, etc.

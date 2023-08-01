@@ -11,9 +11,34 @@ import (
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
+// FindCategoryByID is the resolver for the findCategoryByID field.
+func (r *entityResolver) FindCategoryByID(ctx context.Context, id string) (*model.Category, error) {
+	panic(fmt.Errorf("not implemented: FindCategoryByID - findCategoryByID"))
+}
+
 // FindCommentByID is the resolver for the findCommentByID field.
 func (r *entityResolver) FindCommentByID(ctx context.Context, id string) (*model.Comment, error) {
 	panic(fmt.Errorf("not implemented: FindCommentByID - findCommentByID"))
+}
+
+// FindContentByID is the resolver for the findContentByID field.
+func (r *entityResolver) FindContentByID(ctx context.Context, id string) (*model.Content, error) {
+	panic(fmt.Errorf("not implemented: FindContentByID - findContentByID"))
+}
+
+// FindFileByID is the resolver for the findFileByID field.
+func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.File, error) {
+	panic(fmt.Errorf("not implemented: FindFileByID - findFileByID"))
+}
+
+// FindFollowByID is the resolver for the findFollowByID field.
+func (r *entityResolver) FindFollowByID(ctx context.Context, id string) (*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: FindFollowByID - findFollowByID"))
+}
+
+// FindReactionByID is the resolver for the findReactionByID field.
+func (r *entityResolver) FindReactionByID(ctx context.Context, id string) (*model.Reaction, error) {
+	panic(fmt.Errorf("not implemented: FindReactionByID - findReactionByID"))
 }
 
 // Entity returns EntityResolver implementation.

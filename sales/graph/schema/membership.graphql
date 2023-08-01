@@ -1,4 +1,4 @@
-type Membership {
+type Membership @key(fields: "id") {
   id: ID!
   user: User!
   tier: Tier! #silver, gold, platinum

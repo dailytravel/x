@@ -1,4 +1,4 @@
-type Board {
+type Board @key(fields: "id") {
   id: ID!
   owner: User
   organization: Organization

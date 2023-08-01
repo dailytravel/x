@@ -80,6 +80,8 @@ type Response struct {
 	UpdatedAt string                 `json:"updated_at"`
 }
 
+func (Response) IsEntity() {}
+
 type Responses struct {
 	Count int         `json:"count"`
 	Data  []*Response `json:"data,omitempty"`

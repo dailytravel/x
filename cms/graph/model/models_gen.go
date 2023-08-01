@@ -31,6 +31,8 @@ type Category struct {
 	UpdatedBy   *User                  `json:"updated_by,omitempty"`
 }
 
+func (Category) IsEntity() {}
+
 type Comment struct {
 	ID          string                 `json:"id"`
 	Locale      string                 `json:"locale"`
@@ -80,6 +82,8 @@ type Content struct {
 	Comments    []*Comment             `json:"comments,omitempty"`
 	Attachments []*File                `json:"attachments,omitempty"`
 }
+
+func (Content) IsEntity() {}
 
 type Contents struct {
 	Count int        `json:"count"`
@@ -147,6 +151,8 @@ type File struct {
 	Followers   []*Follow              `json:"followers,omitempty"`
 }
 
+func (File) IsEntity() {}
+
 type Files struct {
 	Count int     `json:"count"`
 	Data  []*File `json:"data,omitempty"`
@@ -163,6 +169,8 @@ type Follow struct {
 	CreatedBy *User                  `json:"created_by"`
 	UpdatedBy *User                  `json:"updated_by"`
 }
+
+func (Follow) IsEntity() {}
 
 type Follows struct {
 	Count int       `json:"count"`
@@ -324,6 +332,8 @@ type Reaction struct {
 	CreatedAt string                 `json:"created_at"`
 	UpdatedAt string                 `json:"updated_at"`
 }
+
+func (Reaction) IsEntity() {}
 
 type Reactions struct {
 	Data  []*Reaction `json:"data,omitempty"`
