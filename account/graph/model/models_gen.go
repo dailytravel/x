@@ -2,19 +2,353 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
+type Board struct {
+	ID string `json:"id"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+func (Board) IsEntity() {}
+
+type Client struct {
+	ID          string                 `json:"id"`
+	User        *User                  `json:"user,omitempty"`
+	Type        string                 `json:"type"`
+	Name        string                 `json:"name"`
+	Description *string                `json:"description,omitempty"`
+	Domains     []*string              `json:"domains,omitempty"`
+	Secret      string                 `json:"secret"`
+	Redirect    string                 `json:"redirect"`
+	Permissions []*string              `json:"permissions,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      string                 `json:"status"`
+	LastUsed    *int                   `json:"last_used,omitempty"`
+	CreatedAt   string                 `json:"created_at"`
+	UpdatedAt   string                 `json:"updated_at"`
+	ExpiresAt   *string                `json:"expires_at,omitempty"`
+}
+
+type Clients struct {
+	Data  []*Client `json:"data,omitempty"`
+	Count int       `json:"count"`
+}
+
+type Contact struct {
+	ID string `json:"id"`
+}
+
+func (Contact) IsEntity() {}
+
+type Identity struct {
+	ID          string                 `json:"id"`
+	User        *User                  `json:"user"`
+	Provider    string                 `json:"provider"`
+	AccessToken string                 `json:"access_token"`
+	ExpiresIn   int                    `json:"expires_in"`
+	Connection  string                 `json:"connection"`
+	IsSocial    bool                   `json:"is_social"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      string                 `json:"status"`
+	CreatedAt   string                 `json:"created_at"`
+	UpdatedAt   string                 `json:"updated_at"`
+}
+
+type Invitation struct {
+	ID        string                 `json:"id"`
+	Email     string                 `json:"email"`
+	FirstName *string                `json:"firstName,omitempty"`
+	LastName  *string                `json:"lastName,omitempty"`
+	Role      string                 `json:"role"`
+	Status    string                 `json:"status"`
+	Team      *Organization          `json:"team"`
+	Inviter   *User                  `json:"inviter"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	CreatedAt string                 `json:"created_at"`
+	UpdatedAt string                 `json:"updated_at"`
+}
+
+type Invitations struct {
+	Data  []*Invitation `json:"data,omitempty"`
+	Count int           `json:"count"`
+}
+
+type Key struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Type        string  `json:"type"`
+	Provider    string  `json:"provider"`
+	Kid         string  `json:"kid"`
+	Certificate string  `json:"certificate"`
+	Fingerprint string  `json:"fingerprint"`
+	Thumbprint  string  `json:"thumbprint"`
+	Status      string  `json:"status"`
+	ExpiresAt   *string `json:"expires_at,omitempty"`
+	CreatedAt   string  `json:"created_at"`
+	UpdatedAt   string  `json:"updated_at"`
+	Owner       *User   `json:"owner,omitempty"`
+}
+
+type Keys struct {
+	Data  []*Key `json:"data,omitempty"`
+	Count int    `json:"count"`
+}
+
+type LoginInput struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type Mfa struct {
+	Enabled bool   `json:"enabled"`
+	Code    string `json:"code"`
+}
+
+type MFAInput struct {
+	Enabled bool   `json:"enabled"`
+	Code    string `json:"code"`
+}
+
+type Membership struct {
+	ID string `json:"id"`
+}
+
+func (Membership) IsEntity() {}
+
+type NewClient struct {
+	Type        string                 `json:"type"`
+	Name        string                 `json:"name"`
+	Description *string                `json:"description,omitempty"`
+	Domains     []*string              `json:"domains,omitempty"`
+	Redirect    string                 `json:"redirect"`
+	Permissions []*string              `json:"permissions,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewInvitation struct {
+	Email     string                 `json:"email"`
+	FirstName *string                `json:"firstName,omitempty"`
+	LastName  *string                `json:"lastName,omitempty"`
+	Role      string                 `json:"role"`
+	Team      string                 `json:"team"`
+	Inviter   string                 `json:"inviter"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewKey struct {
+	Name string `json:"name"`
+	Kid  string `json:"kid"`
+}
+
+type NewPermission struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+}
+
+type NewRole struct {
+	Name        string    `json:"name"`
+	Description *string   `json:"description,omitempty"`
+	Permissions []*string `json:"permissions,omitempty"`
+}
+
+type NewUser struct {
+	Locale   string                 `json:"locale"`
+	Name     string                 `json:"name"`
+	Email    string                 `json:"email"`
+	Phone    *string                `json:"phone,omitempty"`
+	Password string                 `json:"password"`
+	Roles    []*string              `json:"roles,omitempty"`
+	Timezone *string                `json:"timezone,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type Organization struct {
+	ID string `json:"id"`
+}
+
+func (Organization) IsEntity() {}
+
+type PasswordInput struct {
+	CurrentPassword      string `json:"current_password"`
+	Password             string `json:"password"`
+	PasswordConfirmation string `json:"password_confirmation"`
+}
+
+type Payload struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int    `json:"expires_in"`
+}
+
+type Permission struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	CreatedAt   string  `json:"created_at"`
+	UpdatedAt   string  `json:"updated_at"`
+}
+
+type Permissions struct {
+	Data  []*Permission `json:"data,omitempty"`
+	Count int           `json:"count"`
+}
+
+type Point struct {
+	ID string `json:"id"`
+}
+
+func (Point) IsEntity() {}
+
+type RegisterInput struct {
+	Locale   string `json:"locale"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type Role struct {
+	ID          string        `json:"id"`
+	Name        string        `json:"name"`
+	Description *string       `json:"description,omitempty"`
+	Permissions []*Permission `json:"permissions,omitempty"`
+	CreatedAt   string        `json:"created_at"`
+	UpdatedAt   string        `json:"updated_at"`
+	CreatedBy   *User         `json:"created_by,omitempty"`
+	UpdatedBy   *User         `json:"updated_by,omitempty"`
+}
+
+type Roles struct {
+	Data  []*Role `json:"data,omitempty"`
+	Count int     `json:"count"`
+}
+
+type UpdateClient struct {
+	Name        *string                `json:"name,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Domains     []*string              `json:"domains,omitempty"`
+	Redirect    *string                `json:"redirect,omitempty"`
+	Permissions []string               `json:"permissions,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	ExpiresAt   *string                `json:"expires_at,omitempty"`
+}
+
+type UpdateInvitation struct {
+	Email     *string                `json:"email,omitempty"`
+	FirstName *string                `json:"firstName,omitempty"`
+	LastName  *string                `json:"lastName,omitempty"`
+	Role      *string                `json:"role,omitempty"`
+	Status    *string                `json:"status,omitempty"`
+	Team      *string                `json:"team,omitempty"`
+	Inviter   *string                `json:"inviter,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type UpdatePermission struct {
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type UpdateRole struct {
+	Name        *string   `json:"name,omitempty"`
+	Description *string   `json:"description,omitempty"`
+	Permissions []*string `json:"permissions,omitempty"`
+}
+
+type UpdateUser struct {
+	Locale   *string                `json:"locale,omitempty"`
+	Name     *string                `json:"name,omitempty"`
+	Email    *string                `json:"email,omitempty"`
+	Phone    *string                `json:"phone,omitempty"`
+	Roles    []*string              `json:"roles,omitempty"`
+	Photos   []*string              `json:"photos,omitempty"`
+	Timezone *string                `json:"timezone,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID            string                 `json:"id"`
+	Locale        *string                `json:"locale,omitempty"`
+	Name          string                 `json:"name"`
+	Email         string                 `json:"email"`
+	Phone         *string                `json:"phone,omitempty"`
+	Password      string                 `json:"password"`
+	Roles         []*string              `json:"roles,omitempty"`
+	Mfa           *Mfa                   `json:"mfa,omitempty"`
+	Timezone      *string                `json:"timezone,omitempty"`
+	LoginAttempts *int                   `json:"login_attempts,omitempty"`
+	LastLogin     *int                   `json:"last_login,omitempty"`
+	LastIP        *string                `json:"last_ip,omitempty"`
+	VerifiedAt    *int                   `json:"verified_at,omitempty"`
+	CreatedAt     string                 `json:"created_at"`
+	UpdatedAt     string                 `json:"updated_at"`
+	LastActivity  *int                   `json:"last_activity,omitempty"`
+	Identities    []*Identity            `json:"identities,omitempty"`
+	Metadata      map[string]interface{} `json:"metadata,omitempty"`
+	Status        *string                `json:"status,omitempty"`
+	CreatedBy     *User                  `json:"created_by,omitempty"`
+	UpdatedBy     *User                  `json:"updated_by,omitempty"`
+	Board         *Board                 `json:"board,omitempty"`
+	Contacts      []*Contact             `json:"contacts,omitempty"`
+	Points        []*Point               `json:"points,omitempty"`
+	Membership    *Membership            `json:"membership,omitempty"`
+}
+
+type Users struct {
+	Count int     `json:"count"`
+	Data  []*User `json:"data,omitempty"`
+}
+
+type VerifyEmailInput struct {
+	Token string `json:"token"`
+}
+
+type SocialProvider string
+
+const (
+	SocialProviderFacebook SocialProvider = "FACEBOOK"
+	SocialProviderGoogle   SocialProvider = "GOOGLE"
+	SocialProviderTwitter  SocialProvider = "TWITTER"
+	SocialProviderGithub   SocialProvider = "GITHUB"
+)
+
+var AllSocialProvider = []SocialProvider{
+	SocialProviderFacebook,
+	SocialProviderGoogle,
+	SocialProviderTwitter,
+	SocialProviderGithub,
+}
+
+func (e SocialProvider) IsValid() bool {
+	switch e {
+	case SocialProviderFacebook, SocialProviderGoogle, SocialProviderTwitter, SocialProviderGithub:
+		return true
+	}
+	return false
+}
+
+func (e SocialProvider) String() string {
+	return string(e)
+}
+
+func (e *SocialProvider) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SocialProvider(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SocialProvider", str)
+	}
+	return nil
+}
+
+func (e SocialProvider) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

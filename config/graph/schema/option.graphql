@@ -1,0 +1,35 @@
+type Option {
+  id: ID!
+  name: String!
+  data: String!
+  created_at: String!
+  updated_at: String!
+}
+
+type Options {
+  data: [Option]
+  count: Int!
+}
+
+input NewOption {
+  name: String!
+  data: String!
+}
+
+input UpdateOption {
+  name: String
+  data: String
+}
+
+extend type Query {
+  option(name: String!): Option @auth
+  options(args: Map): Options @auth
+}
+
+extend type Mutation {
+  createOption(input: NewOption!): Option @auth
+  updateOption(id: ID!, input: UpdateOption!): Option @auth
+  upsertOption(name: String!, data: String): Option @auth
+  deleteOption(id: ID!): Map @auth
+  deleteOptions(ids: [ID!]!): Map @auth
+}

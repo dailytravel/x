@@ -1,0 +1,52 @@
+type Tier {
+  id: ID!
+  locale: String!
+  name: String!
+  description: String!
+  benefits: [Benefit!]!
+  cost: Int!
+  rewards: [Reward!]!
+  status: String!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+  created_by: User!
+  updated_by: User!
+}
+
+type Tiers {
+  data: [Tier]
+  count: Int!
+}
+
+input NewTier {
+  locale: String!
+  name: String!
+  description: String!
+  cost: Int!
+  rewards: [ID!]!
+  status: String!
+  metadata: Map
+}
+
+input UpdateTier {
+  locale: String!
+  name: String
+  description: String
+  cost: Int
+  rewards: [ID!]
+  status: String
+  metadata: Map
+}
+
+extend type Query {
+  tiers(args: Map): Tiers @auth
+  tier(id: ID!): Tier @auth
+}
+
+extend type Mutation {
+  createTier(input: NewTier!): Tier @auth
+  updateTier(id: ID!, input: UpdateTier!): Tier @auth
+  deleteTier(id: ID!): Map @auth
+  deleteTiers(ids: [ID!]!): Map @auth
+}

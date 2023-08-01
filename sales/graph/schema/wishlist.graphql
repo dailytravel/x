@@ -1,0 +1,42 @@
+type Wishlist {
+  id: ID!
+  owner: User!
+  product: Content!
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+}
+
+enum WishlistStatus {
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+type Wishlists {
+  count: Int!
+  data: [Wishlist!]!
+}
+
+input NewWishlist {
+  product: ID!
+  metadata: Map
+}
+
+input UpdateWishlist {
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  wishlist(id: ID!): Wishlist @auth
+  wishlists(args: Map): Wishlists
+}
+
+extend type Mutation {
+  createWishlist(input: NewWishlist!): Wishlist @auth
+  updateWishlist(input: UpdateWishlist!): Wishlist @auth
+  deleteWishlist(id: ID!): Map @auth
+  deleteWishlists(ids: [ID!]!): Map @auth
+}

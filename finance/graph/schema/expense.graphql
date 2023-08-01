@@ -1,0 +1,82 @@
+type Expense {
+  id: ID!
+  reference: String!
+  type: String! #debit or credit
+  description: String!
+  amount: Float!
+  currency: String!
+  followers: [Follower]
+  comments: [Comment]
+  metadata: Map
+  status: String
+  date: String!
+  notes: String
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+  owner: User!
+}
+
+enum ExpenseType {
+  DEBIT
+  CREDIT
+}
+
+enum ExpenseStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  PAID
+}
+
+enum Payer {
+  EMPLOYEE
+  COMPANY
+}
+
+type Expenses {
+  count: Int!
+  data: [Expense]
+}
+
+input NewExpense {
+  type: String!
+  reference: String
+  description: String!
+  amount: Float!
+  currency: String!
+  metadata: Map
+  status: String
+  date: String!
+  owner: ID!
+  notes: String
+  categories: [ID!]
+}
+
+input UpdateExpense {
+  type: String
+  reference: String
+  description: String
+  metadata: Map
+  status: String
+  date: String
+  amount: Float
+  currency: String
+  owner: ID
+  notes: String
+  categories: [ID!]
+}
+
+extend type Query {
+  expenses(args: Map): Map @auth
+  expense(id: ID!): Expense @auth
+}
+
+extend type Mutation {
+  createExpense(input: NewExpense!): Expense @auth
+  updateExpense(id: ID!, input: UpdateExpense!): Expense @auth
+  deleteExpense(id: ID!): Map @auth
+  deleteExpenses(ids: [ID!]!): Map @auth
+}

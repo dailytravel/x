@@ -1,0 +1,55 @@
+type Locale {
+  id: ID!
+  name: String!
+  locale: String!
+  code: String!
+  order: Int!
+  rtl: Boolean!
+  date_format: String!
+  String_format: String!
+  week_start: Int!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+}
+
+type Locales {
+  count: Int!
+  data: [Locale]
+}
+
+input NewLocale {
+  id: ID
+  name: String!
+  locale: String!
+  code: String!
+  order: Int!
+  rtl: Boolean!
+  date_format: String!
+  String_format: String!
+  week_start: Int!
+  metadata: Map
+}
+
+input UpdateLocale {
+  name: String
+  locale: String!
+  code: String
+  order: Int
+  rtl: Boolean
+  date_format: String
+  String_format: String
+  week_start: Int
+  metadata: Map
+}
+
+extend type Query {
+  locales(args: Map): Locales
+  locale(code: String!): Locale
+}
+
+extend type Mutation {
+  createLocale(input: NewLocale!): Locale @auth(requires: [ADMIN])
+  updateLocale(id: ID!, input: UpdateLocale!): Locale @auth(requires: [ADMIN])
+  deleteLocale(id: ID!): Map @auth(requires: [ADMIN])
+}

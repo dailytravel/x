@@ -1,0 +1,54 @@
+type Point {
+  id: ID!
+  user: User!
+  target: Map! #program, reward
+  points: Int!
+  type: PointType!
+  metadata: Map
+  expires_at: String!
+  created_at: String!
+  updated_at: String!
+  created_by: User!
+  updated_by: User!
+}
+
+enum PointType {
+  EARN
+  REDEEM
+  TRANSFER
+  ADJUSTMENT
+}
+
+type Points {
+  count: Int!
+  data: [Point]
+}
+
+input NewPoint {
+  target: ObjectInput!
+  points: Int!
+  type: String! # "earn", "redeem", "adjustment"
+  expires_at: String
+  metadata: Map
+  status: String! # "pending", "completed", "failed"
+}
+
+input UpdatePoint {
+  points: Int
+  type: String # "earn", "redeem", "adjustment"
+  expires_at: String
+  metadata: Map
+  status: String # "pending", "completed", "failed"
+}
+
+extend type Query {
+  points(args: Map): Points @auth
+  point(id: ID!): Point @auth
+}
+
+extend type Mutation {
+  createPoint(input: NewPoint!): Point @auth
+  updatePoint(input: UpdatePoint!): Point @auth
+  deletePoint(id: ID!): Map @auth
+  deletePoints(ids: [ID!]!): Map @auth
+}

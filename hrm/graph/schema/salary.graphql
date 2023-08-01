@@ -1,0 +1,47 @@
+type Salary {
+  id: ID!
+  owner: User!
+  amount: Float!
+  currency: String!
+  start_date: String!
+  end_date: String
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+  created_by: User!
+  updated_by: User!
+}
+
+type Salaries {
+  data: [Salary]
+  count: Int
+}
+
+input NewSalary {
+  owner: ID!
+  amount: Float!
+  currency: String!
+  start_date: String!
+  end_date: String
+  metadata: Map
+}
+
+input UpdateSalary {
+  amount: Float
+  currency: String
+  start_date: String
+  end_date: String
+  metadata: Map
+}
+
+extend type Query {
+  salary(id: ID!): Salary
+  salaries(args: Map): Salaries
+}
+
+extend type Mutation {
+  createSalary(input: NewSalary!): Salary
+  updateSalary(id: ID!, input: UpdateSalary!): Salary
+  deleteSalary(id: ID!): Map
+}

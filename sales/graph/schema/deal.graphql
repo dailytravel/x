@@ -1,0 +1,24 @@
+type Deal {
+  id: ID!
+  type: String!
+  name: String!
+  amount: Float!
+  currency: String!
+  close_date: String!
+  pipeline: Pipeline!
+  stage: String! #Qualified, Follow-up, Presentation, Contract Sent, Negotiation, Closed Won, Closed Lost
+  priority: String!
+  source: String! #advertising, call, email, other
+  lose_reason: String #competitor, features, price, other
+  description: String!
+  order: Int
+  owner: User
+  company: Organization
+  contact: Contact!
+  metadata: Map
+  status: String! #open, won, lost, abandoned, negotiation
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}

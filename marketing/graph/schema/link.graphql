@@ -1,0 +1,49 @@
+type Link {
+  id: ID!
+  owner: User!
+  domain: String!
+  reference: String!
+  title: String
+  destination: String!
+  metadata: Map
+  status: String
+  created_at: String!
+  updated_at: String!
+  categories: [Category]
+}
+
+type Links {
+  data: [Link]
+  count: Int!
+}
+
+input NewLink {
+  owner: ID
+  title: String
+  domain: String!
+  reference: String!
+  destination: String!
+  categories: [ID!]
+  metadata: Map
+}
+
+input UpdateLink {
+  owner: ID
+  title: String
+  domain: String
+  reference: String
+  categories: [ID!]
+  metadata: Map
+}
+
+extend type Query {
+  links(args: Map): Links @auth
+  link(id: ID!): Link @auth
+}
+
+extend type Mutation {
+  createLink(input: NewLink!): Link @auth
+  updateLink(id: ID!, input: UpdateLink!): Link @auth
+  deleteLink(id: ID!): Map @auth
+  deleteLinks(ids: [ID!]!): Map @auth
+}

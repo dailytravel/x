@@ -1,0 +1,51 @@
+type Follow {
+  id: ID!
+  user: User!
+  object: Map! #contact with object._id and object.type
+  role: String
+  status: String!
+  created_at: String!
+  updated_at: String!
+  created_by: User!
+  updated_by: User!
+}
+
+enum FollowRole {
+  VIEWER
+  COMMENTER
+  EDITOR
+}
+
+enum FollowStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+type Follows {
+  count: Int!
+  data: [Follow]
+}
+
+input NewFollow {
+  user: ID!
+  object: ObjectInput!
+  role: String!
+  status: String!
+}
+
+input UpdateFollow {
+  role: String
+  status: String
+}
+
+extend type Query {
+  follows(ids: [ID!]!): [Follow!]
+  follow(id: ID!): Follow
+}
+
+extend type Mutation {
+  createFollow(input: NewFollow!): Follow @auth
+  updateFollow(id: ID!, input: UpdateFollow!): Follow @auth
+  deleteFollow(id: ID!): Map @auth
+}

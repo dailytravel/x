@@ -1,0 +1,55 @@
+type Reward {
+  id: ID!
+  tier: Tier!
+  locale: String!
+  name: String!
+  description: String!
+  cost: Int!
+  status: String!
+  metadata: Map
+  expires_at: String
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}
+
+type Rewards {
+  data: [Reward]
+  count: Int!
+}
+
+input NewReward {
+  locale: String!
+  tier: ID!
+  name: String!
+  description: String!
+  cost: Int!
+  expires_at: String
+  status: String!
+  metadata: Map
+}
+
+input UpdateReward {
+  locale: String!
+  tier: ID
+  cost: ID
+  name: String
+  description: String
+  points: Int
+  expires_at: String
+  status: String
+  metadata: Map
+}
+
+extend type Query {
+  rewards(args: Map): Rewards @auth
+  reward(id: ID!): Reward @auth
+}
+
+extend type Mutation {
+  createReward(input: NewReward!): Reward @auth
+  updateReward(id: ID!, input: UpdateReward!): Reward @auth
+  deleteReward(id: ID!): Map @auth
+  deleteRewards(ids: [ID!]!): Map @auth
+}

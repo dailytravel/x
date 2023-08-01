@@ -1,0 +1,3 @@
+extend type Membership @key(fields: "id") {
+  id: ID! @external
+}

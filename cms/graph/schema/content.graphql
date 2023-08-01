@@ -1,0 +1,86 @@
+type Content {
+  id: ID!
+  locale: String!
+  type: String! #post, page, template, hotel, restaurant, product, etc.
+  title: String!
+  summary: String!
+  body: String!
+  slug: String!
+  status: String!
+  reviewable: Boolean
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+  published_at: Int!
+  created_by: User!
+  updated_by: User!
+  owner: User!
+  parent: Content
+  followers: [Follower]
+  comments: [Comment]
+  attachments: [File]
+}
+
+enum ContentType {
+  POST
+  PAGE
+  PRODUCT
+  HOTEL
+  RESTAURANT
+  PACKAGE
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+type Contents {
+  count: Int!
+  data: [Content]
+}
+
+input NewContent {
+  parent: ID
+  owner: ID
+  locale: String!
+  type: String!
+  title: String
+  summary: String
+  body: String
+  slug: String
+  categories: [ID!]
+  images: [String]
+  status: String
+  commentable: Boolean
+  metadata: Map
+}
+
+input UpdateContent {
+  parent: ID
+  owner: ID
+  locale: String!
+  type: String
+  title: String
+  summary: String
+  body: String
+  slug: String
+  categories: [ID!]
+  images: [String]
+  status: String
+  commentable: Boolean
+  metadata: Map
+}
+
+extend type Query {
+  content(id: ID!): Content
+  contents(args: Map): Map
+}
+
+extend type Mutation {
+  createContent(input: NewContent!): Content @auth
+  updateContent(id: ID!, input: UpdateContent!): Content @auth
+  deleteContent(id: ID!): Map @auth
+  deleteContents(ids: [ID!]!): Map @auth
+}

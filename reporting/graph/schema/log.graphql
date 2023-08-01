@@ -1,0 +1,39 @@
+#logger
+type Log {
+  id: ID!
+  message: String
+  method: String!
+  latency: Int!
+  path: String!
+  status: String!
+  metadata: Map
+  Timestamp: Int!
+  user: User
+  url: String!
+  user_agent: String!
+  client_ip: String!
+}
+
+enum RequestMethod {
+  GET
+  POST
+  PUT
+  DELETE
+  HEAD
+  OPTIONS
+  PATCH
+}
+
+type Logs {
+  data: [Log]
+  count: Int!
+}
+
+extend type Query {
+  log(id: ID!): Log @auth(requires: [ADMIN])
+  logs(args: Map): Logs
+}
+
+extend type Mutation {
+  deleteLog(id: ID!): Map @auth(requires: [ADMIN])
+}

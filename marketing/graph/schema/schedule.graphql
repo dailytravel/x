@@ -1,0 +1,15 @@
+type Schedule {
+  id: ID!
+  campaign: ID!
+  start_date: String!
+  end_date: String!
+  recurring: Boolean!
+  frequency: String
+  interval: Int
+  days: [String] # array of days of the week
+  time: String!
+  timezone: String!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+}

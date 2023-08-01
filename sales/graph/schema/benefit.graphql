@@ -1,0 +1,9 @@
+type Benefit {
+  id: ID!
+  locale: String!
+  description: String!
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+}

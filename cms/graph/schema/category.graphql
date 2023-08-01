@@ -1,0 +1,57 @@
+type Category {
+  id: ID!
+  parent: Category
+  children: [Category]
+  locale: String!
+  taxonomy: String!
+  slug: String
+  name: String!
+  description: String
+  order: Int!
+  count: Int!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}
+
+type Categories {
+  count: Int!
+  data: [Category]
+}
+
+input NewCategory {
+  locale: String!
+  name: String!
+  slug: String
+  description: String
+  parent: ID
+  taxonomy: String!
+  order: Int
+  metadata: Map
+}
+
+input UpdateCategory {
+  id: ID
+  locale: String!
+  name: String
+  slug: String
+  description: String
+  parent: ID
+  taxonomy: String
+  order: Int
+  metadata: Map
+}
+
+extend type Query {
+  category(id: ID!): Category
+  categories(args: Map): Map
+}
+
+extend type Mutation {
+  createCategory(input: NewCategory!): Category @auth
+  updateCategory(id: ID!, input: UpdateCategory!): Category @auth
+  deleteCategory(id: ID!): Map @auth
+  deleteCategories(ids: [ID!]!): Map @auth
+}

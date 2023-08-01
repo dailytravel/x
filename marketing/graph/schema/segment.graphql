@@ -1,0 +1,47 @@
+type Segment {
+  id: ID!
+  name: String!
+  description: String
+  rules: [Rule]
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}
+
+type Segments {
+  count: Int!
+  data: [Segment]
+}
+
+type Rule {
+  field: String!
+  operator: String!
+  value: String!
+}
+
+input SegmentInput {
+  id: ID
+  name: String!
+  description: String
+  type: String!
+  rules: [RuleInput]
+}
+
+input RuleInput {
+  field: String!
+  operator: String!
+  value: String!
+}
+
+extend type Query {
+  segment(id: ID!): Segment @auth(requires: [ADMIN])
+  segments(args: Map): Segments @auth(requires: [ADMIN])
+}
+
+extend type Mutation {
+  createSegment(input: SegmentInput!): Segment @auth(requires: [ADMIN])
+  updateSegment(id: ID!, input: SegmentInput!): Segment @auth(requires: [ADMIN])
+  deleteSegment(id: ID!): Map @auth(requires: [ADMIN])
+  deleteSegments(ids: [ID!]!): Map @auth(requires: [ADMIN])
+}

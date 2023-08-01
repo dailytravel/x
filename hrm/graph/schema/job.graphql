@@ -1,0 +1,54 @@
+type Job {
+  id: ID!
+  organization: Organization!
+  locale: String!
+  title: String!
+  description: String!
+  location: String!
+  salary: String!
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+  created_by: User!
+  updated_by: User!
+}
+
+type Jobs {
+  map: [Job]
+  count: Int
+}
+
+input NewJob {
+  organization: ID!
+  locale: String!
+  title: String!
+  description: String!
+  location: String!
+  salary: String!
+  metadata: Map
+  status: String!
+}
+
+input UpdateJob {
+  organization: ID
+  locale: String!
+  title: String
+  description: String
+  location: String
+  salary: String
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  job(id: ID!): Job
+  jobs: Jobs
+}
+
+extend type Mutation {
+  createJob(input: NewJob!): Job @auth
+  updateJob(id: ID!, input: UpdateJob!): Job @auth
+  deleteJob(id: ID!): Map @auth
+  deleteJobs(ids: [ID!]!): Map @auth
+}

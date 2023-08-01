@@ -1,0 +1,157 @@
+type Contact {
+  id: ID!
+  owner: User
+  reference: String
+  type: String
+  first_name: String
+  last_name: String
+  email: Email
+  phone: Phone
+  picture: String
+  street: String
+  city: String
+  state: String
+  zip: String
+  country: String
+  website: String
+  gender: Gender
+  birthday: String
+  organization: Organization
+  job_title: String
+  timezone: String
+  language: String
+  source: String
+  revenue: Float
+  subscribed: Boolean
+  rating: Int
+  notes: String
+  stage: String
+  reviewable: Boolean
+  status: String
+  labels: [String]
+  metadata: Map
+  last_activity: Int
+  created_at: String!
+  updated_at: String!
+  followers: [Follower]
+}
+
+type Contacts {
+  count: Int!
+  data: [Contact]
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum PhoneType {
+  HOME
+  MOBILE
+  WORK
+  OTHER
+}
+
+enum EmailType {
+  PERSONAL
+  WORK
+  OTHER
+}
+
+enum ContactStage {
+  NEW
+  NURTURING
+  QUALIFIED
+  CLOSED_LOST
+  CLOSED_WON
+}
+
+enum ContactStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+input NewContact {
+  organization: ID
+  owner: ID
+  reference: String
+  type: String
+  first_name: String
+  last_name: String
+  picture: String
+  email: EmailInput
+  phone: PhoneInput
+  street: String
+  city: String
+  state: String
+  zip: String
+  country: String
+  website: String
+  birthday: String
+  job_title: String
+  gender: Gender
+  timezone: String
+  language: String
+  source: String
+  revenue: Float
+  rating: Int
+  notes: String
+  stage: String
+  status: String
+  labels: [String]
+  metadata: Map
+  reviewable: Boolean
+}
+
+input UpdateContact {
+  organization: ID
+  owner: ID
+  reference: String
+  type: String
+  first_name: String
+  last_name: String
+  picture: String
+  email: EmailInput
+  phone: PhoneInput
+  street: String
+  city: String
+  state: String
+  zip: String
+  country: String
+  website: String
+  birthday: String
+  job_title: String
+  gender: Gender
+  timezone: String
+  language: String
+  source: String
+  revenue: Float
+  rating: Int
+  notes: String
+  stage: String
+  status: String
+  labels: [String]
+  metadata: Map
+  reviewable: Boolean
+}
+
+extend type Query {
+  contacts(args: Map): Map @auth
+  contact(id: ID!): Contact @auth
+}
+
+extend type Mutation {
+  createContact(input: NewContact!): Contact @auth
+  updateContact(id: ID!, input: UpdateContact!): Contact @auth
+  deleteContact(id: ID!): Map @auth
+  deleteContacts(ids: [ID!]!): Map @auth
+}
+
+extend type Subscription {
+  contactCreated: Contact @auth
+  contactUpdated: Contact @auth
+  contactDeleted: Contact @auth
+}

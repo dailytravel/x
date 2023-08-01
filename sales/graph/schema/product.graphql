@@ -1,0 +1,58 @@
+type Product {
+  id: ID!
+  content: Content!
+  sku: String!
+  locale: String!
+  type: String!
+  name: String!
+  description: String
+  quantity: Int!
+  prices: [Price!]!
+  inventory: [Inventory!]!
+  currency: String!
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+  created_by: User!
+  updated_by: User!
+}
+
+type Products {
+  data: [Product]
+  count: Int!
+}
+
+input NewProduct {
+  sku: String!
+  locale: String!
+  type: String!
+  name: String!
+  description: String
+  quantity: Int!
+  currency: String!
+  metadata: Map
+}
+
+input UpdateProduct {
+  sku: String
+  locale: String
+  type: String
+  name: String
+  description: String
+  quantity: Int
+  currency: String
+  metadata: Map
+}
+
+extend type Query {
+  product(id: ID!): Product
+  products(args: Map): Products
+}
+
+extend type Mutation {
+  createProduct(input: NewProduct!): Product @auth
+  updateProduct(input: UpdateProduct!): Product @auth
+  deleteProduct(id: ID!): Map @auth
+  deleteProducts(ids: [ID!]!): Map @auth
+}

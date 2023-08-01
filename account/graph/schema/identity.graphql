@@ -1,0 +1,13 @@
+type Identity {
+  id: ID!
+  user: User!
+  provider: String!
+  access_token: String!
+  expires_in: Int!
+  connection: String! #google-oauth2
+  is_social: Boolean!
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+}

@@ -2,27 +2,11 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
+type Query
+type Mutation
 
-type User {
-  id: ID!
-  name: String!
-}
+scalar Map
 
-type Query {
-  todos: [Todo!]!
-}
-
-input NewTodo {
-  text: String!
-  userId: String!
-}
-
-type Mutation {
-  createTodo(input: NewTodo!): Todo!
-}
+directive @api on FIELD_DEFINITION
+directive @auth(requires: [String]) on FIELD_DEFINITION
+directive @hasScope(scope: [String!]) on FIELD_DEFINITION

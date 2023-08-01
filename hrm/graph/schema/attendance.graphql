@@ -1,0 +1,57 @@
+type Attendance {
+  id: ID!
+  time_in: String!
+  time_out: String!
+  notes: String
+  metadata: Map
+  status: String # "present", "absent", "late", etc.
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+  owner: User!
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+type Attendances {
+  data: [Attendance]
+  count: Int!
+}
+
+input NewAttendance {
+  owner: ID!
+  time_in: String!
+  time_out: String!
+  notes: String
+  metadata: Map
+  status: String!
+}
+
+input UpdateAttendance {
+  owner: ID
+  time_in: String
+  time_out: String
+  notes: String
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  attendance(id: ID!): Attendance @auth
+  attendances(args: Map): Attendances @auth
+}
+
+extend type Mutation {
+  checkIn: Attendance @auth
+  checkOut: Attendance @auth
+  createAttendance(input: NewAttendance!): Attendance @auth
+  updateAttendance(id: ID!, input: UpdateAttendance!): Attendance @auth
+  deleteAttendance(id: ID!): Map @auth
+  deleteAttendances(ids: [ID!]!): Map @auth
+}

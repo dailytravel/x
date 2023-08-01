@@ -1,0 +1,60 @@
+type Campaign {
+  id: ID!
+  owner: User!
+  audience: Audience!
+  type: String!
+  name: String!
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+  responses: [Response]
+}
+
+type Campaigns {
+  count: Int!
+  data: [Campaign]
+}
+
+enum CampaignType {
+  EMAIL
+  SMS
+  PUSH_NOTIFICATION
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+}
+
+input NewCampaign {
+  audience: ID!
+  slug: String!
+  type: CampaignType!
+  name: String!
+  metadata: Map
+}
+
+input UpdateCampaign {
+  audience: ID
+  slug: String
+  type: CampaignType
+  name: String
+  metadata: Map
+}
+
+extend type Query {
+  campaigns(args: Map): [Campaign] @auth
+  campaign(id: ID!): Campaign @auth
+}
+
+extend type Mutation {
+  createCampaign(input: NewCampaign!): Campaign @auth
+  updateCampaign(id: ID!, input: UpdateCampaign!): Campaign @auth
+  deleteCampaign(id: ID!): Map @auth
+  deleteCampaigns(ids: [ID!]!): Map @auth
+}

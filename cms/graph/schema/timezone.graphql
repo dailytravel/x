@@ -1,0 +1,41 @@
+type Timezone {
+  id: ID!
+  name: String!
+  offset: Int!
+  description: String
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+}
+
+type Timezones {
+  count: Int!
+  data: [Timezone]
+}
+
+input NewTimezone {
+  id: ID
+  name: String!
+  offset: Int!
+  metadata: Map
+}
+
+input UpdateTimezone {
+  name: String
+  offset: Int
+  description: String
+  metadata: Map
+}
+
+extend type Query {
+  timezones(args: Map): Timezones @api
+  timezone(id: ID!): Timezone! @api
+}
+
+extend type Mutation {
+  createTimezone(input: NewTimezone!): Timezone @auth
+  updateTimezone(input: UpdateTimezone!): Timezone @auth
+  importTimezones(url: String!): [Timezone] @auth
+  deleteTimezone(id: ID!): Map @auth
+  deleteTimezones(ids: [ID!]!): Map @auth
+}

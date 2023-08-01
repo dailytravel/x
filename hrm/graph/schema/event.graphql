@@ -1,0 +1,131 @@
+type Event {
+  id: ID!
+  type: String!
+  locale: String!
+  title: String!
+  location: String
+  start: Int! # timestamp
+  end: Int! # timestamp
+  timezone: String!
+  all_day: Boolean!
+  description: String
+  color: String!
+  show_as: String!
+  status: String!
+  created_at: String!
+  updated_at: String!
+  created_by: User!
+  updated_by: User
+  owner: User!
+  followers: [Follower]
+  attendees: [User]
+  attachments: [File]
+  reminders: [Reminder]
+  recurrence: Recurrence
+}
+
+type Location {
+  name: String!
+  description: String
+  street: String
+  city: String
+  state: String
+  zip: String
+  country: String
+  geo: Geo
+}
+
+type Geo {
+  lat: Float!
+  lng: Float!
+}
+
+type Reminder {
+  method: String!
+  time: Int!
+  unit: TimeUnit! # minutes, hours, days, weeks
+}
+
+enum TimeUnit {
+  MINUTES
+  HOURS
+  DAYS
+  WEEKS
+}
+
+type Recurrence {
+  frequency: String!
+  interval: Int!
+  end_date: Int
+  exceptions: [Int]
+}
+
+type Events {
+  count: Int!
+  data: [Event]
+}
+
+input ReminderInput {
+  method: String!
+  time: Int!
+  unit: TimeUnit! # minutes, hours, days, weeks
+}
+
+input RecurrenceInput {
+  frequency: String! # daily, weekly, monthly, yearly
+  interval: Int!
+  end_date: Int
+  exceptions: [Int] # timestamps
+}
+
+input NewEvent {
+  owner: ID
+  type: String!
+  locale: String
+  title: String!
+  location: String
+  start: Int!
+  end: Int!
+  timezone: String!
+  all_day: Boolean
+  description: String
+  color: String
+  show_as: String
+  status: String
+  attendees: [ID]
+  reminders: [ReminderInput]
+  recurrence: RecurrenceInput
+  attachments: [ID]
+}
+
+input UpdateEvent {
+  owner: ID
+  type: String
+  locale: String
+  title: String
+  location: String
+  description: String
+  start: Int
+  end: Int
+  timezone: String
+  all_day: Boolean
+  color: String
+  show_as: String
+  status: String
+  attendees: [ID]
+  reminders: [ReminderInput]
+  recurrence: RecurrenceInput
+  attachments: [ID]
+}
+
+extend type Query {
+  events(args: Map): Events @auth
+  event(id: ID!): Event @auth
+}
+
+extend type Mutation {
+  createEvent(input: NewEvent!): Event @auth
+  updateEvent(id: ID!, input: UpdateEvent!): Event @auth
+  deleteEvent(id: ID!): Map @auth
+  deleteEvents(ids: [ID!]!): Map @auth
+}

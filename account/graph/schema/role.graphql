@@ -1,0 +1,39 @@
+type Role {
+  id: ID!
+  name: String!
+  description: String
+  permissions: [Permission!]
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}
+
+type Roles {
+  data: [Role]
+  count: Int!
+}
+
+input NewRole {
+  name: String!
+  description: String
+  permissions: [ID]
+}
+
+input UpdateRole {
+  name: String
+  description: String
+  permissions: [ID]
+}
+
+extend type Query {
+  role(id: ID!): Role @auth(requires: [ADMIN])
+  roles(args: Map): Roles @auth(requires: [ADMIN])
+}
+
+extend type Mutation {
+  createRole(input: NewRole!): Role @auth(requires: [ADMIN])
+  updateRole(id: ID!, input: UpdateRole!): Role @auth(requires: [ADMIN])
+  deleteRole(id: ID!): Map @auth(requires: [ADMIN])
+  deleteRoles(ids: [ID!]!): Map @auth(requires: [ADMIN])
+}

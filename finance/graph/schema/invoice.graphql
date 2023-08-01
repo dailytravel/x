@@ -1,0 +1,58 @@
+type Invoice {
+  id: ID!
+  owner: User!
+  reference: String!
+  template: String!
+  amount: Int!
+  currency: String!
+  billing: Map!
+  due_date: String!
+  notes: String
+  metadata: Map
+  items: [Item]
+  status: String
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}
+
+type Invoices {
+  data: [Invoice]
+  count: Int!
+}
+
+input NewInvoice {
+  reference: String
+  template: String
+  amount: Int
+  currency: String
+  billing: Map
+  due_date: String
+  notes: String
+  metadata: Map
+  items: [NewItem]
+}
+
+input UpdateInvoice {
+  reference: String
+  template: String
+  amount: Int
+  currency: String
+  billing: Map
+  due_date: String
+  notes: String
+  metadata: Map
+  items: [UpdateItem]
+}
+
+extend type Query {
+  invoice(id: ID!): Invoice @auth
+  invoices(args: Map): Invoices @auth
+}
+
+extend type Mutation {
+  createInvoice(input: NewInvoice!): Invoice @auth
+  updateInvoice(id: ID!, input: UpdateInvoice!): Invoice @auth
+  deleteInvoice(id: ID!): Map @auth
+}

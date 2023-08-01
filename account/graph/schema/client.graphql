@@ -1,0 +1,54 @@
+type Client {
+  id: ID!
+  user: User
+  type: String!
+  name: String!
+  description: String
+  domains: [String]
+  secret: String!
+  redirect: String!
+  permissions: [String]
+  metadata: Map
+  status: String!
+  last_used: Int
+  created_at: String!
+  updated_at: String!
+  expires_at: String
+}
+
+type Clients {
+  data: [Client]
+  count: Int!
+}
+
+input NewClient {
+  type: String!
+  name: String!
+  description: String
+  domains: [String]
+  redirect: String!
+  permissions: [String]
+  metadata: Map
+}
+
+input UpdateClient {
+  name: String
+  description: String
+  domains: [String]
+  redirect: String
+  permissions: [String!]
+  metadata: Map
+  expires_at: String
+}
+
+extend type Query {
+  client(id: ID!): Client @auth(requires: [ADMIN])
+  clients(args: Map): Clients @auth(requires: [ADMIN])
+}
+
+extend type Mutation {
+  createClient(input: NewClient!): Client @auth(requires: [ADMIN])
+  updateClient(id: ID!, input: UpdateClient!): Client @auth(requires: [ADMIN])
+  deleteClient(id: ID!): Map @auth(requires: [ADMIN])
+  deleteClients(ids: [ID!]!): Map @auth(requires: [ADMIN])
+}

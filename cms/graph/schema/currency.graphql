@@ -1,0 +1,65 @@
+type Currency {
+  id: ID!
+  locale: String!
+  code: String!
+  name: String!
+  rate: Float!
+  symbol: String!
+  precision: Int!
+  decimal: String!
+  thousand: String!
+  order: Int!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+}
+
+type Currencies {
+  data: [Currency]
+  count: Int!
+}
+
+enum CurrencyStatus {
+  ACTIVE
+  INACTIVE
+}
+
+input NewCurrency {
+  id: ID
+  locale: String!
+  name: String!
+  code: String!
+  rate: Float!
+  symbol: String!
+  precision: Int!
+  decimal: String!
+  thousand: String!
+  order: Int!
+  metadata: Map
+}
+
+input UpdateCurrency {
+  locale: String
+  name: String
+  code: String
+  rate: Float
+  symbol: String
+  precision: Int
+  decimal: String
+  thousand: String
+  order: Int
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  currency(code: String!): Currency
+  currencies(args: Map): Currencies
+}
+
+extend type Mutation {
+  createCurrency(input: NewCurrency!): Currency @auth
+  updateCurrency(id: ID!, input: UpdateCurrency): Currency @auth
+  deleteCurrency(id: ID!): Map @auth
+  deleteCurrencies(ids: [ID!]!): Map @auth
+}

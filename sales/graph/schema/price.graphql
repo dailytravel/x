@@ -1,0 +1,47 @@
+type Price {
+  id: ID!
+  product: Product!
+  start_date: String
+  end_date: Int
+  regular: Float!
+  sale: Float
+  metadata: Map
+}
+
+type Prices {
+  data: [Price]
+  count: Int
+}
+
+input NewPrice {
+  start_date: String
+  end_date: Int
+  regular: Float!
+  sale: Float
+  metadata: Map
+}
+
+input UpdatePrice {
+  start_date: String
+  end_date: Int
+  regular: Float
+  sale: Float
+  metadata: Map
+}
+
+input DateRange {
+  start_date: String
+  end_date: Int
+}
+
+extend type Query {
+  price(id: ID!): Price
+  prices(product: ID!, date: DateRange): Prices
+}
+
+extend type Mutation {
+  createPrice(product: ID!, input: NewPrice!): Price
+  updatePrice(id: ID!, input: UpdatePrice!): Price
+  deletePrice(id: ID!): Map
+  deletePrices(ids: [ID!]!): Map
+}

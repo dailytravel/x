@@ -1,0 +1,54 @@
+type Audience {
+  id: ID!
+  name: String!
+  description: String!
+  segments: [Segment]
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+}
+
+type Audiences {
+  data: [Audience]
+  count: Int!
+}
+
+input NewAudience {
+  name: String!
+  description: String!
+  segment: SegmentInput!
+  metadata: Map
+}
+
+input UpdateAudience {
+  name: String
+  description: String
+  segment: SegmentInput
+  metadata: Map
+}
+
+input CreateSegmentInput {
+  name: String!
+  description: String
+  rules: [RuleInput]!
+}
+
+input UpdateSegmentInput {
+  name: String
+  description: String
+  rules: [RuleInput]
+}
+
+extend type Query {
+  audience(id: ID!): Audience @auth(requires: [ADMIN])
+  audiences(args: Map): [Audience] @auth(requires: [ADMIN])
+}
+
+extend type Mutation {
+  createAudience(input: NewAudience!): Audience @auth(requires: [ADMIN])
+  updateAudience(id: ID!, input: UpdateAudience!): Audience
+    @auth(requires: [ADMIN])
+  deleteAudience(id: ID!): Map @auth(requires: [ADMIN])
+  deleteAudiences(ids: [ID!]!): Map @auth(requires: [ADMIN])
+}

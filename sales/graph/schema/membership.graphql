@@ -1,0 +1,15 @@
+type Membership {
+  id: ID!
+  user: User!
+  tier: Tier! #silver, gold, platinum
+  number: String!
+  since: String!
+  until: String!
+  billing: Map
+  payment: Map
+  transactions: [Transaction]
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+}

@@ -1,0 +1,33 @@
+type Activity {
+  id: ID!
+  user: User!
+  object: Map!
+  comment: Comment
+  action: String!
+  metadata: Map
+  status: String!
+  created_at: String!
+}
+
+type Activities {
+  data: [Activity]
+  count: Int!
+}
+
+enum ActivityAction {
+  CREATED
+  UPDATED
+  DELETED
+  COMMENTED
+  COMPLETED
+  ASSIGNED
+  APPROVED
+  REJECTED
+  ARCHIVED
+  RESTORED
+}
+
+extend type Query {
+  activity(id: ID!): Activity @auth
+  activities(id: ID!, type: String!, limit: Int, page: Int): Activities @auth
+}

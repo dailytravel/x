@@ -1,0 +1,35 @@
+type Permission {
+  id: ID!
+  name: String!
+  description: String
+  created_at: String!
+  updated_at: String!
+}
+
+type Permissions {
+  data: [Permission]
+  count: Int!
+}
+
+input NewPermission {
+  name: String!
+  description: String
+}
+
+input UpdatePermission {
+  name: String
+  description: String
+}
+
+extend type Query {
+  permissions(args: Map): Permissions @auth(requires: [ADMIN])
+  permission(id: ID!): Permission! @auth(requires: [ADMIN])
+}
+
+extend type Mutation {
+  createPermission(input: NewPermission!): Permission! @auth(requires: [ADMIN])
+  updatePermission(id: ID!, input: UpdatePermission!): Permission!
+    @auth(requires: [ADMIN])
+  deletePermission(id: ID!): Map @auth(requires: [ADMIN])
+  deletePermissions(ids: [ID!]!): Map @auth(requires: [ADMIN])
+}

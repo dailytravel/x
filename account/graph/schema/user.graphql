@@ -1,0 +1,129 @@
+type User {
+  id: ID!
+  locale: String
+  name: String!
+  email: String!
+  phone: String
+  password: String!
+  roles: [String]
+  mfa: MFA
+  timezone: String
+  login_attempts: Int
+  last_login: Int
+  last_ip: String
+  verified_at: Int
+  created_at: String!
+  updated_at: String!
+  last_activity: Int
+  identities: [Identity]
+  metadata: Map
+  status: String
+  created_by: User
+  updated_by: User
+  board: Board
+  contacts: [Contact]
+  points: [Point]
+  membership: Membership
+}
+
+type Users {
+  count: Int!
+  data: [User]
+}
+
+type MFA {
+  enabled: Boolean!
+  code: String!
+}
+
+input MFAInput {
+  enabled: Boolean!
+  code: String!
+}
+
+enum SocialProvider {
+  FACEBOOK
+  GOOGLE
+  TWITTER
+  GITHUB
+}
+
+type Payload {
+  access_token: String!
+  refresh_token: String!
+  token_type: String!
+  expires_in: Int!
+}
+
+input NewUser {
+  locale: String!
+  name: String!
+  email: String!
+  phone: String
+  password: String!
+  roles: [String]
+  timezone: String
+  status: String
+  metadata: Map
+}
+
+input RegisterInput {
+  locale: String!
+  name: String!
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input UpdateUser {
+  locale: String
+  name: String
+  email: String
+  phone: String
+  roles: [String]
+  photos: [ID]
+  timezone: String
+  status: String
+  metadata: Map
+}
+
+input PasswordInput {
+  current_password: String!
+  password: String!
+  password_confirmation: String!
+}
+
+input VerifyEmailInput {
+  token: String!
+}
+
+extend type Query {
+  users(args: Map): Map @auth(requires: [ADMIN])
+  user(id: ID!): User @auth(requires: [ADMIN])
+  me: User @auth
+}
+
+extend type Mutation {
+  createUser(input: NewUser!): User
+  register(input: RegisterInput!): Payload
+  login(input: LoginInput!): Payload
+  socialLogin(provider: SocialProvider!, access_token: String!): Payload
+  updateUser(id: ID!, input: UpdateUser!): User @auth(requires: [ADMIN])
+  updateAccount(input: UpdateUser!): User @auth
+  deleteUser(id: ID!): Map @auth(requires: [ADMIN])
+  deleteUsers(ids: [ID!]!): Map @auth(requires: [ADMIN])
+  deleteAccount: Map @auth
+  restoreUser(id: ID!): Map @auth
+  forgotPassword(email: String!): Map
+  resetPassword(
+    token: String!
+    password: String!
+    password_confirmation: String!
+  ): Map
+  updatePassword(input: PasswordInput!): User @auth
+  verify(token: String!): Map
+}

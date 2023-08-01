@@ -1,0 +1,79 @@
+type Quote {
+  id: ID!
+  owner: User!
+  locale: String!
+  contact: Contact
+  reference: String!
+  purchase: String!
+  name: String!
+  description: String
+  terms: String
+  payment: String
+  notes: String
+  template: String!
+  valid_until: Int!
+  amount: Float!
+  currency: String!
+  metadata: Map
+  billing: Map!
+  status: String
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}
+
+type Quotes {
+  count: Int!
+  data: [Quote]
+}
+
+input NewQuote {
+  owner: ID!
+  contact: String
+  locale: String!
+  reference: String!
+  purchase: String!
+  name: String!
+  description: String
+  terms: String
+  notes: String
+  template: String!
+  valid_until: Int!
+  amount: Float!
+  currency: String!
+  billing: Map!
+  metadata: Map
+  status: String
+}
+
+input UpdateQuote {
+  owner: ID
+  contact: String
+  locale: String
+  reference: String
+  purchase: String
+  name: String
+  description: String
+  terms: String
+  notes: String
+  template: String
+  valid_until: Int
+  amount: Float
+  currency: String
+  billing: Map
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  quotes(args: Map): Quotes @auth
+  quote(id: ID!): Quote @auth
+}
+
+extend type Mutation {
+  createQuote(input: NewQuote): Quote
+  updateQuote(id: ID!, input: UpdateQuote!): Quote
+  deleteQuote(id: ID!): Map @auth
+  deleteQuotes(ids: [ID!]!): Map @auth
+}

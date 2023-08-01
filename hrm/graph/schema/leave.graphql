@@ -1,0 +1,72 @@
+type Leave {
+  id: ID!
+  owner: User!
+  type: String!
+  start_date: String!
+  end_date: String
+  reason: String!
+  status: String! # "pending", "approved", "rejected", etc.
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+  created_by: User!
+  updated_by: User!
+}
+
+type Leaves {
+  data: [Leave]
+  count: Int!
+}
+
+enum LeaveStatus {
+  pending
+  approved
+  rejected
+}
+
+enum LeaveType {
+  Parental
+  Sick
+  Bereavement
+  Sabbatical
+  holiday
+  Leave
+  Annual
+  Unpaid
+  Military
+  Marriage
+  Compensatory
+  Religion
+  Earned
+  compassionate
+}
+
+input NewLeave {
+  owner: ID!
+  type: String!
+  start_date: String!
+  end_date: String
+  reason: String!
+  status: String! # "pending", "approved", "rejected", etc.
+  metadata: Map
+}
+
+input UpdateLeave {
+  type: String
+  start_date: String
+  end_date: String
+  reason: String
+  status: String # "pending", "approved", "rejected", etc.
+  metadata: Map
+}
+
+extend type Query {
+  leaves(args: Map): Leaves
+  leave(id: ID!): Leave
+}
+
+extend type Mutation {
+  createLeave(input: NewLeave!): Leave
+  updateLeave(id: ID!, input: UpdateLeave!): Leave
+  deleteLeave(id: ID!): Map
+}

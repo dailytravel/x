@@ -1,0 +1,35 @@
+type Key {
+  id: ID!
+  name: String!
+  type: String! #RSA, ECDSA, etc
+  provider: String! #AWS KMS, GCP KMS, etc
+  kid: String!
+  certificate: String!
+  fingerprint: String!
+  thumbprint: String!
+  status: String! #next, current, previous
+  expires_at: String
+  created_at: String!
+  updated_at: String!
+  owner: User
+}
+
+type Keys {
+  data: [Key]
+  count: Int!
+}
+
+input NewKey {
+  name: String!
+  kid: String!
+}
+
+extend type Query {
+  keys(args: Map): Keys @auth(requires: [ADMIN])
+  key(id: ID!): Key @auth(requires: [ADMIN])
+}
+
+extend type Mutation {
+  revokeKey: Key @auth(requires: [ADMIN])
+  rotateKey: Key @auth(requires: [ADMIN])
+}

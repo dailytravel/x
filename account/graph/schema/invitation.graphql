@@ -1,0 +1,54 @@
+type Invitation {
+  id: ID!
+  sender: User!
+  recipient: String!
+  roles: [String!]!
+  status: String!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+type Invitations {
+  data: [Invitation]
+  count: Int!
+}
+
+input NewInvitation {
+  email: String!
+  firstName: String
+  lastName: String
+  role: String!
+  team: ID!
+  inviter: ID!
+  metadata: Map
+}
+
+input UpdateInvitation {
+  email: String
+  firstName: String
+  lastName: String
+  role: String
+  status: String
+  team: ID
+  inviter: ID
+  metadata: Map
+}
+
+extend type Query {
+  invitations(args: Map): Invitations @auth
+  invitation(id: ID!): Invitation
+}
+
+extend type Mutation {
+  createInvitation(input: NewInvitation!): Invitation @auth
+  updateInvitation(id: ID!, input: UpdateInvitation!): Invitation @auth
+  deleteInvitation(id: ID!): Map @auth
+  deleteInvitations(ids: [ID!]!): Map @auth
+}

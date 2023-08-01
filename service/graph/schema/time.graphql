@@ -1,0 +1,37 @@
+type Time {
+  id: ID!
+  parent: ID
+  name: String!
+  description: String!
+  start_date: String!
+  end_date: Int!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+}
+
+type Times {
+  data: [Time]
+  count: Int!
+}
+
+input TimeInput {
+  parent: ID
+  name: String!
+  description: String!
+  start_date: String!
+  end_date: Int!
+  metadata: Map
+}
+
+extend type Query {
+  time(id: ID!): Time @auth
+  times(args: Map): Times @auth
+}
+
+extend type Mutation {
+  createTime(args: TimeInput!): Time @auth
+  updateTime(args: Map!): Time @auth
+  deleteTime(args: Map): Map @auth
+  deleteTimes(args: Map): Map @auth
+}

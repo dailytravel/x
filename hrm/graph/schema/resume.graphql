@@ -1,0 +1,148 @@
+type Resume {
+  id: ID!
+  user: User!
+  title: String!
+  summary: String
+  experience: [Experience]
+  education: [Education]
+  skills: [String]
+  certifications: [Certification]
+  languages: [Language]
+  projects: [Project]
+  references: [Reference]
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+}
+
+type Experience {
+  title: String!
+  company: String!
+  startDate: String!
+  endDate: String
+  description: String
+}
+
+type Education {
+  degree: String!
+  university: String!
+  startDate: String!
+  endDate: String
+  description: String
+}
+
+type Certification {
+  name: String!
+  issuingAuthority: String!
+  date: String!
+}
+
+type Language {
+  name: String!
+  proficiency: Proficiency
+}
+
+enum Proficiency {
+  BASIC
+  INTERMEDIATE
+  ADVANCED
+  NATIVE
+}
+
+type Project {
+  name: String!
+  description: String
+  startDate: String!
+  endDate: String
+}
+
+type Reference {
+  name: String!
+  relationship: String!
+  email: String!
+  phone: String
+}
+
+type Resumes {
+  data: [Resume]
+  count: Int
+}
+
+input CreateResume {
+  applicantId: ID!
+  title: String!
+  summary: String
+  experience: [ExperienceInput]
+  education: [EducationInput]
+  skills: [String]
+  certifications: [CertificationInput]
+  languages: [LanguageInput]
+  projects: [ProjectInput]
+  references: [ReferenceInput]
+}
+
+input UpdateResume {
+  title: String
+  summary: String
+  experience: [ExperienceInput]
+  education: [EducationInput]
+  skills: [String]
+  certifications: [CertificationInput]
+  languages: [LanguageInput]
+  projects: [ProjectInput]
+  references: [ReferenceInput]
+}
+
+input ExperienceInput {
+  title: String!
+  company: String!
+  startDate: String!
+  endDate: String
+  description: String
+}
+
+input EducationInput {
+  degree: String!
+  university: String!
+  startDate: String!
+  endDate: String
+  description: String
+}
+
+input CertificationInput {
+  name: String!
+  issuingAuthority: String!
+  date: String!
+}
+
+input LanguageInput {
+  name: String!
+  proficiency: Proficiency!
+}
+
+input ProjectInput {
+  name: String!
+  description: String
+  startDate: String!
+  endDate: String
+}
+
+input ReferenceInput {
+  name: String!
+  relationship: String!
+  email: String!
+  phone: String
+}
+
+extend type Query {
+  resume(id: ID!): Resume
+  resumes(args: Map): Resumes
+}
+
+extend type Mutation {
+  createResume(input: CreateResume!): Resume
+  updateResume(id: ID!, input: UpdateResume!): Resume
+  deleteResume(id: ID!): Map
+  deleteResumes(ids: [ID!]!): Map
+}

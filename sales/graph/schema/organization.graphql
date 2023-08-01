@@ -1,0 +1,86 @@
+type Organization {
+  id: ID!
+  name: String!
+  description: String
+  type: String! # "team", "organization", or "department"
+  parent: Organization
+  children: [Organization]
+  industry: String
+  employees: Int
+  revenue: Float
+  city: String
+  state: String
+  zip: String
+  country: String
+  timezone: String
+  phone: String
+  website: String
+  is_organization: Boolean
+  metadata: Map
+  status: String!
+  last_activity: Int!
+  created_at: String!
+  updated_at: String!
+  owner: User
+  followers: [Follower]
+  created_by: User
+  updated_by: User
+}
+
+type Organizations {
+  data: [Organization]
+  count: Int!
+}
+
+input NewOrganization {
+  owner: ID
+  name: String!
+  description: String
+  type: String! # "team", "organization", or "department"
+  parent: ID
+  industry: String
+  employees: Int
+  revenue: Float
+  city: String
+  state: String
+  zip: String
+  country: String
+  timezone: String
+  phone: String
+  website: String
+  is_organization: Boolean
+  metadata: Map
+  status: String!
+}
+
+input UpdateOrganization {
+  owner: ID
+  name: String
+  description: String
+  type: String # "team", "organization", or "department"
+  parent: ID
+  industry: String
+  employees: Int
+  revenue: Float
+  city: String
+  zip: String
+  state: String
+  country: String
+  timezone: String
+  phone: String
+  website: String
+  is_organization: Boolean
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  organizations(args: Map): Organizations
+  organization(id: ID!): Organization @api
+}
+
+extend type Mutation {
+  createOrganization(input: NewOrganization!): Organization @auth
+  updateOrganization(id: ID!, input: UpdateOrganization!): Organization @auth
+  deleteOrganization(id: ID!): Map @auth
+}

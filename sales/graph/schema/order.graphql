@@ -1,0 +1,51 @@
+type Order {
+  id: ID!
+  owner: User
+  reference: String!
+  data: [Item]
+  total: Float!
+  currency: String!
+  cancellable: Boolean!
+  status: String!
+  cancelled_at: Int
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}
+
+type Orders {
+  data: [Order]
+  count: Int!
+}
+
+input NewOrder {
+  reference: String!
+  data: [ID!]
+  total: Float!
+  currency: String!
+  cancellable: Boolean!
+  status: String!
+}
+
+input UpdateOrder {
+  reference: String
+  data: [ID!]
+  total: Float
+  currency: String
+  cancellable: Boolean
+  status: String
+  cancelled_at: Int
+}
+
+extend type Query {
+  order(id: ID!): Order @auth
+  orders(args: Map): Orders @auth
+}
+
+extend type Mutation {
+  createOrder(input: NewOrder!): Order @auth
+  updateOrder(id: ID!, input: UpdateOrder!): Order @auth
+  deleteOrder(id: ID!): Map @auth
+  deleteOrders(ids: [ID!]!): Map @auth
+}

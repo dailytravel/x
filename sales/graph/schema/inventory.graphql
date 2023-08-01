@@ -1,0 +1,33 @@
+type Inventory {
+  id: ID!
+  product: Product!
+  date: Int!
+  quantity: Int
+}
+
+type Inventories {
+  data: [Inventory]
+  count: Int
+}
+
+input NewInventory {
+  date: Int!
+  quantity: Int
+}
+
+input UpdateInventory {
+  date: Int
+  quantity: Int
+}
+
+extend type Query {
+  inventories(product: ID, date: Int!): Inventories
+  inventory(id: ID!): Inventory
+}
+
+extend type Mutation {
+  createInventory(input: NewInventory!): Inventory
+  updateInventory(id: ID!, input: UpdateInventory!): Inventory
+  deleteInventory(id: ID!): Map
+  deleteInventories(ids: [ID!]!): Map
+}
