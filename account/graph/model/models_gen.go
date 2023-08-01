@@ -59,13 +59,10 @@ type Identity struct {
 
 type Invitation struct {
 	ID        string                 `json:"id"`
-	Email     string                 `json:"email"`
-	FirstName *string                `json:"firstName,omitempty"`
-	LastName  *string                `json:"lastName,omitempty"`
-	Role      string                 `json:"role"`
+	Sender    *User                  `json:"sender"`
+	Recipient string                 `json:"recipient"`
+	Roles     []string               `json:"roles"`
 	Status    string                 `json:"status"`
-	Team      *Organization          `json:"team"`
-	Inviter   *User                  `json:"inviter"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	CreatedAt string                 `json:"created_at"`
 	UpdatedAt string                 `json:"updated_at"`
@@ -165,6 +162,31 @@ type NewUser struct {
 	Status   *string                `json:"status,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
+
+type Notification struct {
+	ID        string  `json:"id"`
+	Type      string  `json:"type"`
+	Locale    string  `json:"locale"`
+	Subject   string  `json:"subject"`
+	Body      string  `json:"body"`
+	ReadAt    *int    `json:"read_at,omitempty"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt string  `json:"updated_at"`
+	User      *User   `json:"user"`
+	Object    *Object `json:"object"`
+}
+
+type Notifications struct {
+	Data  []*Notification `json:"data,omitempty"`
+	Count int             `json:"count"`
+}
+
+type Object struct {
+	ID   string  `json:"id"`
+	Type *string `json:"type,omitempty"`
+}
+
+func (Object) IsEntity() {}
 
 type Organization struct {
 	ID string `json:"id"`
@@ -299,6 +321,8 @@ type User struct {
 	Membership    *Membership            `json:"membership,omitempty"`
 }
 
+func (User) IsEntity() {}
+
 type Users struct {
 	Count int     `json:"count"`
 	Data  []*User `json:"data,omitempty"`
@@ -306,6 +330,49 @@ type Users struct {
 
 type VerifyEmailInput struct {
 	Token string `json:"token"`
+}
+
+type InvitationStatus string
+
+const (
+	InvitationStatusPending  InvitationStatus = "PENDING"
+	InvitationStatusAccepted InvitationStatus = "ACCEPTED"
+	InvitationStatusDeclined InvitationStatus = "DECLINED"
+)
+
+var AllInvitationStatus = []InvitationStatus{
+	InvitationStatusPending,
+	InvitationStatusAccepted,
+	InvitationStatusDeclined,
+}
+
+func (e InvitationStatus) IsValid() bool {
+	switch e {
+	case InvitationStatusPending, InvitationStatusAccepted, InvitationStatusDeclined:
+		return true
+	}
+	return false
+}
+
+func (e InvitationStatus) String() string {
+	return string(e)
+}
+
+func (e *InvitationStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = InvitationStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid InvitationStatus", str)
+	}
+	return nil
+}
+
+func (e InvitationStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type SocialProvider string

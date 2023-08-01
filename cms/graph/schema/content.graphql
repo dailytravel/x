@@ -16,7 +16,7 @@ type Content {
   updated_by: User!
   owner: User!
   parent: Content
-  followers: [Follower]
+  followers: [Follow]
   comments: [Comment]
   attachments: [File]
 }

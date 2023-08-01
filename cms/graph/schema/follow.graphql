@@ -29,7 +29,8 @@ type Follows {
 
 input NewFollow {
   user: ID!
-  object: ObjectInput!
+  object: ID!
+  type: String!
   role: String!
   status: String!
 }

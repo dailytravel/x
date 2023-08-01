@@ -2,7 +2,7 @@ type Reaction {
   id: ID!
   user: User!
   object: Map!
-  type: String!
+  action: String!
   created_at: String!
   updated_at: String!
 }
@@ -23,8 +23,9 @@ enum ReactionType {
 }
 
 input NewReaction {
-  object: ObjectInput!
+  object: ID!
   type: String!
+  action: String!
 }
 
 input UpdateReaction {
@@ -32,7 +33,7 @@ input UpdateReaction {
 }
 
 extend type Query {
-  reaction(object: ObjectInput!): Reaction
+  reaction(object: ID!, type: String!): Reaction
   reactions(args: Map): Reactions
 }
 

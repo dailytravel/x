@@ -10,7 +10,7 @@ import (
 	"github.com/dailytravel/x/search/graph"
 )
 
-const defaultPort = "8080"
+const defaultPort = "4009"
 
 func main() {
 	port := os.Getenv("PORT")

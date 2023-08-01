@@ -25,7 +25,8 @@ type Comments {
 
 input NewComment {
   parent: ID
-  object: ObjectInput!
+  object: ID!
+  type: String!
   locale: String!
   content: String
   rating: Int

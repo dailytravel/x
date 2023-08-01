@@ -15,7 +15,7 @@ type File {
   created_by: User
   updated_by: User
   owner: User
-  followers: [Follower]
+  followers: [Follow]
 }
 
 type Files {

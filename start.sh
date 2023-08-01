@@ -1,38 +1,45 @@
 #!/bin/bash
 
+clear
+echo "The server is initializing..."
+
 function cleanup {
     kill "$ACCOUNT_PID"
-    kill "$CONFIG_PID"
     kill "$CMS_PID"
-    kill "$SALES_PID"
+    kill "$CONFIG_PID"
+    kill "$FINANCE_PID"
     kill "$HRM_PID"
     kill "$MARKETING_PID"
-    kill "$FINANCE_PID"
-    kill "$SERVICE_PID"
     kill "$REPORTING_PID"
+    kill "$SALES_PID"
+    kill "$SEARCH_PID"
+    kill "$SERVICE_PID"
 }
 
+# Build each Go service
+(cd account && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/account .)
+(cd cms && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/cms .)
+(cd config && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/config .)
+(cd finance && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/finance .)
+(cd hrm && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/hrm .)
+(cd marketing && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/marketing .)
+(cd reporting && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/reporting .)
+(cd sales && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/sales .)
+(cd search && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/search .)
+(cd service && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/service .)
+
+tmp/account & ACCOUNT_PID=$!
+tmp/cms & CMS_PID=$!
+tmp/config & CONFIG_PID=$!
+tmp/finance & FINANCE_PID=$!
+tmp/hrm & HRM_PID=$!
+tmp/marketing & MARKETING_PID=$!
+tmp/reporting & REPORTING_PID=$!
+tmp/sales & SALES_PID=$!
+tmp/search & SEARCH_PID=$!
+tmp/service & SERVICE_PID=$!
+
 trap cleanup EXIT
-
-go build -o /tmp/srv-account ./account
-go build -o /tmp/srv-config ./config
-go build -o /tmp/srv-cms ./cms
-go build -o /tmp/srv-sales ./sales
-go build -o /tmp/srv-hrm ./hrm
-go build -o /tmp/srv-marketing ./marketing
-go build -o /tmp/srv-finance ./finance
-go build -o /tmp/srv-service ./service
-go build -o /tmp/srv-reporting ./reporting
-
-/tmp/srv-account & ACCOUNT_PID=$!
-/tmp/srv-config & CONFIG_PID=$!
-/tmp/srv-cms & CMS_PID=$!
-/tmp/srv-sales & SALES_PID=$!
-/tmp/srv-hrm & HRM_PID=$!
-/tmp/srv-marketing & MARKETING_PID=$!
-/tmp/srv-finance & FINANCE_PID=$!
-/tmp/srv-service & SERVICE_PID=$!
-/tmp/srv-reporting & REPORTING_PID=$!
 
 sleep 1
 

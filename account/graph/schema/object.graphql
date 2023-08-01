@@ -1,0 +1,4 @@
+extend type Object @key(fields: "id") @key(fields: "type"){
+  id: ID! @external
+  type: String @external
+}
