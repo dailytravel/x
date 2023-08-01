@@ -1,13 +1,12 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
 /node_modules
-/account
-/cms
-/finance
-/hrm
-/marketing
-/reporting
-/sales
-/search
-/service
+# /account
+# /cms
+# /finance
+# /hrm
+# /marketing
+# /reporting
+# /sales
+# /search
+# /service

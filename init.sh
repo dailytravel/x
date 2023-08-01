@@ -11,7 +11,7 @@ for s in "$@"; do
     cp ./tools.go "$s/tools.go"
     cp ./gen.sh "$s/gen.sh"
     cd "$s"
-    go mod init github.com/dailytravel/api/"$s"
+    go mod init github.com/dailytravel/x/"$s"
     go mod tidy
     go run github.com/99designs/gqlgen init
     go run github.com/99designs/gqlgen generate
