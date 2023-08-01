@@ -1,3 +1,4 @@
+const express = require("express");
 const {
   ApolloGateway,
   IntrospectAndCompose,
@@ -6,7 +7,6 @@ const {
 const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
 const { expressjwt: jwt } = require("express-jwt");
-const express = require("express");
 const jwks = require("jwks-rsa");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -71,12 +71,8 @@ const gateway = new ApolloGateway({
   }),
 });
 
-app.use(bodyParser.json());
-// Apply the authentication middleware to the Express app
-app.use(authenticate);
-
-(async () => {
-  var server = new ApolloServer({
+async function startApolloServer() {
+  const server = new ApolloServer({
     gateway,
     subscriptions: false,
     introspection: true,
@@ -86,8 +82,12 @@ app.use(authenticate);
     }),
   });
 
-  // Use server.start with the express option for Apollo Server 3.x
   await server.start();
+
+  app.use(bodyParser.json());
+
+  app.use(authenticate);
+
   app.use(
     "/graphql",
     expressMiddleware(server),
@@ -97,7 +97,11 @@ app.use(authenticate);
     })
   );
 
-  app.listen({ port }, () =>
-    console.log(`🚀 Server ready at http://localhost:4000/graphql`)
-  );
-})();
+  app.listen({ port }, () => {
+    console.log(`🚀 Server ready at http://localhost:${port}/graphql`);
+  });
+}
+
+startApolloServer().catch((err) => {
+  console.error("Error starting the server:", err);
+});
