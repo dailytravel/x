@@ -1,0 +1,95 @@
+version: "3.5"
+
+services:
+  api:
+    container_name: api
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      - docker-network
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+      - redis
+      - typesense
+
+  mongo1:
+    container_name: mongo1
+    restart: always
+    image: mongo:6
+    command: mongod --replSet rs --bind_ip localhost,mongo1
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo1_data:/data/db
+    networks:
+      - docker-network
+
+  mongo2:
+    container_name: mongo2
+    restart: always
+    image: mongo:6
+    command: mongod --replSet rs --bind_ip localhost,mongo2
+    ports:
+      - 27018:27017
+    volumes:
+      - mongo2_data:/data/db
+    networks:
+      - docker-network
+
+  mongo3:
+    container_name: mongo3
+    restart: always
+    image: mongo:6
+    command: mongod --replSet rs --bind_ip localhost,mongo3
+    ports:
+      - 27019:27017
+    volumes:
+      - mongo3_data:/data/db
+    networks:
+      - docker-network
+
+  typesense:
+    image: typesense/typesense:0.24.1
+    container_name: typesense
+    environment:
+      TYPESENSE_DATA_DIR: /data
+      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY}
+    volumes:
+      - typesense_data:/data
+    ports:
+      - 8108:8108
+    networks:
+      - docker-network
+
+  redis:
+    image: redis:6.2.5
+    container_name: redis
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - docker-network
+
+networks:
+  docker-network:
+    driver: bridge
+
+volumes:
+  # trunk-ignore(yamllint/empty-values)
+  mongo1_data:
+  # trunk-ignore(yamllint/empty-values)
+  mongo2_data:
+  # trunk-ignore(yamllint/empty-values)
+  mongo3_data:
+  # trunk-ignore(yamllint/empty-values)
+  typesense_data:
+  # trunk-ignore(yamllint/empty-values)
+  redis_data:
