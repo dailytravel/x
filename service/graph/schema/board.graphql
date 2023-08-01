@@ -12,7 +12,7 @@ type Board {
   starred: Boolean!
   order: Int!
   status: String!
-  followers: [Follower]
+  followers: [Follow]
   created_at: String!
   updated_at: String!
   lists: [List]

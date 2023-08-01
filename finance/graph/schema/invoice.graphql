@@ -9,7 +9,6 @@ type Invoice {
   due_date: String!
   notes: String
   metadata: Map
-  items: [Item]
   status: String
   created_at: String!
   updated_at: String!
@@ -31,7 +30,6 @@ input NewInvoice {
   due_date: String
   notes: String
   metadata: Map
-  items: [NewItem]
 }
 
 input UpdateInvoice {
@@ -43,7 +41,6 @@ input UpdateInvoice {
   due_date: String
   notes: String
   metadata: Map
-  items: [UpdateItem]
 }
 
 extend type Query {

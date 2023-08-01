@@ -25,7 +25,6 @@ type Points {
 }
 
 input NewPoint {
-  target: ObjectInput!
   points: Int!
   type: String! # "earn", "redeem", "adjustment"
   expires_at: String

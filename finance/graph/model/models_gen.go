@@ -2,19 +2,253 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
+type Comment struct {
+	ID string `json:"id"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+func (Comment) IsEntity() {}
+
+type Expense struct {
+	ID          string                 `json:"id"`
+	Reference   string                 `json:"reference"`
+	Type        string                 `json:"type"`
+	Description string                 `json:"description"`
+	Amount      float64                `json:"amount"`
+	Currency    string                 `json:"currency"`
+	Followers   []*Follow              `json:"followers,omitempty"`
+	Comments    []*Comment             `json:"comments,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Date        string                 `json:"date"`
+	Notes       *string                `json:"notes,omitempty"`
+	CreatedAt   string                 `json:"created_at"`
+	UpdatedAt   string                 `json:"updated_at"`
+	CreatedBy   *User                  `json:"created_by,omitempty"`
+	UpdatedBy   *User                  `json:"updated_by,omitempty"`
+	Owner       *User                  `json:"owner"`
+}
+
+type Expenses struct {
+	Count int        `json:"count"`
+	Data  []*Expense `json:"data,omitempty"`
+}
+
+type Follow struct {
+	ID string `json:"id"`
+}
+
+func (Follow) IsEntity() {}
+
+type Invoice struct {
+	ID        string                 `json:"id"`
+	Owner     *User                  `json:"owner"`
+	Reference string                 `json:"reference"`
+	Template  string                 `json:"template"`
+	Amount    int                    `json:"amount"`
+	Currency  string                 `json:"currency"`
+	Billing   map[string]interface{} `json:"billing"`
+	DueDate   string                 `json:"due_date"`
+	Notes     *string                `json:"notes,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Status    *string                `json:"status,omitempty"`
+	CreatedAt string                 `json:"created_at"`
+	UpdatedAt string                 `json:"updated_at"`
+	CreatedBy *User                  `json:"created_by,omitempty"`
+	UpdatedBy *User                  `json:"updated_by,omitempty"`
+}
+
+type Invoices struct {
+	Data  []*Invoice `json:"data,omitempty"`
+	Count int        `json:"count"`
+}
+
+type NewExpense struct {
+	Type        string                 `json:"type"`
+	Reference   *string                `json:"reference,omitempty"`
+	Description string                 `json:"description"`
+	Amount      float64                `json:"amount"`
+	Currency    string                 `json:"currency"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Date        string                 `json:"date"`
+	Owner       string                 `json:"owner"`
+	Notes       *string                `json:"notes,omitempty"`
+	Categories  []string               `json:"categories,omitempty"`
+}
+
+type NewInvoice struct {
+	Reference *string                `json:"reference,omitempty"`
+	Template  *string                `json:"template,omitempty"`
+	Amount    *int                   `json:"amount,omitempty"`
+	Currency  *string                `json:"currency,omitempty"`
+	Billing   map[string]interface{} `json:"billing,omitempty"`
+	DueDate   *string                `json:"due_date,omitempty"`
+	Notes     *string                `json:"notes,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type UpdateExpense struct {
+	Type        *string                `json:"type,omitempty"`
+	Reference   *string                `json:"reference,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Date        *string                `json:"date,omitempty"`
+	Amount      *float64               `json:"amount,omitempty"`
+	Currency    *string                `json:"currency,omitempty"`
+	Owner       *string                `json:"owner,omitempty"`
+	Notes       *string                `json:"notes,omitempty"`
+	Categories  []string               `json:"categories,omitempty"`
+}
+
+type UpdateInvoice struct {
+	Reference *string                `json:"reference,omitempty"`
+	Template  *string                `json:"template,omitempty"`
+	Amount    *int                   `json:"amount,omitempty"`
+	Currency  *string                `json:"currency,omitempty"`
+	Billing   map[string]interface{} `json:"billing,omitempty"`
+	DueDate   *string                `json:"due_date,omitempty"`
+	Notes     *string                `json:"notes,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID string `json:"id"`
+}
+
+func (User) IsEntity() {}
+
+type ExpenseStatus string
+
+const (
+	ExpenseStatusDraft     ExpenseStatus = "DRAFT"
+	ExpenseStatusSubmitted ExpenseStatus = "SUBMITTED"
+	ExpenseStatusApproved  ExpenseStatus = "APPROVED"
+	ExpenseStatusRejected  ExpenseStatus = "REJECTED"
+	ExpenseStatusPaid      ExpenseStatus = "PAID"
+)
+
+var AllExpenseStatus = []ExpenseStatus{
+	ExpenseStatusDraft,
+	ExpenseStatusSubmitted,
+	ExpenseStatusApproved,
+	ExpenseStatusRejected,
+	ExpenseStatusPaid,
+}
+
+func (e ExpenseStatus) IsValid() bool {
+	switch e {
+	case ExpenseStatusDraft, ExpenseStatusSubmitted, ExpenseStatusApproved, ExpenseStatusRejected, ExpenseStatusPaid:
+		return true
+	}
+	return false
+}
+
+func (e ExpenseStatus) String() string {
+	return string(e)
+}
+
+func (e *ExpenseStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ExpenseStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ExpenseStatus", str)
+	}
+	return nil
+}
+
+func (e ExpenseStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ExpenseType string
+
+const (
+	ExpenseTypeDebit  ExpenseType = "DEBIT"
+	ExpenseTypeCredit ExpenseType = "CREDIT"
+)
+
+var AllExpenseType = []ExpenseType{
+	ExpenseTypeDebit,
+	ExpenseTypeCredit,
+}
+
+func (e ExpenseType) IsValid() bool {
+	switch e {
+	case ExpenseTypeDebit, ExpenseTypeCredit:
+		return true
+	}
+	return false
+}
+
+func (e ExpenseType) String() string {
+	return string(e)
+}
+
+func (e *ExpenseType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ExpenseType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ExpenseType", str)
+	}
+	return nil
+}
+
+func (e ExpenseType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type Payer string
+
+const (
+	PayerEmployee Payer = "EMPLOYEE"
+	PayerCompany  Payer = "COMPANY"
+)
+
+var AllPayer = []Payer{
+	PayerEmployee,
+	PayerCompany,
+}
+
+func (e Payer) IsValid() bool {
+	switch e {
+	case PayerEmployee, PayerCompany:
+		return true
+	}
+	return false
+}
+
+func (e Payer) String() string {
+	return string(e)
+}
+
+func (e *Payer) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Payer(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Payer", str)
+	}
+	return nil
+}
+
+func (e Payer) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

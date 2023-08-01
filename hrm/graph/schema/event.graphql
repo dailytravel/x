@@ -17,7 +17,7 @@ type Event {
   created_by: User!
   updated_by: User
   owner: User!
-  followers: [Follower]
+  followers: [Follow]
   attendees: [User]
   attachments: [File]
   reminders: [Reminder]

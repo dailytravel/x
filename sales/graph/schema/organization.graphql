@@ -22,7 +22,7 @@ type Organization {
   created_at: String!
   updated_at: String!
   owner: User
-  followers: [Follower]
+  followers: [Follow]
   created_by: User
   updated_by: User
 }

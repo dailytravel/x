@@ -5,7 +5,7 @@ type Expense {
   description: String!
   amount: Float!
   currency: String!
-  followers: [Follower]
+  followers: [Follow]
   comments: [Comment]
   metadata: Map
   status: String

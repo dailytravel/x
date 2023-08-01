@@ -1,6 +1,6 @@
 type Pipeline {
   id: ID!
-  type: String!
+  type: String! #pipeline, stage
   name: String!
   description: String!
   metadata: Map

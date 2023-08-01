@@ -2,19 +2,416 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
+type Board struct {
+	ID           string                 `json:"id"`
+	Owner        *User                  `json:"owner,omitempty"`
+	Organization *Organization          `json:"organization,omitempty"`
+	Type         string                 `json:"type"`
+	Title        string                 `json:"title"`
+	Description  *string                `json:"description,omitempty"`
+	DueDate      *string                `json:"due_date,omitempty"`
+	IsTemplate   bool                   `json:"is_template"`
+	Background   *string                `json:"background,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Starred      bool                   `json:"starred"`
+	Order        int                    `json:"order"`
+	Status       string                 `json:"status"`
+	Followers    []*Follow              `json:"followers,omitempty"`
+	CreatedAt    string                 `json:"created_at"`
+	UpdatedAt    string                 `json:"updated_at"`
+	Lists        []*List                `json:"lists,omitempty"`
+	CreatedBy    *User                  `json:"created_by,omitempty"`
+	UpdatedBy    *User                  `json:"updated_by,omitempty"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type Boards struct {
+	Data  []*Board `json:"data,omitempty"`
+	Count int      `json:"count"`
+}
+
+type Comment struct {
+	ID string `json:"id"`
+}
+
+func (Comment) IsEntity() {}
+
+type Follow struct {
+	ID string `json:"id"`
+}
+
+func (Follow) IsEntity() {}
+
+type Goal struct {
+	ID           string                 `json:"id"`
+	Name         string                 `json:"name"`
+	Notes        *string                `json:"notes,omitempty"`
+	StartDate    string                 `json:"start_date"`
+	DueDate      string                 `json:"due_date"`
+	IsCompany    bool                   `json:"is_company"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       *string                `json:"status,omitempty"`
+	CreatedAt    string                 `json:"created_at"`
+	UpdatedAt    string                 `json:"updated_at"`
+	CreatedBy    *User                  `json:"created_by,omitempty"`
+	UpdatedBy    *User                  `json:"updated_by,omitempty"`
+	Owner        *User                  `json:"owner"`
+	Parent       *Goal                  `json:"parent,omitempty"`
+	Organization *Organization          `json:"organization,omitempty"`
+	Time         *Time                  `json:"time"`
+	Followers    []*Follow              `json:"followers,omitempty"`
+}
+
+type Goals struct {
+	Count int     `json:"count"`
+	Data  []*Goal `json:"data,omitempty"`
+}
+
+type List struct {
+	ID        string                 `json:"id"`
+	Name      string                 `json:"name"`
+	Board     *Board                 `json:"board"`
+	Order     int                    `json:"order"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	CreatedAt string                 `json:"created_at"`
+	UpdatedAt string                 `json:"updated_at"`
+	CreatedBy *User                  `json:"created_by,omitempty"`
+	UpdatedBy *User                  `json:"updated_by,omitempty"`
+	Tasks     []*Task                `json:"tasks,omitempty"`
+}
+
+type Lists struct {
+	Count int     `json:"count"`
+	Data  []*List `json:"data,omitempty"`
+}
+
+type Metric struct {
+	Initial float64 `json:"initial"`
+	Target  float64 `json:"target"`
+	Actual  float64 `json:"actual"`
+	Unit    string  `json:"unit"`
+}
+
+type NewBoard struct {
+	Type         string                 `json:"type"`
+	Owner        *string                `json:"owner,omitempty"`
+	Organization *string                `json:"organization,omitempty"`
+	Title        string                 `json:"title"`
+	Description  *string                `json:"description,omitempty"`
+	DueDate      *string                `json:"due_date,omitempty"`
+	IsTemplate   bool                   `json:"is_template"`
+	Starred      bool                   `json:"starred"`
+	Order        int                    `json:"order"`
+	Background   *string                `json:"background,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       string                 `json:"status"`
+}
+
+type NewGoal struct {
+	Name         string                 `json:"name"`
+	Notes        *string                `json:"notes,omitempty"`
+	Time         string                 `json:"time"`
+	StartDate    string                 `json:"start_date"`
+	DueDate      string                 `json:"due_date"`
+	IsCompany    *bool                  `json:"is_company,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       *string                `json:"status,omitempty"`
+	Owner        string                 `json:"owner"`
+	Parent       *string                `json:"parent,omitempty"`
+	Organization *string                `json:"organization,omitempty"`
+}
+
+type NewList struct {
+	Name     string                 `json:"name"`
+	Board    string                 `json:"board"`
+	Order    *int                   `json:"order,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewMetric struct {
+	Initial float64 `json:"initial"`
+	Target  float64 `json:"target"`
+	Actual  float64 `json:"actual"`
+	Unit    string  `json:"unit"`
+}
+
+type NewTask struct {
+	Owner      *string                `json:"owner,omitempty"`
+	Parent     *string                `json:"parent,omitempty"`
+	List       *string                `json:"list,omitempty"`
+	Name       string                 `json:"name"`
+	Notes      *string                `json:"notes,omitempty"`
+	Priority   *string                `json:"priority,omitempty"`
+	Order      *int                   `json:"order,omitempty"`
+	StartDate  *string                `json:"start_date,omitempty"`
+	DueDate    *string                `json:"due_date,omitempty"`
+	Labels     []*string              `json:"labels,omitempty"`
+	Categories []string               `json:"categories,omitempty"`
+	Status     *string                `json:"status,omitempty"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type Organization struct {
+	ID string `json:"id"`
+}
+
+func (Organization) IsEntity() {}
+
+type Reaction struct {
+	ID string `json:"id"`
+}
+
+func (Reaction) IsEntity() {}
+
+type Task struct {
+	ID        string                 `json:"id"`
+	Name      string                 `json:"name"`
+	Owner     *User                  `json:"owner,omitempty"`
+	Parent    *Task                  `json:"parent,omitempty"`
+	Subtasks  []*Task                `json:"subtasks,omitempty"`
+	List      *List                  `json:"list"`
+	Notes     *string                `json:"notes,omitempty"`
+	Priority  string                 `json:"priority"`
+	StartDate *string                `json:"start_date,omitempty"`
+	DueDate   *string                `json:"due_date,omitempty"`
+	Labels    []*string              `json:"labels,omitempty"`
+	Order     *int                   `json:"order,omitempty"`
+	Status    string                 `json:"status"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	CreatedAt string                 `json:"created_at"`
+	UpdatedAt string                 `json:"updated_at"`
+	CreatedBy *User                  `json:"created_by,omitempty"`
+	UpdatedBy *User                  `json:"updated_by,omitempty"`
+	Comments  []*Comment             `json:"comments,omitempty"`
+	Followers []*Follow              `json:"followers,omitempty"`
+	Reactions []*Reaction            `json:"reactions,omitempty"`
+}
+
+type Tasks struct {
+	Data  []*Task `json:"data,omitempty"`
+	Count int     `json:"count"`
+}
+
+type Time struct {
+	ID          string                 `json:"id"`
+	Parent      *string                `json:"parent,omitempty"`
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	StartDate   string                 `json:"start_date"`
+	EndDate     int                    `json:"end_date"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	CreatedAt   string                 `json:"created_at"`
+	UpdatedAt   string                 `json:"updated_at"`
+}
+
+type TimeInput struct {
+	Parent      *string                `json:"parent,omitempty"`
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	StartDate   string                 `json:"start_date"`
+	EndDate     int                    `json:"end_date"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type Times struct {
+	Data  []*Time `json:"data,omitempty"`
+	Count int     `json:"count"`
+}
+
+type UpdateBoard struct {
+	Owner        *string                `json:"owner,omitempty"`
+	Organization *string                `json:"organization,omitempty"`
+	Title        *string                `json:"title,omitempty"`
+	Description  *string                `json:"description,omitempty"`
+	DueDate      *string                `json:"due_date,omitempty"`
+	IsTemplate   *bool                  `json:"is_template,omitempty"`
+	Starred      *bool                  `json:"starred,omitempty"`
+	Order        *int                   `json:"order,omitempty"`
+	Background   *string                `json:"background,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       *string                `json:"status,omitempty"`
+}
+
+type UpdateGoal struct {
+	Name         *string                `json:"name,omitempty"`
+	Notes        *string                `json:"notes,omitempty"`
+	Time         *string                `json:"time,omitempty"`
+	StartOn      *int                   `json:"start_on,omitempty"`
+	DueOn        *int                   `json:"due_on,omitempty"`
+	IsCompany    *bool                  `json:"is_company,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       *string                `json:"status,omitempty"`
+	Owner        *string                `json:"owner,omitempty"`
+	Parent       *string                `json:"parent,omitempty"`
+	Organization *string                `json:"organization,omitempty"`
+}
+
+type UpdateList struct {
+	Name     *string                `json:"name,omitempty"`
+	Order    *int                   `json:"order,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type UpdateMetric struct {
+	Actual float64 `json:"actual"`
+}
+
+type UpdateTask struct {
+	Owner      *string                `json:"owner,omitempty"`
+	Parent     *string                `json:"parent,omitempty"`
+	List       *string                `json:"list,omitempty"`
+	Name       *string                `json:"name,omitempty"`
+	Notes      *string                `json:"notes,omitempty"`
+	Priority   *string                `json:"priority,omitempty"`
+	Order      *int                   `json:"order,omitempty"`
+	StartDate  *string                `json:"start_date,omitempty"`
+	DueDate    *string                `json:"due_date,omitempty"`
+	Labels     []*string              `json:"labels,omitempty"`
+	Categories []string               `json:"categories,omitempty"`
+	Status     *string                `json:"status,omitempty"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID string `json:"id"`
+}
+
+func (User) IsEntity() {}
+
+type BoardType string
+
+const (
+	BoardTypeRequest   BoardType = "REQUEST"
+	BoardTypeSales     BoardType = "SALES"
+	BoardTypeProject   BoardType = "PROJECT"
+	BoardTypeMarketing BoardType = "MARKETING"
+)
+
+var AllBoardType = []BoardType{
+	BoardTypeRequest,
+	BoardTypeSales,
+	BoardTypeProject,
+	BoardTypeMarketing,
+}
+
+func (e BoardType) IsValid() bool {
+	switch e {
+	case BoardTypeRequest, BoardTypeSales, BoardTypeProject, BoardTypeMarketing:
+		return true
+	}
+	return false
+}
+
+func (e BoardType) String() string {
+	return string(e)
+}
+
+func (e *BoardType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = BoardType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid BoardType", str)
+	}
+	return nil
+}
+
+func (e BoardType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type GoalStatus string
+
+const (
+	GoalStatusInProgress GoalStatus = "IN_PROGRESS"
+	GoalStatusCompleted  GoalStatus = "COMPLETED"
+	GoalStatusOnHold     GoalStatus = "ON_HOLD"
+	GoalStatusCanceled   GoalStatus = "CANCELED"
+)
+
+var AllGoalStatus = []GoalStatus{
+	GoalStatusInProgress,
+	GoalStatusCompleted,
+	GoalStatusOnHold,
+	GoalStatusCanceled,
+}
+
+func (e GoalStatus) IsValid() bool {
+	switch e {
+	case GoalStatusInProgress, GoalStatusCompleted, GoalStatusOnHold, GoalStatusCanceled:
+		return true
+	}
+	return false
+}
+
+func (e GoalStatus) String() string {
+	return string(e)
+}
+
+func (e *GoalStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = GoalStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid GoalStatus", str)
+	}
+	return nil
+}
+
+func (e GoalStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type TaskStatus string
+
+const (
+	TaskStatusPending    TaskStatus = "PENDING"
+	TaskStatusInProgress TaskStatus = "IN_PROGRESS"
+	TaskStatusCompleted  TaskStatus = "COMPLETED"
+)
+
+var AllTaskStatus = []TaskStatus{
+	TaskStatusPending,
+	TaskStatusInProgress,
+	TaskStatusCompleted,
+}
+
+func (e TaskStatus) IsValid() bool {
+	switch e {
+	case TaskStatusPending, TaskStatusInProgress, TaskStatusCompleted:
+		return true
+	}
+	return false
+}
+
+func (e TaskStatus) String() string {
+	return string(e)
+}
+
+func (e *TaskStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TaskStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TaskStatus", str)
+	}
+	return nil
+}
+
+func (e TaskStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

@@ -15,7 +15,7 @@ type Contract {
   created_at: String!
   updated_at: String!
   comments: [Comment]
-  followers: [Follower]
+  followers: [Follow]
 }
 
 type Contracts {

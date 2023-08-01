@@ -15,7 +15,7 @@ type Goal {
   parent: Goal
   organization: Organization
   time: Time!
-  followers: [Follower]
+  followers: [Follow]
 }
 
 enum GoalStatus {

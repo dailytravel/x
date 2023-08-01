@@ -18,7 +18,7 @@ type Task {
   created_by: User
   updated_by: User
   comments: [Comment]
-  followers: [Follower]
+  followers: [Follow]
   reactions: [Reaction]
 }
 

@@ -1,0 +1,7 @@
+extend type Query {
+  search(args: Map): Map
+}
+
+extend type Mutation {
+  index(args: Map): Map
+}

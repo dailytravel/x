@@ -2,19 +2,688 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
+type Attendance struct {
+	ID        string                 `json:"id"`
+	TimeIn    string                 `json:"time_in"`
+	TimeOut   string                 `json:"time_out"`
+	Notes     *string                `json:"notes,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Status    *string                `json:"status,omitempty"`
+	CreatedAt string                 `json:"created_at"`
+	UpdatedAt string                 `json:"updated_at"`
+	CreatedBy *User                  `json:"created_by,omitempty"`
+	UpdatedBy *User                  `json:"updated_by,omitempty"`
+	Owner     *User                  `json:"owner"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type Attendances struct {
+	Data  []*Attendance `json:"data,omitempty"`
+	Count int           `json:"count"`
+}
+
+type Certification struct {
+	Name             string `json:"name"`
+	IssuingAuthority string `json:"issuingAuthority"`
+	Date             string `json:"date"`
+}
+
+type CertificationInput struct {
+	Name             string `json:"name"`
+	IssuingAuthority string `json:"issuingAuthority"`
+	Date             string `json:"date"`
+}
+
+type CreateResume struct {
+	ApplicantID    string                `json:"applicantId"`
+	Title          string                `json:"title"`
+	Summary        *string               `json:"summary,omitempty"`
+	Experience     []*ExperienceInput    `json:"experience,omitempty"`
+	Education      []*EducationInput     `json:"education,omitempty"`
+	Skills         []*string             `json:"skills,omitempty"`
+	Certifications []*CertificationInput `json:"certifications,omitempty"`
+	Languages      []*LanguageInput      `json:"languages,omitempty"`
+	Projects       []*ProjectInput       `json:"projects,omitempty"`
+	References     []*ReferenceInput     `json:"references,omitempty"`
+}
+
+type Education struct {
+	Degree      string  `json:"degree"`
+	University  string  `json:"university"`
+	StartDate   string  `json:"startDate"`
+	EndDate     *string `json:"endDate,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type EducationInput struct {
+	Degree      string  `json:"degree"`
+	University  string  `json:"university"`
+	StartDate   string  `json:"startDate"`
+	EndDate     *string `json:"endDate,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type Event struct {
+	ID          string      `json:"id"`
+	Type        string      `json:"type"`
+	Locale      string      `json:"locale"`
+	Title       string      `json:"title"`
+	Location    *string     `json:"location,omitempty"`
+	Start       int         `json:"start"`
+	End         int         `json:"end"`
+	Timezone    string      `json:"timezone"`
+	AllDay      bool        `json:"all_day"`
+	Description *string     `json:"description,omitempty"`
+	Color       string      `json:"color"`
+	ShowAs      string      `json:"show_as"`
+	Status      string      `json:"status"`
+	CreatedAt   string      `json:"created_at"`
+	UpdatedAt   string      `json:"updated_at"`
+	CreatedBy   *User       `json:"created_by"`
+	UpdatedBy   *User       `json:"updated_by,omitempty"`
+	Owner       *User       `json:"owner"`
+	Followers   []*Follow   `json:"followers,omitempty"`
+	Attendees   []*User     `json:"attendees,omitempty"`
+	Attachments []*File     `json:"attachments,omitempty"`
+	Reminders   []*Reminder `json:"reminders,omitempty"`
+	Recurrence  *Recurrence `json:"recurrence,omitempty"`
+}
+
+type Events struct {
+	Count int      `json:"count"`
+	Data  []*Event `json:"data,omitempty"`
+}
+
+type Experience struct {
+	Title       string  `json:"title"`
+	Company     string  `json:"company"`
+	StartDate   string  `json:"startDate"`
+	EndDate     *string `json:"endDate,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type ExperienceInput struct {
+	Title       string  `json:"title"`
+	Company     string  `json:"company"`
+	StartDate   string  `json:"startDate"`
+	EndDate     *string `json:"endDate,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type File struct {
+	ID string `json:"id"`
+}
+
+func (File) IsEntity() {}
+
+type Follow struct {
+	ID string `json:"id"`
+}
+
+func (Follow) IsEntity() {}
+
+type Geo struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
+}
+
+type Job struct {
+	ID           string                 `json:"id"`
+	Organization *Organization          `json:"organization"`
+	Locale       string                 `json:"locale"`
+	Title        string                 `json:"title"`
+	Description  string                 `json:"description"`
+	Location     string                 `json:"location"`
+	Salary       string                 `json:"salary"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       string                 `json:"status"`
+	CreatedAt    string                 `json:"created_at"`
+	UpdatedAt    string                 `json:"updated_at"`
+	CreatedBy    *User                  `json:"created_by"`
+	UpdatedBy    *User                  `json:"updated_by"`
+}
+
+type Jobs struct {
+	Map   []*Job `json:"map,omitempty"`
+	Count *int   `json:"count,omitempty"`
+}
+
+type Language struct {
+	Name        string       `json:"name"`
+	Proficiency *Proficiency `json:"proficiency,omitempty"`
+}
+
+type LanguageInput struct {
+	Name        string      `json:"name"`
+	Proficiency Proficiency `json:"proficiency"`
+}
+
+type Leave struct {
+	ID        string                 `json:"id"`
+	Owner     *User                  `json:"owner"`
+	Type      string                 `json:"type"`
+	StartDate string                 `json:"start_date"`
+	EndDate   *string                `json:"end_date,omitempty"`
+	Reason    string                 `json:"reason"`
+	Status    string                 `json:"status"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	CreatedAt string                 `json:"created_at"`
+	UpdatedAt string                 `json:"updated_at"`
+	CreatedBy *User                  `json:"created_by"`
+	UpdatedBy *User                  `json:"updated_by"`
+}
+
+type Leaves struct {
+	Data  []*Leave `json:"data,omitempty"`
+	Count int      `json:"count"`
+}
+
+type Location struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	Street      *string `json:"street,omitempty"`
+	City        *string `json:"city,omitempty"`
+	State       *string `json:"state,omitempty"`
+	Zip         *string `json:"zip,omitempty"`
+	Country     *string `json:"country,omitempty"`
+	Geo         *Geo    `json:"geo,omitempty"`
+}
+
+type NewAttendance struct {
+	Owner    string                 `json:"owner"`
+	TimeIn   string                 `json:"time_in"`
+	TimeOut  string                 `json:"time_out"`
+	Notes    *string                `json:"notes,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   string                 `json:"status"`
+}
+
+type NewEvent struct {
+	Owner       *string          `json:"owner,omitempty"`
+	Type        string           `json:"type"`
+	Locale      *string          `json:"locale,omitempty"`
+	Title       string           `json:"title"`
+	Location    *string          `json:"location,omitempty"`
+	Start       int              `json:"start"`
+	End         int              `json:"end"`
+	Timezone    string           `json:"timezone"`
+	AllDay      *bool            `json:"all_day,omitempty"`
+	Description *string          `json:"description,omitempty"`
+	Color       *string          `json:"color,omitempty"`
+	ShowAs      *string          `json:"show_as,omitempty"`
+	Status      *string          `json:"status,omitempty"`
+	Attendees   []*string        `json:"attendees,omitempty"`
+	Reminders   []*ReminderInput `json:"reminders,omitempty"`
+	Recurrence  *RecurrenceInput `json:"recurrence,omitempty"`
+	Attachments []*string        `json:"attachments,omitempty"`
+}
+
+type NewJob struct {
+	Organization string                 `json:"organization"`
+	Locale       string                 `json:"locale"`
+	Title        string                 `json:"title"`
+	Description  string                 `json:"description"`
+	Location     string                 `json:"location"`
+	Salary       string                 `json:"salary"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       string                 `json:"status"`
+}
+
+type NewLeave struct {
+	Owner     string                 `json:"owner"`
+	Type      string                 `json:"type"`
+	StartDate string                 `json:"start_date"`
+	EndDate   *string                `json:"end_date,omitempty"`
+	Reason    string                 `json:"reason"`
+	Status    string                 `json:"status"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewSalary struct {
+	Owner     string                 `json:"owner"`
+	Amount    float64                `json:"amount"`
+	Currency  string                 `json:"currency"`
+	StartDate string                 `json:"start_date"`
+	EndDate   *string                `json:"end_date,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type Organization struct {
+	ID string `json:"id"`
+}
+
+func (Organization) IsEntity() {}
+
+type Payroll struct {
+	ID        string                 `json:"id"`
+	User      *User                  `json:"user"`
+	PayDate   string                 `json:"pay_date"`
+	Amount    float64                `json:"amount"`
+	Currency  string                 `json:"currency"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Status    string                 `json:"status"`
+	CreatedAt string                 `json:"created_at"`
+	UpdatedAt string                 `json:"updated_at"`
+	CreatedBy *User                  `json:"created_by"`
+	UpdatedBy *User                  `json:"updated_by"`
+}
+
+type Project struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	StartDate   string  `json:"startDate"`
+	EndDate     *string `json:"endDate,omitempty"`
+}
+
+type ProjectInput struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	StartDate   string  `json:"startDate"`
+	EndDate     *string `json:"endDate,omitempty"`
+}
+
+type Recurrence struct {
+	Frequency  string `json:"frequency"`
+	Interval   int    `json:"interval"`
+	EndDate    *int   `json:"end_date,omitempty"`
+	Exceptions []*int `json:"exceptions,omitempty"`
+}
+
+type RecurrenceInput struct {
+	Frequency  string `json:"frequency"`
+	Interval   int    `json:"interval"`
+	EndDate    *int   `json:"end_date,omitempty"`
+	Exceptions []*int `json:"exceptions,omitempty"`
+}
+
+type Reference struct {
+	Name         string  `json:"name"`
+	Relationship string  `json:"relationship"`
+	Email        string  `json:"email"`
+	Phone        *string `json:"phone,omitempty"`
+}
+
+type ReferenceInput struct {
+	Name         string  `json:"name"`
+	Relationship string  `json:"relationship"`
+	Email        string  `json:"email"`
+	Phone        *string `json:"phone,omitempty"`
+}
+
+type Reminder struct {
+	Method string   `json:"method"`
+	Time   int      `json:"time"`
+	Unit   TimeUnit `json:"unit"`
+}
+
+type ReminderInput struct {
+	Method string   `json:"method"`
+	Time   int      `json:"time"`
+	Unit   TimeUnit `json:"unit"`
+}
+
+type Resume struct {
+	ID             string                 `json:"id"`
+	User           *User                  `json:"user"`
+	Title          string                 `json:"title"`
+	Summary        *string                `json:"summary,omitempty"`
+	Experience     []*Experience          `json:"experience,omitempty"`
+	Education      []*Education           `json:"education,omitempty"`
+	Skills         []*string              `json:"skills,omitempty"`
+	Certifications []*Certification       `json:"certifications,omitempty"`
+	Languages      []*Language            `json:"languages,omitempty"`
+	Projects       []*Project             `json:"projects,omitempty"`
+	References     []*Reference           `json:"references,omitempty"`
+	Metadata       map[string]interface{} `json:"metadata,omitempty"`
+	Status         string                 `json:"status"`
+	CreatedAt      string                 `json:"created_at"`
+	UpdatedAt      string                 `json:"updated_at"`
+}
+
+type Resumes struct {
+	Data  []*Resume `json:"data,omitempty"`
+	Count *int      `json:"count,omitempty"`
+}
+
+type Salaries struct {
+	Data  []*Salary `json:"data,omitempty"`
+	Count *int      `json:"count,omitempty"`
+}
+
+type Salary struct {
+	ID        string                 `json:"id"`
+	Owner     *User                  `json:"owner"`
+	Amount    float64                `json:"amount"`
+	Currency  string                 `json:"currency"`
+	StartDate string                 `json:"start_date"`
+	EndDate   *string                `json:"end_date,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Status    string                 `json:"status"`
+	CreatedAt string                 `json:"created_at"`
+	UpdatedAt string                 `json:"updated_at"`
+	CreatedBy *User                  `json:"created_by"`
+	UpdatedBy *User                  `json:"updated_by"`
+}
+
+type UpdateAttendance struct {
+	Owner    *string                `json:"owner,omitempty"`
+	TimeIn   *string                `json:"time_in,omitempty"`
+	TimeOut  *string                `json:"time_out,omitempty"`
+	Notes    *string                `json:"notes,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+}
+
+type UpdateEvent struct {
+	Owner       *string          `json:"owner,omitempty"`
+	Type        *string          `json:"type,omitempty"`
+	Locale      *string          `json:"locale,omitempty"`
+	Title       *string          `json:"title,omitempty"`
+	Location    *string          `json:"location,omitempty"`
+	Description *string          `json:"description,omitempty"`
+	Start       *int             `json:"start,omitempty"`
+	End         *int             `json:"end,omitempty"`
+	Timezone    *string          `json:"timezone,omitempty"`
+	AllDay      *bool            `json:"all_day,omitempty"`
+	Color       *string          `json:"color,omitempty"`
+	ShowAs      *string          `json:"show_as,omitempty"`
+	Status      *string          `json:"status,omitempty"`
+	Attendees   []*string        `json:"attendees,omitempty"`
+	Reminders   []*ReminderInput `json:"reminders,omitempty"`
+	Recurrence  *RecurrenceInput `json:"recurrence,omitempty"`
+	Attachments []*string        `json:"attachments,omitempty"`
+}
+
+type UpdateJob struct {
+	Organization *string                `json:"organization,omitempty"`
+	Locale       string                 `json:"locale"`
+	Title        *string                `json:"title,omitempty"`
+	Description  *string                `json:"description,omitempty"`
+	Location     *string                `json:"location,omitempty"`
+	Salary       *string                `json:"salary,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       *string                `json:"status,omitempty"`
+}
+
+type UpdateLeave struct {
+	Type      *string                `json:"type,omitempty"`
+	StartDate *string                `json:"start_date,omitempty"`
+	EndDate   *string                `json:"end_date,omitempty"`
+	Reason    *string                `json:"reason,omitempty"`
+	Status    *string                `json:"status,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type UpdateResume struct {
+	Title          *string               `json:"title,omitempty"`
+	Summary        *string               `json:"summary,omitempty"`
+	Experience     []*ExperienceInput    `json:"experience,omitempty"`
+	Education      []*EducationInput     `json:"education,omitempty"`
+	Skills         []*string             `json:"skills,omitempty"`
+	Certifications []*CertificationInput `json:"certifications,omitempty"`
+	Languages      []*LanguageInput      `json:"languages,omitempty"`
+	Projects       []*ProjectInput       `json:"projects,omitempty"`
+	References     []*ReferenceInput     `json:"references,omitempty"`
+}
+
+type UpdateSalary struct {
+	Amount    *float64               `json:"amount,omitempty"`
+	Currency  *string                `json:"currency,omitempty"`
+	StartDate *string                `json:"start_date,omitempty"`
+	EndDate   *string                `json:"end_date,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID string `json:"id"`
+}
+
+func (User) IsEntity() {}
+
+type AttendanceStatus string
+
+const (
+	AttendanceStatusPresent AttendanceStatus = "PRESENT"
+	AttendanceStatusAbsent  AttendanceStatus = "ABSENT"
+	AttendanceStatusLate    AttendanceStatus = "LATE"
+	AttendanceStatusExcused AttendanceStatus = "EXCUSED"
+)
+
+var AllAttendanceStatus = []AttendanceStatus{
+	AttendanceStatusPresent,
+	AttendanceStatusAbsent,
+	AttendanceStatusLate,
+	AttendanceStatusExcused,
+}
+
+func (e AttendanceStatus) IsValid() bool {
+	switch e {
+	case AttendanceStatusPresent, AttendanceStatusAbsent, AttendanceStatusLate, AttendanceStatusExcused:
+		return true
+	}
+	return false
+}
+
+func (e AttendanceStatus) String() string {
+	return string(e)
+}
+
+func (e *AttendanceStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = AttendanceStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid AttendanceStatus", str)
+	}
+	return nil
+}
+
+func (e AttendanceStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type LeaveStatus string
+
+const (
+	LeaveStatusPending  LeaveStatus = "pending"
+	LeaveStatusApproved LeaveStatus = "approved"
+	LeaveStatusRejected LeaveStatus = "rejected"
+)
+
+var AllLeaveStatus = []LeaveStatus{
+	LeaveStatusPending,
+	LeaveStatusApproved,
+	LeaveStatusRejected,
+}
+
+func (e LeaveStatus) IsValid() bool {
+	switch e {
+	case LeaveStatusPending, LeaveStatusApproved, LeaveStatusRejected:
+		return true
+	}
+	return false
+}
+
+func (e LeaveStatus) String() string {
+	return string(e)
+}
+
+func (e *LeaveStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = LeaveStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid LeaveStatus", str)
+	}
+	return nil
+}
+
+func (e LeaveStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type LeaveType string
+
+const (
+	LeaveTypeParental      LeaveType = "Parental"
+	LeaveTypeSick          LeaveType = "Sick"
+	LeaveTypeBereavement   LeaveType = "Bereavement"
+	LeaveTypeSabbatical    LeaveType = "Sabbatical"
+	LeaveTypeHoliday       LeaveType = "holiday"
+	LeaveTypeLeave         LeaveType = "Leave"
+	LeaveTypeAnnual        LeaveType = "Annual"
+	LeaveTypeUnpaid        LeaveType = "Unpaid"
+	LeaveTypeMilitary      LeaveType = "Military"
+	LeaveTypeMarriage      LeaveType = "Marriage"
+	LeaveTypeCompensatory  LeaveType = "Compensatory"
+	LeaveTypeReligion      LeaveType = "Religion"
+	LeaveTypeEarned        LeaveType = "Earned"
+	LeaveTypeCompassionate LeaveType = "compassionate"
+)
+
+var AllLeaveType = []LeaveType{
+	LeaveTypeParental,
+	LeaveTypeSick,
+	LeaveTypeBereavement,
+	LeaveTypeSabbatical,
+	LeaveTypeHoliday,
+	LeaveTypeLeave,
+	LeaveTypeAnnual,
+	LeaveTypeUnpaid,
+	LeaveTypeMilitary,
+	LeaveTypeMarriage,
+	LeaveTypeCompensatory,
+	LeaveTypeReligion,
+	LeaveTypeEarned,
+	LeaveTypeCompassionate,
+}
+
+func (e LeaveType) IsValid() bool {
+	switch e {
+	case LeaveTypeParental, LeaveTypeSick, LeaveTypeBereavement, LeaveTypeSabbatical, LeaveTypeHoliday, LeaveTypeLeave, LeaveTypeAnnual, LeaveTypeUnpaid, LeaveTypeMilitary, LeaveTypeMarriage, LeaveTypeCompensatory, LeaveTypeReligion, LeaveTypeEarned, LeaveTypeCompassionate:
+		return true
+	}
+	return false
+}
+
+func (e LeaveType) String() string {
+	return string(e)
+}
+
+func (e *LeaveType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = LeaveType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid LeaveType", str)
+	}
+	return nil
+}
+
+func (e LeaveType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type Proficiency string
+
+const (
+	ProficiencyBasic        Proficiency = "BASIC"
+	ProficiencyIntermediate Proficiency = "INTERMEDIATE"
+	ProficiencyAdvanced     Proficiency = "ADVANCED"
+	ProficiencyNative       Proficiency = "NATIVE"
+)
+
+var AllProficiency = []Proficiency{
+	ProficiencyBasic,
+	ProficiencyIntermediate,
+	ProficiencyAdvanced,
+	ProficiencyNative,
+}
+
+func (e Proficiency) IsValid() bool {
+	switch e {
+	case ProficiencyBasic, ProficiencyIntermediate, ProficiencyAdvanced, ProficiencyNative:
+		return true
+	}
+	return false
+}
+
+func (e Proficiency) String() string {
+	return string(e)
+}
+
+func (e *Proficiency) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Proficiency(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Proficiency", str)
+	}
+	return nil
+}
+
+func (e Proficiency) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type TimeUnit string
+
+const (
+	TimeUnitMinutes TimeUnit = "MINUTES"
+	TimeUnitHours   TimeUnit = "HOURS"
+	TimeUnitDays    TimeUnit = "DAYS"
+	TimeUnitWeeks   TimeUnit = "WEEKS"
+)
+
+var AllTimeUnit = []TimeUnit{
+	TimeUnitMinutes,
+	TimeUnitHours,
+	TimeUnitDays,
+	TimeUnitWeeks,
+}
+
+func (e TimeUnit) IsValid() bool {
+	switch e {
+	case TimeUnitMinutes, TimeUnitHours, TimeUnitDays, TimeUnitWeeks:
+		return true
+	}
+	return false
+}
+
+func (e TimeUnit) String() string {
+	return string(e)
+}
+
+func (e *TimeUnit) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TimeUnit(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TimeUnit", str)
+	}
+	return nil
+}
+
+func (e TimeUnit) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

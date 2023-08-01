@@ -2,7 +2,6 @@ type Order {
   id: ID!
   owner: User
   reference: String!
-  data: [Item]
   total: Float!
   currency: String!
   cancellable: Boolean!

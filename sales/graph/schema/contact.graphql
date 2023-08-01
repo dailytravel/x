@@ -33,7 +33,33 @@ type Contact {
   last_activity: Int
   created_at: String!
   updated_at: String!
-  followers: [Follower]
+  followers: [Follow]
+}
+
+type Phone {
+  mobile: String
+  work: String
+  home: String
+  other: String
+}
+
+input PhoneInput {
+  mobile: String
+  work: String
+  home: String
+  other: String
+}
+
+type Email {
+  personal: String
+  work: String
+  other: String
+}
+
+input EmailInput {
+  personal: String
+  work: String
+  other: String
 }
 
 type Contacts {

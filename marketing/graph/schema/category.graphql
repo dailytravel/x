@@ -1,0 +1,3 @@
+extend type Category @key(fields: "id") {
+  id: ID! @external
+}

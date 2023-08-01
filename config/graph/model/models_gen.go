@@ -2,19 +2,135 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
+type NewOption struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type NewWebhook struct {
+	Name    string                `json:"name"`
+	URL     string                `json:"url"`
+	Headers []*WebhookHeaderInput `json:"headers,omitempty"`
+	Events  []*WebhookEventInput  `json:"events,omitempty"`
+}
+
+type Option struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Data      string `json:"data"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+type Options struct {
+	Data  []*Option `json:"data,omitempty"`
+	Count int       `json:"count"`
+}
+
+type UpdateOption struct {
+	Name *string `json:"name,omitempty"`
+	Data *string `json:"data,omitempty"`
+}
+
+type UpdateWebhook struct {
+	Name    *string               `json:"name,omitempty"`
+	URL     *string               `json:"url,omitempty"`
+	Headers []*WebhookHeaderInput `json:"headers,omitempty"`
+	Events  []*WebhookEventInput  `json:"events,omitempty"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID string `json:"id"`
+}
+
+func (User) IsEntity() {}
+
+type Webhook struct {
+	ID        string           `json:"id"`
+	Name      string           `json:"name"`
+	URL       string           `json:"url"`
+	Headers   []*WebhookHeader `json:"headers,omitempty"`
+	Events    []*WebhookEvent  `json:"events,omitempty"`
+	CreatedBy *User            `json:"created_by,omitempty"`
+	UpdatedBy *User            `json:"updated_by,omitempty"`
+}
+
+type WebhookEvent struct {
+	ObjectID   string                `json:"object_id"`
+	ObjectType string                `json:"object_type"`
+	Actions    []*WebhookEventAction `json:"actions,omitempty"`
+}
+
+type WebhookEventInput struct {
+	ObjectID   string                `json:"object_id"`
+	ObjectType string                `json:"object_type"`
+	Actions    []*WebhookEventAction `json:"actions,omitempty"`
+}
+
+type WebhookHeader struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type WebhookHeaderInput struct {
+	Key   string  `json:"key"`
+	Value *string `json:"value,omitempty"`
+}
+
+type Webhooks struct {
+	Data  []*Webhook `json:"data,omitempty"`
+	Count int        `json:"count"`
+}
+
+type WebhookEventAction string
+
+const (
+	WebhookEventActionCreate    WebhookEventAction = "CREATE"
+	WebhookEventActionUpdate    WebhookEventAction = "UPDATE"
+	WebhookEventActionDelete    WebhookEventAction = "DELETE"
+	WebhookEventActionPublish   WebhookEventAction = "PUBLISH"
+	WebhookEventActionUnpublish WebhookEventAction = "UNPUBLISH"
+)
+
+var AllWebhookEventAction = []WebhookEventAction{
+	WebhookEventActionCreate,
+	WebhookEventActionUpdate,
+	WebhookEventActionDelete,
+	WebhookEventActionPublish,
+	WebhookEventActionUnpublish,
+}
+
+func (e WebhookEventAction) IsValid() bool {
+	switch e {
+	case WebhookEventActionCreate, WebhookEventActionUpdate, WebhookEventActionDelete, WebhookEventActionPublish, WebhookEventActionUnpublish:
+		return true
+	}
+	return false
+}
+
+func (e WebhookEventAction) String() string {
+	return string(e)
+}
+
+func (e *WebhookEventAction) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = WebhookEventAction(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid WebhookEventAction", str)
+	}
+	return nil
+}
+
+func (e WebhookEventAction) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
