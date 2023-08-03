@@ -6,14 +6,23 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/account/graph/model"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // FindUserByID is the resolver for the findUserByID field.
 func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: FindUserByID - findUserByID"))
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.User{
+		Model: model.Model{
+			ID: _id,
+		},
+	}, nil
 }
 
 // Entity returns EntityResolver implementation.

@@ -95,3 +95,68 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: Me - me"))
 }
+
+// ID is the resolver for the id field.
+func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// VerifiedAt is the resolver for the verified_at field.
+func (r *userResolver) VerifiedAt(ctx context.Context, obj *model.User) (*int, error) {
+	panic(fmt.Errorf("not implemented: VerifiedAt - verified_at"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *userResolver) CreatedAt(ctx context.Context, obj *model.User) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *userResolver) UpdatedAt(ctx context.Context, obj *model.User) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// LastActivity is the resolver for the last_activity field.
+func (r *userResolver) LastActivity(ctx context.Context, obj *model.User) (*int, error) {
+	panic(fmt.Errorf("not implemented: LastActivity - last_activity"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *userResolver) Metadata(ctx context.Context, obj *model.User) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *userResolver) CreatedBy(ctx context.Context, obj *model.User) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *userResolver) UpdatedBy(ctx context.Context, obj *model.User) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Board is the resolver for the board field.
+func (r *userResolver) Board(ctx context.Context, obj *model.User) (*model.Board, error) {
+	panic(fmt.Errorf("not implemented: Board - board"))
+}
+
+// Contacts is the resolver for the contacts field.
+func (r *userResolver) Contacts(ctx context.Context, obj *model.User) ([]*model.Contact, error) {
+	panic(fmt.Errorf("not implemented: Contacts - contacts"))
+}
+
+// Points is the resolver for the points field.
+func (r *userResolver) Points(ctx context.Context, obj *model.User) ([]*model.Point, error) {
+	panic(fmt.Errorf("not implemented: Points - points"))
+}
+
+// Membership is the resolver for the membership field.
+func (r *userResolver) Membership(ctx context.Context, obj *model.User) (*model.Membership, error) {
+	panic(fmt.Errorf("not implemented: Membership - membership"))
+}
+
+// User returns UserResolver implementation.
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
+type userResolver struct{ *Resolver }

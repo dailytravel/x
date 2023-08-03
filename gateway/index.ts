@@ -20,10 +20,10 @@ const authenticate = jwt({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: "https://YOUR_AUTH0_DOMAIN/.well-known/jwks.json", // Replace with your Auth0 domain
+    jwksUri: "http://localhost:4000/.well-known/jwks.json", // Replace with your Auth0 domain
   }),
-  audience: "YOUR_AUTH0_AUDIENCE", // Replace with your Auth0 audience
-  issuer: "https://YOUR_AUTH0_DOMAIN/", // Replace with your Auth0 domain
+  audience: "api.trip.express",
+  issuer: "https://api.trip.express/",
   algorithms: ["RS256"],
   credentialsRequired: false,
 });
@@ -36,10 +36,7 @@ class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   }
 
   willSendRequest({ request, context }) {
-    request.http.headers.set("issuer", context.issuer);
-    request.http.headers.set("authorization", context.authorization);
-    request.http.headers.set("client-id", context.clientId);
-    request.http.headers.set("api-key", context.apiKey);
+    request.http.headers.set("x-api-key", context.apiKey);
     request.http.headers.set(
       "auth",
       context.auth ? JSON.stringify(context.auth) : null
@@ -63,7 +60,10 @@ const gateway = new ApolloGateway({
       { name: "service", url: "http://localhost:4010/query" },
     ],
     introspectionHeaders: ({ context }) => {
-      return { Authorization: context?.authorization || "" };
+      return {
+        Authorization: context?.authorization || "",
+        "x-api-key": context?.apiKey || "",
+      };
     },
     buildService: ({ name, url }) => {
       return new AuthenticatedDataSource({ url });
@@ -85,7 +85,6 @@ async function startApolloServer() {
   await server.start();
 
   app.use(bodyParser.json());
-
   app.use(authenticate);
 
   app.use(

@@ -2,7 +2,7 @@ package graph
 
 import (
 	"github.com/dailytravel/x/sales/graph/model"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

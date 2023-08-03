@@ -17,27 +17,28 @@ function cleanup {
 }
 
 # Build each Go service
-(cd account && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/account .)
-(cd cms && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/cms .)
-(cd config && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/config .)
-(cd finance && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/finance .)
-(cd hrm && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/hrm .)
-(cd marketing && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/marketing .)
-(cd reporting && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/reporting .)
-(cd sales && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/sales .)
-(cd search && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/search .)
-(cd service && GOOS=linux GOARCH=amd64 go build -v -o ../tmp/service .)
+(cd account && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd cms && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd config && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd finance && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd hrm && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd marketing && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd reporting && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd sales && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd search && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd service && GOOS=linux GOARCH=amd64 go build -v -o app .)
 
-./tmp/account & ACCOUNT_PID=$!
-./tmp/cms & CMS_PID=$!
-./tmp/config & CONFIG_PID=$!
-./tmp/finance & FINANCE_PID=$!
-./tmp/hrm & HRM_PID=$!
-./tmp/marketing & MARKETING_PID=$!
-./tmp/reporting & REPORTING_PID=$!
-./tmp/sales & SALES_PID=$!
-./tmp/search & SEARCH_PID=$!
-./tmp/service & SERVICE_PID=$!
+# Start each Go service
+./account/app & ACCOUNT_PID=$!
+./cms/app & CMS_PID=$!
+./config/app & CONFIG_PID=$!
+./finance/app & FINANCE_PID=$!
+./hrm/app & HRM_PID=$!
+./marketing/app & MARKETING_PID=$!
+./reporting/app & REPORTING_PID=$!
+./sales/app & SALES_PID=$!
+./search/app & SEARCH_PID=$!
+./service/app & SERVICE_PID=$!
 
 trap cleanup EXIT
 

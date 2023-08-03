@@ -1,28 +1,128 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/dailytravel/x/cms/auth"
+	"github.com/dailytravel/x/cms/config"
+	"github.com/dailytravel/x/cms/db/migrations"
 	"github.com/dailytravel/x/cms/graph"
+	"github.com/dailytravel/x/cms/pkg/mongo"
+	"github.com/dailytravel/x/cms/pkg/redis"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
-const defaultPort = "4002"
+func init() {
+	os.Setenv("GIN_MODE", "release")
+	os.Setenv("PORT", "4002")
+	os.Setenv("DB_HOST", "localhost")
+	os.Setenv("DB_NAME", "cms")
+	os.Setenv("MONGODB_URI", "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1")
+}
+
+// Defining the playgroundHandler handler
+func playgroundHandler() gin.HandlerFunc {
+	h := playground.Handler("GraphQL", "/query")
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
+// Defining the Graphql handler
+func graphqlHandler() gin.HandlerFunc {
+	resolver := graph.NewResolver(mongo.DB, redis.Redis)
+	c := graph.Config{Resolvers: resolver}
+	config.Directives(&c)
+
+	executableSchema := graph.NewExecutableSchema(c)
+
+	server := handler.NewDefaultServer(executableSchema)
+	server.AddTransport(transport.Options{})
+	server.AddTransport(transport.GET{})
+	server.AddTransport(transport.POST{})
+	server.AddTransport(transport.Websocket{
+		Upgrader: websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		},
+		KeepAlivePingInterval: 10 * time.Second,
+	})
+
+	return func(c *gin.Context) {
+		if strings.ToLower(c.Request.Header.Get("Upgrade")) == "websocket" {
+			log.Println("Websocket request")
+		}
+
+		server.ServeHTTP(c.Writer, c.Request)
+	}
+}
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
+	// connect MongoDB
+	client, err := mongo.ConnectDB()
+	if err != nil {
+		log.Fatal("Error connecting to MongoDB: ", err)
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	defer func() {
+		if err := client.Disconnect(context.Background()); err != nil {
+			log.Fatal("Failed to close MongoDB connection: ", err)
+		}
+	}()
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	mongo.DB = client.Database(os.Getenv("DB_NAME"))
+	redis.Redis = redis.ConnectRedis()
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	if err := migrations.AutoMigrate(); err != nil {
+		log.Fatal("Error running migrations: ", err)
+	}
+
+	// setting up Gin
+	r := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
+	accessLog, _ := os.Create("./logs/access.log")
+	errorLog, _ := os.Create("./logs/error.log")
+	gin.DefaultWriter = io.MultiWriter(accessLog)
+	gin.DefaultErrorWriter = io.MultiWriter(errorLog)
+
+	r.Use(auth.Middleware())
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowHeaders:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowCredentials: true,
+	}))
+	r.POST("/query", graphqlHandler())
+	r.GET("/", playgroundHandler())
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "ok",
+		})
+	})
+
+	// Start the server with error handling using a simple channel
+	errCh := make(chan error)
+	go func() {
+		errCh <- r.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
+	}()
+
+	// Wait for the server to start or throw an error
+	err = <-errCh
+	if err != nil {
+		log.Fatal("Error starting server: ", err)
+	}
 }

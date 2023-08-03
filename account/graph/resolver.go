@@ -1,8 +1,9 @@
+//go:generate go run github.com/99designs/gqlgen generate
 package graph
 
 import (
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

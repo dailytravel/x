@@ -293,36 +293,6 @@ type UpdateUser struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type User struct {
-	ID            string                 `json:"id"`
-	Locale        *string                `json:"locale,omitempty"`
-	Name          string                 `json:"name"`
-	Email         string                 `json:"email"`
-	Phone         *string                `json:"phone,omitempty"`
-	Password      string                 `json:"password"`
-	Roles         []*string              `json:"roles,omitempty"`
-	Mfa           *Mfa                   `json:"mfa,omitempty"`
-	Timezone      *string                `json:"timezone,omitempty"`
-	LoginAttempts *int                   `json:"login_attempts,omitempty"`
-	LastLogin     *int                   `json:"last_login,omitempty"`
-	LastIP        *string                `json:"last_ip,omitempty"`
-	VerifiedAt    *int                   `json:"verified_at,omitempty"`
-	CreatedAt     string                 `json:"created_at"`
-	UpdatedAt     string                 `json:"updated_at"`
-	LastActivity  *int                   `json:"last_activity,omitempty"`
-	Identities    []*Identity            `json:"identities,omitempty"`
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
-	Status        *string                `json:"status,omitempty"`
-	CreatedBy     *User                  `json:"created_by,omitempty"`
-	UpdatedBy     *User                  `json:"updated_by,omitempty"`
-	Board         *Board                 `json:"board,omitempty"`
-	Contacts      []*Contact             `json:"contacts,omitempty"`
-	Points        []*Point               `json:"points,omitempty"`
-	Membership    *Membership            `json:"membership,omitempty"`
-}
-
-func (User) IsEntity() {}
-
 type Users struct {
 	Count int     `json:"count"`
 	Data  []*User `json:"data,omitempty"`

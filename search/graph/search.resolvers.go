@@ -16,5 +16,5 @@ func (r *mutationResolver) Index(ctx context.Context, args map[string]interface{
 
 // Search is the resolver for the search field.
 func (r *queryResolver) Search(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Search - search"))
+	return map[string]interface{}{"hello": "world"}, nil
 }
