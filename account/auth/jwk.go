@@ -1,14 +1,22 @@
 package auth
 
 import (
+	"context"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"math/big"
+	"os"
+	"path/filepath"
 
 	"github.com/dailytravel/x/account/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // JWKSKey represents a JSON Web Key (JWK).
@@ -29,7 +37,7 @@ func getJWKS(items []*model.Key) (map[string]interface{}, error) {
 	keys := make([]JWKSKey, 0)
 
 	for _, item := range items {
-		if item.Type == "rsa" && item.Certificate != "" {
+		if item.Type == "RSA" && item.Certificate != "" {
 			privBlock, _ := pem.Decode([]byte(item.Certificate))
 			if privBlock == nil {
 				return nil, fmt.Errorf("error decoding private key PEM block")
@@ -59,4 +67,46 @@ func getJWKS(items []*model.Key) (map[string]interface{}, error) {
 	jwks["keys"] = keys
 
 	return jwks, nil
+}
+
+func CreateJWKSFile(col *mongo.Collection) error {
+	var items []*model.Key
+	status := []string{"current", "previous", "next"}
+	filter := bson.M{"expires_at": bson.M{"$exists": false}, "status": bson.M{"$in": status}}
+	opts := options.Find()
+	opts.SetSort(bson.M{"updated_at": 1})
+
+	cursor, err := col.Find(context.Background(), filter, opts)
+	if err != nil {
+		return err
+	}
+	defer cursor.Close(context.Background())
+
+	if err = cursor.All(context.Background(), &items); err != nil {
+		return err
+	}
+
+	jwks, err := getJWKS(items)
+	if err != nil {
+		return err
+	}
+
+	// Get the current working directory
+	currentDir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	// Create the desired file path relative to the current working directory
+	filePath := filepath.Join(currentDir, "gateway", ".well-known", "jwks.json")
+
+	file, err := json.MarshalIndent(jwks["keys"], "", " ")
+	if err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile(filePath, file, 0644); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -14,6 +14,10 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = 4000; // Replace with your desired port number
 
+app.get("/.well-known/jwks.json", (req, res) => {
+  res.sendFile("./.well-known/jwks.json", { root: __dirname });
+});
+
 // Define authentication middleware
 const authenticate = jwt({
   secret: jwks.expressJwtSecret({

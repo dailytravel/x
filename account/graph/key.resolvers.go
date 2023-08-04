@@ -11,6 +11,31 @@ import (
 	"github.com/dailytravel/x/account/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *keyResolver) ID(ctx context.Context, obj *model.Key) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// ExpiresAt is the resolver for the expires_at field.
+func (r *keyResolver) ExpiresAt(ctx context.Context, obj *model.Key) (*string, error) {
+	panic(fmt.Errorf("not implemented: ExpiresAt - expires_at"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *keyResolver) CreatedAt(ctx context.Context, obj *model.Key) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *keyResolver) UpdatedAt(ctx context.Context, obj *model.Key) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *keyResolver) Owner(ctx context.Context, obj *model.Key) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
 // RevokeKey is the resolver for the revokeKey field.
 func (r *mutationResolver) RevokeKey(ctx context.Context) (*model.Key, error) {
 	panic(fmt.Errorf("not implemented: RevokeKey - revokeKey"))
@@ -30,3 +55,8 @@ func (r *queryResolver) Keys(ctx context.Context, args map[string]interface{}) (
 func (r *queryResolver) Key(ctx context.Context, id string) (*model.Key, error) {
 	panic(fmt.Errorf("not implemented: Key - key"))
 }
+
+// Key returns KeyResolver implementation.
+func (r *Resolver) Key() KeyResolver { return &keyResolver{r} }
+
+type keyResolver struct{ *Resolver }

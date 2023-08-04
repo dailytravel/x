@@ -73,22 +73,6 @@ type Invitations struct {
 	Count int           `json:"count"`
 }
 
-type Key struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Type        string  `json:"type"`
-	Provider    string  `json:"provider"`
-	Kid         string  `json:"kid"`
-	Certificate string  `json:"certificate"`
-	Fingerprint string  `json:"fingerprint"`
-	Thumbprint  string  `json:"thumbprint"`
-	Status      string  `json:"status"`
-	ExpiresAt   *string `json:"expires_at,omitempty"`
-	CreatedAt   string  `json:"created_at"`
-	UpdatedAt   string  `json:"updated_at"`
-	Owner       *User   `json:"owner,omitempty"`
-}
-
 type Keys struct {
 	Data  []*Key `json:"data,omitempty"`
 	Count int    `json:"count"`
