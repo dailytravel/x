@@ -30,6 +30,8 @@ type Board struct {
 	UpdatedBy    *User                  `json:"updated_by,omitempty"`
 }
 
+func (Board) IsEntity() {}
+
 type Boards struct {
 	Data  []*Board `json:"data,omitempty"`
 	Count int      `json:"count"`

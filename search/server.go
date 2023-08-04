@@ -16,8 +16,7 @@ import (
 	"github.com/dailytravel/x/search/config"
 	"github.com/dailytravel/x/search/db/migrations"
 	"github.com/dailytravel/x/search/graph"
-	"github.com/dailytravel/x/search/pkg/mongo"
-	"github.com/dailytravel/x/search/pkg/redis"
+	"github.com/dailytravel/x/search/pkg/typesense"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -29,6 +28,8 @@ func init() {
 	os.Setenv("DB_HOST", "localhost")
 	os.Setenv("DB_NAME", "search")
 	os.Setenv("MONGODB_URI", "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1")
+	os.Setenv("TYPESENSE_HOST", "http://localhost:8108")
+	os.Setenv("TYPESENSE_API_KEY", "5213473d89e548d14568ea01a2309f72")
 }
 
 // Defining the playgroundHandler handler
@@ -42,7 +43,7 @@ func playgroundHandler() gin.HandlerFunc {
 
 // Defining the Graphql handler
 func graphqlHandler() gin.HandlerFunc {
-	resolver := graph.NewResolver(mongo.DB, redis.Redis)
+	resolver := graph.NewResolver(typesense.TS)
 	c := graph.Config{Resolvers: resolver}
 	config.Directives(&c)
 
@@ -72,7 +73,7 @@ func graphqlHandler() gin.HandlerFunc {
 
 func main() {
 	// connect MongoDB
-	redis.Redis = redis.ConnectRedis()
+	typesense.TS = typesense.ConnectTypesense()
 
 	if err := migrations.AutoMigrate(); err != nil {
 		log.Fatal("Error running migrations: ", err)
@@ -108,7 +109,7 @@ func main() {
 	}()
 
 	// Wait for the server to start or throw an error
-	err = <-errCh
+	err := <-errCh
 	if err != nil {
 		log.Fatal("Error starting server: ", err)
 	}
