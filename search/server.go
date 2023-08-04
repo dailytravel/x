@@ -14,9 +14,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/dailytravel/x/search/auth"
 	"github.com/dailytravel/x/search/config"
+	"github.com/dailytravel/x/search/db"
 	"github.com/dailytravel/x/search/db/migrations"
 	"github.com/dailytravel/x/search/graph"
-	"github.com/dailytravel/x/search/pkg/typesense"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -43,7 +43,7 @@ func playgroundHandler() gin.HandlerFunc {
 
 // Defining the Graphql handler
 func graphqlHandler() gin.HandlerFunc {
-	resolver := graph.NewResolver(typesense.TS)
+	resolver := graph.NewResolver(db.Client)
 	c := graph.Config{Resolvers: resolver}
 	config.Directives(&c)
 
@@ -73,7 +73,7 @@ func graphqlHandler() gin.HandlerFunc {
 
 func main() {
 	// connect MongoDB
-	typesense.TS = typesense.ConnectTypesense()
+	db.Client = db.ConnectTypesense()
 
 	if err := migrations.AutoMigrate(); err != nil {
 		log.Fatal("Error running migrations: ", err)

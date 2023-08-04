@@ -31,6 +31,21 @@ func (r *mutationResolver) DeletePermissions(ctx context.Context, ids []string) 
 	panic(fmt.Errorf("not implemented: DeletePermissions - deletePermissions"))
 }
 
+// ID is the resolver for the id field.
+func (r *permissionResolver) ID(ctx context.Context, obj *model.Permission) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *permissionResolver) CreatedAt(ctx context.Context, obj *model.Permission) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *permissionResolver) UpdatedAt(ctx context.Context, obj *model.Permission) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
 // Permissions is the resolver for the permissions field.
 func (r *queryResolver) Permissions(ctx context.Context, args map[string]interface{}) (*model.Permissions, error) {
 	panic(fmt.Errorf("not implemented: Permissions - permissions"))
@@ -40,3 +55,8 @@ func (r *queryResolver) Permissions(ctx context.Context, args map[string]interfa
 func (r *queryResolver) Permission(ctx context.Context, id string) (*model.Permission, error) {
 	panic(fmt.Errorf("not implemented: Permission - permission"))
 }
+
+// Permission returns PermissionResolver implementation.
+func (r *Resolver) Permission() PermissionResolver { return &permissionResolver{r} }
+
+type permissionResolver struct{ *Resolver }

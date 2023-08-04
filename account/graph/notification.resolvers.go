@@ -26,6 +26,36 @@ func (r *mutationResolver) DeleteNotifications(ctx context.Context, ids []string
 	panic(fmt.Errorf("not implemented: DeleteNotifications - deleteNotifications"))
 }
 
+// ID is the resolver for the id field.
+func (r *notificationResolver) ID(ctx context.Context, obj *model.Notification) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// ReadAt is the resolver for the read_at field.
+func (r *notificationResolver) ReadAt(ctx context.Context, obj *model.Notification) (*int, error) {
+	panic(fmt.Errorf("not implemented: ReadAt - read_at"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *notificationResolver) CreatedAt(ctx context.Context, obj *model.Notification) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *notificationResolver) UpdatedAt(ctx context.Context, obj *model.Notification) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// User is the resolver for the user field.
+func (r *notificationResolver) User(ctx context.Context, obj *model.Notification) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *notificationResolver) Metadata(ctx context.Context, obj *model.Notification) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
 // Notifications is the resolver for the notifications field.
 func (r *queryResolver) Notifications(ctx context.Context, args map[string]interface{}) (*model.Notifications, error) {
 	panic(fmt.Errorf("not implemented: Notifications - notifications"))
@@ -35,3 +65,8 @@ func (r *queryResolver) Notifications(ctx context.Context, args map[string]inter
 func (r *queryResolver) Notification(ctx context.Context, id string) (*model.Notification, error) {
 	panic(fmt.Errorf("not implemented: Notification - notification"))
 }
+
+// Notification returns NotificationResolver implementation.
+func (r *Resolver) Notification() NotificationResolver { return &notificationResolver{r} }
+
+type notificationResolver struct{ *Resolver }

@@ -14,24 +14,6 @@ type Board struct {
 
 func (Board) IsEntity() {}
 
-type Client struct {
-	ID          string                 `json:"id"`
-	User        *User                  `json:"user,omitempty"`
-	Type        string                 `json:"type"`
-	Name        string                 `json:"name"`
-	Description *string                `json:"description,omitempty"`
-	Domains     []*string              `json:"domains,omitempty"`
-	Secret      string                 `json:"secret"`
-	Redirect    string                 `json:"redirect"`
-	Permissions []*string              `json:"permissions,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      string                 `json:"status"`
-	LastUsed    *int                   `json:"last_used,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	ExpiresAt   *string                `json:"expires_at,omitempty"`
-}
-
 type Clients struct {
 	Data  []*Client `json:"data,omitempty"`
 	Count int       `json:"count"`
@@ -147,19 +129,6 @@ type NewUser struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type Notification struct {
-	ID        string  `json:"id"`
-	Type      string  `json:"type"`
-	Locale    string  `json:"locale"`
-	Subject   string  `json:"subject"`
-	Body      string  `json:"body"`
-	ReadAt    *int    `json:"read_at,omitempty"`
-	CreatedAt string  `json:"created_at"`
-	UpdatedAt string  `json:"updated_at"`
-	User      *User   `json:"user"`
-	Object    *Object `json:"object"`
-}
-
 type Notifications struct {
 	Data  []*Notification `json:"data,omitempty"`
 	Count int             `json:"count"`
@@ -191,14 +160,6 @@ type Payload struct {
 	ExpiresIn    int    `json:"expires_in"`
 }
 
-type Permission struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	CreatedAt   string  `json:"created_at"`
-	UpdatedAt   string  `json:"updated_at"`
-}
-
 type Permissions struct {
 	Data  []*Permission `json:"data,omitempty"`
 	Count int           `json:"count"`
@@ -215,17 +176,6 @@ type RegisterInput struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-
-type Role struct {
-	ID          string        `json:"id"`
-	Name        string        `json:"name"`
-	Description *string       `json:"description,omitempty"`
-	Permissions []*Permission `json:"permissions,omitempty"`
-	CreatedAt   string        `json:"created_at"`
-	UpdatedAt   string        `json:"updated_at"`
-	CreatedBy   *User         `json:"created_by,omitempty"`
-	UpdatedBy   *User         `json:"updated_by,omitempty"`
 }
 
 type Roles struct {

@@ -1,14 +1,14 @@
 type Taxonomy {
   id: ID!
   category: Category!
-  object: Object!
+  Taxonomizable: Map!
   sticky: Boolean!
   created_at: String!
 }
 
 input NewTaxonomy {
   category: ID!
-  object: ID!
+  Taxonomizable: ID!
   type: String!
   sticky: Boolean
 }

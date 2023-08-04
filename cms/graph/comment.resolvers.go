@@ -11,6 +11,76 @@ import (
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *commentResolver) ID(ctx context.Context, obj *model.Comment) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Content is the resolver for the content field.
+func (r *commentResolver) Content(ctx context.Context, obj *model.Comment) (string, error) {
+	panic(fmt.Errorf("not implemented: Content - content"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *commentResolver) Metadata(ctx context.Context, obj *model.Comment) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *commentResolver) CreatedAt(ctx context.Context, obj *model.Comment) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *commentResolver) UpdatedAt(ctx context.Context, obj *model.Comment) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// Parent is the resolver for the parent field.
+func (r *commentResolver) Parent(ctx context.Context, obj *model.Comment) (*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: Parent - parent"))
+}
+
+// Children is the resolver for the children field.
+func (r *commentResolver) Children(ctx context.Context, obj *model.Comment) ([]*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: Children - children"))
+}
+
+// Commentable is the resolver for the commentable field.
+func (r *commentResolver) Commentable(ctx context.Context, obj *model.Comment) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Commentable - commentable"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *commentResolver) Owner(ctx context.Context, obj *model.Comment) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Reaction is the resolver for the reaction field.
+func (r *commentResolver) Reaction(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error) {
+	panic(fmt.Errorf("not implemented: Reaction - reaction"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *commentResolver) CreatedBy(ctx context.Context, obj *model.Comment) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *commentResolver) UpdatedBy(ctx context.Context, obj *model.Comment) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Attachments is the resolver for the attachments field.
+func (r *commentResolver) Attachments(ctx context.Context, obj *model.Comment) ([]*model.File, error) {
+	panic(fmt.Errorf("not implemented: Attachments - attachments"))
+}
+
+// Reactions is the resolver for the reactions field.
+func (r *commentResolver) Reactions(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error) {
+	panic(fmt.Errorf("not implemented: Reactions - reactions"))
+}
+
 // CreateComment is the resolver for the createComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewComment) (*model.Comment, error) {
 	panic(fmt.Errorf("not implemented: CreateComment - createComment"))
@@ -40,3 +110,8 @@ func (r *queryResolver) Comments(ctx context.Context, args map[string]interface{
 func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
 	panic(fmt.Errorf("not implemented: Comment - comment"))
 }
+
+// Comment returns CommentResolver implementation.
+func (r *Resolver) Comment() CommentResolver { return &commentResolver{r} }
+
+type commentResolver struct{ *Resolver }

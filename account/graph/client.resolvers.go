@@ -11,6 +11,41 @@ import (
 	"github.com/dailytravel/x/account/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *clientResolver) ID(ctx context.Context, obj *model.Client) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// User is the resolver for the user field.
+func (r *clientResolver) User(ctx context.Context, obj *model.Client) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *clientResolver) Metadata(ctx context.Context, obj *model.Client) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// LastUsed is the resolver for the last_used field.
+func (r *clientResolver) LastUsed(ctx context.Context, obj *model.Client) (*int, error) {
+	panic(fmt.Errorf("not implemented: LastUsed - last_used"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *clientResolver) CreatedAt(ctx context.Context, obj *model.Client) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *clientResolver) UpdatedAt(ctx context.Context, obj *model.Client) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// ExpiresAt is the resolver for the expires_at field.
+func (r *clientResolver) ExpiresAt(ctx context.Context, obj *model.Client) (*string, error) {
+	panic(fmt.Errorf("not implemented: ExpiresAt - expires_at"))
+}
+
 // CreateClient is the resolver for the createClient field.
 func (r *mutationResolver) CreateClient(ctx context.Context, input model.NewClient) (*model.Client, error) {
 	panic(fmt.Errorf("not implemented: CreateClient - createClient"))
@@ -40,3 +75,8 @@ func (r *queryResolver) Client(ctx context.Context, id string) (*model.Client, e
 func (r *queryResolver) Clients(ctx context.Context, args map[string]interface{}) (*model.Clients, error) {
 	panic(fmt.Errorf("not implemented: Clients - clients"))
 }
+
+// Client returns ClientResolver implementation.
+func (r *Resolver) Client() ClientResolver { return &clientResolver{r} }
+
+type clientResolver struct{ *Resolver }

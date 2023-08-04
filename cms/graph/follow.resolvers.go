@@ -11,6 +11,41 @@ import (
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *followResolver) ID(ctx context.Context, obj *model.Follow) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// User is the resolver for the user field.
+func (r *followResolver) User(ctx context.Context, obj *model.Follow) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
+// Followable is the resolver for the followable field.
+func (r *followResolver) Followable(ctx context.Context, obj *model.Follow) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Followable - followable"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *followResolver) CreatedAt(ctx context.Context, obj *model.Follow) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *followResolver) UpdatedAt(ctx context.Context, obj *model.Follow) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *followResolver) CreatedBy(ctx context.Context, obj *model.Follow) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *followResolver) UpdatedBy(ctx context.Context, obj *model.Follow) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateFollow is the resolver for the createFollow field.
 func (r *mutationResolver) CreateFollow(ctx context.Context, input model.NewFollow) (*model.Follow, error) {
 	panic(fmt.Errorf("not implemented: CreateFollow - createFollow"))
@@ -35,3 +70,8 @@ func (r *queryResolver) Follows(ctx context.Context, ids []string) ([]*model.Fol
 func (r *queryResolver) Follow(ctx context.Context, id string) (*model.Follow, error) {
 	panic(fmt.Errorf("not implemented: Follow - follow"))
 }
+
+// Follow returns FollowResolver implementation.
+func (r *Resolver) Follow() FollowResolver { return &followResolver{r} }
+
+type followResolver struct{ *Resolver }

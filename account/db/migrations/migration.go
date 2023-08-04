@@ -1,8 +1,6 @@
 package migrations
 
-import (
-	"github.com/dailytravel/x/account/pkg/mongo"
-)
+import "github.com/dailytravel/x/account/db"
 
 type Migrator interface {
 	Migrate() error
@@ -10,8 +8,12 @@ type Migrator interface {
 
 func AutoMigrate() error {
 	migrators := []Migrator{
-		&User{DB: mongo.DB},
-		&Key{DB: mongo.DB},
+		&User{Database: db.Database},
+		&Role{Database: db.Database},
+		&Permission{Database: db.Database},
+		&Client{Database: db.Database},
+		&Key{Database: db.Database},
+		&Notification{Database: db.Database},
 	}
 
 	for _, migration := range migrators {

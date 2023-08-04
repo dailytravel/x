@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/99designs/gqlgen/graphql"
+
 	"github.com/dailytravel/x/cms/graph"
 )
 

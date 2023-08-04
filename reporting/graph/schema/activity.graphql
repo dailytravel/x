@@ -1,7 +1,7 @@
 type Activity {
   id: ID!
   user: User!
-  object: Map!
+  activitable: Map!
   comment: Comment
   action: String!
   metadata: Map

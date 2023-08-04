@@ -10,8 +10,8 @@ import (
 )
 
 type User struct {
-	DB    *mongo.Database
-	Model *model.User
+	Database *mongo.Database
+	Model    *model.User
 }
 
 func (m *User) Migrate() error {
@@ -43,7 +43,7 @@ func (m *User) Migrate() error {
 		},
 	}
 
-	col := m.DB.Collection(m.Model.Collection())
+	col := m.Database.Collection(m.Model.Collection())
 	indexes, err := col.Indexes().List(context.Background())
 	if err != nil {
 		return err

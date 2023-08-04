@@ -11,6 +11,46 @@ import (
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *fileResolver) ID(ctx context.Context, obj *model.File) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *fileResolver) Metadata(ctx context.Context, obj *model.File) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *fileResolver) CreatedAt(ctx context.Context, obj *model.File) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *fileResolver) UpdatedAt(ctx context.Context, obj *model.File) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *fileResolver) CreatedBy(ctx context.Context, obj *model.File) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *fileResolver) UpdatedBy(ctx context.Context, obj *model.File) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *fileResolver) Owner(ctx context.Context, obj *model.File) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Followers is the resolver for the followers field.
+func (r *fileResolver) Followers(ctx context.Context, obj *model.File) ([]*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: Followers - followers"))
+}
+
 // CreateFile is the resolver for the createFile field.
 func (r *mutationResolver) CreateFile(ctx context.Context, input model.NewFile) (*model.File, error) {
 	panic(fmt.Errorf("not implemented: CreateFile - createFile"))
@@ -40,3 +80,8 @@ func (r *queryResolver) Files(ctx context.Context, args map[string]interface{}) 
 func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error) {
 	panic(fmt.Errorf("not implemented: File - file"))
 }
+
+// File returns FileResolver implementation.
+func (r *Resolver) File() FileResolver { return &fileResolver{r} }
+
+type fileResolver struct{ *Resolver }

@@ -15,10 +15,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/config"
+	"github.com/dailytravel/x/hrm/db"
 	"github.com/dailytravel/x/hrm/db/migrations"
 	"github.com/dailytravel/x/hrm/graph"
 	"github.com/dailytravel/x/hrm/pkg/mongo"
-	"github.com/dailytravel/x/hrm/pkg/redis"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -43,7 +43,7 @@ func playgroundHandler() gin.HandlerFunc {
 
 // Defining the Graphql handler
 func graphqlHandler() gin.HandlerFunc {
-	resolver := graph.NewResolver(mongo.DB, redis.Redis)
+	resolver := graph.NewResolver(db.Database, db.Redis, db.Client)
 	c := graph.Config{Resolvers: resolver}
 	config.Directives(&c)
 
@@ -84,8 +84,9 @@ func main() {
 		}
 	}()
 
-	mongo.DB = client.Database(os.Getenv("DB_NAME"))
-	redis.Redis = redis.ConnectRedis()
+	db.Database = client.Database(os.Getenv("DB_NAME"))
+	db.Redis = db.ConnectRedis()
+	db.Client = db.ConnectTypesense()
 
 	if err := migrations.AutoMigrate(); err != nil {
 		log.Fatal("Error running migrations: ", err)

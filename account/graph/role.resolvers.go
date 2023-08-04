@@ -40,3 +40,38 @@ func (r *queryResolver) Role(ctx context.Context, id string) (*model.Role, error
 func (r *queryResolver) Roles(ctx context.Context, args map[string]interface{}) (*model.Roles, error) {
 	panic(fmt.Errorf("not implemented: Roles - roles"))
 }
+
+// ID is the resolver for the id field.
+func (r *roleResolver) ID(ctx context.Context, obj *model.Role) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Permissions is the resolver for the permissions field.
+func (r *roleResolver) Permissions(ctx context.Context, obj *model.Role) ([]*model.Permission, error) {
+	panic(fmt.Errorf("not implemented: Permissions - permissions"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *roleResolver) CreatedAt(ctx context.Context, obj *model.Role) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *roleResolver) UpdatedAt(ctx context.Context, obj *model.Role) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *roleResolver) CreatedBy(ctx context.Context, obj *model.Role) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *roleResolver) UpdatedBy(ctx context.Context, obj *model.Role) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Role returns RoleResolver implementation.
+func (r *Resolver) Role() RoleResolver { return &roleResolver{r} }
+
+type roleResolver struct{ *Resolver }

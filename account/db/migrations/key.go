@@ -17,13 +17,13 @@ import (
 )
 
 type Key struct {
-	DB    *mongo.Database
+	Database    *mongo.Database
 	Model *model.Key
 }
 
 // Create mongo collection
 func (m *Key) Migrate() error {
-	col := m.DB.Collection(m.Model.Collection())
+	col := m.Database.Collection(m.Model.Collection())
 	indexes, err := col.Indexes().List(context.Background())
 	if err != nil {
 		return err

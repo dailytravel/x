@@ -45,3 +45,28 @@ func (r *queryResolver) Timezones(ctx context.Context, args map[string]interface
 func (r *queryResolver) Timezone(ctx context.Context, id string) (*model.Timezone, error) {
 	panic(fmt.Errorf("not implemented: Timezone - timezone"))
 }
+
+// ID is the resolver for the id field.
+func (r *timezoneResolver) ID(ctx context.Context, obj *model.Timezone) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *timezoneResolver) Metadata(ctx context.Context, obj *model.Timezone) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *timezoneResolver) CreatedAt(ctx context.Context, obj *model.Timezone) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *timezoneResolver) UpdatedAt(ctx context.Context, obj *model.Timezone) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// Timezone returns TimezoneResolver implementation.
+func (r *Resolver) Timezone() TimezoneResolver { return &timezoneResolver{r} }
+
+type timezoneResolver struct{ *Resolver }

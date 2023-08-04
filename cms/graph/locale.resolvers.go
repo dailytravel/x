@@ -11,6 +11,36 @@ import (
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *localeResolver) ID(ctx context.Context, obj *model.Locale) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Name is the resolver for the name field.
+func (r *localeResolver) Name(ctx context.Context, obj *model.Locale) (string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
+}
+
+// StringFormat is the resolver for the String_format field.
+func (r *localeResolver) StringFormat(ctx context.Context, obj *model.Locale) (string, error) {
+	panic(fmt.Errorf("not implemented: StringFormat - String_format"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *localeResolver) Metadata(ctx context.Context, obj *model.Locale) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *localeResolver) CreatedAt(ctx context.Context, obj *model.Locale) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *localeResolver) UpdatedAt(ctx context.Context, obj *model.Locale) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
 // CreateLocale is the resolver for the createLocale field.
 func (r *mutationResolver) CreateLocale(ctx context.Context, input model.NewLocale) (*model.Locale, error) {
 	panic(fmt.Errorf("not implemented: CreateLocale - createLocale"))
@@ -35,3 +65,8 @@ func (r *queryResolver) Locales(ctx context.Context, args map[string]interface{}
 func (r *queryResolver) Locale(ctx context.Context, code string) (*model.Locale, error) {
 	panic(fmt.Errorf("not implemented: Locale - locale"))
 }
+
+// Locale returns LocaleResolver implementation.
+func (r *Resolver) Locale() LocaleResolver { return &localeResolver{r} }
+
+type localeResolver struct{ *Resolver }

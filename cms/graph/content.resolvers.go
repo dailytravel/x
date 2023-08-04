@@ -11,6 +11,86 @@ import (
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *contentResolver) ID(ctx context.Context, obj *model.Content) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Title is the resolver for the title field.
+func (r *contentResolver) Title(ctx context.Context, obj *model.Content) (string, error) {
+	panic(fmt.Errorf("not implemented: Title - title"))
+}
+
+// Summary is the resolver for the summary field.
+func (r *contentResolver) Summary(ctx context.Context, obj *model.Content) (string, error) {
+	panic(fmt.Errorf("not implemented: Summary - summary"))
+}
+
+// Body is the resolver for the body field.
+func (r *contentResolver) Body(ctx context.Context, obj *model.Content) (string, error) {
+	panic(fmt.Errorf("not implemented: Body - body"))
+}
+
+// Reviewable is the resolver for the reviewable field.
+func (r *contentResolver) Reviewable(ctx context.Context, obj *model.Content) (*bool, error) {
+	panic(fmt.Errorf("not implemented: Reviewable - reviewable"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *contentResolver) Metadata(ctx context.Context, obj *model.Content) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *contentResolver) CreatedAt(ctx context.Context, obj *model.Content) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *contentResolver) UpdatedAt(ctx context.Context, obj *model.Content) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// PublishedAt is the resolver for the published_at field.
+func (r *contentResolver) PublishedAt(ctx context.Context, obj *model.Content) (int, error) {
+	panic(fmt.Errorf("not implemented: PublishedAt - published_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *contentResolver) CreatedBy(ctx context.Context, obj *model.Content) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *contentResolver) UpdatedBy(ctx context.Context, obj *model.Content) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *contentResolver) Owner(ctx context.Context, obj *model.Content) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Parent is the resolver for the parent field.
+func (r *contentResolver) Parent(ctx context.Context, obj *model.Content) (*model.Content, error) {
+	panic(fmt.Errorf("not implemented: Parent - parent"))
+}
+
+// Followers is the resolver for the followers field.
+func (r *contentResolver) Followers(ctx context.Context, obj *model.Content) ([]*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: Followers - followers"))
+}
+
+// Comments is the resolver for the comments field.
+func (r *contentResolver) Comments(ctx context.Context, obj *model.Content) ([]*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: Comments - comments"))
+}
+
+// Attachments is the resolver for the attachments field.
+func (r *contentResolver) Attachments(ctx context.Context, obj *model.Content) ([]*model.File, error) {
+	panic(fmt.Errorf("not implemented: Attachments - attachments"))
+}
+
 // CreateContent is the resolver for the createContent field.
 func (r *mutationResolver) CreateContent(ctx context.Context, input model.NewContent) (*model.Content, error) {
 	panic(fmt.Errorf("not implemented: CreateContent - createContent"))
@@ -40,3 +120,8 @@ func (r *queryResolver) Content(ctx context.Context, id string) (*model.Content,
 func (r *queryResolver) Contents(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
 	panic(fmt.Errorf("not implemented: Contents - contents"))
 }
+
+// Content returns ContentResolver implementation.
+func (r *Resolver) Content() ContentResolver { return &contentResolver{r} }
+
+type contentResolver struct{ *Resolver }

@@ -66,7 +66,7 @@ const gateway = new ApolloGateway({
     introspectionHeaders: ({ context }) => {
       return {
         Authorization: context?.authorization || "",
-        "x-api-key": context?.apiKey || "",
+        "x-api-key": context?.["x-api-key"] || "",
       };
     },
     buildService: ({ name, url }) => {

@@ -56,14 +56,14 @@ type ComplexityRoot struct {
 	}
 
 	Activity struct {
-		Action    func(childComplexity int) int
-		Comment   func(childComplexity int) int
-		CreatedAt func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Metadata  func(childComplexity int) int
-		Object    func(childComplexity int) int
-		Status    func(childComplexity int) int
-		User      func(childComplexity int) int
+		Action      func(childComplexity int) int
+		Activitable func(childComplexity int) int
+		Comment     func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Metadata    func(childComplexity int) int
+		Status      func(childComplexity int) int
+		User        func(childComplexity int) int
 	}
 
 	Campaign struct {
@@ -201,6 +201,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Activity.Action(childComplexity), true
 
+	case "Activity.activitable":
+		if e.complexity.Activity.Activitable == nil {
+			break
+		}
+
+		return e.complexity.Activity.Activitable(childComplexity), true
+
 	case "Activity.comment":
 		if e.complexity.Activity.Comment == nil {
 			break
@@ -228,13 +235,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Activity.Metadata(childComplexity), true
-
-	case "Activity.object":
-		if e.complexity.Activity.Object == nil {
-			break
-		}
-
-		return e.complexity.Activity.Object(childComplexity), true
 
 	case "Activity.status":
 		if e.complexity.Activity.Status == nil {
@@ -1131,8 +1131,8 @@ func (ec *executionContext) fieldContext_Activities_data(ctx context.Context, fi
 				return ec.fieldContext_Activity_id(ctx, field)
 			case "user":
 				return ec.fieldContext_Activity_user(ctx, field)
-			case "object":
-				return ec.fieldContext_Activity_object(ctx, field)
+			case "activitable":
+				return ec.fieldContext_Activity_activitable(ctx, field)
 			case "comment":
 				return ec.fieldContext_Activity_comment(ctx, field)
 			case "action":
@@ -1286,8 +1286,8 @@ func (ec *executionContext) fieldContext_Activity_user(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Activity_object(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Activity_object(ctx, field)
+func (ec *executionContext) _Activity_activitable(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Activity_activitable(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1300,7 +1300,7 @@ func (ec *executionContext) _Activity_object(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Object, nil
+		return obj.Activitable, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1317,7 +1317,7 @@ func (ec *executionContext) _Activity_object(ctx context.Context, field graphql.
 	return ec.marshalNMap2map(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Activity_object(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Activity_activitable(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Activity",
 		Field:      field,
@@ -2797,8 +2797,8 @@ func (ec *executionContext) fieldContext_Query_activity(ctx context.Context, fie
 				return ec.fieldContext_Activity_id(ctx, field)
 			case "user":
 				return ec.fieldContext_Activity_user(ctx, field)
-			case "object":
-				return ec.fieldContext_Activity_object(ctx, field)
+			case "activitable":
+				return ec.fieldContext_Activity_activitable(ctx, field)
 			case "comment":
 				return ec.fieldContext_Activity_comment(ctx, field)
 			case "action":
@@ -6008,8 +6008,8 @@ func (ec *executionContext) _Activity(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "object":
-			out.Values[i] = ec._Activity_object(ctx, field, obj)
+		case "activitable":
+			out.Values[i] = ec._Activity_activitable(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

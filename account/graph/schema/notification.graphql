@@ -2,13 +2,12 @@ type Notification {
   id: ID!
   type: String!
   locale: String!
-  subject: String!
-  body: String!
   read_at: Int
   created_at: String!
   updated_at: String!
   user: User!
-  object: Object!
+  notifiable: Object!
+  metadata: Map
 }
 
 type Notifications {

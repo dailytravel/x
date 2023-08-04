@@ -22,7 +22,7 @@ func (r *mutationResolver) UpdateReaction(ctx context.Context, id string, input 
 }
 
 // Reaction is the resolver for the reaction field.
-func (r *queryResolver) Reaction(ctx context.Context, object string, typeArg string) (*model.Reaction, error) {
+func (r *queryResolver) Reaction(ctx context.Context, reactable string, typeArg string) (*model.Reaction, error) {
 	panic(fmt.Errorf("not implemented: Reaction - reaction"))
 }
 
@@ -30,3 +30,33 @@ func (r *queryResolver) Reaction(ctx context.Context, object string, typeArg str
 func (r *queryResolver) Reactions(ctx context.Context, args map[string]interface{}) (*model.Reactions, error) {
 	panic(fmt.Errorf("not implemented: Reactions - reactions"))
 }
+
+// ID is the resolver for the id field.
+func (r *reactionResolver) ID(ctx context.Context, obj *model.Reaction) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// User is the resolver for the user field.
+func (r *reactionResolver) User(ctx context.Context, obj *model.Reaction) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
+// Reactable is the resolver for the reactable field.
+func (r *reactionResolver) Reactable(ctx context.Context, obj *model.Reaction) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Reactable - reactable"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *reactionResolver) CreatedAt(ctx context.Context, obj *model.Reaction) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *reactionResolver) UpdatedAt(ctx context.Context, obj *model.Reaction) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// Reaction returns ReactionResolver implementation.
+func (r *Resolver) Reaction() ReactionResolver { return &reactionResolver{r} }
+
+type reactionResolver struct{ *Resolver }

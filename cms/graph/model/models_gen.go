@@ -13,77 +13,10 @@ type Categories struct {
 	Data  []*Category `json:"data,omitempty"`
 }
 
-type Category struct {
-	ID          string                 `json:"id"`
-	Parent      *Category              `json:"parent,omitempty"`
-	Children    []*Category            `json:"children,omitempty"`
-	Locale      string                 `json:"locale"`
-	Taxonomy    string                 `json:"taxonomy"`
-	Slug        *string                `json:"slug,omitempty"`
-	Name        string                 `json:"name"`
-	Description *string                `json:"description,omitempty"`
-	Order       int                    `json:"order"`
-	Count       int                    `json:"count"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	CreatedBy   *User                  `json:"created_by,omitempty"`
-	UpdatedBy   *User                  `json:"updated_by,omitempty"`
-}
-
-func (Category) IsEntity() {}
-
-type Comment struct {
-	ID          string                 `json:"id"`
-	Locale      string                 `json:"locale"`
-	Content     string                 `json:"content"`
-	Rating      *int                   `json:"rating,omitempty"`
-	Status      string                 `json:"status"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	Parent      *Comment               `json:"parent,omitempty"`
-	Children    []*Comment             `json:"children,omitempty"`
-	Object      map[string]interface{} `json:"object"`
-	Owner       *User                  `json:"owner"`
-	Reaction    []*Reaction            `json:"reaction,omitempty"`
-	CreatedBy   *User                  `json:"created_by,omitempty"`
-	UpdatedBy   *User                  `json:"updated_by,omitempty"`
-	Attachments []*File                `json:"attachments,omitempty"`
-	Reactions   []*Reaction            `json:"reactions,omitempty"`
-}
-
-func (Comment) IsEntity() {}
-
 type Comments struct {
 	Count int        `json:"count"`
 	Data  []*Comment `json:"data,omitempty"`
 }
-
-type Content struct {
-	ID          string                 `json:"id"`
-	Locale      string                 `json:"locale"`
-	Type        string                 `json:"type"`
-	Title       string                 `json:"title"`
-	Summary     string                 `json:"summary"`
-	Body        string                 `json:"body"`
-	Slug        string                 `json:"slug"`
-	Status      string                 `json:"status"`
-	Reviewable  *bool                  `json:"reviewable,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	PublishedAt int                    `json:"published_at"`
-	CreatedBy   *User                  `json:"created_by"`
-	UpdatedBy   *User                  `json:"updated_by"`
-	Owner       *User                  `json:"owner"`
-	Parent      *Content               `json:"parent,omitempty"`
-	Followers   []*Follow              `json:"followers,omitempty"`
-	Comments    []*Comment             `json:"comments,omitempty"`
-	Attachments []*File                `json:"attachments,omitempty"`
-}
-
-func (Content) IsEntity() {}
 
 type Contents struct {
 	Count int        `json:"count"`
@@ -95,101 +28,19 @@ type Countries struct {
 	Count int        `json:"count"`
 }
 
-type Country struct {
-	ID        string                 `json:"id"`
-	Code      string                 `json:"code"`
-	Locale    string                 `json:"locale"`
-	Name      string                 `json:"name"`
-	Continent string                 `json:"continent"`
-	Currency  *string                `json:"currency,omitempty"`
-	Languages []*string              `json:"languages,omitempty"`
-	Capital   *string                `json:"capital,omitempty"`
-	Flag      *string                `json:"flag,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-}
-
 type Currencies struct {
 	Data  []*Currency `json:"data,omitempty"`
 	Count int         `json:"count"`
 }
-
-type Currency struct {
-	ID        string                 `json:"id"`
-	Locale    string                 `json:"locale"`
-	Code      string                 `json:"code"`
-	Name      string                 `json:"name"`
-	Rate      float64                `json:"rate"`
-	Symbol    string                 `json:"symbol"`
-	Precision int                    `json:"precision"`
-	Decimal   string                 `json:"decimal"`
-	Thousand  string                 `json:"thousand"`
-	Order     int                    `json:"order"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-}
-
-type File struct {
-	ID          string                 `json:"id"`
-	Locale      string                 `json:"locale"`
-	Name        string                 `json:"name"`
-	Description *string                `json:"description,omitempty"`
-	Type        string                 `json:"type"`
-	Size        int                    `json:"size"`
-	Provider    string                 `json:"provider"`
-	URL         string                 `json:"url"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Starred     bool                   `json:"starred"`
-	Status      string                 `json:"status"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	CreatedBy   *User                  `json:"created_by,omitempty"`
-	UpdatedBy   *User                  `json:"updated_by,omitempty"`
-	Owner       *User                  `json:"owner,omitempty"`
-	Followers   []*Follow              `json:"followers,omitempty"`
-}
-
-func (File) IsEntity() {}
 
 type Files struct {
 	Count int     `json:"count"`
 	Data  []*File `json:"data,omitempty"`
 }
 
-type Follow struct {
-	ID        string                 `json:"id"`
-	User      *User                  `json:"user"`
-	Object    map[string]interface{} `json:"object"`
-	Role      *string                `json:"role,omitempty"`
-	Status    string                 `json:"status"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	CreatedBy *User                  `json:"created_by"`
-	UpdatedBy *User                  `json:"updated_by"`
-}
-
-func (Follow) IsEntity() {}
-
 type Follows struct {
 	Count int       `json:"count"`
 	Data  []*Follow `json:"data,omitempty"`
-}
-
-type Locale struct {
-	ID           string                 `json:"id"`
-	Name         string                 `json:"name"`
-	Locale       string                 `json:"locale"`
-	Code         string                 `json:"code"`
-	Order        int                    `json:"order"`
-	Rtl          bool                   `json:"rtl"`
-	DateFormat   string                 `json:"date_format"`
-	StringFormat string                 `json:"String_format"`
-	WeekStart    int                    `json:"week_start"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt    string                 `json:"created_at"`
-	UpdatedAt    string                 `json:"updated_at"`
 }
 
 type Locales struct {
@@ -209,15 +60,15 @@ type NewCategory struct {
 }
 
 type NewComment struct {
-	Parent      *string                `json:"parent,omitempty"`
-	Object      string                 `json:"object"`
-	Type        string                 `json:"type"`
-	Locale      string                 `json:"locale"`
-	Content     *string                `json:"content,omitempty"`
-	Rating      *int                   `json:"rating,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      *string                `json:"status,omitempty"`
-	Attachments []*string              `json:"attachments,omitempty"`
+	Parent          *string                `json:"parent,omitempty"`
+	CommentableID   string                 `json:"commentableId"`
+	CommentableType string                 `json:"commentableType"`
+	Locale          string                 `json:"locale"`
+	Content         *string                `json:"content,omitempty"`
+	Rating          *int                   `json:"rating,omitempty"`
+	Metadata        map[string]interface{} `json:"metadata,omitempty"`
+	Status          *string                `json:"status,omitempty"`
+	Attachments     []*string              `json:"attachments,omitempty"`
 }
 
 type NewContent struct {
@@ -279,11 +130,11 @@ type NewFile struct {
 }
 
 type NewFollow struct {
-	User   string `json:"user"`
-	Object string `json:"object"`
-	Type   string `json:"type"`
-	Role   string `json:"role"`
-	Status string `json:"status"`
+	User           string `json:"user"`
+	FollowableID   string `json:"followableId"`
+	FollowableType string `json:"followableType"`
+	Role           string `json:"role"`
+	Status         string `json:"status"`
 }
 
 type NewLocale struct {
@@ -300,16 +151,16 @@ type NewLocale struct {
 }
 
 type NewReaction struct {
-	Object string `json:"object"`
-	Type   string `json:"type"`
-	Action string `json:"action"`
+	ReactableID   string `json:"reactableId"`
+	ReactableType string `json:"reactableType"`
+	Action        string `json:"action"`
 }
 
 type NewTaxonomy struct {
-	Category string `json:"category"`
-	Object   string `json:"object"`
-	Type     string `json:"type"`
-	Sticky   *bool  `json:"sticky,omitempty"`
+	Category      string `json:"category"`
+	Taxonomizable string `json:"Taxonomizable"`
+	Type          string `json:"type"`
+	Sticky        *bool  `json:"sticky,omitempty"`
 }
 
 type NewTimezone struct {
@@ -319,43 +170,9 @@ type NewTimezone struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type Object struct {
-	ID   string `json:"id"`
-	Type string `json:"type"`
-}
-
-type Reaction struct {
-	ID        string                 `json:"id"`
-	User      *User                  `json:"user"`
-	Object    map[string]interface{} `json:"object"`
-	Action    string                 `json:"action"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-}
-
-func (Reaction) IsEntity() {}
-
 type Reactions struct {
 	Data  []*Reaction `json:"data,omitempty"`
 	Count int         `json:"count"`
-}
-
-type Taxonomy struct {
-	ID        string    `json:"id"`
-	Category  *Category `json:"category"`
-	Object    *Object   `json:"object"`
-	Sticky    bool      `json:"sticky"`
-	CreatedAt string    `json:"created_at"`
-}
-
-type Timezone struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Offset      int                    `json:"offset"`
-	Description *string                `json:"description,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
 }
 
 type Timezones struct {

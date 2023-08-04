@@ -14,12 +14,14 @@ type Resolver struct {
 	model model.Model
 	db    *mongo.Database
 	redis *redis.Client
+	ts    *typesense.Client
 }
 
-func NewResolver(db *mongo.Database, rdb *redis.Client) *Resolver {
+func NewResolver(db *mongo.Database, rdb *redis.Client, ts *typesense.Client) *Resolver {
 	return &Resolver{
 		db:    db,
 		redis: rdb,
+		ts:    ts,
 		model: model.Model{},
 	}
 }

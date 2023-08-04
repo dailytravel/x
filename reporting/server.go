@@ -15,10 +15,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/dailytravel/x/reporting/auth"
 	"github.com/dailytravel/x/reporting/config"
+	"github.com/dailytravel/x/reporting/db"
 	"github.com/dailytravel/x/reporting/db/migrations"
 	"github.com/dailytravel/x/reporting/graph"
-	"github.com/dailytravel/x/reporting/pkg/mongo"
-	"github.com/dailytravel/x/reporting/pkg/redis"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -43,7 +42,7 @@ func playgroundHandler() gin.HandlerFunc {
 
 // Defining the Graphql handler
 func graphqlHandler() gin.HandlerFunc {
-	resolver := graph.NewResolver(mongo.DB, redis.Redis)
+	resolver := graph.NewResolver(db.Database, db.Redis, db.Client)
 	c := graph.Config{Resolvers: resolver}
 	config.Directives(&c)
 
@@ -73,7 +72,7 @@ func graphqlHandler() gin.HandlerFunc {
 
 func main() {
 	// connect MongoDB
-	client, err := mongo.ConnectDB()
+	client, err := db.ConnectDB()
 	if err != nil {
 		log.Fatal("Error connecting to MongoDB: ", err)
 	}
@@ -84,8 +83,9 @@ func main() {
 		}
 	}()
 
-	mongo.DB = client.Database(os.Getenv("DB_NAME"))
-	redis.Redis = redis.ConnectRedis()
+	db.Database = client.Database(os.Getenv("DB_NAME"))
+	db.Redis = db.ConnectRedis()
+	db.Client = db.ConnectTypesense()
 
 	if err := migrations.AutoMigrate(); err != nil {
 		log.Fatal("Error running migrations: ", err)

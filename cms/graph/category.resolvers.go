@@ -11,6 +11,56 @@ import (
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *categoryResolver) ID(ctx context.Context, obj *model.Category) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Parent is the resolver for the parent field.
+func (r *categoryResolver) Parent(ctx context.Context, obj *model.Category) (*model.Category, error) {
+	panic(fmt.Errorf("not implemented: Parent - parent"))
+}
+
+// Children is the resolver for the children field.
+func (r *categoryResolver) Children(ctx context.Context, obj *model.Category) ([]*model.Category, error) {
+	panic(fmt.Errorf("not implemented: Children - children"))
+}
+
+// Name is the resolver for the name field.
+func (r *categoryResolver) Name(ctx context.Context, obj *model.Category) (string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
+}
+
+// Description is the resolver for the description field.
+func (r *categoryResolver) Description(ctx context.Context, obj *model.Category) (*string, error) {
+	panic(fmt.Errorf("not implemented: Description - description"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *categoryResolver) Metadata(ctx context.Context, obj *model.Category) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *categoryResolver) CreatedAt(ctx context.Context, obj *model.Category) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *categoryResolver) UpdatedAt(ctx context.Context, obj *model.Category) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *categoryResolver) CreatedBy(ctx context.Context, obj *model.Category) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *categoryResolver) UpdatedBy(ctx context.Context, obj *model.Category) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateCategory is the resolver for the createCategory field.
 func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCategory) (*model.Category, error) {
 	panic(fmt.Errorf("not implemented: CreateCategory - createCategory"))
@@ -40,3 +90,8 @@ func (r *queryResolver) Category(ctx context.Context, id string) (*model.Categor
 func (r *queryResolver) Categories(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
 	panic(fmt.Errorf("not implemented: Categories - categories"))
 }
+
+// Category returns CategoryResolver implementation.
+func (r *Resolver) Category() CategoryResolver { return &categoryResolver{r} }
+
+type categoryResolver struct{ *Resolver }

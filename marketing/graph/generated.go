@@ -38,6 +38,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Entity() EntityResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -87,6 +88,10 @@ type ComplexityRoot struct {
 
 	Category struct {
 		ID func(childComplexity int) int
+	}
+
+	Entity struct {
+		FindCampaignByID func(childComplexity int, id string) int
 	}
 
 	Follow struct {
@@ -195,6 +200,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type EntityResolver interface {
+	FindCampaignByID(ctx context.Context, id string) (*model.Campaign, error)
+}
 type MutationResolver interface {
 	CreateAudience(ctx context.Context, input model.NewAudience) (*model.Audience, error)
 	UpdateAudience(ctx context.Context, id string, input model.UpdateAudience) (*model.Audience, error)
@@ -413,6 +421,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Category.ID(childComplexity), true
+
+	case "Entity.findCampaignByID":
+		if e.complexity.Entity.FindCampaignByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findCampaignByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindCampaignByID(childComplexity, args["id"].(string)), true
 
 	case "Follow.id":
 		if e.complexity.Follow.ID == nil {
@@ -1169,7 +1189,13 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Category | Follow | Response | User
+union _Entity = Campaign | Category | Follow | Response | User
+
+# fake type to build resolver interfaces for users to implement
+type Entity {
+		findCampaignByID(id: ID!,): Campaign!
+
+}
 
 type _Service {
   sdl: String
@@ -1214,6 +1240,21 @@ func (ec *executionContext) dir_hasScope_args(ctx context.Context, rawArgs map[s
 		}
 	}
 	args["scope"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findCampaignByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -2849,6 +2890,87 @@ func (ec *executionContext) fieldContext_Category_id(ctx context.Context, field 
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Entity_findCampaignByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findCampaignByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindCampaignByID(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Campaign)
+	fc.Result = res
+	return ec.marshalNCampaign2ᚖgithubᚗcomᚋdailytravelᚋxᚋmarketingᚋgraphᚋmodelᚐCampaign(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findCampaignByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Campaign_id(ctx, field)
+			case "owner":
+				return ec.fieldContext_Campaign_owner(ctx, field)
+			case "audience":
+				return ec.fieldContext_Campaign_audience(ctx, field)
+			case "type":
+				return ec.fieldContext_Campaign_type(ctx, field)
+			case "name":
+				return ec.fieldContext_Campaign_name(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Campaign_metadata(ctx, field)
+			case "status":
+				return ec.fieldContext_Campaign_status(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Campaign_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Campaign_updated_at(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Campaign_created_by(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Campaign_updated_by(ctx, field)
+			case "responses":
+				return ec.fieldContext_Campaign_responses(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Campaign", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findCampaignByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -9474,6 +9596,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case model.Campaign:
+		return ec._Campaign(ctx, sel, &obj)
+	case *model.Campaign:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Campaign(ctx, sel, obj)
 	case model.Category:
 		return ec._Category(ctx, sel, &obj)
 	case *model.Category:
@@ -9620,7 +9749,7 @@ func (ec *executionContext) _Audiences(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
-var campaignImplementors = []string{"Campaign"}
+var campaignImplementors = []string{"Campaign", "_Entity"}
 
 func (ec *executionContext) _Campaign(ctx context.Context, sel ast.SelectionSet, obj *model.Campaign) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, campaignImplementors)
@@ -9759,6 +9888,70 @@ func (ec *executionContext) _Category(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var entityImplementors = []string{"Entity"}
+
+func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, entityImplementors)
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Entity",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Entity")
+		case "findCampaignByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findCampaignByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10993,6 +11186,20 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNCampaign2githubᚗcomᚋdailytravelᚋxᚋmarketingᚋgraphᚋmodelᚐCampaign(ctx context.Context, sel ast.SelectionSet, v model.Campaign) graphql.Marshaler {
+	return ec._Campaign(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCampaign2ᚖgithubᚗcomᚋdailytravelᚋxᚋmarketingᚋgraphᚋmodelᚐCampaign(ctx context.Context, sel ast.SelectionSet, v *model.Campaign) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Campaign(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNCampaignType2githubᚗcomᚋdailytravelᚋxᚋmarketingᚋgraphᚋmodelᚐCampaignType(ctx context.Context, v interface{}) (model.CampaignType, error) {

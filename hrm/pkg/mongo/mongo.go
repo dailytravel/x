@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	DB *mongo.Database
+	Database *mongo.Database
 )
 
 func ConnectDB() (*mongo.Client, error) {

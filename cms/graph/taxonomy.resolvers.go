@@ -40,3 +40,28 @@ func (r *queryResolver) Taxonomies(ctx context.Context, ids []string) ([]*model.
 func (r *queryResolver) Taxonomy(ctx context.Context, id string) (*model.Taxonomy, error) {
 	panic(fmt.Errorf("not implemented: Taxonomy - taxonomy"))
 }
+
+// ID is the resolver for the id field.
+func (r *taxonomyResolver) ID(ctx context.Context, obj *model.Taxonomy) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Category is the resolver for the category field.
+func (r *taxonomyResolver) Category(ctx context.Context, obj *model.Taxonomy) (*model.Category, error) {
+	panic(fmt.Errorf("not implemented: Category - category"))
+}
+
+// Taxonomizable is the resolver for the Taxonomizable field.
+func (r *taxonomyResolver) Taxonomizable(ctx context.Context, obj *model.Taxonomy) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Taxonomizable - Taxonomizable"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *taxonomyResolver) CreatedAt(ctx context.Context, obj *model.Taxonomy) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// Taxonomy returns TaxonomyResolver implementation.
+func (r *Resolver) Taxonomy() TaxonomyResolver { return &taxonomyResolver{r} }
+
+type taxonomyResolver struct{ *Resolver }

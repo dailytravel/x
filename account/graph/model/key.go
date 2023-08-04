@@ -11,16 +11,16 @@ import (
 
 type Key struct {
 	Model       `bson:",inline"`
-	Owner       primitive.ObjectID  `json:"owner,omitempty" bson:"owner,omitempty"`
-	Name        string              `json:"name,omitempty" bson:"name,omitempty"`
-	Type        string              `json:"type,omitempty" bson:"type,omitempty"`
-	Provider    string              `json:"provider,omitempty" bson:"provider,omitempty"`
-	Kid         string              `json:"kid,omitempty" bson:"kid,omitempty"`
-	Certificate string              `json:"certificate,omitempty" bson:"certificate,omitempty"`
-	Fingerprint string              `json:"fingerprint,omitempty" bson:"fingerprint,omitempty"`
-	Thumbprint  string              `json:"thumbprint,omitempty" bson:"thumbprint,omitempty"`
-	ExpiresAt   primitive.Timestamp `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
-	Status      string              `json:"status,omitempty" bson:"status,omitempty"`
+	Owner       *primitive.ObjectID  `json:"owner,omitempty" bson:"owner,omitempty"`
+	Name        string               `json:"name" bson:"name"`
+	Type        string               `json:"type" bson:"type"`
+	Provider    string               `json:"provider" bson:"provider"`
+	Kid         string               `json:"kid" bson:"kid"`
+	Certificate string               `json:"certificate" bson:"certificate"`
+	Fingerprint string               `json:"fingerprint" bson:"fingerprint"`
+	Thumbprint  string               `json:"thumbprint" bson:"thumbprint"`
+	ExpiresAt   *primitive.Timestamp `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
+	Status      string               `json:"status" bson:"status"`
 }
 
 func (i *Key) MarshalBSON() ([]byte, error) {

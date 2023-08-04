@@ -39,6 +39,8 @@ type Campaign struct {
 	Responses []*Response            `json:"responses,omitempty"`
 }
 
+func (Campaign) IsEntity() {}
+
 type Campaigns struct {
 	Count int         `json:"count"`
 	Data  []*Campaign `json:"data,omitempty"`

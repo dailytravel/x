@@ -11,6 +11,31 @@ import (
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *countryResolver) ID(ctx context.Context, obj *model.Country) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Name is the resolver for the name field.
+func (r *countryResolver) Name(ctx context.Context, obj *model.Country) (string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *countryResolver) Metadata(ctx context.Context, obj *model.Country) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *countryResolver) CreatedAt(ctx context.Context, obj *model.Country) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *countryResolver) UpdatedAt(ctx context.Context, obj *model.Country) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
 // CreateCountry is the resolver for the createCountry field.
 func (r *mutationResolver) CreateCountry(ctx context.Context, input model.NewCountry) (*model.Country, error) {
 	panic(fmt.Errorf("not implemented: CreateCountry - createCountry"))
@@ -40,3 +65,8 @@ func (r *queryResolver) Country(ctx context.Context, id string) (*model.Country,
 func (r *queryResolver) Countries(ctx context.Context, args map[string]interface{}) (*model.Countries, error) {
 	panic(fmt.Errorf("not implemented: Countries - countries"))
 }
+
+// Country returns CountryResolver implementation.
+func (r *Resolver) Country() CountryResolver { return &countryResolver{r} }
+
+type countryResolver struct{ *Resolver }

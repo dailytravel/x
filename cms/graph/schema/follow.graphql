@@ -1,7 +1,7 @@
 type Follow @key(fields: "id") {
   id: ID!
   user: User!
-  object: Map! #contact with object._id and object.type
+  followable: Map! #contact with followable._id and followable.type
   role: String
   status: String!
   created_at: String!
@@ -29,8 +29,8 @@ type Follows {
 
 input NewFollow {
   user: ID!
-  object: ID!
-  type: String!
+  followableId: ID!
+  followableType: String!
   role: String!
   status: String!
 }

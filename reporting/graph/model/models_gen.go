@@ -14,14 +14,14 @@ type Activities struct {
 }
 
 type Activity struct {
-	ID        string                 `json:"id"`
-	User      *User                  `json:"user"`
-	Object    map[string]interface{} `json:"object"`
-	Comment   *Comment               `json:"comment,omitempty"`
-	Action    string                 `json:"action"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    string                 `json:"status"`
-	CreatedAt string                 `json:"created_at"`
+	ID          string                 `json:"id"`
+	User        *User                  `json:"user"`
+	Activitable map[string]interface{} `json:"activitable"`
+	Comment     *Comment               `json:"comment,omitempty"`
+	Action      string                 `json:"action"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      string                 `json:"status"`
+	CreatedAt   string                 `json:"created_at"`
 }
 
 type Campaign struct {
