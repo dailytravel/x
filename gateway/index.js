@@ -33,7 +33,7 @@ const authenticate = expressjwt({
 
 class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   willSendRequest({ request, context }) {
-    request.http.headers.set("x-user-id", context.userId);
+    request.http.headers.set("auth", context.auth);
     request.http.headers.set("x-api-key", context.apiKey);
   }
 }
@@ -67,14 +67,16 @@ async function startApolloServer() {
 
   // Use the Apollo server middleware along with authentication and CORS
   app.use(
-    cors(),
+    cors({
+      origin: ["http://localhost:4000", "https://api.trip.express"],
+    }),
     json(),
     authenticate,
     expressMiddleware(server, {
       context: async ({ req }) => {
         return {
-          userId: req.auth?.sub,
           apiKey: req.headers["x-api-key"],
+          auth: req.headers["auth"],
         };
       },
     })
