@@ -1,12 +1,14 @@
 {
   "name": "x",
   "version": "0.1.0",
-  "private": true,
   "license": "MIT",
+  "scripts": {
+    "start": "node ./gateway/index.js",
+    "dev": "nodemon ./gateway/index.js"
+  },
   "dependencies": {
     "@apollo/gateway": "^2.5.1",
     "@apollo/server": "^4.9.0",
-    "apollo-server-express": "^3.12.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

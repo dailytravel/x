@@ -28,8 +28,6 @@ func ConnectRedis() *redis.Client {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Connected to Redis")
-
 	return rdb
 }
 
