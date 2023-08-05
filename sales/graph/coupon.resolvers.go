@@ -11,6 +11,51 @@ import (
 	"github.com/dailytravel/x/sales/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *couponResolver) ID(ctx context.Context, obj *model.Coupon) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// StartDate is the resolver for the start_date field.
+func (r *couponResolver) StartDate(ctx context.Context, obj *model.Coupon) (string, error) {
+	panic(fmt.Errorf("not implemented: StartDate - start_date"))
+}
+
+// EndDate is the resolver for the end_date field.
+func (r *couponResolver) EndDate(ctx context.Context, obj *model.Coupon) (int, error) {
+	panic(fmt.Errorf("not implemented: EndDate - end_date"))
+}
+
+// Products is the resolver for the products field.
+func (r *couponResolver) Products(ctx context.Context, obj *model.Coupon) ([]*model.Content, error) {
+	panic(fmt.Errorf("not implemented: Products - products"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *couponResolver) Metadata(ctx context.Context, obj *model.Coupon) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *couponResolver) CreatedAt(ctx context.Context, obj *model.Coupon) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *couponResolver) UpdatedAt(ctx context.Context, obj *model.Coupon) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *couponResolver) CreatedBy(ctx context.Context, obj *model.Coupon) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *couponResolver) UpdatedBy(ctx context.Context, obj *model.Coupon) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateCoupon is the resolver for the createCoupon field.
 func (r *mutationResolver) CreateCoupon(ctx context.Context, input model.NewCoupon) (*model.Coupon, error) {
 	panic(fmt.Errorf("not implemented: CreateCoupon - createCoupon"))
@@ -40,3 +85,8 @@ func (r *queryResolver) Coupon(ctx context.Context, id string) (*model.Coupon, e
 func (r *queryResolver) Coupons(ctx context.Context, args map[string]interface{}) (*model.Coupons, error) {
 	panic(fmt.Errorf("not implemented: Coupons - coupons"))
 }
+
+// Coupon returns CouponResolver implementation.
+func (r *Resolver) Coupon() CouponResolver { return &couponResolver{r} }
+
+type couponResolver struct{ *Resolver }

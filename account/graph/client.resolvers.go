@@ -7,13 +7,14 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *clientResolver) ID(ctx context.Context, obj *model.Client) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // User is the resolver for the user field.
@@ -23,7 +24,7 @@ func (r *clientResolver) User(ctx context.Context, obj *model.Client) (*model.Us
 
 // Metadata is the resolver for the metadata field.
 func (r *clientResolver) Metadata(ctx context.Context, obj *model.Client) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // LastUsed is the resolver for the last_used field.
@@ -33,12 +34,12 @@ func (r *clientResolver) LastUsed(ctx context.Context, obj *model.Client) (*int,
 
 // CreatedAt is the resolver for the created_at field.
 func (r *clientResolver) CreatedAt(ctx context.Context, obj *model.Client) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *clientResolver) UpdatedAt(ctx context.Context, obj *model.Client) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // ExpiresAt is the resolver for the expires_at field.

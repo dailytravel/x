@@ -40,3 +40,58 @@ func (r *queryResolver) Quotes(ctx context.Context, args map[string]interface{})
 func (r *queryResolver) Quote(ctx context.Context, id string) (*model.Quote, error) {
 	panic(fmt.Errorf("not implemented: Quote - quote"))
 }
+
+// ID is the resolver for the id field.
+func (r *quoteResolver) ID(ctx context.Context, obj *model.Quote) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *quoteResolver) Owner(ctx context.Context, obj *model.Quote) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Contact is the resolver for the contact field.
+func (r *quoteResolver) Contact(ctx context.Context, obj *model.Quote) (*model.Contact, error) {
+	panic(fmt.Errorf("not implemented: Contact - contact"))
+}
+
+// ValidUntil is the resolver for the valid_until field.
+func (r *quoteResolver) ValidUntil(ctx context.Context, obj *model.Quote) (int, error) {
+	panic(fmt.Errorf("not implemented: ValidUntil - valid_until"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *quoteResolver) Metadata(ctx context.Context, obj *model.Quote) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// Billing is the resolver for the billing field.
+func (r *quoteResolver) Billing(ctx context.Context, obj *model.Quote) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Billing - billing"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *quoteResolver) CreatedAt(ctx context.Context, obj *model.Quote) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *quoteResolver) UpdatedAt(ctx context.Context, obj *model.Quote) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *quoteResolver) CreatedBy(ctx context.Context, obj *model.Quote) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *quoteResolver) UpdatedBy(ctx context.Context, obj *model.Quote) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Quote returns QuoteResolver implementation.
+func (r *Resolver) Quote() QuoteResolver { return &quoteResolver{r} }
+
+type quoteResolver struct{ *Resolver }

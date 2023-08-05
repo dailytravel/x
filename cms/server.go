@@ -65,9 +65,6 @@ func graphqlHandler() gin.HandlerFunc {
 			log.Println("Websocket request")
 		}
 
-		xAPIKey := c.GetHeader("x-api-key")
-		log.Println("x-api-key: ", xAPIKey)
-
 		server.ServeHTTP(c.Writer, c.Request)
 	}
 }
@@ -94,8 +91,7 @@ func main() {
 	}
 
 	// setting up Gin
-	r := gin.Default()
-
+	r := gin.New()
 	r.Use(auth.Middleware())
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},

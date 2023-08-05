@@ -92,8 +92,7 @@ func main() {
 	}
 
 	// setting up Gin
-	r := gin.Default()
-
+	r := gin.New()
 	r.Use(auth.Middleware())
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},

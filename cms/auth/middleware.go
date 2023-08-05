@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -18,8 +19,12 @@ const LocaleContextKey contextKey = "LocaleContextKey"
 
 func Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		auth := c.Request.Header.Get("auth")
-		apiKey := c.Request.Header.Get("x-api-key")
+		auth := c.GetHeader("auth")
+		apiKey := c.GetHeader("x-api-key")
+
+		//log header keys here
+		log.Println("apiKey: ", c.Request.Header.Get("x-api-key"))
+
 		ctx := context.WithValue(c.Request.Context(), GinContextKey, c)
 		ctx = context.WithValue(ctx, AuthContextKey, auth)
 		ctx = context.WithValue(ctx, APIKeyContextKey, apiKey)

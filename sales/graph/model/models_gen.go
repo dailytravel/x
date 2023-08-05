@@ -24,46 +24,6 @@ type Comment struct {
 
 func (Comment) IsEntity() {}
 
-type Contact struct {
-	ID           string                 `json:"id"`
-	Owner        *User                  `json:"owner,omitempty"`
-	Reference    *string                `json:"reference,omitempty"`
-	Type         *string                `json:"type,omitempty"`
-	FirstName    *string                `json:"first_name,omitempty"`
-	LastName     *string                `json:"last_name,omitempty"`
-	Email        *Email                 `json:"email,omitempty"`
-	Phone        *Phone                 `json:"phone,omitempty"`
-	Picture      *string                `json:"picture,omitempty"`
-	Street       *string                `json:"street,omitempty"`
-	City         *string                `json:"city,omitempty"`
-	State        *string                `json:"state,omitempty"`
-	Zip          *string                `json:"zip,omitempty"`
-	Country      *string                `json:"country,omitempty"`
-	Website      *string                `json:"website,omitempty"`
-	Gender       *Gender                `json:"gender,omitempty"`
-	Birthday     *string                `json:"birthday,omitempty"`
-	Organization *Organization          `json:"organization,omitempty"`
-	JobTitle     *string                `json:"job_title,omitempty"`
-	Timezone     *string                `json:"timezone,omitempty"`
-	Language     *string                `json:"language,omitempty"`
-	Source       *string                `json:"source,omitempty"`
-	Revenue      *float64               `json:"revenue,omitempty"`
-	Subscribed   *bool                  `json:"subscribed,omitempty"`
-	Rating       *int                   `json:"rating,omitempty"`
-	Notes        *string                `json:"notes,omitempty"`
-	Stage        *string                `json:"stage,omitempty"`
-	Reviewable   *bool                  `json:"reviewable,omitempty"`
-	Status       *string                `json:"status,omitempty"`
-	Labels       []*string              `json:"labels,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
-	LastActivity *int                   `json:"last_activity,omitempty"`
-	CreatedAt    string                 `json:"created_at"`
-	UpdatedAt    string                 `json:"updated_at"`
-	Followers    []*Follow              `json:"followers,omitempty"`
-}
-
-func (Contact) IsEntity() {}
-
 type Contacts struct {
 	Count int        `json:"count"`
 	Data  []*Contact `json:"data,omitempty"`
@@ -98,28 +58,6 @@ type Contract struct {
 type Contracts struct {
 	Data  []*Contract `json:"data,omitempty"`
 	Count int         `json:"count"`
-}
-
-type Coupon struct {
-	ID          string                 `json:"id"`
-	Locale      string                 `json:"locale"`
-	Code        string                 `json:"code"`
-	Description string                 `json:"description"`
-	Type        string                 `json:"type"`
-	Amount      float64                `json:"amount"`
-	MaxDiscount *float64               `json:"max_discount,omitempty"`
-	Currency    string                 `json:"currency"`
-	StartDate   string                 `json:"start_date"`
-	EndDate     int                    `json:"end_date"`
-	Products    []*Content             `json:"products,omitempty"`
-	MaxUses     *int                   `json:"max_uses,omitempty"`
-	MinPurchase *float64               `json:"min_purchase,omitempty"`
-	Uses        *int                   `json:"uses,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	CreatedBy   *User                  `json:"created_by,omitempty"`
-	UpdatedBy   *User                  `json:"updated_by,omitempty"`
 }
 
 type Coupons struct {
@@ -179,31 +117,6 @@ type Inventories struct {
 	Data  []*Inventory `json:"data,omitempty"`
 	Count *int         `json:"count,omitempty"`
 }
-
-type Inventory struct {
-	ID       string   `json:"id"`
-	Product  *Product `json:"product"`
-	Date     int      `json:"date"`
-	Quantity *int     `json:"quantity,omitempty"`
-}
-
-type Membership struct {
-	ID           string                 `json:"id"`
-	User         *User                  `json:"user"`
-	Tier         *Tier                  `json:"tier"`
-	Number       string                 `json:"number"`
-	Since        string                 `json:"since"`
-	Until        string                 `json:"until"`
-	Billing      map[string]interface{} `json:"billing,omitempty"`
-	Payment      map[string]interface{} `json:"payment,omitempty"`
-	Transactions []*Transaction         `json:"transactions,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
-	Status       string                 `json:"status"`
-	CreatedAt    string                 `json:"created_at"`
-	UpdatedAt    string                 `json:"updated_at"`
-}
-
-func (Membership) IsEntity() {}
 
 type NewContact struct {
 	Organization *string                `json:"organization,omitempty"`
@@ -395,56 +308,10 @@ type NewWishlist struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type Order struct {
-	ID          string  `json:"id"`
-	Owner       *User   `json:"owner,omitempty"`
-	Reference   string  `json:"reference"`
-	Total       float64 `json:"total"`
-	Currency    string  `json:"currency"`
-	Cancellable bool    `json:"cancellable"`
-	Status      string  `json:"status"`
-	CancelledAt *int    `json:"cancelled_at,omitempty"`
-	CreatedAt   string  `json:"created_at"`
-	UpdatedAt   string  `json:"updated_at"`
-	CreatedBy   *User   `json:"created_by,omitempty"`
-	UpdatedBy   *User   `json:"updated_by,omitempty"`
-}
-
 type Orders struct {
 	Data  []*Order `json:"data,omitempty"`
 	Count int      `json:"count"`
 }
-
-type Organization struct {
-	ID             string                 `json:"id"`
-	Name           string                 `json:"name"`
-	Description    *string                `json:"description,omitempty"`
-	Type           string                 `json:"type"`
-	Parent         *Organization          `json:"parent,omitempty"`
-	Children       []*Organization        `json:"children,omitempty"`
-	Industry       *string                `json:"industry,omitempty"`
-	Employees      *int                   `json:"employees,omitempty"`
-	Revenue        *float64               `json:"revenue,omitempty"`
-	City           *string                `json:"city,omitempty"`
-	State          *string                `json:"state,omitempty"`
-	Zip            *string                `json:"zip,omitempty"`
-	Country        *string                `json:"country,omitempty"`
-	Timezone       *string                `json:"timezone,omitempty"`
-	Phone          *string                `json:"phone,omitempty"`
-	Website        *string                `json:"website,omitempty"`
-	IsOrganization *bool                  `json:"is_organization,omitempty"`
-	Metadata       map[string]interface{} `json:"metadata,omitempty"`
-	Status         string                 `json:"status"`
-	LastActivity   int                    `json:"last_activity"`
-	CreatedAt      string                 `json:"created_at"`
-	UpdatedAt      string                 `json:"updated_at"`
-	Owner          *User                  `json:"owner,omitempty"`
-	Followers      []*Follow              `json:"followers,omitempty"`
-	CreatedBy      *User                  `json:"created_by,omitempty"`
-	UpdatedBy      *User                  `json:"updated_by,omitempty"`
-}
-
-func (Organization) IsEntity() {}
 
 type Organizations struct {
 	Data  []*Organization `json:"data,omitempty"`
@@ -499,39 +366,9 @@ type Points struct {
 	Data  []*Point `json:"data,omitempty"`
 }
 
-type Price struct {
-	ID        string                 `json:"id"`
-	Product   *Product               `json:"product"`
-	StartDate *string                `json:"start_date,omitempty"`
-	EndDate   *int                   `json:"end_date,omitempty"`
-	Regular   float64                `json:"regular"`
-	Sale      *float64               `json:"sale,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-}
-
 type Prices struct {
 	Data  []*Price `json:"data,omitempty"`
 	Count *int     `json:"count,omitempty"`
-}
-
-type Product struct {
-	ID          string                 `json:"id"`
-	Content     *Content               `json:"content"`
-	Sku         string                 `json:"sku"`
-	Locale      string                 `json:"locale"`
-	Type        string                 `json:"type"`
-	Name        string                 `json:"name"`
-	Description *string                `json:"description,omitempty"`
-	Quantity    int                    `json:"quantity"`
-	Prices      []*Price               `json:"prices"`
-	Inventory   []*Inventory           `json:"inventory"`
-	Currency    string                 `json:"currency"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      string                 `json:"status"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	CreatedBy   *User                  `json:"created_by"`
-	UpdatedBy   *User                  `json:"updated_by"`
 }
 
 type Products struct {
@@ -539,48 +376,9 @@ type Products struct {
 	Count int        `json:"count"`
 }
 
-type Program struct {
-	ID          string                 `json:"id"`
-	Type        ProgramType            `json:"type"`
-	Locale      string                 `json:"locale"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Points      int                    `json:"points"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	CreatedBy   *User                  `json:"created_by"`
-	UpdatedBy   *User                  `json:"updated_by"`
-}
-
 type Programs struct {
 	Data  []*Program `json:"data,omitempty"`
 	Count int        `json:"count"`
-}
-
-type Quote struct {
-	ID          string                 `json:"id"`
-	Owner       *User                  `json:"owner"`
-	Locale      string                 `json:"locale"`
-	Contact     *Contact               `json:"contact,omitempty"`
-	Reference   string                 `json:"reference"`
-	Purchase    string                 `json:"purchase"`
-	Name        string                 `json:"name"`
-	Description *string                `json:"description,omitempty"`
-	Terms       *string                `json:"terms,omitempty"`
-	Payment     *string                `json:"payment,omitempty"`
-	Notes       *string                `json:"notes,omitempty"`
-	Template    string                 `json:"template"`
-	ValidUntil  int                    `json:"valid_until"`
-	Amount      float64                `json:"amount"`
-	Currency    string                 `json:"currency"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Billing     map[string]interface{} `json:"billing"`
-	Status      *string                `json:"status,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	CreatedBy   *User                  `json:"created_by,omitempty"`
-	UpdatedBy   *User                  `json:"updated_by,omitempty"`
 }
 
 type Quotes struct {
@@ -588,41 +386,9 @@ type Quotes struct {
 	Data  []*Quote `json:"data,omitempty"`
 }
 
-type Reward struct {
-	ID          string                 `json:"id"`
-	Tier        *Tier                  `json:"tier"`
-	Locale      string                 `json:"locale"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Cost        int                    `json:"cost"`
-	Status      string                 `json:"status"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	ExpiresAt   *string                `json:"expires_at,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	CreatedBy   *User                  `json:"created_by,omitempty"`
-	UpdatedBy   *User                  `json:"updated_by,omitempty"`
-}
-
 type Rewards struct {
 	Data  []*Reward `json:"data,omitempty"`
 	Count int       `json:"count"`
-}
-
-type Tier struct {
-	ID          string                 `json:"id"`
-	Locale      string                 `json:"locale"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Benefits    []*Benefit             `json:"benefits"`
-	Cost        int                    `json:"cost"`
-	Rewards     []*Reward              `json:"rewards"`
-	Status      string                 `json:"status"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	CreatedBy   *User                  `json:"created_by"`
-	UpdatedBy   *User                  `json:"updated_by"`
 }
 
 type Tiers struct {

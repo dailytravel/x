@@ -9,12 +9,12 @@ type User @key(fields: "id") {
   mfa: MFA
   timezone: String
   login_attempts: Int
-  last_login: Int
+  last_login: String
   last_ip: String
-  verified_at: Int
+  verified_at: String
   created_at: String!
   updated_at: String!
-  last_activity: Int
+  last_activity: String
   identities: [Identity]
   metadata: Map
   status: String

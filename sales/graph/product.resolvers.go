@@ -31,6 +31,61 @@ func (r *mutationResolver) DeleteProducts(ctx context.Context, ids []string) (ma
 	panic(fmt.Errorf("not implemented: DeleteProducts - deleteProducts"))
 }
 
+// ID is the resolver for the id field.
+func (r *productResolver) ID(ctx context.Context, obj *model.Product) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Content is the resolver for the content field.
+func (r *productResolver) Content(ctx context.Context, obj *model.Product) (*model.Content, error) {
+	panic(fmt.Errorf("not implemented: Content - content"))
+}
+
+// Name is the resolver for the name field.
+func (r *productResolver) Name(ctx context.Context, obj *model.Product) (string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
+}
+
+// Description is the resolver for the description field.
+func (r *productResolver) Description(ctx context.Context, obj *model.Product) (*string, error) {
+	panic(fmt.Errorf("not implemented: Description - description"))
+}
+
+// Prices is the resolver for the prices field.
+func (r *productResolver) Prices(ctx context.Context, obj *model.Product) ([]*model.Price, error) {
+	panic(fmt.Errorf("not implemented: Prices - prices"))
+}
+
+// Inventory is the resolver for the inventory field.
+func (r *productResolver) Inventory(ctx context.Context, obj *model.Product) ([]*model.Inventory, error) {
+	panic(fmt.Errorf("not implemented: Inventory - inventory"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *productResolver) Metadata(ctx context.Context, obj *model.Product) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *productResolver) CreatedAt(ctx context.Context, obj *model.Product) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *productResolver) UpdatedAt(ctx context.Context, obj *model.Product) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *productResolver) CreatedBy(ctx context.Context, obj *model.Product) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *productResolver) UpdatedBy(ctx context.Context, obj *model.Product) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // Product is the resolver for the product field.
 func (r *queryResolver) Product(ctx context.Context, id string) (*model.Product, error) {
 	panic(fmt.Errorf("not implemented: Product - product"))
@@ -40,3 +95,8 @@ func (r *queryResolver) Product(ctx context.Context, id string) (*model.Product,
 func (r *queryResolver) Products(ctx context.Context, args map[string]interface{}) (*model.Products, error) {
 	panic(fmt.Errorf("not implemented: Products - products"))
 }
+
+// Product returns ProductResolver implementation.
+func (r *Resolver) Product() ProductResolver { return &productResolver{r} }
+
+type productResolver struct{ *Resolver }

@@ -12,6 +12,7 @@ import (
 
 	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
+	"github.com/dailytravel/x/cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -49,12 +50,43 @@ func (r *localeResolver) UpdatedAt(ctx context.Context, obj *model.Locale) (stri
 
 // CreateLocale is the resolver for the createLocale field.
 func (r *mutationResolver) CreateLocale(ctx context.Context, input model.NewLocale) (*model.Locale, error) {
-	panic(fmt.Errorf("not implemented: CreateLocale - createLocale"))
+	var item *model.Locale
+
+	doc := &model.Locale{
+		Code: input.Code,
+		Name: map[string]interface{}{
+			input.Locale: input.Name,
+		},
+	}
+
+	//insert item
+	if _, err := r.db.Collection(item.Collection()).InsertOne(ctx, doc, nil); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateLocale is the resolver for the updateLocale field.
 func (r *mutationResolver) UpdateLocale(ctx context.Context, id string, input model.UpdateLocale) (*model.Locale, error) {
-	panic(fmt.Errorf("not implemented: UpdateLocale - updateLocale"))
+	var item *model.Locale
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	//get item
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}, nil).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	//update item
+	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, bson.M{"_id": _id}, bson.M{"$set": input}); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteLocale is the resolver for the deleteLocale field.
@@ -107,7 +139,7 @@ func (r *mutationResolver) DeleteLocales(ctx context.Context, ids []string) (map
 func (r *queryResolver) Locales(ctx context.Context, args map[string]interface{}) (*model.Locales, error) {
 	var items []*model.Locale
 	//find all items
-	cur, err := r.db.Collection("locales").Find(ctx, r.model.Query(args), r.model.Options(args))
+	cur, err := r.db.Collection("locales").Find(ctx, utils.Query(args), utils.Options(args))
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +153,7 @@ func (r *queryResolver) Locales(ctx context.Context, args map[string]interface{}
 	}
 
 	//get total count
-	count, err := r.db.Collection("locales").CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("locales").CountDocuments(ctx, utils.Query(args), nil)
 	if err != nil {
 		return nil, err
 	}

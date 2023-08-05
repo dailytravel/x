@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
 )
@@ -43,7 +44,7 @@ func (r *queryResolver) Roles(ctx context.Context, args map[string]interface{}) 
 
 // ID is the resolver for the id field.
 func (r *roleResolver) ID(ctx context.Context, obj *model.Role) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Permissions is the resolver for the permissions field.
@@ -53,12 +54,12 @@ func (r *roleResolver) Permissions(ctx context.Context, obj *model.Role) ([]*mod
 
 // CreatedAt is the resolver for the created_at field.
 func (r *roleResolver) CreatedAt(ctx context.Context, obj *model.Role) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *roleResolver) UpdatedAt(ctx context.Context, obj *model.Role) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreatedBy is the resolver for the created_by field.

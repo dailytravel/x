@@ -31,6 +31,51 @@ func (r *mutationResolver) DeletePrograms(ctx context.Context, ids []string) (*b
 	panic(fmt.Errorf("not implemented: DeletePrograms - deletePrograms"))
 }
 
+// ID is the resolver for the id field.
+func (r *programResolver) ID(ctx context.Context, obj *model.Program) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Type is the resolver for the type field.
+func (r *programResolver) Type(ctx context.Context, obj *model.Program) (model.ProgramType, error) {
+	panic(fmt.Errorf("not implemented: Type - type"))
+}
+
+// Name is the resolver for the name field.
+func (r *programResolver) Name(ctx context.Context, obj *model.Program) (string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
+}
+
+// Description is the resolver for the description field.
+func (r *programResolver) Description(ctx context.Context, obj *model.Program) (string, error) {
+	panic(fmt.Errorf("not implemented: Description - description"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *programResolver) Metadata(ctx context.Context, obj *model.Program) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *programResolver) CreatedAt(ctx context.Context, obj *model.Program) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *programResolver) UpdatedAt(ctx context.Context, obj *model.Program) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *programResolver) CreatedBy(ctx context.Context, obj *model.Program) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *programResolver) UpdatedBy(ctx context.Context, obj *model.Program) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // Program is the resolver for the program field.
 func (r *queryResolver) Program(ctx context.Context, id string) (*model.Program, error) {
 	panic(fmt.Errorf("not implemented: Program - program"))
@@ -40,3 +85,8 @@ func (r *queryResolver) Program(ctx context.Context, id string) (*model.Program,
 func (r *queryResolver) Programs(ctx context.Context, args map[string]interface{}) (*model.Programs, error) {
 	panic(fmt.Errorf("not implemented: Programs - programs"))
 }
+
+// Program returns ProgramResolver implementation.
+func (r *Resolver) Program() ProgramResolver { return &programResolver{r} }
+
+type programResolver struct{ *Resolver }

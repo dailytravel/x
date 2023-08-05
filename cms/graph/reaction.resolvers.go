@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/cms/graph/model"
 )
@@ -33,7 +34,7 @@ func (r *queryResolver) Reactions(ctx context.Context, args map[string]interface
 
 // ID is the resolver for the id field.
 func (r *reactionResolver) ID(ctx context.Context, obj *model.Reaction) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // User is the resolver for the user field.
@@ -48,12 +49,12 @@ func (r *reactionResolver) Reactable(ctx context.Context, obj *model.Reaction) (
 
 // CreatedAt is the resolver for the created_at field.
 func (r *reactionResolver) CreatedAt(ctx context.Context, obj *model.Reaction) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *reactionResolver) UpdatedAt(ctx context.Context, obj *model.Reaction) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Reaction returns ReactionResolver implementation.

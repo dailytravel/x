@@ -40,3 +40,58 @@ func (r *queryResolver) Rewards(ctx context.Context, args map[string]interface{}
 func (r *queryResolver) Reward(ctx context.Context, id string) (*model.Reward, error) {
 	panic(fmt.Errorf("not implemented: Reward - reward"))
 }
+
+// ID is the resolver for the id field.
+func (r *rewardResolver) ID(ctx context.Context, obj *model.Reward) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Tier is the resolver for the tier field.
+func (r *rewardResolver) Tier(ctx context.Context, obj *model.Reward) (*model.Tier, error) {
+	panic(fmt.Errorf("not implemented: Tier - tier"))
+}
+
+// Name is the resolver for the name field.
+func (r *rewardResolver) Name(ctx context.Context, obj *model.Reward) (string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
+}
+
+// Description is the resolver for the description field.
+func (r *rewardResolver) Description(ctx context.Context, obj *model.Reward) (string, error) {
+	panic(fmt.Errorf("not implemented: Description - description"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *rewardResolver) Metadata(ctx context.Context, obj *model.Reward) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// ExpiresAt is the resolver for the expires_at field.
+func (r *rewardResolver) ExpiresAt(ctx context.Context, obj *model.Reward) (*string, error) {
+	panic(fmt.Errorf("not implemented: ExpiresAt - expires_at"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *rewardResolver) CreatedAt(ctx context.Context, obj *model.Reward) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *rewardResolver) UpdatedAt(ctx context.Context, obj *model.Reward) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *rewardResolver) CreatedBy(ctx context.Context, obj *model.Reward) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *rewardResolver) UpdatedBy(ctx context.Context, obj *model.Reward) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Reward returns RewardResolver implementation.
+func (r *Resolver) Reward() RewardResolver { return &rewardResolver{r} }
+
+type rewardResolver struct{ *Resolver }

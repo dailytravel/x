@@ -7,13 +7,14 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *contentResolver) ID(ctx context.Context, obj *model.Content) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Title is the resolver for the title field.
@@ -38,17 +39,17 @@ func (r *contentResolver) Reviewable(ctx context.Context, obj *model.Content) (*
 
 // Metadata is the resolver for the metadata field.
 func (r *contentResolver) Metadata(ctx context.Context, obj *model.Content) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *contentResolver) CreatedAt(ctx context.Context, obj *model.Content) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *contentResolver) UpdatedAt(ctx context.Context, obj *model.Content) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // PublishedAt is the resolver for the published_at field.

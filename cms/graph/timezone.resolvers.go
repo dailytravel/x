@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/cms/graph/model"
+	"github.com/dailytravel/x/cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -81,7 +82,7 @@ func (r *mutationResolver) DeleteTimezones(ctx context.Context, ids []string) (m
 func (r *queryResolver) Timezones(ctx context.Context, args map[string]interface{}) (*model.Timezones, error) {
 	var items []*model.Timezone
 	//find all items
-	cur, err := r.db.Collection("timezones").Find(ctx, r.model.Query(args), r.model.Options(args))
+	cur, err := r.db.Collection("timezones").Find(ctx, utils.Query(args), utils.Options(args))
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +96,7 @@ func (r *queryResolver) Timezones(ctx context.Context, args map[string]interface
 	}
 
 	//get total count
-	count, err := r.db.Collection("timezones").CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("timezones").CountDocuments(ctx, utils.Query(args), nil)
 	if err != nil {
 		return nil, err
 	}

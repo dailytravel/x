@@ -12,6 +12,7 @@ import (
 
 	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
+	"github.com/dailytravel/x/cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -49,12 +50,43 @@ func (r *countryResolver) UpdatedAt(ctx context.Context, obj *model.Country) (st
 
 // CreateCountry is the resolver for the createCountry field.
 func (r *mutationResolver) CreateCountry(ctx context.Context, input model.NewCountry) (*model.Country, error) {
-	panic(fmt.Errorf("not implemented: UpdateCountry - updateCountry"))
+	var item *model.Country
+
+	doc := &model.Country{
+		Code: input.Code,
+		Name: map[string]interface{}{
+			input.Locale: input.Name,
+		},
+	}
+
+	//insert item
+	if _, err := r.db.Collection(item.Collection()).InsertOne(ctx, doc, nil); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateCountry is the resolver for the updateCountry field.
 func (r *mutationResolver) UpdateCountry(ctx context.Context, id string, input model.UpdateCountry) (*model.Country, error) {
-	panic(fmt.Errorf("not implemented: UpdateCountry - updateCountry"))
+	var item *model.Country
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	//get item
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}, nil).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	//update item
+	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, bson.M{"_id": _id}, bson.M{"$set": input}); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteCountry is the resolver for the deleteCountry field.
@@ -125,7 +157,7 @@ func (r *queryResolver) Country(ctx context.Context, code string) (*model.Countr
 func (r *queryResolver) Countries(ctx context.Context, args map[string]interface{}) (*model.Countries, error) {
 	var items []*model.Country
 	//find all items
-	cur, err := r.db.Collection("countries").Find(ctx, r.model.Query(args), r.model.Options(args))
+	cur, err := r.db.Collection("countries").Find(ctx, utils.Query(args), utils.Options(args))
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +171,7 @@ func (r *queryResolver) Countries(ctx context.Context, args map[string]interface
 	}
 
 	//get total count
-	count, err := r.db.Collection("countries").CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("countries").CountDocuments(ctx, utils.Query(args), nil)
 	if err != nil {
 		return nil, err
 	}

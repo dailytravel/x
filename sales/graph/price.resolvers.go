@@ -31,6 +31,26 @@ func (r *mutationResolver) DeletePrices(ctx context.Context, ids []string) (map[
 	panic(fmt.Errorf("not implemented: DeletePrices - deletePrices"))
 }
 
+// ID is the resolver for the id field.
+func (r *priceResolver) ID(ctx context.Context, obj *model.Price) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Product is the resolver for the product field.
+func (r *priceResolver) Product(ctx context.Context, obj *model.Price) (*model.Product, error) {
+	panic(fmt.Errorf("not implemented: Product - product"))
+}
+
+// StartDate is the resolver for the start_date field.
+func (r *priceResolver) StartDate(ctx context.Context, obj *model.Price) (*string, error) {
+	panic(fmt.Errorf("not implemented: StartDate - start_date"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *priceResolver) Metadata(ctx context.Context, obj *model.Price) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
 // Price is the resolver for the price field.
 func (r *queryResolver) Price(ctx context.Context, id string) (*model.Price, error) {
 	panic(fmt.Errorf("not implemented: Price - price"))
@@ -40,3 +60,8 @@ func (r *queryResolver) Price(ctx context.Context, id string) (*model.Price, err
 func (r *queryResolver) Prices(ctx context.Context, product string, date *model.DateRange) (*model.Prices, error) {
 	panic(fmt.Errorf("not implemented: Prices - prices"))
 }
+
+// Price returns PriceResolver implementation.
+func (r *Resolver) Price() PriceResolver { return &priceResolver{r} }
+
+type priceResolver struct{ *Resolver }

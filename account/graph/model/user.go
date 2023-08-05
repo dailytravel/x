@@ -22,8 +22,8 @@ type User struct {
 	Mfa           *Mfa                 `json:"mfa,omitempty" bson:"mfa,omitempty"`
 	Timezone      *string              `json:"timezone,omitempty" bson:"timezone,omitempty"`
 	LoginAttempts *int                 `json:"login_attempts,omitempty" bson:"login_attempts,omitempty"`
-	LastLogin     *int                 `json:"last_login,omitempty" bson:"last_login,omitempty"`
 	LastIP        *string              `json:"last_ip,omitempty" bson:"last_ip,omitempty"`
+	LastLogin     *primitive.Timestamp `json:"last_login,omitempty" bson:"last_login,omitempty"`
 	VerifiedAt    *primitive.Timestamp `json:"verified_at,omitempty" bson:"verified_at,omitempty"`
 	LastActivity  *primitive.Timestamp `json:"last_activity,omitempty" bson:"last_activity,omitempty"`
 	Identities    []*Identity          `json:"identities,omitempty" bson:"identities,omitempty"`

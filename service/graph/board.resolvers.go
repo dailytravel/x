@@ -11,6 +11,61 @@ import (
 	"github.com/dailytravel/x/service/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *boardResolver) ID(ctx context.Context, obj *model.Board) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *boardResolver) Owner(ctx context.Context, obj *model.Board) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Organization is the resolver for the organization field.
+func (r *boardResolver) Organization(ctx context.Context, obj *model.Board) (*model.Organization, error) {
+	panic(fmt.Errorf("not implemented: Organization - organization"))
+}
+
+// DueDate is the resolver for the due_date field.
+func (r *boardResolver) DueDate(ctx context.Context, obj *model.Board) (*string, error) {
+	panic(fmt.Errorf("not implemented: DueDate - due_date"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *boardResolver) Metadata(ctx context.Context, obj *model.Board) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// Followers is the resolver for the followers field.
+func (r *boardResolver) Followers(ctx context.Context, obj *model.Board) ([]*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: Followers - followers"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *boardResolver) CreatedAt(ctx context.Context, obj *model.Board) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *boardResolver) UpdatedAt(ctx context.Context, obj *model.Board) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// Lists is the resolver for the lists field.
+func (r *boardResolver) Lists(ctx context.Context, obj *model.Board) ([]*model.List, error) {
+	panic(fmt.Errorf("not implemented: Lists - lists"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *boardResolver) CreatedBy(ctx context.Context, obj *model.Board) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *boardResolver) UpdatedBy(ctx context.Context, obj *model.Board) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateBoard is the resolver for the createBoard field.
 func (r *mutationResolver) CreateBoard(ctx context.Context, input model.NewBoard) (*model.Board, error) {
 	panic(fmt.Errorf("not implemented: CreateBoard - createBoard"))
@@ -40,3 +95,8 @@ func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, err
 func (r *queryResolver) Boards(ctx context.Context, args map[string]interface{}) (*model.Boards, error) {
 	panic(fmt.Errorf("not implemented: Boards - boards"))
 }
+
+// Board returns BoardResolver implementation.
+func (r *Resolver) Board() BoardResolver { return &boardResolver{r} }
+
+type boardResolver struct{ *Resolver }

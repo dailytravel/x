@@ -1,0 +1,72 @@
+type Webhook {
+  id: ID!
+  name: String!
+  url: String!
+  headers: [WebhookHeader!]
+  events: [WebhookEvent]
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}
+
+type Webhooks {
+  data: [Webhook]
+  count: Int!
+}
+
+type WebhookHeader {
+  key: String!
+  value: String!
+}
+
+type WebhookEvent {
+  object_id: ID!
+  object_type: String!
+  actions: [WebhookEventAction]
+}
+
+enum WebhookEventAction {
+  CREATE
+  UPDATE
+  DELETE
+  PUBLISH
+  UNPUBLISH
+}
+
+input NewWebhook {
+  name: String!
+  url: String!
+  headers: [WebhookHeaderInput!]
+  events: [WebhookEventInput]
+}
+
+input UpdateWebhook {
+  name: String
+  url: String
+  headers: [WebhookHeaderInput!]
+  events: [WebhookEventInput]
+}
+
+input WebhookHeaderInput {
+  key: String!
+  value: String
+}
+
+input WebhookEventInput {
+  object_id: ID!
+  object_type: String!
+  actions: [WebhookEventAction]
+}
+
+extend type Query {
+  webhooks(args: Map): [Webhook]
+  webhook(id: ID!): Webhook
+}
+
+extend type Mutation {
+  createWebhook(input: NewWebhook!): Webhook!
+  updateWebhook(id: ID!, input: UpdateWebhook!): Webhook!
+  deleteWebhook(id: ID!): Map @auth
+  deleteWebhooks(ids: [ID!]!): Map @auth
+}

@@ -32,21 +32,6 @@ const authenticate = jwt({
   credentialsRequired: false,
 });
 
-class AuthenticatedDataSource extends RemoteGraphQLDataSource {
-  constructor(url) {
-    super({ url });
-  }
-
-  willSendRequest({ request, context }) {
-    const { req } = context;
-    request.http.headers.set("x-api-key", req.headers["x-api-key"]);
-    request.http.headers.set(
-      "auth",
-      req.headers.auth ? JSON.stringify(req.headers.auth) : null
-    );
-  }
-}
-
 // Create an Apollo Gateway with IntrospectAndCompose
 const gateway = new ApolloGateway({
   supergraphSdl: new IntrospectAndCompose({
@@ -62,8 +47,17 @@ const gateway = new ApolloGateway({
       { name: "search", url: "http://localhost:4009/query" },
       { name: "service", url: "http://localhost:4010/query" },
     ],
-    buildService({ name, url }) {
-      return new AuthenticatedDataSource({ url });
+    buildService({ url }) {
+      return new RemoteGraphQLDataSource({
+        url,
+        willSendRequest({ request, context }) {
+          Object.keys(context.headers).forEach((key) => {
+            if (context.headers[key]) {
+              request.http.headers.set(key, context.headers[key]);
+            }
+          });
+        },
+      });
     },
   }),
 });
@@ -72,24 +66,23 @@ async function startApolloServer() {
   const server = new ApolloServer({
     gateway,
     subscriptions: false,
-    introspection: true,
-    playground: true,
-    context: ({ req }) => ({
-      req,
-    }),
   });
 
   await server.start();
 
+  app.use(
+    cors({
+      origin: "*", // Be sure to switch to your production domain
+      exposedHeaders: true, // Expose all headers
+      credentials: true,
+    })
+  );
+
   app.use(bodyParser.json());
   app.use(authenticate);
-
   app.use(
-    "/graphql",
-    expressMiddleware(server),
-    cors({
-      origin: "*",
-      credentials: true,
+    expressMiddleware(server, {
+      context: async ({ req }) => ({ req }),
     })
   );
 

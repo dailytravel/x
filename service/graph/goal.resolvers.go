@@ -11,6 +11,76 @@ import (
 	"github.com/dailytravel/x/service/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *goalResolver) ID(ctx context.Context, obj *model.Goal) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// StartDate is the resolver for the start_date field.
+func (r *goalResolver) StartDate(ctx context.Context, obj *model.Goal) (string, error) {
+	panic(fmt.Errorf("not implemented: StartDate - start_date"))
+}
+
+// DueDate is the resolver for the due_date field.
+func (r *goalResolver) DueDate(ctx context.Context, obj *model.Goal) (string, error) {
+	panic(fmt.Errorf("not implemented: DueDate - due_date"))
+}
+
+// IsCompany is the resolver for the is_company field.
+func (r *goalResolver) IsCompany(ctx context.Context, obj *model.Goal) (bool, error) {
+	panic(fmt.Errorf("not implemented: IsCompany - is_company"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *goalResolver) Metadata(ctx context.Context, obj *model.Goal) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *goalResolver) CreatedAt(ctx context.Context, obj *model.Goal) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *goalResolver) UpdatedAt(ctx context.Context, obj *model.Goal) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *goalResolver) CreatedBy(ctx context.Context, obj *model.Goal) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *goalResolver) UpdatedBy(ctx context.Context, obj *model.Goal) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *goalResolver) Owner(ctx context.Context, obj *model.Goal) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Parent is the resolver for the parent field.
+func (r *goalResolver) Parent(ctx context.Context, obj *model.Goal) (*model.Goal, error) {
+	panic(fmt.Errorf("not implemented: Parent - parent"))
+}
+
+// Organization is the resolver for the organization field.
+func (r *goalResolver) Organization(ctx context.Context, obj *model.Goal) (*model.Organization, error) {
+	panic(fmt.Errorf("not implemented: Organization - organization"))
+}
+
+// Time is the resolver for the time field.
+func (r *goalResolver) Time(ctx context.Context, obj *model.Goal) (*model.Time, error) {
+	panic(fmt.Errorf("not implemented: Time - time"))
+}
+
+// Followers is the resolver for the followers field.
+func (r *goalResolver) Followers(ctx context.Context, obj *model.Goal) ([]*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: Followers - followers"))
+}
+
 // CreateGoal is the resolver for the createGoal field.
 func (r *mutationResolver) CreateGoal(ctx context.Context, input model.NewGoal) (*model.Goal, error) {
 	panic(fmt.Errorf("not implemented: CreateGoal - createGoal"))
@@ -50,3 +120,8 @@ func (r *queryResolver) Goal(ctx context.Context, id string) (*model.Goal, error
 func (r *queryResolver) Goals(ctx context.Context, args map[string]interface{}) (*model.Goals, error) {
 	panic(fmt.Errorf("not implemented: Goals - goals"))
 }
+
+// Goal returns GoalResolver implementation.
+func (r *Resolver) Goal() GoalResolver { return &goalResolver{r} }
+
+type goalResolver struct{ *Resolver }

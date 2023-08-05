@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
 )
@@ -98,32 +99,49 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 
 // ID is the resolver for the id field.
 func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
+}
+
+// LastLogin is the resolver for the last_login field.
+func (r *userResolver) LastLogin(ctx context.Context, obj *model.User) (*string, error) {
+	if obj.LastLogin != nil {
+		lastLoginStr := time.Unix(int64(obj.LastLogin.T), 0).Format(time.RFC3339)
+		return &lastLoginStr, nil
+	}
+	return nil, nil
 }
 
 // VerifiedAt is the resolver for the verified_at field.
-func (r *userResolver) VerifiedAt(ctx context.Context, obj *model.User) (*int, error) {
-	panic(fmt.Errorf("not implemented: VerifiedAt - verified_at"))
+func (r *userResolver) VerifiedAt(ctx context.Context, obj *model.User) (*string, error) {
+	if obj.VerifiedAt != nil {
+		verifiedAtStr := time.Unix(int64(obj.VerifiedAt.T), 0).Format(time.RFC3339)
+		return &verifiedAtStr, nil
+	}
+	return nil, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *userResolver) CreatedAt(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *userResolver) UpdatedAt(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // LastActivity is the resolver for the last_activity field.
-func (r *userResolver) LastActivity(ctx context.Context, obj *model.User) (*int, error) {
-	panic(fmt.Errorf("not implemented: LastActivity - last_activity"))
+func (r *userResolver) LastActivity(ctx context.Context, obj *model.User) (*string, error) {
+	if obj.LastActivity != nil {
+		lastActivityStr := time.Unix(int64(obj.LastActivity.T), 0).Format(time.RFC3339)
+		return &lastActivityStr, nil
+	}
+	return nil, nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *userResolver) Metadata(ctx context.Context, obj *model.User) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedBy is the resolver for the created_by field.

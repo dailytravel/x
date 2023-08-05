@@ -8,30 +8,6 @@ import (
 	"strconv"
 )
 
-type Board struct {
-	ID           string                 `json:"id"`
-	Owner        *User                  `json:"owner,omitempty"`
-	Organization *Organization          `json:"organization,omitempty"`
-	Type         string                 `json:"type"`
-	Title        string                 `json:"title"`
-	Description  *string                `json:"description,omitempty"`
-	DueDate      *string                `json:"due_date,omitempty"`
-	IsTemplate   bool                   `json:"is_template"`
-	Background   *string                `json:"background,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
-	Starred      bool                   `json:"starred"`
-	Order        int                    `json:"order"`
-	Status       string                 `json:"status"`
-	Followers    []*Follow              `json:"followers,omitempty"`
-	CreatedAt    string                 `json:"created_at"`
-	UpdatedAt    string                 `json:"updated_at"`
-	Lists        []*List                `json:"lists,omitempty"`
-	CreatedBy    *User                  `json:"created_by,omitempty"`
-	UpdatedBy    *User                  `json:"updated_by,omitempty"`
-}
-
-func (Board) IsEntity() {}
-
 type Boards struct {
 	Data  []*Board `json:"data,omitempty"`
 	Count int      `json:"count"`
@@ -49,42 +25,9 @@ type Follow struct {
 
 func (Follow) IsEntity() {}
 
-type Goal struct {
-	ID           string                 `json:"id"`
-	Name         string                 `json:"name"`
-	Notes        *string                `json:"notes,omitempty"`
-	StartDate    string                 `json:"start_date"`
-	DueDate      string                 `json:"due_date"`
-	IsCompany    bool                   `json:"is_company"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
-	Status       *string                `json:"status,omitempty"`
-	CreatedAt    string                 `json:"created_at"`
-	UpdatedAt    string                 `json:"updated_at"`
-	CreatedBy    *User                  `json:"created_by,omitempty"`
-	UpdatedBy    *User                  `json:"updated_by,omitempty"`
-	Owner        *User                  `json:"owner"`
-	Parent       *Goal                  `json:"parent,omitempty"`
-	Organization *Organization          `json:"organization,omitempty"`
-	Time         *Time                  `json:"time"`
-	Followers    []*Follow              `json:"followers,omitempty"`
-}
-
 type Goals struct {
 	Count int     `json:"count"`
 	Data  []*Goal `json:"data,omitempty"`
-}
-
-type List struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Board     *Board                 `json:"board"`
-	Order     int                    `json:"order"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	CreatedBy *User                  `json:"created_by,omitempty"`
-	UpdatedBy *User                  `json:"updated_by,omitempty"`
-	Tasks     []*Task                `json:"tasks,omitempty"`
 }
 
 type Lists struct {
@@ -169,30 +112,6 @@ type Reaction struct {
 }
 
 func (Reaction) IsEntity() {}
-
-type Task struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Owner     *User                  `json:"owner,omitempty"`
-	Parent    *Task                  `json:"parent,omitempty"`
-	Subtasks  []*Task                `json:"subtasks,omitempty"`
-	List      *List                  `json:"list"`
-	Notes     *string                `json:"notes,omitempty"`
-	Priority  string                 `json:"priority"`
-	StartDate *string                `json:"start_date,omitempty"`
-	DueDate   *string                `json:"due_date,omitempty"`
-	Labels    []*string              `json:"labels,omitempty"`
-	Order     *int                   `json:"order,omitempty"`
-	Status    string                 `json:"status"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	CreatedBy *User                  `json:"created_by,omitempty"`
-	UpdatedBy *User                  `json:"updated_by,omitempty"`
-	Comments  []*Comment             `json:"comments,omitempty"`
-	Followers []*Follow              `json:"followers,omitempty"`
-	Reactions []*Reaction            `json:"reactions,omitempty"`
-}
 
 type Tasks struct {
 	Data  []*Task `json:"data,omitempty"`

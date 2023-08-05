@@ -12,6 +12,7 @@ import (
 
 	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
+	"github.com/dailytravel/x/cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -49,17 +50,63 @@ func (r *currencyResolver) UpdatedAt(ctx context.Context, obj *model.Currency) (
 
 // CreateCurrency is the resolver for the createCurrency field.
 func (r *mutationResolver) CreateCurrency(ctx context.Context, input model.NewCurrency) (*model.Currency, error) {
-	panic(fmt.Errorf("not implemented: CreateCurrency - createCurrency"))
+	var item *model.Currency
+
+	doc := &model.Currency{
+		Code: input.Code,
+		Name: map[string]interface{}{
+			input.Locale: input.Name,
+		},
+	}
+
+	//insert item
+	if _, err := r.db.Collection(item.Collection()).InsertOne(ctx, doc, nil); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateCurrency is the resolver for the updateCurrency field.
 func (r *mutationResolver) UpdateCurrency(ctx context.Context, id string, input *model.UpdateCurrency) (*model.Currency, error) {
-	panic(fmt.Errorf("not implemented: UpdateCurrency - updateCurrency"))
+	var item *model.Currency
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	//get item
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}, nil).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	//update item
+	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, bson.M{"_id": _id}, bson.M{"$set": input}); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteCurrency is the resolver for the deleteCurrency field.
 func (r *mutationResolver) DeleteCurrency(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteCurrency - deleteCurrency"))
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	res, err := r.db.Collection("currencies").DeleteOne(ctx, bson.M{"_id": _id})
+	if err != nil {
+		return nil, fmt.Errorf("error deleting log: %v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("log not found")
+	}
+
+	return map[string]interface{}{
+		"status": "success",
+	}, nil
 }
 
 // DeleteCurrencies is the resolver for the deleteCurrencies field.
@@ -110,7 +157,7 @@ func (r *queryResolver) Currency(ctx context.Context, code string) (*model.Curre
 func (r *queryResolver) Currencies(ctx context.Context, args map[string]interface{}) (*model.Currencies, error) {
 	var items []*model.Currency
 	//find all items
-	cur, err := r.db.Collection("currencies").Find(ctx, r.model.Query(args), r.model.Options(args))
+	cur, err := r.db.Collection("currencies").Find(ctx, utils.Query(args), utils.Options(args))
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +171,7 @@ func (r *queryResolver) Currencies(ctx context.Context, args map[string]interfac
 	}
 
 	//get total count
-	count, err := r.db.Collection("currencies").CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("currencies").CountDocuments(ctx, utils.Query(args), nil)
 	if err != nil {
 		return nil, err
 	}

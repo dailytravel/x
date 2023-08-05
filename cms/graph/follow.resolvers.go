@@ -7,13 +7,14 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *followResolver) ID(ctx context.Context, obj *model.Follow) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // User is the resolver for the user field.
@@ -28,12 +29,12 @@ func (r *followResolver) Followable(ctx context.Context, obj *model.Follow) (map
 
 // CreatedAt is the resolver for the created_at field.
 func (r *followResolver) CreatedAt(ctx context.Context, obj *model.Follow) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *followResolver) UpdatedAt(ctx context.Context, obj *model.Follow) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreatedBy is the resolver for the created_by field.

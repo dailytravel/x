@@ -26,6 +26,61 @@ func (r *mutationResolver) DeleteOrganization(ctx context.Context, id string) (m
 	panic(fmt.Errorf("not implemented: DeleteOrganization - deleteOrganization"))
 }
 
+// ID is the resolver for the id field.
+func (r *organizationResolver) ID(ctx context.Context, obj *model.Organization) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Parent is the resolver for the parent field.
+func (r *organizationResolver) Parent(ctx context.Context, obj *model.Organization) (*model.Organization, error) {
+	panic(fmt.Errorf("not implemented: Parent - parent"))
+}
+
+// Children is the resolver for the children field.
+func (r *organizationResolver) Children(ctx context.Context, obj *model.Organization) ([]*model.Organization, error) {
+	panic(fmt.Errorf("not implemented: Children - children"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *organizationResolver) Metadata(ctx context.Context, obj *model.Organization) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// LastActivity is the resolver for the last_activity field.
+func (r *organizationResolver) LastActivity(ctx context.Context, obj *model.Organization) (int, error) {
+	panic(fmt.Errorf("not implemented: LastActivity - last_activity"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *organizationResolver) CreatedAt(ctx context.Context, obj *model.Organization) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *organizationResolver) UpdatedAt(ctx context.Context, obj *model.Organization) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *organizationResolver) Owner(ctx context.Context, obj *model.Organization) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Followers is the resolver for the followers field.
+func (r *organizationResolver) Followers(ctx context.Context, obj *model.Organization) ([]*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: Followers - followers"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *organizationResolver) CreatedBy(ctx context.Context, obj *model.Organization) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *organizationResolver) UpdatedBy(ctx context.Context, obj *model.Organization) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // Organizations is the resolver for the organizations field.
 func (r *queryResolver) Organizations(ctx context.Context, args map[string]interface{}) (*model.Organizations, error) {
 	panic(fmt.Errorf("not implemented: Organizations - organizations"))
@@ -35,3 +90,8 @@ func (r *queryResolver) Organizations(ctx context.Context, args map[string]inter
 func (r *queryResolver) Organization(ctx context.Context, id string) (*model.Organization, error) {
 	panic(fmt.Errorf("not implemented: Organization - organization"))
 }
+
+// Organization returns OrganizationResolver implementation.
+func (r *Resolver) Organization() OrganizationResolver { return &organizationResolver{r} }
+
+type organizationResolver struct{ *Resolver }

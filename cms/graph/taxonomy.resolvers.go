@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/cms/graph/model"
 )
@@ -43,7 +44,7 @@ func (r *queryResolver) Taxonomy(ctx context.Context, id string) (*model.Taxonom
 
 // ID is the resolver for the id field.
 func (r *taxonomyResolver) ID(ctx context.Context, obj *model.Taxonomy) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Category is the resolver for the category field.
@@ -58,7 +59,7 @@ func (r *taxonomyResolver) Taxonomizable(ctx context.Context, obj *model.Taxonom
 
 // CreatedAt is the resolver for the created_at field.
 func (r *taxonomyResolver) CreatedAt(ctx context.Context, obj *model.Taxonomy) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Taxonomy returns TaxonomyResolver implementation.

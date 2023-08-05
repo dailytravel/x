@@ -11,6 +11,21 @@ import (
 	"github.com/dailytravel/x/sales/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *inventoryResolver) ID(ctx context.Context, obj *model.Inventory) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Product is the resolver for the product field.
+func (r *inventoryResolver) Product(ctx context.Context, obj *model.Inventory) (*model.Product, error) {
+	panic(fmt.Errorf("not implemented: Product - product"))
+}
+
+// Date is the resolver for the date field.
+func (r *inventoryResolver) Date(ctx context.Context, obj *model.Inventory) (int, error) {
+	panic(fmt.Errorf("not implemented: Date - date"))
+}
+
 // CreateInventory is the resolver for the createInventory field.
 func (r *mutationResolver) CreateInventory(ctx context.Context, input model.NewInventory) (*model.Inventory, error) {
 	panic(fmt.Errorf("not implemented: CreateInventory - createInventory"))
@@ -40,3 +55,8 @@ func (r *queryResolver) Inventories(ctx context.Context, product *string, date i
 func (r *queryResolver) Inventory(ctx context.Context, id string) (*model.Inventory, error) {
 	panic(fmt.Errorf("not implemented: Inventory - inventory"))
 }
+
+// Inventory returns InventoryResolver implementation.
+func (r *Resolver) Inventory() InventoryResolver { return &inventoryResolver{r} }
+
+type inventoryResolver struct{ *Resolver }

@@ -31,6 +31,46 @@ func (r *mutationResolver) DeleteOrders(ctx context.Context, ids []string) (map[
 	panic(fmt.Errorf("not implemented: DeleteOrders - deleteOrders"))
 }
 
+// ID is the resolver for the id field.
+func (r *orderResolver) ID(ctx context.Context, obj *model.Order) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *orderResolver) Owner(ctx context.Context, obj *model.Order) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Total is the resolver for the total field.
+func (r *orderResolver) Total(ctx context.Context, obj *model.Order) (float64, error) {
+	panic(fmt.Errorf("not implemented: Total - total"))
+}
+
+// CancelledAt is the resolver for the cancelled_at field.
+func (r *orderResolver) CancelledAt(ctx context.Context, obj *model.Order) (*int, error) {
+	panic(fmt.Errorf("not implemented: CancelledAt - cancelled_at"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *orderResolver) CreatedAt(ctx context.Context, obj *model.Order) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *orderResolver) UpdatedAt(ctx context.Context, obj *model.Order) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *orderResolver) CreatedBy(ctx context.Context, obj *model.Order) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *orderResolver) UpdatedBy(ctx context.Context, obj *model.Order) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // Order is the resolver for the order field.
 func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, error) {
 	panic(fmt.Errorf("not implemented: Order - order"))
@@ -40,3 +80,8 @@ func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, err
 func (r *queryResolver) Orders(ctx context.Context, args map[string]interface{}) (*model.Orders, error) {
 	panic(fmt.Errorf("not implemented: Orders - orders"))
 }
+
+// Order returns OrderResolver implementation.
+func (r *Resolver) Order() OrderResolver { return &orderResolver{r} }
+
+type orderResolver struct{ *Resolver }

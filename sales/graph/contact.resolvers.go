@@ -11,6 +11,56 @@ import (
 	"github.com/dailytravel/x/sales/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *contactResolver) ID(ctx context.Context, obj *model.Contact) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *contactResolver) Owner(ctx context.Context, obj *model.Contact) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Birthday is the resolver for the birthday field.
+func (r *contactResolver) Birthday(ctx context.Context, obj *model.Contact) (*string, error) {
+	panic(fmt.Errorf("not implemented: Birthday - birthday"))
+}
+
+// Organization is the resolver for the organization field.
+func (r *contactResolver) Organization(ctx context.Context, obj *model.Contact) (*model.Organization, error) {
+	panic(fmt.Errorf("not implemented: Organization - organization"))
+}
+
+// Rating is the resolver for the rating field.
+func (r *contactResolver) Rating(ctx context.Context, obj *model.Contact) (*int, error) {
+	panic(fmt.Errorf("not implemented: Rating - rating"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *contactResolver) Metadata(ctx context.Context, obj *model.Contact) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// LastActivity is the resolver for the last_activity field.
+func (r *contactResolver) LastActivity(ctx context.Context, obj *model.Contact) (*int, error) {
+	panic(fmt.Errorf("not implemented: LastActivity - last_activity"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *contactResolver) CreatedAt(ctx context.Context, obj *model.Contact) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *contactResolver) UpdatedAt(ctx context.Context, obj *model.Contact) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// Followers is the resolver for the followers field.
+func (r *contactResolver) Followers(ctx context.Context, obj *model.Contact) ([]*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: Followers - followers"))
+}
+
 // CreateContact is the resolver for the createContact field.
 func (r *mutationResolver) CreateContact(ctx context.Context, input model.NewContact) (*model.Contact, error) {
 	panic(fmt.Errorf("not implemented: CreateContact - createContact"))
@@ -56,7 +106,11 @@ func (r *subscriptionResolver) ContactDeleted(ctx context.Context) (<-chan *mode
 	panic(fmt.Errorf("not implemented: ContactDeleted - contactDeleted"))
 }
 
+// Contact returns ContactResolver implementation.
+func (r *Resolver) Contact() ContactResolver { return &contactResolver{r} }
+
 // Subscription returns SubscriptionResolver implementation.
 func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r} }
 
+type contactResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }

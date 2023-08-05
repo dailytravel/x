@@ -40,3 +40,58 @@ func (r *queryResolver) Tiers(ctx context.Context, args map[string]interface{}) 
 func (r *queryResolver) Tier(ctx context.Context, id string) (*model.Tier, error) {
 	panic(fmt.Errorf("not implemented: Tier - tier"))
 }
+
+// ID is the resolver for the id field.
+func (r *tierResolver) ID(ctx context.Context, obj *model.Tier) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Name is the resolver for the name field.
+func (r *tierResolver) Name(ctx context.Context, obj *model.Tier) (string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
+}
+
+// Description is the resolver for the description field.
+func (r *tierResolver) Description(ctx context.Context, obj *model.Tier) (string, error) {
+	panic(fmt.Errorf("not implemented: Description - description"))
+}
+
+// Benefits is the resolver for the benefits field.
+func (r *tierResolver) Benefits(ctx context.Context, obj *model.Tier) ([]*model.Benefit, error) {
+	panic(fmt.Errorf("not implemented: Benefits - benefits"))
+}
+
+// Rewards is the resolver for the rewards field.
+func (r *tierResolver) Rewards(ctx context.Context, obj *model.Tier) ([]*model.Reward, error) {
+	panic(fmt.Errorf("not implemented: Rewards - rewards"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *tierResolver) Metadata(ctx context.Context, obj *model.Tier) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *tierResolver) CreatedAt(ctx context.Context, obj *model.Tier) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *tierResolver) UpdatedAt(ctx context.Context, obj *model.Tier) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *tierResolver) CreatedBy(ctx context.Context, obj *model.Tier) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *tierResolver) UpdatedBy(ctx context.Context, obj *model.Tier) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Tier returns TierResolver implementation.
+func (r *Resolver) Tier() TierResolver { return &tierResolver{r} }
+
+type tierResolver struct{ *Resolver }
