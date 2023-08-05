@@ -3,6 +3,7 @@ package graph
 import (
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/go-redis/redis/v8"
+	"github.com/typesense/typesense-go/typesense"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

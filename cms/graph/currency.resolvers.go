@@ -6,34 +6,45 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
+	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
 func (r *currencyResolver) ID(ctx context.Context, obj *model.Currency) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Name is the resolver for the name field.
 func (r *currencyResolver) Name(ctx context.Context, obj *model.Currency) (string, error) {
-	panic(fmt.Errorf("not implemented: Name - name"))
+	locale := auth.Locale(ctx)
+	if name, ok := obj.Name[locale].(string); ok {
+		return name, nil
+	}
+
+	return obj.Name[obj.Code].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *currencyResolver) Metadata(ctx context.Context, obj *model.Currency) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *currencyResolver) CreatedAt(ctx context.Context, obj *model.Currency) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *currencyResolver) UpdatedAt(ctx context.Context, obj *model.Currency) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateCurrency is the resolver for the createCurrency field.
@@ -53,17 +64,75 @@ func (r *mutationResolver) DeleteCurrency(ctx context.Context, id string) (map[s
 
 // DeleteCurrencies is the resolver for the deleteCurrencies field.
 func (r *mutationResolver) DeleteCurrencies(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteCurrencies - deleteCurrencies"))
+	var _ids []primitive.ObjectID
+
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		_ids = append(_ids, _id)
+	}
+
+	res, err := r.db.Collection("currencies").DeleteMany(ctx, bson.M{"_id": bson.M{"$in": _ids}})
+	if err != nil {
+		return nil, fmt.Errorf("error deleting log: %v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("log not found")
+	}
+
+	return map[string]interface{}{
+		"status": "success",
+	}, nil
 }
 
 // Currency is the resolver for the currency field.
 func (r *queryResolver) Currency(ctx context.Context, code string) (*model.Currency, error) {
-	panic(fmt.Errorf("not implemented: Currency - currency"))
+	var item *model.Currency
+	col := r.db.Collection(item.Collection())
+
+	filter := bson.M{"code": code}
+
+	err := col.FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Currencies is the resolver for the currencies field.
 func (r *queryResolver) Currencies(ctx context.Context, args map[string]interface{}) (*model.Currencies, error) {
-	panic(fmt.Errorf("not implemented: Currencies - currencies"))
+	var items []*model.Currency
+	//find all items
+	cur, err := r.db.Collection("currencies").Find(ctx, r.model.Query(args), r.model.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Currency
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("currencies").CountDocuments(ctx, r.model.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Currencies{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Currency returns CurrencyResolver implementation.

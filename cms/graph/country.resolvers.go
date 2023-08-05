@@ -6,39 +6,50 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
+	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
 func (r *countryResolver) ID(ctx context.Context, obj *model.Country) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Name is the resolver for the name field.
 func (r *countryResolver) Name(ctx context.Context, obj *model.Country) (string, error) {
-	panic(fmt.Errorf("not implemented: Name - name"))
+	locale := auth.Locale(ctx)
+	if name, ok := obj.Name[locale].(string); ok {
+		return name, nil
+	}
+
+	return obj.Name[obj.Code].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *countryResolver) Metadata(ctx context.Context, obj *model.Country) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *countryResolver) CreatedAt(ctx context.Context, obj *model.Country) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *countryResolver) UpdatedAt(ctx context.Context, obj *model.Country) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateCountry is the resolver for the createCountry field.
 func (r *mutationResolver) CreateCountry(ctx context.Context, input model.NewCountry) (*model.Country, error) {
-	panic(fmt.Errorf("not implemented: CreateCountry - createCountry"))
+	panic(fmt.Errorf("not implemented: UpdateCountry - updateCountry"))
 }
 
 // UpdateCountry is the resolver for the updateCountry field.
@@ -48,22 +59,95 @@ func (r *mutationResolver) UpdateCountry(ctx context.Context, id string, input m
 
 // DeleteCountry is the resolver for the deleteCountry field.
 func (r *mutationResolver) DeleteCountry(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteCountry - deleteCountry"))
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	res, err := r.db.Collection("countries").DeleteOne(ctx, bson.M{"_id": _id})
+	if err != nil {
+		return nil, fmt.Errorf("error deleting log: %v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("log not found")
+	}
+
+	return map[string]interface{}{
+		"status": "success",
+	}, nil
 }
 
 // DeleteCountries is the resolver for the deleteCountries field.
 func (r *mutationResolver) DeleteCountries(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteCountries - deleteCountries"))
+	var _ids []primitive.ObjectID
+
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		_ids = append(_ids, _id)
+	}
+
+	res, err := r.db.Collection("countries").DeleteMany(ctx, bson.M{"_id": bson.M{"$in": _ids}})
+	if err != nil {
+		return nil, fmt.Errorf("error deleting log: %v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("log not found")
+	}
+
+	return map[string]interface{}{
+		"status": "success",
+	}, nil
 }
 
 // Country is the resolver for the country field.
-func (r *queryResolver) Country(ctx context.Context, id string) (*model.Country, error) {
-	panic(fmt.Errorf("not implemented: Country - country"))
+func (r *queryResolver) Country(ctx context.Context, code string) (*model.Country, error) {
+	var item *model.Country
+	col := r.db.Collection(item.Collection())
+
+	filter := bson.M{"code": code}
+
+	err := col.FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Countries is the resolver for the countries field.
 func (r *queryResolver) Countries(ctx context.Context, args map[string]interface{}) (*model.Countries, error) {
-	panic(fmt.Errorf("not implemented: Countries - countries"))
+	var items []*model.Country
+	//find all items
+	cur, err := r.db.Collection("countries").Find(ctx, r.model.Query(args), r.model.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Country
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("countries").CountDocuments(ctx, r.model.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Countries{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Country returns CountryResolver implementation.

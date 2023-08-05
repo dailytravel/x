@@ -134,13 +134,6 @@ type Notifications struct {
 	Count int             `json:"count"`
 }
 
-type Object struct {
-	ID   string  `json:"id"`
-	Type *string `json:"type,omitempty"`
-}
-
-func (Object) IsEntity() {}
-
 type Organization struct {
 	ID string `json:"id"`
 }

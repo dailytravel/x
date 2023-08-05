@@ -138,16 +138,16 @@ type NewFollow struct {
 }
 
 type NewLocale struct {
-	ID           *string                `json:"id,omitempty"`
-	Name         string                 `json:"name"`
-	Locale       string                 `json:"locale"`
-	Code         string                 `json:"code"`
-	Order        int                    `json:"order"`
-	Rtl          bool                   `json:"rtl"`
-	DateFormat   string                 `json:"date_format"`
-	StringFormat string                 `json:"String_format"`
-	WeekStart    int                    `json:"week_start"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	ID         *string                `json:"id,omitempty"`
+	Name       string                 `json:"name"`
+	Locale     string                 `json:"locale"`
+	Code       string                 `json:"code"`
+	Order      int                    `json:"order"`
+	Rtl        bool                   `json:"rtl"`
+	DateFormat string                 `json:"date_format"`
+	TimeFormat string                 `json:"time_format"`
+	WeekStart  int                    `json:"week_start"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewReaction struct {
@@ -266,15 +266,15 @@ type UpdateFollow struct {
 }
 
 type UpdateLocale struct {
-	Name         *string                `json:"name,omitempty"`
-	Locale       string                 `json:"locale"`
-	Code         *string                `json:"code,omitempty"`
-	Order        *int                   `json:"order,omitempty"`
-	Rtl          *bool                  `json:"rtl,omitempty"`
-	DateFormat   *string                `json:"date_format,omitempty"`
-	StringFormat *string                `json:"String_format,omitempty"`
-	WeekStart    *int                   `json:"week_start,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Name       *string                `json:"name,omitempty"`
+	Locale     string                 `json:"locale"`
+	Code       *string                `json:"code,omitempty"`
+	Order      *int                   `json:"order,omitempty"`
+	Rtl        *bool                  `json:"rtl,omitempty"`
+	DateFormat *string                `json:"date_format,omitempty"`
+	TimeFormat *string                `json:"time_format,omitempty"`
+	WeekStart  *int                   `json:"week_start,omitempty"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateReaction struct {

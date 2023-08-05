@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -93,11 +92,6 @@ func main() {
 
 	// setting up Gin
 	r := gin.Default()
-	gin.SetMode(gin.ReleaseMode)
-	accessLog, _ := os.Create("./logs/access.log")
-	errorLog, _ := os.Create("./logs/error.log")
-	gin.DefaultWriter = io.MultiWriter(accessLog)
-	gin.DefaultErrorWriter = io.MultiWriter(errorLog)
 
 	r.Use(auth.Middleware())
 	r.Use(cors.New(cors.Config{

@@ -206,11 +206,6 @@ type ComplexityRoot struct {
 		Data  func(childComplexity int) int
 	}
 
-	Object struct {
-		ID   func(childComplexity int) int
-		Type func(childComplexity int) int
-	}
-
 	Organization struct {
 		ID func(childComplexity int) int
 	}
@@ -379,7 +374,7 @@ type NotificationResolver interface {
 	CreatedAt(ctx context.Context, obj *model.Notification) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.Notification) (string, error)
 	User(ctx context.Context, obj *model.Notification) (*model.User, error)
-
+	Notifiable(ctx context.Context, obj *model.Notification) (map[string]interface{}, error)
 	Metadata(ctx context.Context, obj *model.Notification) (map[string]interface{}, error)
 }
 type PermissionResolver interface {
@@ -1347,20 +1342,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Notifications.Data(childComplexity), true
 
-	case "Object.id":
-		if e.complexity.Object.ID == nil {
-			break
-		}
-
-		return e.complexity.Object.ID(childComplexity), true
-
-	case "Object.type":
-		if e.complexity.Object.Type == nil {
-			break
-		}
-
-		return e.complexity.Object.Type(childComplexity), true
-
 	case "Organization.id":
 		if e.complexity.Organization.ID == nil {
 			break
@@ -2032,7 +2013,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/board.graphql" "schema/client.graphql" "schema/contact.graphql" "schema/identity.graphql" "schema/invitation.graphql" "schema/key.graphql" "schema/membership.graphql" "schema/notification.graphql" "schema/object.graphql" "schema/organization.graphql" "schema/permission.graphql" "schema/point.graphql" "schema/role.graphql" "schema/user.graphql"
+//go:embed "schema.graphqls" "schema/board.graphql" "schema/client.graphql" "schema/contact.graphql" "schema/identity.graphql" "schema/invitation.graphql" "schema/key.graphql" "schema/membership.graphql" "schema/notification.graphql" "schema/organization.graphql" "schema/permission.graphql" "schema/point.graphql" "schema/role.graphql" "schema/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2053,7 +2034,6 @@ var sources = []*ast.Source{
 	{Name: "schema/key.graphql", Input: sourceData("schema/key.graphql"), BuiltIn: false},
 	{Name: "schema/membership.graphql", Input: sourceData("schema/membership.graphql"), BuiltIn: false},
 	{Name: "schema/notification.graphql", Input: sourceData("schema/notification.graphql"), BuiltIn: false},
-	{Name: "schema/object.graphql", Input: sourceData("schema/object.graphql"), BuiltIn: false},
 	{Name: "schema/organization.graphql", Input: sourceData("schema/organization.graphql"), BuiltIn: false},
 	{Name: "schema/permission.graphql", Input: sourceData("schema/permission.graphql"), BuiltIn: false},
 	{Name: "schema/point.graphql", Input: sourceData("schema/point.graphql"), BuiltIn: false},
@@ -2070,7 +2050,7 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Board | Contact | Membership | Object | Organization | Point | User
+union _Entity = Board | Contact | Membership | Organization | Point | User
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
@@ -9118,7 +9098,7 @@ func (ec *executionContext) _Notification_notifiable(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Notifiable, nil
+		return ec.resolvers.Notification().Notifiable(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9130,25 +9110,19 @@ func (ec *executionContext) _Notification_notifiable(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(model.Object)
+	res := resTmp.(map[string]interface{})
 	fc.Result = res
-	return ec.marshalNObject2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐObject(ctx, field.Selections, res)
+	return ec.marshalNMap2map(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Notification_notifiable(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Notification",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Object_id(ctx, field)
-			case "type":
-				return ec.fieldContext_Object_type(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Object", field.Name)
+			return nil, errors.New("field of type Map does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9295,91 +9269,6 @@ func (ec *executionContext) fieldContext_Notifications_count(ctx context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Object_id(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Object_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Object_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Object",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Object_type(ctx context.Context, field graphql.CollectedField, obj *model.Object) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Object_type(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Type, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Object_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Object",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -16249,13 +16138,6 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._Membership(ctx, sel, obj)
-	case model.Object:
-		return ec._Object(ctx, sel, &obj)
-	case *model.Object:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Object(ctx, sel, obj)
 	case model.Organization:
 		return ec._Organization(ctx, sel, &obj)
 	case *model.Organization:
@@ -17731,10 +17613,41 @@ func (ec *executionContext) _Notification(ctx context.Context, sel ast.Selection
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "notifiable":
-			out.Values[i] = ec._Notification_notifiable(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Notification_notifiable(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "metadata":
 			field := field
 
@@ -17809,47 +17722,6 @@ func (ec *executionContext) _Notifications(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var objectImplementors = []string{"Object", "_Entity"}
-
-func (ec *executionContext) _Object(ctx context.Context, sel ast.SelectionSet, obj *model.Object) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, objectImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Object")
-		case "id":
-			out.Values[i] = ec._Object_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "type":
-			out.Values[i] = ec._Object_type(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19886,10 +19758,6 @@ func (ec *executionContext) marshalNNotification2ᚖgithubᚗcomᚋdailytravel�
 		return graphql.Null
 	}
 	return ec._Notification(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNObject2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐObject(ctx context.Context, sel ast.SelectionSet, v model.Object) graphql.Marshaler {
-	return ec._Object(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNPasswordInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐPasswordInput(ctx context.Context, v interface{}) (model.PasswordInput, error) {

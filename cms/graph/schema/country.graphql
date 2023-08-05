@@ -45,7 +45,7 @@ input UpdateCountry {
 }
 
 extend type Query {
-  country(id: ID!): Country
+  country(code: String!): Country
   countries(args: Map): Countries
 }
 

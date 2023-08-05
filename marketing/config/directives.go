@@ -18,17 +18,14 @@ var (
 
 func Directives(c *graph.Config) {
 	c.Directives.Api = func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-
 		return next(ctx)
 	}
 
 	c.Directives.Auth = func(ctx context.Context, obj interface{}, next graphql.Resolver, requires []*string) (interface{}, error) {
-
 		return nil, ErrMissingRole
 	}
 
 	c.Directives.HasScope = func(ctx context.Context, obj interface{}, next graphql.Resolver, scope []string) (interface{}, error) {
-
 		return nil, ErrMissingScope
 	}
 }

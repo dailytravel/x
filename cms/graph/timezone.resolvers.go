@@ -6,9 +6,14 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/cms/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // CreateTimezone is the resolver for the createTimezone field.
@@ -28,42 +33,115 @@ func (r *mutationResolver) ImportTimezones(ctx context.Context, url string) ([]*
 
 // DeleteTimezone is the resolver for the deleteTimezone field.
 func (r *mutationResolver) DeleteTimezone(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteTimezone - deleteTimezone"))
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	res, err := r.db.Collection("timezones").DeleteOne(ctx, bson.M{"_id": _id})
+	if err != nil {
+		return nil, fmt.Errorf("error deleting log: %v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("log not found")
+	}
+
+	return map[string]interface{}{
+		"status": "success",
+	}, nil
 }
 
 // DeleteTimezones is the resolver for the deleteTimezones field.
 func (r *mutationResolver) DeleteTimezones(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteTimezones - deleteTimezones"))
+	var _ids []primitive.ObjectID
+
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		_ids = append(_ids, _id)
+	}
+
+	res, err := r.db.Collection("timezones").DeleteMany(ctx, bson.M{"_id": bson.M{"$in": _ids}})
+	if err != nil {
+		return nil, fmt.Errorf("error deleting log: %v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("log not found")
+	}
+
+	return map[string]interface{}{
+		"status": "success",
+	}, nil
 }
 
 // Timezones is the resolver for the timezones field.
 func (r *queryResolver) Timezones(ctx context.Context, args map[string]interface{}) (*model.Timezones, error) {
-	panic(fmt.Errorf("not implemented: Timezones - timezones"))
+	var items []*model.Timezone
+	//find all items
+	cur, err := r.db.Collection("timezones").Find(ctx, r.model.Query(args), r.model.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Timezone
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("timezones").CountDocuments(ctx, r.model.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Timezones{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Timezone is the resolver for the timezone field.
 func (r *queryResolver) Timezone(ctx context.Context, id string) (*model.Timezone, error) {
-	panic(fmt.Errorf("not implemented: Timezone - timezone"))
+	var item *model.Timezone
+	col := r.db.Collection(item.Collection())
+
+	filter := bson.M{"_id": id}
+
+	err := col.FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // ID is the resolver for the id field.
 func (r *timezoneResolver) ID(ctx context.Context, obj *model.Timezone) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *timezoneResolver) Metadata(ctx context.Context, obj *model.Timezone) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *timezoneResolver) CreatedAt(ctx context.Context, obj *model.Timezone) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *timezoneResolver) UpdatedAt(ctx context.Context, obj *model.Timezone) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Timezone returns TimezoneResolver implementation.

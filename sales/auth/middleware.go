@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
-	// trunk-ignore(golangci-lint/typecheck)
+	"github.com/golang-jwt/jwt/v4"
 )
 
 // Define a custom context key type
@@ -35,7 +35,8 @@ func APIKey(ctx context.Context) string {
 	return raw
 }
 
-func Auth(ctx context.Context) string {
-	raw, _ := ctx.Value(AuthContextKey).(string)
+func Auth(ctx context.Context) jwt.MapClaims {
+	raw, _ := ctx.Value(AuthContextKey).(jwt.MapClaims)
 	return raw
 }
+

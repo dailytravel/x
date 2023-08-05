@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -18,7 +17,6 @@ import (
 	"github.com/dailytravel/x/cms/db"
 	"github.com/dailytravel/x/cms/db/migrations"
 	"github.com/dailytravel/x/cms/graph"
-	"github.com/dailytravel/x/cms/pkg/mongo"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -67,13 +65,16 @@ func graphqlHandler() gin.HandlerFunc {
 			log.Println("Websocket request")
 		}
 
+		xAPIKey := c.GetHeader("x-api-key")
+		log.Println("x-api-key: ", xAPIKey)
+
 		server.ServeHTTP(c.Writer, c.Request)
 	}
 }
 
 func main() {
 	// connect MongoDB
-	client, err := mongo.ConnectDB()
+	client, err := db.ConnectDB()
 	if err != nil {
 		log.Fatal("Error connecting to MongoDB: ", err)
 	}
@@ -94,11 +95,6 @@ func main() {
 
 	// setting up Gin
 	r := gin.Default()
-	gin.SetMode(gin.ReleaseMode)
-	accessLog, _ := os.Create("./logs/access.log")
-	errorLog, _ := os.Create("./logs/error.log")
-	gin.DefaultWriter = io.MultiWriter(accessLog)
-	gin.DefaultErrorWriter = io.MultiWriter(errorLog)
 
 	r.Use(auth.Middleware())
 	r.Use(cors.New(cors.Config{

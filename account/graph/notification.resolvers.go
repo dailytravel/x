@@ -51,6 +51,11 @@ func (r *notificationResolver) User(ctx context.Context, obj *model.Notification
 	panic(fmt.Errorf("not implemented: User - user"))
 }
 
+// Notifiable is the resolver for the notifiable field.
+func (r *notificationResolver) Notifiable(ctx context.Context, obj *model.Notification) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Notifiable - notifiable"))
+}
+
 // Metadata is the resolver for the metadata field.
 func (r *notificationResolver) Metadata(ctx context.Context, obj *model.Notification) (map[string]interface{}, error) {
 	panic(fmt.Errorf("not implemented: Metadata - metadata"))

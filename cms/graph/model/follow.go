@@ -38,7 +38,7 @@ func (i *Follow) MarshalBSON() ([]byte, error) {
 }
 
 func (i *Follow) Collection() string {
-	return "followers"
+	return "follows"
 }
 
 func (i *Follow) Index() []mongo.IndexModel {

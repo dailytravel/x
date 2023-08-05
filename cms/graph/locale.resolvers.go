@@ -6,39 +6,45 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
+	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
 func (r *localeResolver) ID(ctx context.Context, obj *model.Locale) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Name is the resolver for the name field.
 func (r *localeResolver) Name(ctx context.Context, obj *model.Locale) (string, error) {
-	panic(fmt.Errorf("not implemented: Name - name"))
-}
+	locale := auth.Locale(ctx)
+	if name, ok := obj.Name[locale].(string); ok {
+		return name, nil
+	}
 
-// StringFormat is the resolver for the String_format field.
-func (r *localeResolver) StringFormat(ctx context.Context, obj *model.Locale) (string, error) {
-	panic(fmt.Errorf("not implemented: StringFormat - String_format"))
+	return obj.Name[obj.Code].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *localeResolver) Metadata(ctx context.Context, obj *model.Locale) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *localeResolver) CreatedAt(ctx context.Context, obj *model.Locale) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *localeResolver) UpdatedAt(ctx context.Context, obj *model.Locale) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateLocale is the resolver for the createLocale field.
@@ -53,17 +59,95 @@ func (r *mutationResolver) UpdateLocale(ctx context.Context, id string, input mo
 
 // DeleteLocale is the resolver for the deleteLocale field.
 func (r *mutationResolver) DeleteLocale(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteLocale - deleteLocale"))
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	res, err := r.db.Collection("locales").DeleteOne(ctx, bson.M{"_id": _id})
+	if err != nil {
+		return nil, fmt.Errorf("error deleting log: %v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("log not found")
+	}
+
+	return map[string]interface{}{
+		"status": "success",
+	}, nil
 }
 
-// Locales is the resolver for the locales field.
+// DeleteLocales is the resolver for the deleteLocales field.
+func (r *mutationResolver) DeleteLocales(ctx context.Context, ids []string) (map[string]interface{}, error) {
+	var _ids []primitive.ObjectID
+
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		_ids = append(_ids, _id)
+	}
+
+	res, err := r.db.Collection("locales").DeleteMany(ctx, bson.M{"_id": bson.M{"$in": _ids}})
+	if err != nil {
+		return nil, fmt.Errorf("error deleting log: %v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("log not found")
+	}
+
+	return map[string]interface{}{
+		"status": "success",
+	}, nil
+}
+
+// Locales is the resolver for the Locales field.
 func (r *queryResolver) Locales(ctx context.Context, args map[string]interface{}) (*model.Locales, error) {
-	panic(fmt.Errorf("not implemented: Locales - locales"))
+	var items []*model.Locale
+	//find all items
+	cur, err := r.db.Collection("locales").Find(ctx, r.model.Query(args), r.model.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Locale
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("locales").CountDocuments(ctx, r.model.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Locales{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
-// Locale is the resolver for the locale field.
+// Locale is the resolver for the Locale field.
 func (r *queryResolver) Locale(ctx context.Context, code string) (*model.Locale, error) {
-	panic(fmt.Errorf("not implemented: Locale - locale"))
+	var item *model.Locale
+	col := r.db.Collection(item.Collection())
+
+	filter := bson.M{"code": code}
+
+	err := col.FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Locale returns LocaleResolver implementation.

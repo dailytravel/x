@@ -6,7 +6,7 @@ type Locale {
   order: Int!
   rtl: Boolean!
   date_format: String!
-  String_format: String!
+  time_format: String!
   week_start: Int!
   metadata: Map
   created_at: String!
@@ -26,7 +26,7 @@ input NewLocale {
   order: Int!
   rtl: Boolean!
   date_format: String!
-  String_format: String!
+  time_format: String!
   week_start: Int!
   metadata: Map
 }
@@ -38,7 +38,7 @@ input UpdateLocale {
   order: Int
   rtl: Boolean
   date_format: String
-  String_format: String
+  time_format: String
   week_start: Int
   metadata: Map
 }
@@ -52,4 +52,5 @@ extend type Mutation {
   createLocale(input: NewLocale!): Locale @auth(requires: [ADMIN])
   updateLocale(id: ID!, input: UpdateLocale!): Locale @auth(requires: [ADMIN])
   deleteLocale(id: ID!): Map @auth(requires: [ADMIN])
+  deleteLocales(ids: [ID!]!): Map @auth(requires: [ADMIN])
 }

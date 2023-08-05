@@ -32,18 +32,17 @@ const authenticate = jwt({
   credentialsRequired: false,
 });
 
-// Create a remote GraphQL data source
 class AuthenticatedDataSource extends RemoteGraphQLDataSource {
-  constructor({ url }) {
-    super();
-    this.url = url;
+  constructor(url) {
+    super({ url });
   }
 
   willSendRequest({ request, context }) {
-    request.http.headers.set("x-api-key", context.apiKey);
+    const { req } = context;
+    request.http.headers.set("x-api-key", req.headers["x-api-key"]);
     request.http.headers.set(
       "auth",
-      context.auth ? JSON.stringify(context.auth) : null
+      req.headers.auth ? JSON.stringify(req.headers.auth) : null
     );
   }
 }
@@ -63,13 +62,7 @@ const gateway = new ApolloGateway({
       { name: "search", url: "http://localhost:4009/query" },
       { name: "service", url: "http://localhost:4010/query" },
     ],
-    introspectionHeaders: ({ context }) => {
-      return {
-        Authorization: context?.authorization || "",
-        "x-api-key": context?.["x-api-key"] || "",
-      };
-    },
-    buildService: ({ name, url }) => {
+    buildService({ name, url }) {
       return new AuthenticatedDataSource({ url });
     },
   }),
@@ -82,7 +75,7 @@ async function startApolloServer() {
     introspection: true,
     playground: true,
     context: ({ req }) => ({
-      req, // Make sure to include the req object in the context
+      req,
     }),
   });
 

@@ -230,18 +230,18 @@ type ComplexityRoot struct {
 	}
 
 	Locale struct {
-		Code         func(childComplexity int) int
-		CreatedAt    func(childComplexity int) int
-		DateFormat   func(childComplexity int) int
-		ID           func(childComplexity int) int
-		Locale       func(childComplexity int) int
-		Metadata     func(childComplexity int) int
-		Name         func(childComplexity int) int
-		Order        func(childComplexity int) int
-		Rtl          func(childComplexity int) int
-		StringFormat func(childComplexity int) int
-		UpdatedAt    func(childComplexity int) int
-		WeekStart    func(childComplexity int) int
+		Code       func(childComplexity int) int
+		CreatedAt  func(childComplexity int) int
+		DateFormat func(childComplexity int) int
+		ID         func(childComplexity int) int
+		Locale     func(childComplexity int) int
+		Metadata   func(childComplexity int) int
+		Name       func(childComplexity int) int
+		Order      func(childComplexity int) int
+		Rtl        func(childComplexity int) int
+		TimeFormat func(childComplexity int) int
+		UpdatedAt  func(childComplexity int) int
+		WeekStart  func(childComplexity int) int
 	}
 
 	Locales struct {
@@ -275,6 +275,7 @@ type ComplexityRoot struct {
 		DeleteFiles      func(childComplexity int, ids []string) int
 		DeleteFollow     func(childComplexity int, id string) int
 		DeleteLocale     func(childComplexity int, id string) int
+		DeleteLocales    func(childComplexity int, ids []string) int
 		DeleteTaxonomies func(childComplexity int, ids []string) int
 		DeleteTaxonomy   func(childComplexity int, id string) int
 		DeleteTimezone   func(childComplexity int, id string) int
@@ -301,7 +302,7 @@ type ComplexityRoot struct {
 		Content            func(childComplexity int, id string) int
 		Contents           func(childComplexity int, args map[string]interface{}) int
 		Countries          func(childComplexity int, args map[string]interface{}) int
-		Country            func(childComplexity int, id string) int
+		Country            func(childComplexity int, code string) int
 		Currencies         func(childComplexity int, args map[string]interface{}) int
 		Currency           func(childComplexity int, code string) int
 		File               func(childComplexity int, id string) int
@@ -471,8 +472,6 @@ type LocaleResolver interface {
 	ID(ctx context.Context, obj *model.Locale) (string, error)
 	Name(ctx context.Context, obj *model.Locale) (string, error)
 
-	StringFormat(ctx context.Context, obj *model.Locale) (string, error)
-
 	Metadata(ctx context.Context, obj *model.Locale) (map[string]interface{}, error)
 	CreatedAt(ctx context.Context, obj *model.Locale) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.Locale) (string, error)
@@ -508,6 +507,7 @@ type MutationResolver interface {
 	CreateLocale(ctx context.Context, input model.NewLocale) (*model.Locale, error)
 	UpdateLocale(ctx context.Context, id string, input model.UpdateLocale) (*model.Locale, error)
 	DeleteLocale(ctx context.Context, id string) (map[string]interface{}, error)
+	DeleteLocales(ctx context.Context, ids []string) (map[string]interface{}, error)
 	CreateReaction(ctx context.Context, input model.NewReaction) (*model.Reaction, error)
 	UpdateReaction(ctx context.Context, id string, input model.UpdateReaction) (*model.Reaction, error)
 	CreateTaxonomy(ctx context.Context, input model.NewTaxonomy) (*model.Taxonomy, error)
@@ -527,7 +527,7 @@ type QueryResolver interface {
 	Comment(ctx context.Context, id string) (*model.Comment, error)
 	Content(ctx context.Context, id string) (*model.Content, error)
 	Contents(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
-	Country(ctx context.Context, id string) (*model.Country, error)
+	Country(ctx context.Context, code string) (*model.Country, error)
 	Countries(ctx context.Context, args map[string]interface{}) (*model.Countries, error)
 	Currency(ctx context.Context, code string) (*model.Currency, error)
 	Currencies(ctx context.Context, args map[string]interface{}) (*model.Currencies, error)
@@ -1536,12 +1536,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Locale.Rtl(childComplexity), true
 
-	case "Locale.String_format":
-		if e.complexity.Locale.StringFormat == nil {
+	case "Locale.time_format":
+		if e.complexity.Locale.TimeFormat == nil {
 			break
 		}
 
-		return e.complexity.Locale.StringFormat(childComplexity), true
+		return e.complexity.Locale.TimeFormat(childComplexity), true
 
 	case "Locale.updated_at":
 		if e.complexity.Locale.UpdatedAt == nil {
@@ -1871,6 +1871,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteLocale(childComplexity, args["id"].(string)), true
 
+	case "Mutation.deleteLocales":
+		if e.complexity.Mutation.DeleteLocales == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteLocales_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteLocales(childComplexity, args["ids"].([]string)), true
+
 	case "Mutation.deleteTaxonomies":
 		if e.complexity.Mutation.DeleteTaxonomies == nil {
 			break
@@ -2157,7 +2169,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Country(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.Country(childComplexity, args["code"].(string)), true
 
 	case "Query.currencies":
 		if e.complexity.Query.Currencies == nil {
@@ -3207,6 +3219,21 @@ func (ec *executionContext) field_Mutation_deleteLocale_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteLocales_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["ids"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ids"))
+		arg0, err = ec.unmarshalNID2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ids"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteTaxonomies_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3667,14 +3694,14 @@ func (ec *executionContext) field_Query_country_args(ctx context.Context, rawArg
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+	if tmp, ok := rawArgs["code"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
+	args["code"] = arg0
 	return args, nil
 }
 
@@ -10433,8 +10460,8 @@ func (ec *executionContext) fieldContext_Locale_date_format(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Locale_String_format(ctx context.Context, field graphql.CollectedField, obj *model.Locale) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Locale_String_format(ctx, field)
+func (ec *executionContext) _Locale_time_format(ctx context.Context, field graphql.CollectedField, obj *model.Locale) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Locale_time_format(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10447,7 +10474,7 @@ func (ec *executionContext) _Locale_String_format(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Locale().StringFormat(rctx, obj)
+		return obj.TimeFormat, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10464,12 +10491,12 @@ func (ec *executionContext) _Locale_String_format(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Locale_String_format(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Locale_time_format(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Locale",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -10744,8 +10771,8 @@ func (ec *executionContext) fieldContext_Locales_data(ctx context.Context, field
 				return ec.fieldContext_Locale_rtl(ctx, field)
 			case "date_format":
 				return ec.fieldContext_Locale_date_format(ctx, field)
-			case "String_format":
-				return ec.fieldContext_Locale_String_format(ctx, field)
+			case "time_format":
+				return ec.fieldContext_Locale_time_format(ctx, field)
 			case "week_start":
 				return ec.fieldContext_Locale_week_start(ctx, field)
 			case "metadata":
@@ -13219,8 +13246,8 @@ func (ec *executionContext) fieldContext_Mutation_createLocale(ctx context.Conte
 				return ec.fieldContext_Locale_rtl(ctx, field)
 			case "date_format":
 				return ec.fieldContext_Locale_date_format(ctx, field)
-			case "String_format":
-				return ec.fieldContext_Locale_String_format(ctx, field)
+			case "time_format":
+				return ec.fieldContext_Locale_time_format(ctx, field)
 			case "week_start":
 				return ec.fieldContext_Locale_week_start(ctx, field)
 			case "metadata":
@@ -13321,8 +13348,8 @@ func (ec *executionContext) fieldContext_Mutation_updateLocale(ctx context.Conte
 				return ec.fieldContext_Locale_rtl(ctx, field)
 			case "date_format":
 				return ec.fieldContext_Locale_date_format(ctx, field)
-			case "String_format":
-				return ec.fieldContext_Locale_String_format(ctx, field)
+			case "time_format":
+				return ec.fieldContext_Locale_time_format(ctx, field)
 			case "week_start":
 				return ec.fieldContext_Locale_week_start(ctx, field)
 			case "metadata":
@@ -13419,6 +13446,82 @@ func (ec *executionContext) fieldContext_Mutation_deleteLocale(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteLocale_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteLocales(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteLocales(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteLocales(rctx, fc.Args["ids"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0, requires)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(map[string]interface{}); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be map[string]interface{}`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(map[string]interface{})
+	fc.Result = res
+	return ec.marshalOMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteLocales(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteLocales_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -14709,7 +14812,7 @@ func (ec *executionContext) _Query_country(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Country(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Query().Country(rctx, fc.Args["code"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15387,8 +15490,8 @@ func (ec *executionContext) fieldContext_Query_locale(ctx context.Context, field
 				return ec.fieldContext_Locale_rtl(ctx, field)
 			case "date_format":
 				return ec.fieldContext_Locale_date_format(ctx, field)
-			case "String_format":
-				return ec.fieldContext_Locale_String_format(ctx, field)
+			case "time_format":
+				return ec.fieldContext_Locale_time_format(ctx, field)
 			case "week_start":
 				return ec.fieldContext_Locale_week_start(ctx, field)
 			case "metadata":
@@ -19750,7 +19853,7 @@ func (ec *executionContext) unmarshalInputNewLocale(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "locale", "code", "order", "rtl", "date_format", "String_format", "week_start", "metadata"}
+	fieldsInOrder := [...]string{"id", "name", "locale", "code", "order", "rtl", "date_format", "time_format", "week_start", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -19820,15 +19923,15 @@ func (ec *executionContext) unmarshalInputNewLocale(ctx context.Context, obj int
 				return it, err
 			}
 			it.DateFormat = data
-		case "String_format":
+		case "time_format":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("String_format"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("time_format"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.StringFormat = data
+			it.TimeFormat = data
 		case "week_start":
 			var err error
 
@@ -20735,7 +20838,7 @@ func (ec *executionContext) unmarshalInputUpdateLocale(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "locale", "code", "order", "rtl", "date_format", "String_format", "week_start", "metadata"}
+	fieldsInOrder := [...]string{"name", "locale", "code", "order", "rtl", "date_format", "time_format", "week_start", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -20796,15 +20899,15 @@ func (ec *executionContext) unmarshalInputUpdateLocale(ctx context.Context, obj 
 				return it, err
 			}
 			it.DateFormat = data
-		case "String_format":
+		case "time_format":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("String_format"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("time_format"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.StringFormat = data
+			it.TimeFormat = data
 		case "week_start":
 			var err error
 
@@ -24241,42 +24344,11 @@ func (ec *executionContext) _Locale(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "String_format":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Locale_String_format(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+		case "time_format":
+			out.Values[i] = ec._Locale_time_format(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "week_start":
 			out.Values[i] = ec._Locale_week_start(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -24589,6 +24661,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteLocale":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteLocale(ctx, field)
+			})
+		case "deleteLocales":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteLocales(ctx, field)
 			})
 		case "createReaction":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {

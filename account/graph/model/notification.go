@@ -12,10 +12,15 @@ import (
 type Notification struct {
 	Model      `bson:",inline"`
 	User       primitive.ObjectID  `json:"user" bson:"user"`
-	Notifiable Object              `json:"notifiable" bson:"notifiable"`
+	Notifiable Notifiable          `json:"notifiable" bson:"notifiable"`
 	Locale     string              `json:"locale" bson:"locale"`
 	Type       string              `json:"type" bson:"type"`
 	ReadAt     primitive.Timestamp `json:"read_at,omitempty" bson:"read_at,omitempty"`
+}
+
+type Notifiable struct {
+	ID   primitive.ObjectID `json:"id" bson:"id"`
+	Type string             `json:"type" bson:"type"`
 }
 
 func (i *Notification) MarshalBSON() ([]byte, error) {
