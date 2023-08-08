@@ -40,3 +40,33 @@ func (r *queryResolver) Responses(ctx context.Context, args map[string]interface
 func (r *queryResolver) Response(ctx context.Context, id string) (*model.Response, error) {
 	panic(fmt.Errorf("not implemented: Response - response"))
 }
+
+// ID is the resolver for the id field.
+func (r *responseResolver) ID(ctx context.Context, obj *model.Response) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Campaign is the resolver for the campaign field.
+func (r *responseResolver) Campaign(ctx context.Context, obj *model.Response) (*model.Campaign, error) {
+	panic(fmt.Errorf("not implemented: Campaign - campaign"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *responseResolver) Metadata(ctx context.Context, obj *model.Response) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *responseResolver) CreatedAt(ctx context.Context, obj *model.Response) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *responseResolver) UpdatedAt(ctx context.Context, obj *model.Response) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// Response returns ResponseResolver implementation.
+func (r *Resolver) Response() ResponseResolver { return &responseResolver{r} }
+
+type responseResolver struct{ *Resolver }

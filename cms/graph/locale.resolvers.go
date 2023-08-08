@@ -30,7 +30,7 @@ func (r *localeResolver) Name(ctx context.Context, obj *model.Locale) (string, e
 		return name, nil
 	}
 
-	return obj.Name[obj.Code].(string), nil
+	return obj.Name[obj.Locale].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.

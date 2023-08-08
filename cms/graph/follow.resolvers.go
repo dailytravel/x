@@ -6,10 +6,13 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/cms/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
@@ -24,7 +27,17 @@ func (r *followResolver) User(ctx context.Context, obj *model.Follow) (*model.Us
 
 // Followable is the resolver for the followable field.
 func (r *followResolver) Followable(ctx context.Context, obj *model.Follow) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Followable - followable"))
+	var item map[string]interface{}
+
+	err := r.db.Collection(obj.Followable.Type).FindOne(ctx, bson.M{"_id": obj.Followable.ID}).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // CreatedAt is the resolver for the created_at field.

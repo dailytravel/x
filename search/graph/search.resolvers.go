@@ -6,7 +6,12 @@ package graph
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+
+	"github.com/dailytravel/x/search/db"
+	"github.com/dailytravel/x/search/utils"
+	"github.com/typesense/typesense-go/typesense/api"
 )
 
 // Index is the resolver for the index field.
@@ -16,5 +21,65 @@ func (r *mutationResolver) Index(ctx context.Context, args map[string]interface{
 
 // Search is the resolver for the search field.
 func (r *queryResolver) Search(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	return map[string]interface{}{"hello": "world"}, nil
+	// Initialize searchParams and commonSearchParams
+	searchParams := api.MultiSearchParams{}
+	commonSearchParams := api.MultiSearchSearchesParameter{}
+
+	// Process searches
+	if searches, ok := args["searches"].([]interface{}); ok {
+		for _, search := range searches {
+			if search, ok := search.(map[string]interface{}); ok {
+				commonSearchParams.Searches = append(commonSearchParams.Searches, api.MultiSearchCollectionParameters{
+					Collection: search["collection"].(string),
+				})
+			}
+		}
+	}
+
+	if q, ok := args["q"].(string); ok {
+		searchParams.Q = &q
+	}
+
+	if query_by, ok := args["query_by"].(string); ok {
+		searchParams.QueryBy = &query_by
+	}
+
+	if filter_by, ok := args["filter_by"].(string); ok {
+		searchParams.FilterBy = &filter_by
+	}
+
+	if sort_by, ok := args["sort_by"].(string); ok {
+		searchParams.SortBy = &sort_by
+	}
+
+	if page, ok := args["page"].(json.Number); ok {
+		pageInt, err := page.Int64()
+		if err != nil {
+			return nil, err
+		}
+		pageInt32 := int(pageInt)
+		searchParams.Page = &pageInt32
+	}
+
+	if per_page, ok := args["per_page"].(json.Number); ok {
+		perPageInt, err := per_page.Int64()
+		if err != nil {
+			return nil, err
+		}
+		perPageInt32 := int(perPageInt)
+		searchParams.PerPage = &perPageInt32
+	}
+
+	res, err := db.Client.MultiSearch.Perform(&searchParams, commonSearchParams)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert struct to map
+	results, err := utils.StructToMap(res)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }

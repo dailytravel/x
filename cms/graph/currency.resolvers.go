@@ -30,7 +30,7 @@ func (r *currencyResolver) Name(ctx context.Context, obj *model.Currency) (strin
 		return name, nil
 	}
 
-	return obj.Name[obj.Code].(string), nil
+	return obj.Name[obj.Locale].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.

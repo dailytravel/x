@@ -6,10 +6,13 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/cms/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // CreateTaxonomy is the resolver for the createTaxonomy field.
@@ -54,7 +57,17 @@ func (r *taxonomyResolver) Category(ctx context.Context, obj *model.Taxonomy) (*
 
 // Taxonomizable is the resolver for the Taxonomizable field.
 func (r *taxonomyResolver) Taxonomizable(ctx context.Context, obj *model.Taxonomy) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Taxonomizable - Taxonomizable"))
+	var item map[string]interface{}
+
+	err := r.db.Collection(obj.Taxonomizable.Type).FindOne(ctx, bson.M{"_id": obj.Taxonomizable.ID}).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // CreatedAt is the resolver for the created_at field.

@@ -1,0 +1,58 @@
+type Comment @key(fields: "id") {
+  id: ID!
+  locale: String!
+  content: String!
+  rating: Int
+  status: String!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+  parent: Comment
+  children: [Comment]
+  commentable: Map!
+  owner: User!
+  reaction: [Reaction]
+  created_by: User
+  updated_by: User
+  attachments: [File]
+  reactions: [Reaction]
+}
+
+type Comments {
+  count: Int!
+  data: [Comment]
+}
+
+input NewComment {
+  parent: ID
+  commentableId: ID!
+  commentableType: String!
+  locale: String!
+  content: String
+  rating: Int
+  metadata: Map
+  status: String
+  attachments: [ID]
+}
+
+input UpdateComment {
+  parent: ID
+  locale: String!
+  content: String
+  rating: Int
+  metadata: Map
+  status: String
+  attachments: [ID]
+}
+
+extend type Query {
+  comments(args: Map): [Comment]
+  comment(id: ID!): Comment
+}
+
+extend type Mutation {
+  createComment(input: NewComment!): Comment @auth
+  updateComment(id: ID!, input: UpdateComment!): Comment @auth
+  deleteComment(id: ID!): Map @auth
+  deleteComments(ids: [ID!]!): Map @auth
+}

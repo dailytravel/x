@@ -11,6 +11,51 @@ import (
 	"github.com/dailytravel/x/hrm/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *attendanceResolver) ID(ctx context.Context, obj *model.Attendance) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// TimeIn is the resolver for the time_in field.
+func (r *attendanceResolver) TimeIn(ctx context.Context, obj *model.Attendance) (string, error) {
+	panic(fmt.Errorf("not implemented: TimeIn - time_in"))
+}
+
+// TimeOut is the resolver for the time_out field.
+func (r *attendanceResolver) TimeOut(ctx context.Context, obj *model.Attendance) (string, error) {
+	panic(fmt.Errorf("not implemented: TimeOut - time_out"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *attendanceResolver) Metadata(ctx context.Context, obj *model.Attendance) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *attendanceResolver) CreatedAt(ctx context.Context, obj *model.Attendance) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *attendanceResolver) UpdatedAt(ctx context.Context, obj *model.Attendance) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *attendanceResolver) CreatedBy(ctx context.Context, obj *model.Attendance) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *attendanceResolver) UpdatedBy(ctx context.Context, obj *model.Attendance) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *attendanceResolver) Owner(ctx context.Context, obj *model.Attendance) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
 // CheckIn is the resolver for the checkIn field.
 func (r *mutationResolver) CheckIn(ctx context.Context) (*model.Attendance, error) {
 	panic(fmt.Errorf("not implemented: CheckIn - checkIn"))
@@ -50,3 +95,8 @@ func (r *queryResolver) Attendance(ctx context.Context, id string) (*model.Atten
 func (r *queryResolver) Attendances(ctx context.Context, args map[string]interface{}) (*model.Attendances, error) {
 	panic(fmt.Errorf("not implemented: Attendances - attendances"))
 }
+
+// Attendance returns AttendanceResolver implementation.
+func (r *Resolver) Attendance() AttendanceResolver { return &attendanceResolver{r} }
+
+type attendanceResolver struct{ *Resolver }

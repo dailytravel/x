@@ -6,10 +6,13 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/cms/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
@@ -49,7 +52,17 @@ func (r *commentResolver) Children(ctx context.Context, obj *model.Comment) ([]*
 
 // Commentable is the resolver for the commentable field.
 func (r *commentResolver) Commentable(ctx context.Context, obj *model.Comment) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Commentable - commentable"))
+	var item map[string]interface{}
+
+	err := r.db.Collection(obj.Commentable.Type).FindOne(ctx, bson.M{"_id": obj.Commentable.ID}).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Owner is the resolver for the owner field.

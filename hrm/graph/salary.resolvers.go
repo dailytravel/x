@@ -35,3 +35,53 @@ func (r *queryResolver) Salary(ctx context.Context, id string) (*model.Salary, e
 func (r *queryResolver) Salaries(ctx context.Context, args map[string]interface{}) (*model.Salaries, error) {
 	panic(fmt.Errorf("not implemented: Salaries - salaries"))
 }
+
+// ID is the resolver for the id field.
+func (r *salaryResolver) ID(ctx context.Context, obj *model.Salary) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *salaryResolver) Owner(ctx context.Context, obj *model.Salary) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// StartDate is the resolver for the start_date field.
+func (r *salaryResolver) StartDate(ctx context.Context, obj *model.Salary) (string, error) {
+	panic(fmt.Errorf("not implemented: StartDate - start_date"))
+}
+
+// EndDate is the resolver for the end_date field.
+func (r *salaryResolver) EndDate(ctx context.Context, obj *model.Salary) (*string, error) {
+	panic(fmt.Errorf("not implemented: EndDate - end_date"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *salaryResolver) Metadata(ctx context.Context, obj *model.Salary) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *salaryResolver) CreatedAt(ctx context.Context, obj *model.Salary) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *salaryResolver) UpdatedAt(ctx context.Context, obj *model.Salary) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *salaryResolver) CreatedBy(ctx context.Context, obj *model.Salary) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *salaryResolver) UpdatedBy(ctx context.Context, obj *model.Salary) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Salary returns SalaryResolver implementation.
+func (r *Resolver) Salary() SalaryResolver { return &salaryResolver{r} }
+
+type salaryResolver struct{ *Resolver }

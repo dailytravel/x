@@ -102,24 +102,6 @@ func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) 
 	return obj.ID.Hex(), nil
 }
 
-// LastLogin is the resolver for the last_login field.
-func (r *userResolver) LastLogin(ctx context.Context, obj *model.User) (*string, error) {
-	if obj.LastLogin != nil {
-		lastLoginStr := time.Unix(int64(obj.LastLogin.T), 0).Format(time.RFC3339)
-		return &lastLoginStr, nil
-	}
-	return nil, nil
-}
-
-// VerifiedAt is the resolver for the verified_at field.
-func (r *userResolver) VerifiedAt(ctx context.Context, obj *model.User) (*string, error) {
-	if obj.VerifiedAt != nil {
-		verifiedAtStr := time.Unix(int64(obj.VerifiedAt.T), 0).Format(time.RFC3339)
-		return &verifiedAtStr, nil
-	}
-	return nil, nil
-}
-
 // CreatedAt is the resolver for the created_at field.
 func (r *userResolver) CreatedAt(ctx context.Context, obj *model.User) (string, error) {
 	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
@@ -128,50 +110,6 @@ func (r *userResolver) CreatedAt(ctx context.Context, obj *model.User) (string, 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *userResolver) UpdatedAt(ctx context.Context, obj *model.User) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// LastActivity is the resolver for the last_activity field.
-func (r *userResolver) LastActivity(ctx context.Context, obj *model.User) (*string, error) {
-	if obj.LastActivity != nil {
-		lastActivityStr := time.Unix(int64(obj.LastActivity.T), 0).Format(time.RFC3339)
-		return &lastActivityStr, nil
-	}
-	return nil, nil
-}
-
-// Metadata is the resolver for the metadata field.
-func (r *userResolver) Metadata(ctx context.Context, obj *model.User) (map[string]interface{}, error) {
-	return obj.Metadata, nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *userResolver) CreatedBy(ctx context.Context, obj *model.User) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *userResolver) UpdatedBy(ctx context.Context, obj *model.User) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
-}
-
-// Board is the resolver for the board field.
-func (r *userResolver) Board(ctx context.Context, obj *model.User) (*model.Board, error) {
-	panic(fmt.Errorf("not implemented: Board - board"))
-}
-
-// Contacts is the resolver for the contacts field.
-func (r *userResolver) Contacts(ctx context.Context, obj *model.User) ([]*model.Contact, error) {
-	panic(fmt.Errorf("not implemented: Contacts - contacts"))
-}
-
-// Points is the resolver for the points field.
-func (r *userResolver) Points(ctx context.Context, obj *model.User) ([]*model.Point, error) {
-	panic(fmt.Errorf("not implemented: Points - points"))
-}
-
-// Membership is the resolver for the membership field.
-func (r *userResolver) Membership(ctx context.Context, obj *model.User) (*model.Membership, error) {
-	panic(fmt.Errorf("not implemented: Membership - membership"))
 }
 
 // User returns UserResolver implementation.

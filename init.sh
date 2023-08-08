@@ -15,6 +15,7 @@ for s in "$@"; do
     go mod tidy
     go run github.com/99designs/gqlgen init
     go run github.com/99designs/gqlgen generate
+    rm -r ./graph/schema.resolvers.go
     cd ../
     echo "Setup for $s is done!"
   else

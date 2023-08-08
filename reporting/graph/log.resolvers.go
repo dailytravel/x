@@ -11,6 +11,26 @@ import (
 	"github.com/dailytravel/x/reporting/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *logResolver) ID(ctx context.Context, obj *model.Log) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *logResolver) Metadata(ctx context.Context, obj *model.Log) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// Timestamp is the resolver for the Timestamp field.
+func (r *logResolver) Timestamp(ctx context.Context, obj *model.Log) (int, error) {
+	panic(fmt.Errorf("not implemented: Timestamp - Timestamp"))
+}
+
+// User is the resolver for the user field.
+func (r *logResolver) User(ctx context.Context, obj *model.Log) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
 // DeleteLog is the resolver for the deleteLog field.
 func (r *mutationResolver) DeleteLog(ctx context.Context, id string) (map[string]interface{}, error) {
 	panic(fmt.Errorf("not implemented: DeleteLog - deleteLog"))
@@ -25,3 +45,8 @@ func (r *queryResolver) Log(ctx context.Context, id string) (*model.Log, error) 
 func (r *queryResolver) Logs(ctx context.Context, args map[string]interface{}) (*model.Logs, error) {
 	panic(fmt.Errorf("not implemented: Logs - logs"))
 }
+
+// Log returns LogResolver implementation.
+func (r *Resolver) Log() LogResolver { return &logResolver{r} }
+
+type logResolver struct{ *Resolver }

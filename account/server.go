@@ -20,6 +20,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
 )
 
 func init() {
@@ -70,6 +71,11 @@ func graphqlHandler() gin.HandlerFunc {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	// connect MongoDB
 	client, err := db.ConnectDB()
 	if err != nil {

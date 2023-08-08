@@ -42,21 +42,6 @@ type Follow struct {
 
 func (Follow) IsEntity() {}
 
-type Log struct {
-	ID        string                 `json:"id"`
-	Message   *string                `json:"message,omitempty"`
-	Method    string                 `json:"method"`
-	Latency   int                    `json:"latency"`
-	Path      string                 `json:"path"`
-	Status    string                 `json:"status"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Timestamp int                    `json:"Timestamp"`
-	User      *User                  `json:"user,omitempty"`
-	URL       string                 `json:"url"`
-	UserAgent string                 `json:"user_agent"`
-	ClientIP  string                 `json:"client_ip"`
-}
-
 type Logs struct {
 	Data  []*Log `json:"data,omitempty"`
 	Count int    `json:"count"`
@@ -68,19 +53,6 @@ type NewResponse struct {
 	Campaign  string                 `json:"campaign"`
 	Metadata  map[string]interface{} `json:"metadata"`
 }
-
-type Response struct {
-	ID        string                 `json:"id"`
-	Reference *string                `json:"reference,omitempty"`
-	Campaign  *Campaign              `json:"campaign"`
-	Type      string                 `json:"type"`
-	UserAgent string                 `json:"user_agent"`
-	Metadata  map[string]interface{} `json:"metadata"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-}
-
-func (Response) IsEntity() {}
 
 type Responses struct {
 	Count int         `json:"count"`

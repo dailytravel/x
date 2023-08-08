@@ -11,6 +11,56 @@ import (
 	"github.com/dailytravel/x/finance/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *invoiceResolver) ID(ctx context.Context, obj *model.Invoice) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *invoiceResolver) Owner(ctx context.Context, obj *model.Invoice) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Amount is the resolver for the amount field.
+func (r *invoiceResolver) Amount(ctx context.Context, obj *model.Invoice) (int, error) {
+	panic(fmt.Errorf("not implemented: Amount - amount"))
+}
+
+// Billing is the resolver for the billing field.
+func (r *invoiceResolver) Billing(ctx context.Context, obj *model.Invoice) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Billing - billing"))
+}
+
+// DueDate is the resolver for the due_date field.
+func (r *invoiceResolver) DueDate(ctx context.Context, obj *model.Invoice) (string, error) {
+	panic(fmt.Errorf("not implemented: DueDate - due_date"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *invoiceResolver) Metadata(ctx context.Context, obj *model.Invoice) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *invoiceResolver) CreatedAt(ctx context.Context, obj *model.Invoice) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *invoiceResolver) UpdatedAt(ctx context.Context, obj *model.Invoice) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *invoiceResolver) CreatedBy(ctx context.Context, obj *model.Invoice) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *invoiceResolver) UpdatedBy(ctx context.Context, obj *model.Invoice) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateInvoice is the resolver for the createInvoice field.
 func (r *mutationResolver) CreateInvoice(ctx context.Context, input model.NewInvoice) (*model.Invoice, error) {
 	panic(fmt.Errorf("not implemented: CreateInvoice - createInvoice"))
@@ -35,3 +85,8 @@ func (r *queryResolver) Invoice(ctx context.Context, id string) (*model.Invoice,
 func (r *queryResolver) Invoices(ctx context.Context, args map[string]interface{}) (*model.Invoices, error) {
 	panic(fmt.Errorf("not implemented: Invoices - invoices"))
 }
+
+// Invoice returns InvoiceResolver implementation.
+func (r *Resolver) Invoice() InvoiceResolver { return &invoiceResolver{r} }
+
+type invoiceResolver struct{ *Resolver }

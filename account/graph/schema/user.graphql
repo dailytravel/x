@@ -1,29 +1,12 @@
 type User @key(fields: "id") {
   id: ID!
-  locale: String
   name: String!
   email: String!
-  phone: String
-  password: String!
   roles: [String]
   mfa: MFA
-  timezone: String
-  login_attempts: Int
-  last_login: String
-  last_ip: String
-  verified_at: String
   created_at: String!
   updated_at: String!
-  last_activity: String
-  identities: [Identity]
-  metadata: Map
   status: String
-  created_by: User
-  updated_by: User
-  board: Board
-  contacts: [Contact]
-  points: [Point]
-  membership: Membership
 }
 
 type Users {
@@ -56,15 +39,11 @@ type Payload {
 }
 
 input NewUser {
-  locale: String!
   name: String!
   email: String!
-  phone: String
   password: String!
   roles: [String]
-  timezone: String
-  status: String
-  metadata: Map
+  mfa: MFAInput
 }
 
 input RegisterInput {
@@ -80,15 +59,11 @@ input LoginInput {
 }
 
 input UpdateUser {
-  locale: String
   name: String
   email: String
-  phone: String
+  password: String
   roles: [String]
-  photos: [ID]
-  timezone: String
-  status: String
-  metadata: Map
+  mfa: MFAInput
 }
 
 input PasswordInput {

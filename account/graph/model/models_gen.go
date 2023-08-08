@@ -129,11 +129,6 @@ type NewUser struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type Notifications struct {
-	Data  []*Notification `json:"data,omitempty"`
-	Count int             `json:"count"`
-}
-
 type Organization struct {
 	ID string `json:"id"`
 }

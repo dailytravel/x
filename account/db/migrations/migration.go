@@ -13,7 +13,6 @@ func AutoMigrate() error {
 		&Permission{Database: db.Database},
 		&Client{Database: db.Database},
 		&Key{Database: db.Database},
-		&Notification{Database: db.Database},
 	}
 
 	for _, migration := range migrators {

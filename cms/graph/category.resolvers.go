@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
@@ -29,12 +30,26 @@ func (r *categoryResolver) Children(ctx context.Context, obj *model.Category) ([
 
 // Name is the resolver for the name field.
 func (r *categoryResolver) Name(ctx context.Context, obj *model.Category) (string, error) {
-	panic(fmt.Errorf("not implemented: Name - name"))
+	locale := auth.Locale(ctx)
+	if name, ok := obj.Name[locale].(string); ok {
+		return name, nil
+	}
+
+	return obj.Name[obj.Locale].(string), nil
 }
 
 // Description is the resolver for the description field.
 func (r *categoryResolver) Description(ctx context.Context, obj *model.Category) (*string, error) {
-	panic(fmt.Errorf("not implemented: Description - description"))
+	locale := auth.Locale(ctx)
+	if description, ok := obj.Description[locale].(string); ok {
+		return &description, nil
+	}
+
+	if description, ok := obj.Description[obj.Locale].(string); ok {
+		return &description, nil
+	}
+
+	return nil, nil // or return nil, errors.New("Description not found for any locale")
 }
 
 // Metadata is the resolver for the metadata field.

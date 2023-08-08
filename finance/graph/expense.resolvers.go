@@ -11,6 +11,56 @@ import (
 	"github.com/dailytravel/x/finance/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *expenseResolver) ID(ctx context.Context, obj *model.Expense) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Followers is the resolver for the followers field.
+func (r *expenseResolver) Followers(ctx context.Context, obj *model.Expense) ([]*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: Followers - followers"))
+}
+
+// Comments is the resolver for the comments field.
+func (r *expenseResolver) Comments(ctx context.Context, obj *model.Expense) ([]*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: Comments - comments"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *expenseResolver) Metadata(ctx context.Context, obj *model.Expense) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// Date is the resolver for the date field.
+func (r *expenseResolver) Date(ctx context.Context, obj *model.Expense) (string, error) {
+	panic(fmt.Errorf("not implemented: Date - date"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *expenseResolver) CreatedAt(ctx context.Context, obj *model.Expense) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *expenseResolver) UpdatedAt(ctx context.Context, obj *model.Expense) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *expenseResolver) CreatedBy(ctx context.Context, obj *model.Expense) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *expenseResolver) UpdatedBy(ctx context.Context, obj *model.Expense) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *expenseResolver) Owner(ctx context.Context, obj *model.Expense) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
 // CreateExpense is the resolver for the createExpense field.
 func (r *mutationResolver) CreateExpense(ctx context.Context, input model.NewExpense) (*model.Expense, error) {
 	panic(fmt.Errorf("not implemented: CreateExpense - createExpense"))
@@ -40,3 +90,8 @@ func (r *queryResolver) Expenses(ctx context.Context, args map[string]interface{
 func (r *queryResolver) Expense(ctx context.Context, id string) (*model.Expense, error) {
 	panic(fmt.Errorf("not implemented: Expense - expense"))
 }
+
+// Expense returns ExpenseResolver implementation.
+func (r *Resolver) Expense() ExpenseResolver { return &expenseResolver{r} }
+
+type expenseResolver struct{ *Resolver }

@@ -1,0 +1,58 @@
+type Message {
+  id: ID!
+  conversation: Conversation!
+  owner: User!
+  subject: String!
+  body: String!
+  status: String!
+  created_at: String!
+  updated_at: String!
+  recipients: [Recipient!]!
+  attachments: [File]
+}
+
+enum MessageStatus {
+  DRAFT
+  SENT
+  ARCHIVED
+  SPAM
+  SCHEDULED
+  DELIVERED
+  READ
+  FAILED
+}
+
+type Messages {
+  data: [Message]
+  count: Int!
+}
+
+input NewMessage {
+  conversation: ID!
+  recipients: [ID!]!
+  subject: String!
+  body: Map!
+  categories: [ID!]
+  metadata: Map
+}
+
+input UpdateMessage {
+  conversation: ID
+  recipients: [ID!]
+  subject: String
+  body: Map
+  categories: [ID!]
+  metadata: Map
+}
+
+extend type Query {
+  message(id: ID!): Message @auth
+  messages(args: Map): Map @auth
+}
+
+extend type Mutation {
+  createMessage(input: NewMessage!): Message @auth
+  updateMessage(id: ID!, input: UpdateMessage!): Message @auth
+  deleteMessage(id: ID!): Map @auth
+  deleteMessages(ids: [ID!]!): Map @auth
+}

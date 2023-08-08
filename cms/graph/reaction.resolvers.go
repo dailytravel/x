@@ -6,10 +6,13 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/cms/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // CreateReaction is the resolver for the createReaction field.
@@ -44,7 +47,17 @@ func (r *reactionResolver) User(ctx context.Context, obj *model.Reaction) (*mode
 
 // Reactable is the resolver for the reactable field.
 func (r *reactionResolver) Reactable(ctx context.Context, obj *model.Reaction) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Reactable - reactable"))
+	var item map[string]interface{}
+
+	err := r.db.Collection(obj.Reactable.Type).FindOne(ctx, bson.M{"_id": obj.Reactable.ID}).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // CreatedAt is the resolver for the created_at field.

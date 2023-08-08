@@ -1,0 +1,31 @@
+type Recipient {
+  id: ID!
+  user: User!
+  message: Message!
+  read_at: Int
+  created_at: String!
+  updated_at: String!
+}
+
+type Recipients {
+  count: Int!
+  data: [Recipient]
+}
+
+input RecipientInput {
+  recipient: ID!
+  message: ID!
+  read_at: Int
+}
+
+extend type Query {
+  recipient(id: ID!): Recipient @auth
+  recipients(args: Map): Recipients @auth
+}
+
+extend type Mutation {
+  createRecipient(input: RecipientInput!): Recipient @auth
+  updateRecipient(args: Map!): Recipient @auth
+  deleteRecipient(id: ID!): Map @auth
+  deleteRecipients(ids: [ID!]!): Map @auth
+}

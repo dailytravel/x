@@ -14,26 +14,6 @@ type Comment struct {
 
 func (Comment) IsEntity() {}
 
-type Expense struct {
-	ID          string                 `json:"id"`
-	Reference   string                 `json:"reference"`
-	Type        string                 `json:"type"`
-	Description string                 `json:"description"`
-	Amount      float64                `json:"amount"`
-	Currency    string                 `json:"currency"`
-	Followers   []*Follow              `json:"followers,omitempty"`
-	Comments    []*Comment             `json:"comments,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      *string                `json:"status,omitempty"`
-	Date        string                 `json:"date"`
-	Notes       *string                `json:"notes,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	CreatedBy   *User                  `json:"created_by,omitempty"`
-	UpdatedBy   *User                  `json:"updated_by,omitempty"`
-	Owner       *User                  `json:"owner"`
-}
-
 type Expenses struct {
 	Count int        `json:"count"`
 	Data  []*Expense `json:"data,omitempty"`
@@ -44,24 +24,6 @@ type Follow struct {
 }
 
 func (Follow) IsEntity() {}
-
-type Invoice struct {
-	ID        string                 `json:"id"`
-	Owner     *User                  `json:"owner"`
-	Reference string                 `json:"reference"`
-	Template  string                 `json:"template"`
-	Amount    int                    `json:"amount"`
-	Currency  string                 `json:"currency"`
-	Billing   map[string]interface{} `json:"billing"`
-	DueDate   string                 `json:"due_date"`
-	Notes     *string                `json:"notes,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    *string                `json:"status,omitempty"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	CreatedBy *User                  `json:"created_by,omitempty"`
-	UpdatedBy *User                  `json:"updated_by,omitempty"`
-}
 
 type Invoices struct {
 	Data  []*Invoice `json:"data,omitempty"`

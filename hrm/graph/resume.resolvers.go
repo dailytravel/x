@@ -40,3 +40,33 @@ func (r *queryResolver) Resume(ctx context.Context, id string) (*model.Resume, e
 func (r *queryResolver) Resumes(ctx context.Context, args map[string]interface{}) (*model.Resumes, error) {
 	panic(fmt.Errorf("not implemented: Resumes - resumes"))
 }
+
+// ID is the resolver for the id field.
+func (r *resumeResolver) ID(ctx context.Context, obj *model.Resume) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// User is the resolver for the user field.
+func (r *resumeResolver) User(ctx context.Context, obj *model.Resume) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *resumeResolver) Metadata(ctx context.Context, obj *model.Resume) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *resumeResolver) CreatedAt(ctx context.Context, obj *model.Resume) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *resumeResolver) UpdatedAt(ctx context.Context, obj *model.Resume) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// Resume returns ResumeResolver implementation.
+func (r *Resolver) Resume() ResumeResolver { return &resumeResolver{r} }
+
+type resumeResolver struct{ *Resolver }

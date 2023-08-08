@@ -11,6 +11,61 @@ import (
 	"github.com/dailytravel/x/hrm/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *eventResolver) ID(ctx context.Context, obj *model.Event) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Start is the resolver for the start field.
+func (r *eventResolver) Start(ctx context.Context, obj *model.Event) (int, error) {
+	panic(fmt.Errorf("not implemented: Start - start"))
+}
+
+// End is the resolver for the end field.
+func (r *eventResolver) End(ctx context.Context, obj *model.Event) (int, error) {
+	panic(fmt.Errorf("not implemented: End - end"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *eventResolver) CreatedAt(ctx context.Context, obj *model.Event) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *eventResolver) UpdatedAt(ctx context.Context, obj *model.Event) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *eventResolver) CreatedBy(ctx context.Context, obj *model.Event) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *eventResolver) UpdatedBy(ctx context.Context, obj *model.Event) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *eventResolver) Owner(ctx context.Context, obj *model.Event) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Followers is the resolver for the followers field.
+func (r *eventResolver) Followers(ctx context.Context, obj *model.Event) ([]*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: Followers - followers"))
+}
+
+// Attendees is the resolver for the attendees field.
+func (r *eventResolver) Attendees(ctx context.Context, obj *model.Event) ([]*model.User, error) {
+	panic(fmt.Errorf("not implemented: Attendees - attendees"))
+}
+
+// Attachments is the resolver for the attachments field.
+func (r *eventResolver) Attachments(ctx context.Context, obj *model.Event) ([]*model.File, error) {
+	panic(fmt.Errorf("not implemented: Attachments - attachments"))
+}
+
 // CreateEvent is the resolver for the createEvent field.
 func (r *mutationResolver) CreateEvent(ctx context.Context, input model.NewEvent) (*model.Event, error) {
 	panic(fmt.Errorf("not implemented: CreateEvent - createEvent"))
@@ -40,3 +95,22 @@ func (r *queryResolver) Events(ctx context.Context, args map[string]interface{})
 func (r *queryResolver) Event(ctx context.Context, id string) (*model.Event, error) {
 	panic(fmt.Errorf("not implemented: Event - event"))
 }
+
+// EndDate is the resolver for the end_date field.
+func (r *recurrenceResolver) EndDate(ctx context.Context, obj *model.Recurrence) (*int, error) {
+	panic(fmt.Errorf("not implemented: EndDate - end_date"))
+}
+
+// Exceptions is the resolver for the exceptions field.
+func (r *recurrenceResolver) Exceptions(ctx context.Context, obj *model.Recurrence) ([]*int, error) {
+	panic(fmt.Errorf("not implemented: Exceptions - exceptions"))
+}
+
+// Event returns EventResolver implementation.
+func (r *Resolver) Event() EventResolver { return &eventResolver{r} }
+
+// Recurrence returns RecurrenceResolver implementation.
+func (r *Resolver) Recurrence() RecurrenceResolver { return &recurrenceResolver{r} }
+
+type eventResolver struct{ *Resolver }
+type recurrenceResolver struct{ *Resolver }

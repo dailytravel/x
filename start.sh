@@ -9,7 +9,10 @@ function cleanup {
   kill "$CONFIG_PID"
   kill "$FINANCE_PID"
   kill "$HRM_PID"
+  kill "$INTEGRATION_PID"
   kill "$MARKETING_PID"
+  kill "$NOTIFICATION_PID"
+  kill "$PAYMENT_PID" 
   kill "$REPORTING_PID"
   kill "$SALES_PID"
   kill "$SEARCH_PID"
@@ -22,7 +25,10 @@ function cleanup {
 (cd configuration && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd finance && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd hrm && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd integration && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd marketing && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd notification && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd payment && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd reporting && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd sales && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd search && GOOS=linux GOARCH=amd64 go build -v -o app .)
@@ -34,7 +40,10 @@ function cleanup {
 ./configuration/app & CONFIG_PID=$!
 ./finance/app & FINANCE_PID=$!
 ./hrm/app & HRM_PID=$!
+./integration/app & INTEGRATION_PID=$!
 ./marketing/app & MARKETING_PID=$!
+./notification/app & NOTIFICATION_PID=$!
+./payment/app & PAYMENT_PID=$!
 ./reporting/app & REPORTING_PID=$!
 ./sales/app & SALES_PID=$!
 ./search/app & SEARCH_PID=$!

@@ -8,20 +8,6 @@ import (
 	"strconv"
 )
 
-type Attendance struct {
-	ID        string                 `json:"id"`
-	TimeIn    string                 `json:"time_in"`
-	TimeOut   string                 `json:"time_out"`
-	Notes     *string                `json:"notes,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    *string                `json:"status,omitempty"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	CreatedBy *User                  `json:"created_by,omitempty"`
-	UpdatedBy *User                  `json:"updated_by,omitempty"`
-	Owner     *User                  `json:"owner"`
-}
-
 type Attendances struct {
 	Data  []*Attendance `json:"data,omitempty"`
 	Count int           `json:"count"`
@@ -68,32 +54,6 @@ type EducationInput struct {
 	Description *string `json:"description,omitempty"`
 }
 
-type Event struct {
-	ID          string      `json:"id"`
-	Type        string      `json:"type"`
-	Locale      string      `json:"locale"`
-	Title       string      `json:"title"`
-	Location    *string     `json:"location,omitempty"`
-	Start       int         `json:"start"`
-	End         int         `json:"end"`
-	Timezone    string      `json:"timezone"`
-	AllDay      bool        `json:"all_day"`
-	Description *string     `json:"description,omitempty"`
-	Color       string      `json:"color"`
-	ShowAs      string      `json:"show_as"`
-	Status      string      `json:"status"`
-	CreatedAt   string      `json:"created_at"`
-	UpdatedAt   string      `json:"updated_at"`
-	CreatedBy   *User       `json:"created_by"`
-	UpdatedBy   *User       `json:"updated_by,omitempty"`
-	Owner       *User       `json:"owner"`
-	Followers   []*Follow   `json:"followers,omitempty"`
-	Attendees   []*User     `json:"attendees,omitempty"`
-	Attachments []*File     `json:"attachments,omitempty"`
-	Reminders   []*Reminder `json:"reminders,omitempty"`
-	Recurrence  *Recurrence `json:"recurrence,omitempty"`
-}
-
 type Events struct {
 	Count int      `json:"count"`
 	Data  []*Event `json:"data,omitempty"`
@@ -132,22 +92,6 @@ type Geo struct {
 	Lng float64 `json:"lng"`
 }
 
-type Job struct {
-	ID           string                 `json:"id"`
-	Organization *Organization          `json:"organization"`
-	Locale       string                 `json:"locale"`
-	Title        string                 `json:"title"`
-	Description  string                 `json:"description"`
-	Location     string                 `json:"location"`
-	Salary       string                 `json:"salary"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
-	Status       string                 `json:"status"`
-	CreatedAt    string                 `json:"created_at"`
-	UpdatedAt    string                 `json:"updated_at"`
-	CreatedBy    *User                  `json:"created_by"`
-	UpdatedBy    *User                  `json:"updated_by"`
-}
-
 type Jobs struct {
 	Map   []*Job `json:"map,omitempty"`
 	Count *int   `json:"count,omitempty"`
@@ -161,21 +105,6 @@ type Language struct {
 type LanguageInput struct {
 	Name        string      `json:"name"`
 	Proficiency Proficiency `json:"proficiency"`
-}
-
-type Leave struct {
-	ID        string                 `json:"id"`
-	Owner     *User                  `json:"owner"`
-	Type      string                 `json:"type"`
-	StartDate string                 `json:"start_date"`
-	EndDate   *string                `json:"end_date,omitempty"`
-	Reason    string                 `json:"reason"`
-	Status    string                 `json:"status"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	CreatedBy *User                  `json:"created_by"`
-	UpdatedBy *User                  `json:"updated_by"`
 }
 
 type Leaves struct {
@@ -259,19 +188,7 @@ type Organization struct {
 
 func (Organization) IsEntity() {}
 
-type Payroll struct {
-	ID        string                 `json:"id"`
-	User      *User                  `json:"user"`
-	PayDate   string                 `json:"pay_date"`
-	Amount    float64                `json:"amount"`
-	Currency  string                 `json:"currency"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    string                 `json:"status"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	CreatedBy *User                  `json:"created_by"`
-	UpdatedBy *User                  `json:"updated_by"`
-}
+
 
 type Project struct {
 	Name        string  `json:"name"`
@@ -285,13 +202,6 @@ type ProjectInput struct {
 	Description *string `json:"description,omitempty"`
 	StartDate   string  `json:"startDate"`
 	EndDate     *string `json:"endDate,omitempty"`
-}
-
-type Recurrence struct {
-	Frequency  string `json:"frequency"`
-	Interval   int    `json:"interval"`
-	EndDate    *int   `json:"end_date,omitempty"`
-	Exceptions []*int `json:"exceptions,omitempty"`
 }
 
 type RecurrenceInput struct {
@@ -327,24 +237,6 @@ type ReminderInput struct {
 	Unit   TimeUnit `json:"unit"`
 }
 
-type Resume struct {
-	ID             string                 `json:"id"`
-	User           *User                  `json:"user"`
-	Title          string                 `json:"title"`
-	Summary        *string                `json:"summary,omitempty"`
-	Experience     []*Experience          `json:"experience,omitempty"`
-	Education      []*Education           `json:"education,omitempty"`
-	Skills         []*string              `json:"skills,omitempty"`
-	Certifications []*Certification       `json:"certifications,omitempty"`
-	Languages      []*Language            `json:"languages,omitempty"`
-	Projects       []*Project             `json:"projects,omitempty"`
-	References     []*Reference           `json:"references,omitempty"`
-	Metadata       map[string]interface{} `json:"metadata,omitempty"`
-	Status         string                 `json:"status"`
-	CreatedAt      string                 `json:"created_at"`
-	UpdatedAt      string                 `json:"updated_at"`
-}
-
 type Resumes struct {
 	Data  []*Resume `json:"data,omitempty"`
 	Count *int      `json:"count,omitempty"`
@@ -353,21 +245,6 @@ type Resumes struct {
 type Salaries struct {
 	Data  []*Salary `json:"data,omitempty"`
 	Count *int      `json:"count,omitempty"`
-}
-
-type Salary struct {
-	ID        string                 `json:"id"`
-	Owner     *User                  `json:"owner"`
-	Amount    float64                `json:"amount"`
-	Currency  string                 `json:"currency"`
-	StartDate string                 `json:"start_date"`
-	EndDate   *string                `json:"end_date,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    string                 `json:"status"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	CreatedBy *User                  `json:"created_by"`
-	UpdatedBy *User                  `json:"updated_by"`
 }
 
 type UpdateAttendance struct {

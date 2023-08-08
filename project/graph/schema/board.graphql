@@ -1,0 +1,75 @@
+type Board @key(fields: "id") {
+  id: ID!
+  owner: User
+  organization: Organization
+  portfolio: Portfolio
+  type: String!
+  title: String!
+  description: String
+  due_date: String
+  is_template: Boolean!
+  background: String
+  metadata: Map
+  starred: Boolean!
+  order: Int!
+  status: String!
+  followers: [Follow]
+  created_at: String!
+  updated_at: String!
+  lists: [List]
+  created_by: User
+  updated_by: User
+}
+
+enum BoardType {
+  REQUEST
+  SALES
+  PROJECT
+  MARKETING
+}
+
+type Boards {
+  data: [Board]
+  count: Int!
+}
+
+input NewBoard {
+  type: String!
+  owner: ID
+  organization: ID
+  title: String!
+  description: String
+  due_date: String
+  is_template: Boolean!
+  starred: Boolean!
+  order: Int!
+  background: String
+  metadata: Map
+  status: String!
+}
+
+input UpdateBoard {
+  owner: ID
+  organization: ID
+  title: String
+  description: String
+  due_date: String
+  is_template: Boolean
+  starred: Boolean
+  order: Int
+  background: String
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  board(id: ID!): Board
+  boards(args: Map): Boards @auth
+}
+
+extend type Mutation {
+  createBoard(input: NewBoard!): Board! @auth
+  updateBoard(id: ID!, input: UpdateBoard!): Board! @auth
+  deleteBoard(id: ID!): Map! @auth
+  deleteBoards(ids: [ID!]!): Map! @auth
+}
