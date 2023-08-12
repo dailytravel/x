@@ -1,7 +1,7 @@
 type Task {
   id: ID!
   name: String!
-  owner: User
+  user: User
   parent: Task
   subtasks: [Task]
   list: List!
@@ -32,7 +32,7 @@ enum TaskStatus {
 }
 
 input NewTask {
-  owner: ID
+  user: ID
   parent: ID
   list: ID
   name: String!
@@ -48,7 +48,7 @@ input NewTask {
 }
 
 input UpdateTask {
-  owner: ID
+  user: ID
   parent: ID
   list: ID
   name: String

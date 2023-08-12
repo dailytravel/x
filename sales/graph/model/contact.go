@@ -16,7 +16,7 @@ import (
 
 type Contact struct {
 	Model        `bson:",inline"`
-	Owner        primitive.ObjectID  `bson:"owner" json:"owner"`
+	User         primitive.ObjectID  `bson:"user" json:"user"`
 	Company      *primitive.ObjectID `bson:"company,omitempty" json:"company,omitempty"`
 	Reference    string              `json:"reference" bson:"reference"`
 	FirstName    string              `json:"first_name,omitempty" bson:"first_name,omitempty"`
@@ -68,7 +68,7 @@ func (i *Contact) Collection() string {
 
 func (i *Contact) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "company", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "first_name", Value: "text"}, {Key: "last_name", Value: "text"}}, Options: options.Index().SetWeights(bson.M{"first_name": 2, "last_name": 1})},
 		{Keys: bson.D{{Key: "source", Value: 1}}, Options: options.Index()},
@@ -87,7 +87,7 @@ func (i *Contact) Schema() interface{} {
 	return &api.CollectionSchema{
 		Name: i.Collection(),
 		Fields: []api.Field{
-			{Name: "owner", Type: "string"},
+			{Name: "user", Type: "string"},
 			{Name: "company", Type: "string", Optional: pointer.True()},
 			{Name: "first_name", Type: "string", Optional: pointer.True()},
 			{Name: "last_name", Type: "string", Optional: pointer.True()},
@@ -124,7 +124,7 @@ func (i *Contact) Document() map[string]interface{} {
 
 	document := map[string]interface{}{
 		"id":            i.ID,
-		"owner":         i.Owner,
+		"user":          i.User,
 		"company":       i.Company,
 		"first_name":    i.FirstName,
 		"last_name":     i.LastName,
@@ -233,9 +233,9 @@ func (i *Contact) Delete(collection typesense.CollectionInterface, documentKey p
 	return nil
 }
 
-func (i *Contact) SetOwner(id *string) {
+func (i *Contact) Setuser(id *string) {
 	if id != nil {
-		i.Owner, _ = primitive.ObjectIDFromHex(*id)
+		i.User, _ = primitive.ObjectIDFromHex(*id)
 	}
 }
 

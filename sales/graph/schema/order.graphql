@@ -1,6 +1,6 @@
 type Order {
   id: ID!
-  owner: User
+  user: User
   reference: String!
   total: Float!
   currency: String!

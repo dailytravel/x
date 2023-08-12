@@ -144,12 +144,12 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		Kid         func(childComplexity int) int
 		Name        func(childComplexity int) int
-		Owner       func(childComplexity int) int
 		Provider    func(childComplexity int) int
 		Status      func(childComplexity int) int
 		Thumbprint  func(childComplexity int) int
 		Type        func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
+		User        func(childComplexity int) int
 	}
 
 	Keys struct {
@@ -270,7 +270,6 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		Comments  func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
 		Email     func(childComplexity int) int
 		ID        func(childComplexity int) int
@@ -297,7 +296,7 @@ type ClientResolver interface {
 
 	Metadata(ctx context.Context, obj *model.Client) (map[string]interface{}, error)
 
-	LastUsed(ctx context.Context, obj *model.Client) (*int, error)
+	LastUsed(ctx context.Context, obj *model.Client) (*string, error)
 	CreatedAt(ctx context.Context, obj *model.Client) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.Client) (string, error)
 	ExpiresAt(ctx context.Context, obj *model.Client) (*string, error)
@@ -322,7 +321,7 @@ type KeyResolver interface {
 	ExpiresAt(ctx context.Context, obj *model.Key) (*string, error)
 	CreatedAt(ctx context.Context, obj *model.Key) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.Key) (string, error)
-	Owner(ctx context.Context, obj *model.Key) (*model.User, error)
+	User(ctx context.Context, obj *model.Key) (*model.User, error)
 }
 type MutationResolver interface {
 	CreateClient(ctx context.Context, input model.NewClient) (*model.Client, error)
@@ -393,8 +392,6 @@ type UserResolver interface {
 
 	CreatedAt(ctx context.Context, obj *model.User) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.User) (string, error)
-
-	Comments(ctx context.Context, obj *model.User) ([]*model.Comment, error)
 }
 
 type executableSchema struct {
@@ -831,13 +828,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Key.Name(childComplexity), true
 
-	case "Key.owner":
-		if e.complexity.Key.Owner == nil {
-			break
-		}
-
-		return e.complexity.Key.Owner(childComplexity), true
-
 	case "Key.provider":
 		if e.complexity.Key.Provider == nil {
 			break
@@ -872,6 +862,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Key.UpdatedAt(childComplexity), true
+
+	case "Key.user":
+		if e.complexity.Key.User == nil {
+			break
+		}
+
+		return e.complexity.Key.User(childComplexity), true
 
 	case "Keys.count":
 		if e.complexity.Keys.Count == nil {
@@ -1628,13 +1625,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Roles.Data(childComplexity), true
-
-	case "User.comments":
-		if e.complexity.User.Comments == nil {
-			break
-		}
-
-		return e.complexity.User.Comments(childComplexity), true
 
 	case "User.created_at":
 		if e.complexity.User.CreatedAt == nil {
@@ -2884,8 +2874,6 @@ func (ec *executionContext) fieldContext_Client_user(ctx context.Context, field 
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -3300,9 +3288,9 @@ func (ec *executionContext) _Client_last_used(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Client_last_used(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3312,7 +3300,7 @@ func (ec *executionContext) fieldContext_Client_last_used(ctx context.Context, f
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3704,8 +3692,6 @@ func (ec *executionContext) fieldContext_Comment_owner(ctx context.Context, fiel
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -4001,8 +3987,6 @@ func (ec *executionContext) fieldContext_Entity_findUserByID(ctx context.Context
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -4161,8 +4145,6 @@ func (ec *executionContext) fieldContext_Follow_owner(ctx context.Context, field
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -4269,8 +4251,6 @@ func (ec *executionContext) fieldContext_Identity_user(ctx context.Context, fiel
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -4770,8 +4750,6 @@ func (ec *executionContext) fieldContext_Invitation_sender(ctx context.Context, 
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -5668,8 +5646,8 @@ func (ec *executionContext) fieldContext_Key_updated_at(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Key_owner(ctx context.Context, field graphql.CollectedField, obj *model.Key) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Key_owner(ctx, field)
+func (ec *executionContext) _Key_user(ctx context.Context, field graphql.CollectedField, obj *model.Key) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Key_user(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5682,7 +5660,7 @@ func (ec *executionContext) _Key_owner(ctx context.Context, field graphql.Collec
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Key().Owner(rctx, obj)
+		return ec.resolvers.Key().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5696,7 +5674,7 @@ func (ec *executionContext) _Key_owner(ctx context.Context, field graphql.Collec
 	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Key_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Key_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Key",
 		Field:      field,
@@ -5720,8 +5698,6 @@ func (ec *executionContext) fieldContext_Key_owner(ctx context.Context, field gr
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -5789,8 +5765,8 @@ func (ec *executionContext) fieldContext_Keys_data(ctx context.Context, field gr
 				return ec.fieldContext_Key_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Key_updated_at(ctx, field)
-			case "owner":
-				return ec.fieldContext_Key_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Key_user(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Key", field.Name)
 		},
@@ -6750,8 +6726,8 @@ func (ec *executionContext) fieldContext_Mutation_revokeKey(ctx context.Context,
 				return ec.fieldContext_Key_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Key_updated_at(ctx, field)
-			case "owner":
-				return ec.fieldContext_Key_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Key_user(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Key", field.Name)
 		},
@@ -6843,8 +6819,8 @@ func (ec *executionContext) fieldContext_Mutation_rotateKey(ctx context.Context,
 				return ec.fieldContext_Key_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Key_updated_at(ctx, field)
-			case "owner":
-				return ec.fieldContext_Key_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Key_user(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Key", field.Name)
 		},
@@ -7578,8 +7554,6 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -7860,8 +7834,6 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -7952,8 +7924,6 @@ func (ec *executionContext) fieldContext_Mutation_updateAccount(ctx context.Cont
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -8433,8 +8403,6 @@ func (ec *executionContext) fieldContext_Mutation_updatePassword(ctx context.Con
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -9587,8 +9555,8 @@ func (ec *executionContext) fieldContext_Query_key(ctx context.Context, field gr
 				return ec.fieldContext_Key_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Key_updated_at(ctx, field)
-			case "owner":
-				return ec.fieldContext_Key_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Key_user(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Key", field.Name)
 		},
@@ -10108,8 +10076,6 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -10200,8 +10166,6 @@ func (ec *executionContext) fieldContext_Query_me(ctx context.Context, field gra
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -10581,8 +10545,6 @@ func (ec *executionContext) fieldContext_Reaction_owner(ctx context.Context, fie
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -10912,8 +10874,6 @@ func (ec *executionContext) fieldContext_Role_created_by(ctx context.Context, fi
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -10973,8 +10933,6 @@ func (ec *executionContext) fieldContext_Role_updated_by(ctx context.Context, fi
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -11434,55 +11392,6 @@ func (ec *executionContext) fieldContext_User_status(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _User_comments(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_comments(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Comments(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Comment)
-	fc.Result = res
-	return ec.marshalOComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_User_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Comment_id(ctx, field)
-			case "user":
-				return ec.fieldContext_Comment_user(ctx, field)
-			case "owner":
-				return ec.fieldContext_Comment_owner(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Users_count(ctx context.Context, field graphql.CollectedField, obj *model.Users) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Users_count(ctx, field)
 	if err != nil {
@@ -11579,8 +11488,6 @@ func (ec *executionContext) fieldContext_Users_data(ctx context.Context, field g
 				return ec.fieldContext_User_updated_at(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -15479,7 +15386,7 @@ func (ec *executionContext) _Key(ctx context.Context, sel ast.SelectionSet, obj 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "owner":
+		case "user":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15488,7 +15395,7 @@ func (ec *executionContext) _Key(ctx context.Context, sel ast.SelectionSet, obj 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Key_owner(ctx, field, obj)
+				res = ec._Key_user(ctx, field, obj)
 				return res
 			}
 
@@ -16971,39 +16878,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "status":
 			out.Values[i] = ec._User_status(ctx, field, obj)
-		case "comments":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._User_comments(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18143,54 +18017,6 @@ func (ec *executionContext) marshalOClients2ᚖgithubᚗcomᚋdailytravelᚋxᚋ
 	return ec._Clients(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOComment2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐComment(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOComment2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v *model.Comment) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Comment(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalOID2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
 	if v == nil {
 		return nil, nil
@@ -18236,22 +18062,6 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	res := graphql.MarshalID(*v)
-	return res
-}
-
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalInt(*v)
 	return res
 }
 

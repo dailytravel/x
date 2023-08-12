@@ -16,9 +16,9 @@ func (r *dealResolver) ID(ctx context.Context, obj *model.Deal) (string, error) 
 	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
-// Owner is the resolver for the owner field.
-func (r *dealResolver) Owner(ctx context.Context, obj *model.Deal) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
+// User is the resolver for the user field.
+func (r *dealResolver) User(ctx context.Context, obj *model.Deal) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
 }
 
 // Contact is the resolver for the contact field.
@@ -70,3 +70,13 @@ func (r *queryResolver) Deals(ctx context.Context, args map[string]interface{}) 
 func (r *Resolver) Deal() DealResolver { return &dealResolver{r} }
 
 type dealResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *dealResolver) Owner(ctx context.Context, obj *model.Deal) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}

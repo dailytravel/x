@@ -11,7 +11,7 @@ import (
 
 type Order struct {
 	Model       `bson:",inline"`
-	Owner       primitive.ObjectID  `bson:"owner,omitempty" json:"owner,omitempty"`
+	User        primitive.ObjectID  `bson:"user,omitempty" json:"user,omitempty"`
 	Type        string              `json:"type,omitempty" bson:"type,omitempty"`
 	Order       string              `json:"locale,omitempty" bson:"locale,omitempty"`
 	Reference   string              `json:"reference,omitempty" bson:"reference,omitempty"`
@@ -43,7 +43,7 @@ func (i *Order) Collection() string {
 func (i *Order) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "reference", Value: 1}}, Options: options.Index().SetUnique(true)},
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "locale", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "coupon", Value: 1}}, Options: options.Index()},

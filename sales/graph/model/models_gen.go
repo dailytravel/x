@@ -74,7 +74,7 @@ type Inventories struct {
 }
 
 type NewCompany struct {
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Name        string                 `json:"name"`
 	Description *string                `json:"description,omitempty"`
 	Type        string                 `json:"type"`
@@ -95,7 +95,7 @@ type NewCompany struct {
 
 type NewContact struct {
 	Company    *string                `json:"company,omitempty"`
-	Owner      *string                `json:"owner,omitempty"`
+	User       *string                `json:"user,omitempty"`
 	Type       *string                `json:"type,omitempty"`
 	FirstName  *string                `json:"first_name,omitempty"`
 	LastName   *string                `json:"last_name,omitempty"`
@@ -125,7 +125,7 @@ type NewContact struct {
 }
 
 type NewContract struct {
-	Owner       string                 `json:"owner"`
+	User        string                 `json:"user"`
 	Contact     string                 `json:"contact"`
 	Reference   string                 `json:"reference"`
 	Description string                 `json:"description"`
@@ -167,7 +167,7 @@ type NewDeal struct {
 	LoseReason  *string                `json:"lose_reason,omitempty"`
 	Description string                 `json:"description"`
 	Order       *int                   `json:"order,omitempty"`
-	OwnerID     *string                `json:"owner_id,omitempty"`
+	UserID      *string                `json:"user_id,omitempty"`
 	ContactID   string                 `json:"contact_id"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      string                 `json:"status"`
@@ -224,7 +224,7 @@ type NewProgram struct {
 }
 
 type NewQuote struct {
-	Owner       string                 `json:"owner"`
+	User        string                 `json:"user"`
 	Contact     *string                `json:"contact,omitempty"`
 	Locale      string                 `json:"locale"`
 	Reference   string                 `json:"reference"`
@@ -364,7 +364,7 @@ type Transactions struct {
 }
 
 type UpdateCompany struct {
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Type        *string                `json:"type,omitempty"`
@@ -385,7 +385,7 @@ type UpdateCompany struct {
 
 type UpdateContact struct {
 	Company    *string                `json:"company,omitempty"`
-	Owner      *string                `json:"owner,omitempty"`
+	User       *string                `json:"user,omitempty"`
 	Reference  *string                `json:"reference,omitempty"`
 	Type       *string                `json:"type,omitempty"`
 	FirstName  *string                `json:"first_name,omitempty"`
@@ -416,7 +416,7 @@ type UpdateContact struct {
 }
 
 type UpdateContract struct {
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Contact     *string                `json:"contact,omitempty"`
 	Reference   *string                `json:"reference,omitempty"`
 	Description *string                `json:"description,omitempty"`
@@ -458,7 +458,7 @@ type UpdateDeal struct {
 	LoseReason  *string                `json:"lose_reason,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Order       *int                   `json:"order,omitempty"`
-	OwnerID     *string                `json:"owner_id,omitempty"`
+	UserID      *string                `json:"user_id,omitempty"`
 	ContactID   *string                `json:"contact_id,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
@@ -515,7 +515,7 @@ type UpdateProgram struct {
 }
 
 type UpdateQuote struct {
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Contact     *string                `json:"contact,omitempty"`
 	Locale      *string                `json:"locale,omitempty"`
 	Reference   *string                `json:"reference,omitempty"`
@@ -573,7 +573,7 @@ type UpdateWishlist struct {
 
 type Wishlist struct {
 	ID        string                 `json:"id"`
-	Owner     *User                  `json:"owner"`
+	User      *User                  `json:"user"`
 	Product   *Content               `json:"product"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	Status    string                 `json:"status"`

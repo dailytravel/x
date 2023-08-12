@@ -17,7 +17,7 @@ type Links {
 }
 
 input NewLink {
-  owner: ID
+  user: ID
   title: String
   domain: String!
   reference: String!
@@ -27,7 +27,7 @@ input NewLink {
 }
 
 input UpdateLink {
-  owner: ID
+  user: ID
   title: String
   domain: String
   reference: String

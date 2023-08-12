@@ -5765,7 +5765,7 @@ func (ec *executionContext) unmarshalInputNewExpense(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type", "reference", "description", "amount", "currency", "metadata", "status", "date", "owner", "notes", "categories"}
+	fieldsInOrder := [...]string{"type", "reference", "description", "amount", "currency", "metadata", "status", "date", "user", "notes", "categories"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5844,15 +5844,15 @@ func (ec *executionContext) unmarshalInputNewExpense(ctx context.Context, obj in
 				return it, err
 			}
 			it.Date = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "notes":
 			var err error
 
@@ -5976,7 +5976,7 @@ func (ec *executionContext) unmarshalInputUpdateExpense(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type", "reference", "description", "metadata", "status", "date", "amount", "currency", "owner", "notes", "categories"}
+	fieldsInOrder := [...]string{"type", "reference", "description", "metadata", "status", "date", "amount", "currency", "user", "notes", "categories"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6055,15 +6055,15 @@ func (ec *executionContext) unmarshalInputUpdateExpense(ctx context.Context, obj
 				return it, err
 			}
 			it.Currency = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "notes":
 			var err error
 

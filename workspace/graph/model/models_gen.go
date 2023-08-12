@@ -50,7 +50,7 @@ type Metric struct {
 
 type NewBoard struct {
 	Type         string                 `json:"type"`
-	Owner        *string                `json:"owner,omitempty"`
+	User         *string                `json:"user,omitempty"`
 	Organization *string                `json:"organization,omitempty"`
 	Title        string                 `json:"title"`
 	Description  *string                `json:"description,omitempty"`
@@ -72,7 +72,7 @@ type NewGoal struct {
 	IsCompany    *bool                  `json:"is_company,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	Status       *string                `json:"status,omitempty"`
-	Owner        string                 `json:"owner"`
+	User         string                 `json:"user"`
 	Parent       *string                `json:"parent,omitempty"`
 	Organization *string                `json:"organization,omitempty"`
 }
@@ -92,7 +92,7 @@ type NewMetric struct {
 }
 
 type NewTask struct {
-	Owner      *string                `json:"owner,omitempty"`
+	User       *string                `json:"user,omitempty"`
 	Parent     *string                `json:"parent,omitempty"`
 	List       *string                `json:"list,omitempty"`
 	Name       string                 `json:"name"`
@@ -133,7 +133,7 @@ type Times struct {
 }
 
 type UpdateBoard struct {
-	Owner        *string                `json:"owner,omitempty"`
+	User         *string                `json:"user,omitempty"`
 	Organization *string                `json:"organization,omitempty"`
 	Title        *string                `json:"title,omitempty"`
 	Description  *string                `json:"description,omitempty"`
@@ -155,7 +155,7 @@ type UpdateGoal struct {
 	IsCompany    *bool                  `json:"is_company,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	Status       *string                `json:"status,omitempty"`
-	Owner        *string                `json:"owner,omitempty"`
+	User         *string                `json:"user,omitempty"`
 	Parent       *string                `json:"parent,omitempty"`
 	Organization *string                `json:"organization,omitempty"`
 }
@@ -171,7 +171,7 @@ type UpdateMetric struct {
 }
 
 type UpdateTask struct {
-	Owner      *string                `json:"owner,omitempty"`
+	User       *string                `json:"user,omitempty"`
 	Parent     *string                `json:"parent,omitempty"`
 	List       *string                `json:"list,omitempty"`
 	Name       *string                `json:"name,omitempty"`

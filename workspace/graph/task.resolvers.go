@@ -47,9 +47,9 @@ func (r *taskResolver) ID(ctx context.Context, obj *model.Task) (string, error) 
 	return obj.ID.Hex(), nil
 }
 
-// Owner is the resolver for the owner field.
-func (r *taskResolver) Owner(ctx context.Context, obj *model.Task) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
+// User is the resolver for the user field.
+func (r *taskResolver) User(ctx context.Context, obj *model.Task) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
 }
 
 // Parent is the resolver for the parent field.
@@ -118,6 +118,9 @@ type taskResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *taskResolver) Owner(ctx context.Context, obj *model.Task) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
 func (r *taskResolver) CreatedBy(ctx context.Context, obj *model.Task) (*model.User, error) {
 	return &model.User{
 		Model: model.Model{

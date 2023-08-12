@@ -11,7 +11,7 @@ import (
 
 type Task struct {
 	Model     `bson:",inline"`
-	Owner     primitive.ObjectID   `json:"owner" bson:"owner"`
+	user      primitive.ObjectID   `json:"user" bson:"user"`
 	Parent    primitive.ObjectID   `json:"parent,omitempty" bson:"parent,omitempty"`
 	List      primitive.ObjectID   `json:"list" bson:"list"`
 	Name      string               `json:"name" bson:"name"`
@@ -44,7 +44,7 @@ func (i *Task) Collection() string {
 func (i *Task) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "name", Value: "text"}, {Key: "notes", Value: "text"}}, Options: options.Index().SetWeights(bson.M{"name": 2, "notes": 1})},
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "parent", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "list", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "priority", Value: 1}}, Options: options.Index()},

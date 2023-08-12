@@ -211,7 +211,6 @@ type ComplexityRoot struct {
 		Name      func(childComplexity int) int
 		Notes     func(childComplexity int) int
 		Order     func(childComplexity int) int
-		Owner     func(childComplexity int) int
 		Parent    func(childComplexity int) int
 		Priority  func(childComplexity int) int
 		Reactions func(childComplexity int) int
@@ -219,6 +218,7 @@ type ComplexityRoot struct {
 		Status    func(childComplexity int) int
 		Subtasks  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
+		User      func(childComplexity int) int
 	}
 
 	Tasks struct {
@@ -342,7 +342,7 @@ type QueryResolver interface {
 type TaskResolver interface {
 	ID(ctx context.Context, obj *model.Task) (string, error)
 
-	Owner(ctx context.Context, obj *model.Task) (*model.User, error)
+	User(ctx context.Context, obj *model.Task) (*model.User, error)
 	Parent(ctx context.Context, obj *model.Task) (*model.Task, error)
 	Subtasks(ctx context.Context, obj *model.Task) ([]*model.Task, error)
 	List(ctx context.Context, obj *model.Task) (*model.List, error)
@@ -1317,13 +1317,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.Order(childComplexity), true
 
-	case "Task.owner":
-		if e.complexity.Task.Owner == nil {
-			break
-		}
-
-		return e.complexity.Task.Owner(childComplexity), true
-
 	case "Task.parent":
 		if e.complexity.Task.Parent == nil {
 			break
@@ -1372,6 +1365,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Task.UpdatedAt(childComplexity), true
+
+	case "Task.user":
+		if e.complexity.Task.User == nil {
+			break
+		}
+
+		return e.complexity.Task.User(childComplexity), true
 
 	case "Tasks.count":
 		if e.complexity.Tasks.Count == nil {
@@ -4480,8 +4480,8 @@ func (ec *executionContext) fieldContext_List_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
-			case "owner":
-				return ec.fieldContext_Task_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Task_user(ctx, field)
 			case "parent":
 				return ec.fieldContext_Task_parent(ctx, field)
 			case "subtasks":
@@ -6096,8 +6096,8 @@ func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context
 				return ec.fieldContext_Task_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
-			case "owner":
-				return ec.fieldContext_Task_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Task_user(ctx, field)
 			case "parent":
 				return ec.fieldContext_Task_parent(ctx, field)
 			case "subtasks":
@@ -6208,8 +6208,8 @@ func (ec *executionContext) fieldContext_Mutation_updateTask(ctx context.Context
 				return ec.fieldContext_Task_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
-			case "owner":
-				return ec.fieldContext_Task_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Task_user(ctx, field)
 			case "parent":
 				return ec.fieldContext_Task_parent(ctx, field)
 			case "subtasks":
@@ -7842,8 +7842,8 @@ func (ec *executionContext) fieldContext_Query_task(ctx context.Context, field g
 				return ec.fieldContext_Task_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
-			case "owner":
-				return ec.fieldContext_Task_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Task_user(ctx, field)
 			case "parent":
 				return ec.fieldContext_Task_parent(ctx, field)
 			case "subtasks":
@@ -8506,8 +8506,8 @@ func (ec *executionContext) fieldContext_Task_name(ctx context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_owner(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_owner(ctx, field)
+func (ec *executionContext) _Task_user(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_user(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8520,7 +8520,7 @@ func (ec *executionContext) _Task_owner(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Task().Owner(rctx, obj)
+		return ec.resolvers.Task().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8534,7 +8534,7 @@ func (ec *executionContext) _Task_owner(ctx context.Context, field graphql.Colle
 	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋworkspaceᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -8591,8 +8591,8 @@ func (ec *executionContext) fieldContext_Task_parent(ctx context.Context, field 
 				return ec.fieldContext_Task_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
-			case "owner":
-				return ec.fieldContext_Task_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Task_user(ctx, field)
 			case "parent":
 				return ec.fieldContext_Task_parent(ctx, field)
 			case "subtasks":
@@ -8672,8 +8672,8 @@ func (ec *executionContext) fieldContext_Task_subtasks(ctx context.Context, fiel
 				return ec.fieldContext_Task_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
-			case "owner":
-				return ec.fieldContext_Task_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Task_user(ctx, field)
 			case "parent":
 				return ec.fieldContext_Task_parent(ctx, field)
 			case "subtasks":
@@ -9372,8 +9372,8 @@ func (ec *executionContext) fieldContext_Tasks_data(ctx context.Context, field g
 				return ec.fieldContext_Task_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Task_name(ctx, field)
-			case "owner":
-				return ec.fieldContext_Task_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Task_user(ctx, field)
 			case "parent":
 				return ec.fieldContext_Task_parent(ctx, field)
 			case "subtasks":
@@ -11817,7 +11817,7 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type", "owner", "organization", "title", "description", "due_date", "is_template", "starred", "order", "background", "metadata", "status"}
+	fieldsInOrder := [...]string{"type", "user", "organization", "title", "description", "due_date", "is_template", "starred", "order", "background", "metadata", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -11833,15 +11833,15 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 				return it, err
 			}
 			it.Type = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "organization":
 			var err error
 
@@ -11945,7 +11945,7 @@ func (ec *executionContext) unmarshalInputNewGoal(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "notes", "time", "start_date", "due_date", "is_company", "metadata", "status", "owner", "parent", "organization"}
+	fieldsInOrder := [...]string{"name", "notes", "time", "start_date", "due_date", "is_company", "metadata", "status", "user", "parent", "organization"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12024,15 +12024,15 @@ func (ec *executionContext) unmarshalInputNewGoal(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Status = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "parent":
 			var err error
 
@@ -12176,22 +12176,22 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "parent", "list", "name", "notes", "priority", "order", "start_date", "due_date", "labels", "categories", "status", "metadata"}
+	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "order", "start_date", "due_date", "labels", "categories", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "parent":
 			var err error
 
@@ -12387,22 +12387,22 @@ func (ec *executionContext) unmarshalInputUpdateBoard(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "organization", "title", "description", "due_date", "is_template", "starred", "order", "background", "metadata", "status"}
+	fieldsInOrder := [...]string{"user", "organization", "title", "description", "due_date", "is_template", "starred", "order", "background", "metadata", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "organization":
 			var err error
 
@@ -12506,7 +12506,7 @@ func (ec *executionContext) unmarshalInputUpdateGoal(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "notes", "time", "start_on", "due_on", "is_company", "metadata", "status", "owner", "parent", "organization"}
+	fieldsInOrder := [...]string{"name", "notes", "time", "start_on", "due_on", "is_company", "metadata", "status", "user", "parent", "organization"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12585,15 +12585,15 @@ func (ec *executionContext) unmarshalInputUpdateGoal(ctx context.Context, obj in
 				return it, err
 			}
 			it.Status = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "parent":
 			var err error
 
@@ -12701,22 +12701,22 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "parent", "list", "name", "notes", "priority", "order", "start_date", "due_date", "labels", "categories", "status", "metadata"}
+	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "order", "start_date", "due_date", "labels", "categories", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "parent":
 			var err error
 
@@ -15023,7 +15023,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "owner":
+		case "user":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15032,7 +15032,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Task_owner(ctx, field, obj)
+				res = ec._Task_user(ctx, field, obj)
 				return res
 			}
 

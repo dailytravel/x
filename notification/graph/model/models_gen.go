@@ -35,7 +35,6 @@ type File struct {
 	UpdatedAt   string                 `json:"updated_at"`
 	CreatedBy   *User                  `json:"created_by,omitempty"`
 	UpdatedBy   *User                  `json:"updated_by,omitempty"`
-	Owner       *User                  `json:"owner,omitempty"`
 	Followers   []*Follow              `json:"followers,omitempty"`
 }
 
@@ -75,7 +74,7 @@ type NewFile struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Starred     *bool                  `json:"starred,omitempty"`
 	Status      *string                `json:"status,omitempty"`
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Categories  []string               `json:"categories,omitempty"`
 }
 
@@ -128,7 +127,7 @@ type UpdateFile struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Starred     *bool                  `json:"starred,omitempty"`
 	Status      *string                `json:"status,omitempty"`
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Categories  []string               `json:"categories,omitempty"`
 }
 

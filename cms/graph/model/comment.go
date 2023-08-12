@@ -11,7 +11,7 @@ import (
 
 type Comment struct {
 	Model       `bson:",inline"`
-	Owner       primitive.ObjectID `json:"owner" bson:"owner"`
+	User        primitive.ObjectID `json:"user" bson:"user"`
 	Parent      primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
 	Commentable Commentable        `json:"commentable" bson:"commentable"`
 	Locale      string             `json:"locale,omitempty" bson:"locale,omitempty"`
@@ -46,7 +46,7 @@ func (i *Comment) Collection() string {
 
 func (i *Comment) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "object._id", Value: 1}, {Key: "object.type", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "user", Value: 1}, {Key: "commentable._id", Value: 1}, {Key: "commentable.type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "parent", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},

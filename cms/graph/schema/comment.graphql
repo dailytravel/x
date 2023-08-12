@@ -14,7 +14,6 @@ type Comment @key(fields: "id") {
   reaction: [Reaction]
   created_by: User
   updated_by: User
-  attachments: [File]
   reactions: [Reaction]
 }
 
@@ -46,7 +45,7 @@ input UpdateComment {
 }
 
 extend type Query {
-  comments(args: Map): [Comment]
+  comments(args: Map): Comments
   comment(id: ID!): Comment
 }
 

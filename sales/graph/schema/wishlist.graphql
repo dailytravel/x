@@ -1,6 +1,6 @@
 type Wishlist {
   id: ID!
-  owner: User!
+  user: User!
   product: Content!
   metadata: Map
   status: String!

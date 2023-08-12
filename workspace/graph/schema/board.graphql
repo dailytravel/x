@@ -31,7 +31,7 @@ type Boards {
 
 input NewBoard {
   type: String!
-  owner: ID
+  user: ID
   organization: ID
   title: String!
   description: String
@@ -45,7 +45,7 @@ input NewBoard {
 }
 
 input UpdateBoard {
-  owner: ID
+  user: ID
   organization: ID
   title: String
   description: String

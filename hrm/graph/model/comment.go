@@ -11,7 +11,7 @@ import (
 
 type Comment struct {
 	Model       `bson:",inline"`
-	Owner       primitive.ObjectID   `json:"owner,omitempty" bson:"owner,omitempty"`
+	User        primitive.ObjectID   `json:"user,omitempty" bson:"user,omitempty"`
 	Parent      primitive.ObjectID   `json:"parent,omitempty" bson:"parent,omitempty"`
 	Commentable Commentable          `json:"commentable,omitempty" bson:"commentable,omitempty"`
 	Locale      string               `json:"locale,omitempty" bson:"locale,omitempty"`

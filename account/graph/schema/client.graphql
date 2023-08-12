@@ -10,7 +10,7 @@ type Client {
   permissions: [String]
   metadata: Map
   status: String!
-  last_used: Int
+  last_used: String
   created_at: String!
   updated_at: String!
   expires_at: String

@@ -11,7 +11,7 @@ import (
 
 type Event struct {
 	Model       `bson:",inline"`
-	Owner       primitive.ObjectID   `bson:"owner,omitempty" json:"owner,omitempty"`
+	User        primitive.ObjectID   `bson:"user,omitempty" json:"user,omitempty"`
 	Type        string               `bson:"type,omitempty" json:"type,omitempty"`
 	Locale      string               `json:"locale,omitempty" bson:"locale,omitempty"`
 	Title       string               `json:"title,omitempty" bson:"title,omitempty"`
@@ -55,7 +55,7 @@ func (i *Event) Collection() string {
 
 func (i *Event) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "locale", Value: 1}}, Options: options.Index()},

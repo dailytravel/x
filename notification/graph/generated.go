@@ -92,7 +92,6 @@ type ComplexityRoot struct {
 		Locale      func(childComplexity int) int
 		Metadata    func(childComplexity int) int
 		Name        func(childComplexity int) int
-		Owner       func(childComplexity int) int
 		Provider    func(childComplexity int) int
 		Size        func(childComplexity int) int
 		Starred     func(childComplexity int) int
@@ -478,13 +477,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.File.Name(childComplexity), true
-
-	case "File.owner":
-		if e.complexity.File.Owner == nil {
-			break
-		}
-
-		return e.complexity.File.Owner(childComplexity), true
 
 	case "File.provider":
 		if e.complexity.File.Provider == nil {
@@ -2713,8 +2705,6 @@ func (ec *executionContext) fieldContext_Entity_findFileByID(ctx context.Context
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -3395,53 +3385,6 @@ func (ec *executionContext) fieldContext_File_updated_by(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _File_owner(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_File_owner(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Owner, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋnotificationᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_File_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "File",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _File_followers(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_File_followers(ctx, field)
 	if err != nil {
@@ -3597,8 +3540,6 @@ func (ec *executionContext) fieldContext_Files_data(ctx context.Context, field g
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -4110,8 +4051,6 @@ func (ec *executionContext) fieldContext_Message_attachments(ctx context.Context
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -4730,8 +4669,6 @@ func (ec *executionContext) fieldContext_Mutation_createFile(ctx context.Context
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -4838,8 +4775,6 @@ func (ec *executionContext) fieldContext_Mutation_updateFile(ctx context.Context
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -6679,8 +6614,6 @@ func (ec *executionContext) fieldContext_Query_file(ctx context.Context, field g
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -9826,7 +9759,7 @@ func (ec *executionContext) unmarshalInputNewFile(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"locale", "name", "description", "type", "size", "provider", "url", "metadata", "starred", "status", "owner", "categories"}
+	fieldsInOrder := [...]string{"locale", "name", "description", "type", "size", "provider", "url", "metadata", "starred", "status", "user", "categories"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9923,15 +9856,15 @@ func (ec *executionContext) unmarshalInputNewFile(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Status = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "categories":
 			var err error
 
@@ -10131,7 +10064,7 @@ func (ec *executionContext) unmarshalInputUpdateFile(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"locale", "name", "description", "type", "size", "provider", "url", "metadata", "starred", "status", "owner", "categories"}
+	fieldsInOrder := [...]string{"locale", "name", "description", "type", "size", "provider", "url", "metadata", "starred", "status", "user", "categories"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10228,15 +10161,15 @@ func (ec *executionContext) unmarshalInputUpdateFile(ctx context.Context, obj in
 				return it, err
 			}
 			it.Status = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "categories":
 			var err error
 
@@ -10886,8 +10819,6 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._File_created_by(ctx, field, obj)
 		case "updated_by":
 			out.Values[i] = ec._File_updated_by(ctx, field, obj)
-		case "owner":
-			out.Values[i] = ec._File_owner(ctx, field, obj)
 		case "followers":
 			out.Values[i] = ec._File_followers(ctx, field, obj)
 		default:

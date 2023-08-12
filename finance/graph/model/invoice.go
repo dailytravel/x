@@ -11,7 +11,7 @@ import (
 
 type Invoice struct {
 	Model     `bson:",inline"`
-	Owner     primitive.ObjectID  `json:"owner" bson:"owner"`
+	User      primitive.ObjectID  `json:"user" bson:"user"`
 	Reference string              `json:"reference" bson:"reference"`
 	Template  string              `json:"template" bson:"template"`
 	Amount    float64             `json:"amount" bson:"amount"`

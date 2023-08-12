@@ -39,7 +39,7 @@ func (i *Payment) Collection() string {
 
 func (i *Payment) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "invoice", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "date", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},

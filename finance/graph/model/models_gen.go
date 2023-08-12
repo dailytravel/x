@@ -39,7 +39,7 @@ type NewExpense struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 	Date        string                 `json:"date"`
-	Owner       string                 `json:"owner"`
+	User        string                 `json:"user"`
 	Notes       *string                `json:"notes,omitempty"`
 	Categories  []string               `json:"categories,omitempty"`
 }
@@ -64,7 +64,7 @@ type UpdateExpense struct {
 	Date        *string                `json:"date,omitempty"`
 	Amount      *float64               `json:"amount,omitempty"`
 	Currency    *string                `json:"currency,omitempty"`
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Notes       *string                `json:"notes,omitempty"`
 	Categories  []string               `json:"categories,omitempty"`
 }

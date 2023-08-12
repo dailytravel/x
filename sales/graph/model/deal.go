@@ -11,7 +11,7 @@ import (
 
 type Deal struct {
 	Model       `bson:",inline"`
-	Owner       primitive.ObjectID `json:"owner,omitempty" bson:"owner,omitempty"`
+	User        primitive.ObjectID `json:"user,omitempty" bson:"user,omitempty"`
 	Contact     primitive.ObjectID `json:"contact,omitempty" bson:"contact,omitempty"`
 	Type        string             `json:"type" bson:"type"`
 	Name        string             `json:"name" bson:"name"`
@@ -48,7 +48,7 @@ func (i *Deal) Collection() string {
 
 func (i *Deal) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "contact", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},

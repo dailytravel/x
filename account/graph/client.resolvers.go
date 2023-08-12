@@ -28,8 +28,13 @@ func (r *clientResolver) Metadata(ctx context.Context, obj *model.Client) (map[s
 }
 
 // LastUsed is the resolver for the last_used field.
-func (r *clientResolver) LastUsed(ctx context.Context, obj *model.Client) (*int, error) {
-	panic(fmt.Errorf("not implemented: LastUsed - last_used"))
+func (r *clientResolver) LastUsed(ctx context.Context, obj *model.Client) (*string, error) {
+	if obj.LastUsed.IsZero() {
+		return nil, nil
+	}
+
+	lastUsed := time.Unix(int64(obj.LastUsed.T), 0).Format(time.RFC3339)
+	return &lastUsed, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -44,7 +49,12 @@ func (r *clientResolver) UpdatedAt(ctx context.Context, obj *model.Client) (stri
 
 // ExpiresAt is the resolver for the expires_at field.
 func (r *clientResolver) ExpiresAt(ctx context.Context, obj *model.Client) (*string, error) {
-	panic(fmt.Errorf("not implemented: ExpiresAt - expires_at"))
+	if obj.ExpiresAt.IsZero() {
+		return nil, nil
+	}
+
+	expiresAt := time.Unix(int64(obj.ExpiresAt.T), 0).Format(time.RFC3339)
+	return &expiresAt, nil
 }
 
 // CreateClient is the resolver for the createClient field.

@@ -73,7 +73,7 @@ type NewComment struct {
 
 type NewContent struct {
 	Parent      *string                `json:"parent,omitempty"`
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Locale      string                 `json:"locale"`
 	Type        string                 `json:"type"`
 	Title       *string                `json:"title,omitempty"`
@@ -125,7 +125,7 @@ type NewFile struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Starred     *bool                  `json:"starred,omitempty"`
 	Status      *string                `json:"status,omitempty"`
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Categories  []string               `json:"categories,omitempty"`
 }
 
@@ -203,7 +203,7 @@ type UpdateComment struct {
 
 type UpdateContent struct {
 	Parent      *string                `json:"parent,omitempty"`
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Locale      string                 `json:"locale"`
 	Type        *string                `json:"type,omitempty"`
 	Title       *string                `json:"title,omitempty"`
@@ -255,7 +255,7 @@ type UpdateFile struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Starred     *bool                  `json:"starred,omitempty"`
 	Status      *string                `json:"status,omitempty"`
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Categories  []string               `json:"categories,omitempty"`
 }
 

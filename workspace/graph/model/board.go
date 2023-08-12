@@ -11,7 +11,7 @@ import (
 
 type Board struct {
 	Model        `bson:",inline"`
-	Owner        primitive.ObjectID  `json:"owner" bson:"owner"`
+	User         primitive.ObjectID  `json:"user" bson:"user"`
 	Organization primitive.ObjectID  `json:"organization" bson:"organization"`
 	Portfolio    primitive.ObjectID  `json:"portfolio" bson:"portfolio"`
 	Type         string              `json:"type" bson:"type"`
@@ -46,7 +46,7 @@ func (i *Board) Collection() string {
 
 func (i *Board) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "organization", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "starred", Value: 1}}, Options: options.Index()},

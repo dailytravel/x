@@ -7,7 +7,6 @@ type User @key(fields: "id") {
   created_at: String!
   updated_at: String!
   status: String
-  comments: [Comment]
 }
 
 type Users {

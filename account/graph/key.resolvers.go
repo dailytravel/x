@@ -48,11 +48,11 @@ func (r *keyResolver) UpdatedAt(ctx context.Context, obj *model.Key) (string, er
 }
 
 // Owner is the resolver for the owner field.
-func (r *keyResolver) Owner(ctx context.Context, obj *model.Key) (*model.User, error) {
+func (r *keyResolver) User(ctx context.Context, obj *model.Key) (*model.User, error) {
 	var item *model.User
 	col := r.db.Collection(item.Collection())
 
-	filter := bson.M{"_id": obj.Owner}
+	filter := bson.M{"_id": obj.User}
 	options := options.FindOne().SetProjection(bson.M{"_id": 1, "name": 1, "email": 1, "photos": 1})
 
 	err := col.FindOne(ctx, filter, options).Decode(&item)

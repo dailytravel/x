@@ -11,7 +11,7 @@ import (
 
 type Goal struct {
 	Model        `bson:",inline"`
-	Owner        primitive.ObjectID  `bson:"owner" json:"owner"`
+	User         primitive.ObjectID  `bson:"user" json:"user"`
 	Parent       primitive.ObjectID  `json:"parent,omitempty" bson:"parent,omitempty"`
 	Organization primitive.ObjectID  `json:"organization" bson:"organization"`
 	Time         primitive.ObjectID  `json:"time" bson:"time"`
@@ -41,7 +41,7 @@ func (i *Goal) Collection() string {
 
 func (i *Goal) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "parent", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "organization", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "time", Value: 1}}, Options: options.Index()},

@@ -28,7 +28,7 @@ type Companies {
 }
 
 input NewCompany {
-  owner: ID
+  user: ID
   name: String!
   description: String
   type: String! # "team", "company", or "department"
@@ -48,7 +48,7 @@ input NewCompany {
 }
 
 input UpdateCompany {
-  owner: ID
+  user: ID
   name: String
   description: String
   type: String # "team", "company", or "department"

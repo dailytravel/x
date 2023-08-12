@@ -130,7 +130,6 @@ type ComplexityRoot struct {
 		LastName     func(childComplexity int) int
 		Metadata     func(childComplexity int) int
 		Notes        func(childComplexity int) int
-		Owner        func(childComplexity int) int
 		Phone        func(childComplexity int) int
 		Picture      func(childComplexity int) int
 		Rating       func(childComplexity int) int
@@ -145,6 +144,7 @@ type ComplexityRoot struct {
 		Timezone     func(childComplexity int) int
 		Type         func(childComplexity int) int
 		UpdatedAt    func(childComplexity int) int
+		User         func(childComplexity int) int
 		Website      func(childComplexity int) int
 		Zip          func(childComplexity int) int
 	}
@@ -170,11 +170,11 @@ type ComplexityRoot struct {
 		Followers   func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Metadata    func(childComplexity int) int
-		Owner       func(childComplexity int) int
 		Reference   func(childComplexity int) int
 		StartDate   func(childComplexity int) int
 		Status      func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
+		User        func(childComplexity int) int
 	}
 
 	Contracts struct {
@@ -219,7 +219,6 @@ type ComplexityRoot struct {
 		Metadata    func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Order       func(childComplexity int) int
-		Owner       func(childComplexity int) int
 		Pipeline    func(childComplexity int) int
 		Priority    func(childComplexity int) int
 		Source      func(childComplexity int) int
@@ -227,6 +226,7 @@ type ComplexityRoot struct {
 		Status      func(childComplexity int) int
 		Type        func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
+		User        func(childComplexity int) int
 	}
 
 	Deals struct {
@@ -349,11 +349,11 @@ type ComplexityRoot struct {
 		CreatedAt   func(childComplexity int) int
 		Currency    func(childComplexity int) int
 		ID          func(childComplexity int) int
-		Owner       func(childComplexity int) int
 		Reference   func(childComplexity int) int
 		Status      func(childComplexity int) int
 		Total       func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
+		User        func(childComplexity int) int
 	}
 
 	Orders struct {
@@ -500,7 +500,6 @@ type ComplexityRoot struct {
 		Metadata    func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Notes       func(childComplexity int) int
-		Owner       func(childComplexity int) int
 		Payment     func(childComplexity int) int
 		Purchase    func(childComplexity int) int
 		Reference   func(childComplexity int) int
@@ -508,6 +507,7 @@ type ComplexityRoot struct {
 		Template    func(childComplexity int) int
 		Terms       func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
+		User        func(childComplexity int) int
 		ValidUntil  func(childComplexity int) int
 	}
 
@@ -587,10 +587,10 @@ type ComplexityRoot struct {
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Metadata  func(childComplexity int) int
-		Owner     func(childComplexity int) int
 		Product   func(childComplexity int) int
 		Status    func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
+		User      func(childComplexity int) int
 	}
 
 	Wishlists struct {
@@ -626,7 +626,7 @@ type CompanyResolver interface {
 }
 type ContactResolver interface {
 	ID(ctx context.Context, obj *model.Contact) (string, error)
-	Owner(ctx context.Context, obj *model.Contact) (*model.User, error)
+	User(ctx context.Context, obj *model.Contact) (*model.User, error)
 	Type(ctx context.Context, obj *model.Contact) (*string, error)
 
 	Birthday(ctx context.Context, obj *model.Contact) (*string, error)
@@ -642,7 +642,7 @@ type ContactResolver interface {
 }
 type ContractResolver interface {
 	ID(ctx context.Context, obj *model.Contract) (string, error)
-	Owner(ctx context.Context, obj *model.Contract) (*model.User, error)
+	User(ctx context.Context, obj *model.Contract) (*model.User, error)
 	Contact(ctx context.Context, obj *model.Contract) (*model.Contact, error)
 
 	StartDate(ctx context.Context, obj *model.Contract) (string, error)
@@ -669,7 +669,7 @@ type CouponResolver interface {
 type DealResolver interface {
 	ID(ctx context.Context, obj *model.Deal) (string, error)
 
-	Owner(ctx context.Context, obj *model.Deal) (*model.User, error)
+	User(ctx context.Context, obj *model.Deal) (*model.User, error)
 	Contact(ctx context.Context, obj *model.Deal) (*model.Contact, error)
 	Metadata(ctx context.Context, obj *model.Deal) (map[string]interface{}, error)
 
@@ -767,7 +767,7 @@ type MutationResolver interface {
 }
 type OrderResolver interface {
 	ID(ctx context.Context, obj *model.Order) (string, error)
-	Owner(ctx context.Context, obj *model.Order) (*model.User, error)
+	User(ctx context.Context, obj *model.Order) (*model.User, error)
 
 	Total(ctx context.Context, obj *model.Order) (float64, error)
 
@@ -854,7 +854,7 @@ type QueryResolver interface {
 }
 type QuoteResolver interface {
 	ID(ctx context.Context, obj *model.Quote) (string, error)
-	Owner(ctx context.Context, obj *model.Quote) (*model.User, error)
+	User(ctx context.Context, obj *model.Quote) (*model.User, error)
 
 	Contact(ctx context.Context, obj *model.Quote) (*model.Contact, error)
 
@@ -1251,13 +1251,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Contact.Notes(childComplexity), true
 
-	case "Contact.owner":
-		if e.complexity.Contact.Owner == nil {
-			break
-		}
-
-		return e.complexity.Contact.Owner(childComplexity), true
-
 	case "Contact.phone":
 		if e.complexity.Contact.Phone == nil {
 			break
@@ -1355,6 +1348,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Contact.UpdatedAt(childComplexity), true
+
+	case "Contact.user":
+		if e.complexity.Contact.User == nil {
+			break
+		}
+
+		return e.complexity.Contact.User(childComplexity), true
 
 	case "Contact.website":
 		if e.complexity.Contact.Website == nil {
@@ -1468,13 +1468,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Contract.Metadata(childComplexity), true
 
-	case "Contract.owner":
-		if e.complexity.Contract.Owner == nil {
-			break
-		}
-
-		return e.complexity.Contract.Owner(childComplexity), true
-
 	case "Contract.reference":
 		if e.complexity.Contract.Reference == nil {
 			break
@@ -1502,6 +1495,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Contract.UpdatedAt(childComplexity), true
+
+	case "Contract.user":
+		if e.complexity.Contract.User == nil {
+			break
+		}
+
+		return e.complexity.Contract.User(childComplexity), true
 
 	case "Contracts.count":
 		if e.complexity.Contracts.Count == nil {
@@ -1727,13 +1727,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Deal.Order(childComplexity), true
 
-	case "Deal.owner":
-		if e.complexity.Deal.Owner == nil {
-			break
-		}
-
-		return e.complexity.Deal.Owner(childComplexity), true
-
 	case "Deal.pipeline":
 		if e.complexity.Deal.Pipeline == nil {
 			break
@@ -1782,6 +1775,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Deal.UpdatedAt(childComplexity), true
+
+	case "Deal.user":
+		if e.complexity.Deal.User == nil {
+			break
+		}
+
+		return e.complexity.Deal.User(childComplexity), true
 
 	case "Deals.count":
 		if e.complexity.Deals.Count == nil {
@@ -2773,13 +2773,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Order.ID(childComplexity), true
 
-	case "Order.owner":
-		if e.complexity.Order.Owner == nil {
-			break
-		}
-
-		return e.complexity.Order.Owner(childComplexity), true
-
 	case "Order.reference":
 		if e.complexity.Order.Reference == nil {
 			break
@@ -2807,6 +2800,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Order.UpdatedAt(childComplexity), true
+
+	case "Order.user":
+		if e.complexity.Order.User == nil {
+			break
+		}
+
+		return e.complexity.Order.User(childComplexity), true
 
 	case "Orders.count":
 		if e.complexity.Orders.Count == nil {
@@ -3722,13 +3722,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Quote.Notes(childComplexity), true
 
-	case "Quote.owner":
-		if e.complexity.Quote.Owner == nil {
-			break
-		}
-
-		return e.complexity.Quote.Owner(childComplexity), true
-
 	case "Quote.payment":
 		if e.complexity.Quote.Payment == nil {
 			break
@@ -3777,6 +3770,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Quote.UpdatedAt(childComplexity), true
+
+	case "Quote.user":
+		if e.complexity.Quote.User == nil {
+			break
+		}
+
+		return e.complexity.Quote.User(childComplexity), true
 
 	case "Quote.valid_until":
 		if e.complexity.Quote.ValidUntil == nil {
@@ -4121,13 +4121,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Wishlist.Metadata(childComplexity), true
 
-	case "Wishlist.owner":
-		if e.complexity.Wishlist.Owner == nil {
-			break
-		}
-
-		return e.complexity.Wishlist.Owner(childComplexity), true
-
 	case "Wishlist.product":
 		if e.complexity.Wishlist.Product == nil {
 			break
@@ -4148,6 +4141,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Wishlist.UpdatedAt(childComplexity), true
+
+	case "Wishlist.user":
+		if e.complexity.Wishlist.User == nil {
+			break
+		}
+
+		return e.complexity.Wishlist.User(childComplexity), true
 
 	case "Wishlists.count":
 		if e.complexity.Wishlists.Count == nil {
@@ -7588,8 +7588,8 @@ func (ec *executionContext) fieldContext_Contact_id(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Contact_owner(ctx context.Context, field graphql.CollectedField, obj *model.Contact) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Contact_owner(ctx, field)
+func (ec *executionContext) _Contact_user(ctx context.Context, field graphql.CollectedField, obj *model.Contact) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Contact_user(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7602,7 +7602,7 @@ func (ec *executionContext) _Contact_owner(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Contact().Owner(rctx, obj)
+		return ec.resolvers.Contact().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7616,7 +7616,7 @@ func (ec *executionContext) _Contact_owner(ctx context.Context, field graphql.Co
 	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋsalesᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Contact_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Contact_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Contact",
 		Field:      field,
@@ -9099,8 +9099,8 @@ func (ec *executionContext) fieldContext_Contacts_data(ctx context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -9260,8 +9260,8 @@ func (ec *executionContext) fieldContext_Contract_id(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Contract_owner(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Contract_owner(ctx, field)
+func (ec *executionContext) _Contract_user(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Contract_user(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9274,7 +9274,7 @@ func (ec *executionContext) _Contract_owner(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Contract().Owner(rctx, obj)
+		return ec.resolvers.Contract().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9291,7 +9291,7 @@ func (ec *executionContext) _Contract_owner(ctx context.Context, field graphql.C
 	return ec.marshalNUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋsalesᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Contract_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Contract_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Contract",
 		Field:      field,
@@ -9349,8 +9349,8 @@ func (ec *executionContext) fieldContext_Contract_contact(ctx context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -10031,8 +10031,8 @@ func (ec *executionContext) fieldContext_Contracts_data(ctx context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contract_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contract_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contract_user(ctx, field)
 			case "contact":
 				return ec.fieldContext_Contract_contact(ctx, field)
 			case "reference":
@@ -11551,8 +11551,8 @@ func (ec *executionContext) fieldContext_Deal_order(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Deal_owner(ctx context.Context, field graphql.CollectedField, obj *model.Deal) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Deal_owner(ctx, field)
+func (ec *executionContext) _Deal_user(ctx context.Context, field graphql.CollectedField, obj *model.Deal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Deal_user(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11565,7 +11565,7 @@ func (ec *executionContext) _Deal_owner(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Deal().Owner(rctx, obj)
+		return ec.resolvers.Deal().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11579,7 +11579,7 @@ func (ec *executionContext) _Deal_owner(ctx context.Context, field graphql.Colle
 	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋsalesᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Deal_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Deal_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Deal",
 		Field:      field,
@@ -11637,8 +11637,8 @@ func (ec *executionContext) fieldContext_Deal_contact(ctx context.Context, field
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -11945,8 +11945,8 @@ func (ec *executionContext) fieldContext_Deals_data(ctx context.Context, field g
 				return ec.fieldContext_Deal_description(ctx, field)
 			case "order":
 				return ec.fieldContext_Deal_order(ctx, field)
-			case "owner":
-				return ec.fieldContext_Deal_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Deal_user(ctx, field)
 			case "contact":
 				return ec.fieldContext_Deal_contact(ctx, field)
 			case "metadata":
@@ -12268,8 +12268,8 @@ func (ec *executionContext) fieldContext_Entity_findContactByID(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -13750,8 +13750,8 @@ func (ec *executionContext) fieldContext_Mutation_createContact(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -13892,8 +13892,8 @@ func (ec *executionContext) fieldContext_Mutation_updateContact(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -14182,8 +14182,8 @@ func (ec *executionContext) fieldContext_Mutation_createContract(ctx context.Con
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contract_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contract_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contract_user(ctx, field)
 			case "contact":
 				return ec.fieldContext_Contract_contact(ctx, field)
 			case "reference":
@@ -14292,8 +14292,8 @@ func (ec *executionContext) fieldContext_Mutation_updateContract(ctx context.Con
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contract_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contract_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contract_user(ctx, field)
 			case "contact":
 				return ec.fieldContext_Contract_contact(ctx, field)
 			case "reference":
@@ -14914,8 +14914,8 @@ func (ec *executionContext) fieldContext_Mutation_createDeal(ctx context.Context
 				return ec.fieldContext_Deal_description(ctx, field)
 			case "order":
 				return ec.fieldContext_Deal_order(ctx, field)
-			case "owner":
-				return ec.fieldContext_Deal_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Deal_user(ctx, field)
 			case "contact":
 				return ec.fieldContext_Deal_contact(ctx, field)
 			case "metadata":
@@ -15006,8 +15006,8 @@ func (ec *executionContext) fieldContext_Mutation_updateDeal(ctx context.Context
 				return ec.fieldContext_Deal_description(ctx, field)
 			case "order":
 				return ec.fieldContext_Deal_order(ctx, field)
-			case "owner":
-				return ec.fieldContext_Deal_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Deal_user(ctx, field)
 			case "contact":
 				return ec.fieldContext_Deal_contact(ctx, field)
 			case "metadata":
@@ -15098,8 +15098,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteDeal(ctx context.Context
 				return ec.fieldContext_Deal_description(ctx, field)
 			case "order":
 				return ec.fieldContext_Deal_order(ctx, field)
-			case "owner":
-				return ec.fieldContext_Deal_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Deal_user(ctx, field)
 			case "contact":
 				return ec.fieldContext_Deal_contact(ctx, field)
 			case "metadata":
@@ -15414,8 +15414,8 @@ func (ec *executionContext) fieldContext_Mutation_createOrder(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Order_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Order_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Order_user(ctx, field)
 			case "reference":
 				return ec.fieldContext_Order_reference(ctx, field)
 			case "total":
@@ -15508,8 +15508,8 @@ func (ec *executionContext) fieldContext_Mutation_updateOrder(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Order_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Order_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Order_user(ctx, field)
 			case "reference":
 				return ec.fieldContext_Order_reference(ctx, field)
 			case "total":
@@ -16994,8 +16994,8 @@ func (ec *executionContext) fieldContext_Mutation_createQuote(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Quote_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Quote_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Quote_user(ctx, field)
 			case "locale":
 				return ec.fieldContext_Quote_locale(ctx, field)
 			case "contact":
@@ -17088,8 +17088,8 @@ func (ec *executionContext) fieldContext_Mutation_updateQuote(ctx context.Contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Quote_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Quote_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Quote_user(ctx, field)
 			case "locale":
 				return ec.fieldContext_Quote_locale(ctx, field)
 			case "contact":
@@ -18360,8 +18360,8 @@ func (ec *executionContext) fieldContext_Mutation_createWishlist(ctx context.Con
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Wishlist_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Wishlist_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Wishlist_user(ctx, field)
 			case "product":
 				return ec.fieldContext_Wishlist_product(ctx, field)
 			case "metadata":
@@ -18448,8 +18448,8 @@ func (ec *executionContext) fieldContext_Mutation_updateWishlist(ctx context.Con
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Wishlist_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Wishlist_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Wishlist_user(ctx, field)
 			case "product":
 				return ec.fieldContext_Wishlist_product(ctx, field)
 			case "metadata":
@@ -18666,8 +18666,8 @@ func (ec *executionContext) fieldContext_Order_id(ctx context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _Order_owner(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Order_owner(ctx, field)
+func (ec *executionContext) _Order_user(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Order_user(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -18680,7 +18680,7 @@ func (ec *executionContext) _Order_owner(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Order().Owner(rctx, obj)
+		return ec.resolvers.Order().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -18694,7 +18694,7 @@ func (ec *executionContext) _Order_owner(ctx context.Context, field graphql.Coll
 	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋsalesᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Order_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Order_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Order",
 		Field:      field,
@@ -19098,8 +19098,8 @@ func (ec *executionContext) fieldContext_Orders_data(ctx context.Context, field 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Order_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Order_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Order_user(ctx, field)
 			case "reference":
 				return ec.fieldContext_Order_reference(ctx, field)
 			case "total":
@@ -22226,8 +22226,8 @@ func (ec *executionContext) fieldContext_Query_contact(ctx context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -22368,8 +22368,8 @@ func (ec *executionContext) fieldContext_Query_contract(ctx context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contract_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contract_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contract_user(ctx, field)
 			case "contact":
 				return ec.fieldContext_Contract_contact(ctx, field)
 			case "reference":
@@ -22742,8 +22742,8 @@ func (ec *executionContext) fieldContext_Query_deal(ctx context.Context, field g
 				return ec.fieldContext_Deal_description(ctx, field)
 			case "order":
 				return ec.fieldContext_Deal_order(ctx, field)
-			case "owner":
-				return ec.fieldContext_Deal_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Deal_user(ctx, field)
 			case "contact":
 				return ec.fieldContext_Deal_contact(ctx, field)
 			case "metadata":
@@ -23008,8 +23008,8 @@ func (ec *executionContext) fieldContext_Query_order(ctx context.Context, field 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Order_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Order_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Order_user(ctx, field)
 			case "reference":
 				return ec.fieldContext_Order_reference(ctx, field)
 			case "total":
@@ -23866,8 +23866,8 @@ func (ec *executionContext) fieldContext_Query_quote(ctx context.Context, field 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Quote_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Quote_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Quote_user(ctx, field)
 			case "locale":
 				return ec.fieldContext_Quote_locale(ctx, field)
 			case "contact":
@@ -24502,8 +24502,8 @@ func (ec *executionContext) fieldContext_Query_wishlist(ctx context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Wishlist_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Wishlist_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Wishlist_user(ctx, field)
 			case "product":
 				return ec.fieldContext_Wishlist_product(ctx, field)
 			case "metadata":
@@ -24866,8 +24866,8 @@ func (ec *executionContext) fieldContext_Quote_id(ctx context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _Quote_owner(ctx context.Context, field graphql.CollectedField, obj *model.Quote) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Quote_owner(ctx, field)
+func (ec *executionContext) _Quote_user(ctx context.Context, field graphql.CollectedField, obj *model.Quote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Quote_user(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -24880,7 +24880,7 @@ func (ec *executionContext) _Quote_owner(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Quote().Owner(rctx, obj)
+		return ec.resolvers.Quote().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -24897,7 +24897,7 @@ func (ec *executionContext) _Quote_owner(ctx context.Context, field graphql.Coll
 	return ec.marshalNUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋsalesᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Quote_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Quote_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Quote",
 		Field:      field,
@@ -24996,8 +24996,8 @@ func (ec *executionContext) fieldContext_Quote_contact(ctx context.Context, fiel
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -25837,8 +25837,8 @@ func (ec *executionContext) fieldContext_Quotes_data(ctx context.Context, field 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Quote_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Quote_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Quote_user(ctx, field)
 			case "locale":
 				return ec.fieldContext_Quote_locale(ctx, field)
 			case "contact":
@@ -26565,8 +26565,8 @@ func (ec *executionContext) fieldContext_Subscription_contactCreated(ctx context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -26710,8 +26710,8 @@ func (ec *executionContext) fieldContext_Subscription_contactUpdated(ctx context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -26855,8 +26855,8 @@ func (ec *executionContext) fieldContext_Subscription_contactDeleted(ctx context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Contact_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Contact_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Contact_user(ctx, field)
 			case "type":
 				return ec.fieldContext_Contact_type(ctx, field)
 			case "first_name":
@@ -28240,8 +28240,8 @@ func (ec *executionContext) fieldContext_Wishlist_id(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Wishlist_owner(ctx context.Context, field graphql.CollectedField, obj *model.Wishlist) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Wishlist_owner(ctx, field)
+func (ec *executionContext) _Wishlist_user(ctx context.Context, field graphql.CollectedField, obj *model.Wishlist) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Wishlist_user(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -28254,7 +28254,7 @@ func (ec *executionContext) _Wishlist_owner(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Owner, nil
+		return obj.User, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -28271,7 +28271,7 @@ func (ec *executionContext) _Wishlist_owner(ctx context.Context, field graphql.C
 	return ec.marshalNUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋsalesᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Wishlist_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Wishlist_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Wishlist",
 		Field:      field,
@@ -28594,8 +28594,8 @@ func (ec *executionContext) fieldContext_Wishlists_data(ctx context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Wishlist_id(ctx, field)
-			case "owner":
-				return ec.fieldContext_Wishlist_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_Wishlist_user(ctx, field)
 			case "product":
 				return ec.fieldContext_Wishlist_product(ctx, field)
 			case "metadata":
@@ -30519,22 +30519,22 @@ func (ec *executionContext) unmarshalInputNewCompany(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "name", "description", "type", "parent", "industry", "employees", "revenue", "city", "state", "zip", "country", "timezone", "phone", "website", "metadata", "status"}
+	fieldsInOrder := [...]string{"user", "name", "description", "type", "parent", "industry", "employees", "revenue", "city", "state", "zip", "country", "timezone", "phone", "website", "metadata", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "name":
 			var err error
 
@@ -30692,7 +30692,7 @@ func (ec *executionContext) unmarshalInputNewContact(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"company", "owner", "type", "first_name", "last_name", "picture", "email", "phone", "street", "city", "state", "zip", "country", "website", "birthday", "job_title", "gender", "timezone", "language", "source", "revenue", "rating", "notes", "stage", "status", "labels", "metadata", "reviewable"}
+	fieldsInOrder := [...]string{"company", "user", "type", "first_name", "last_name", "picture", "email", "phone", "street", "city", "state", "zip", "country", "website", "birthday", "job_title", "gender", "timezone", "language", "source", "revenue", "rating", "notes", "stage", "status", "labels", "metadata", "reviewable"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -30708,15 +30708,15 @@ func (ec *executionContext) unmarshalInputNewContact(ctx context.Context, obj in
 				return it, err
 			}
 			it.Company = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "type":
 			var err error
 
@@ -30964,22 +30964,22 @@ func (ec *executionContext) unmarshalInputNewContract(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "contact", "reference", "description", "amount", "currency", "start_date", "end_date", "auto_renew", "categories", "metadata"}
+	fieldsInOrder := [...]string{"user", "contact", "reference", "description", "amount", "currency", "start_date", "end_date", "auto_renew", "categories", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "contact":
 			var err error
 
@@ -31220,7 +31220,7 @@ func (ec *executionContext) unmarshalInputNewDeal(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type", "name", "amount", "currency", "close_date", "pipeline_id", "stage", "priority", "source", "lose_reason", "description", "order", "owner_id", "contact_id", "metadata", "status"}
+	fieldsInOrder := [...]string{"type", "name", "amount", "currency", "close_date", "pipeline_id", "stage", "priority", "source", "lose_reason", "description", "order", "user_id", "contact_id", "metadata", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -31335,15 +31335,15 @@ func (ec *executionContext) unmarshalInputNewDeal(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Order = data
-		case "owner_id":
+		case "user_id":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner_id"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.OwnerID = data
+			it.UserID = data
 		case "contact_id":
 			var err error
 
@@ -31792,22 +31792,22 @@ func (ec *executionContext) unmarshalInputNewQuote(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "contact", "locale", "reference", "purchase", "name", "description", "terms", "notes", "template", "valid_until", "amount", "currency", "billing", "metadata", "status"}
+	fieldsInOrder := [...]string{"user", "contact", "locale", "reference", "purchase", "name", "description", "terms", "notes", "template", "valid_until", "amount", "currency", "billing", "metadata", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "contact":
 			var err error
 
@@ -32317,22 +32317,22 @@ func (ec *executionContext) unmarshalInputUpdateCompany(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "name", "description", "type", "parent", "industry", "employees", "revenue", "city", "zip", "state", "country", "timezone", "phone", "website", "metadata", "status"}
+	fieldsInOrder := [...]string{"user", "name", "description", "type", "parent", "industry", "employees", "revenue", "city", "zip", "state", "country", "timezone", "phone", "website", "metadata", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "name":
 			var err error
 
@@ -32490,7 +32490,7 @@ func (ec *executionContext) unmarshalInputUpdateContact(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"company", "owner", "reference", "type", "first_name", "last_name", "picture", "email", "phone", "street", "city", "state", "zip", "country", "website", "birthday", "job_title", "gender", "timezone", "language", "source", "revenue", "rating", "notes", "stage", "status", "labels", "metadata", "reviewable"}
+	fieldsInOrder := [...]string{"company", "user", "reference", "type", "first_name", "last_name", "picture", "email", "phone", "street", "city", "state", "zip", "country", "website", "birthday", "job_title", "gender", "timezone", "language", "source", "revenue", "rating", "notes", "stage", "status", "labels", "metadata", "reviewable"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -32506,15 +32506,15 @@ func (ec *executionContext) unmarshalInputUpdateContact(ctx context.Context, obj
 				return it, err
 			}
 			it.Company = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "reference":
 			var err error
 
@@ -32771,22 +32771,22 @@ func (ec *executionContext) unmarshalInputUpdateContract(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "contact", "reference", "description", "amount", "currency", "start_date", "end_date", "auto_renew", "categories", "metadata"}
+	fieldsInOrder := [...]string{"user", "contact", "reference", "description", "amount", "currency", "start_date", "end_date", "auto_renew", "categories", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "contact":
 			var err error
 
@@ -33027,7 +33027,7 @@ func (ec *executionContext) unmarshalInputUpdateDeal(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type", "name", "amount", "currency", "close_date", "pipeline_id", "stage", "priority", "source", "lose_reason", "description", "order", "owner_id", "contact_id", "metadata", "status"}
+	fieldsInOrder := [...]string{"type", "name", "amount", "currency", "close_date", "pipeline_id", "stage", "priority", "source", "lose_reason", "description", "order", "user_id", "contact_id", "metadata", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -33142,15 +33142,15 @@ func (ec *executionContext) unmarshalInputUpdateDeal(ctx context.Context, obj in
 				return it, err
 			}
 			it.Order = data
-		case "owner_id":
+		case "user_id":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner_id"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.OwnerID = data
+			it.UserID = data
 		case "contact_id":
 			var err error
 
@@ -33599,22 +33599,22 @@ func (ec *executionContext) unmarshalInputUpdateQuote(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "contact", "locale", "reference", "purchase", "name", "description", "terms", "notes", "template", "valid_until", "amount", "currency", "billing", "metadata", "status"}
+	fieldsInOrder := [...]string{"user", "contact", "locale", "reference", "purchase", "name", "description", "terms", "notes", "template", "valid_until", "amount", "currency", "billing", "metadata", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "contact":
 			var err error
 
@@ -34798,7 +34798,7 @@ func (ec *executionContext) _Contact(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "owner":
+		case "user":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -34807,7 +34807,7 @@ func (ec *executionContext) _Contact(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Contact_owner(ctx, field, obj)
+				res = ec._Contact_user(ctx, field, obj)
 				return res
 			}
 
@@ -35330,7 +35330,7 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "owner":
+		case "user":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -35339,7 +35339,7 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Contract_owner(ctx, field, obj)
+				res = ec._Contract_user(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -36199,7 +36199,7 @@ func (ec *executionContext) _Deal(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "order":
 			out.Values[i] = ec._Deal_order(ctx, field, obj)
-		case "owner":
+		case "user":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -36208,7 +36208,7 @@ func (ec *executionContext) _Deal(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Deal_owner(ctx, field, obj)
+				res = ec._Deal_user(ctx, field, obj)
 				return res
 			}
 
@@ -37579,7 +37579,7 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "owner":
+		case "user":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -37588,7 +37588,7 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Order_owner(ctx, field, obj)
+				res = ec._Order_user(ctx, field, obj)
 				return res
 			}
 
@@ -39975,7 +39975,7 @@ func (ec *executionContext) _Quote(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "owner":
+		case "user":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -39984,7 +39984,7 @@ func (ec *executionContext) _Quote(ctx context.Context, sel ast.SelectionSet, ob
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Quote_owner(ctx, field, obj)
+				res = ec._Quote_user(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -41314,8 +41314,8 @@ func (ec *executionContext) _Wishlist(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "owner":
-			out.Values[i] = ec._Wishlist_owner(ctx, field, obj)
+		case "user":
+			out.Values[i] = ec._Wishlist_user(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

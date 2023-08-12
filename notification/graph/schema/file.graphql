@@ -14,7 +14,6 @@ type File @key(fields: "id") {
   updated_at: String!
   created_by: User
   updated_by: User
-  owner: User
   followers: [Follow]
 }
 
@@ -34,7 +33,7 @@ input NewFile {
   metadata: Map
   starred: Boolean
   status: String
-  owner: ID
+  user: ID
   categories: [ID!]
 }
 
@@ -49,7 +48,7 @@ input UpdateFile {
   metadata: Map
   starred: Boolean
   status: String
-  owner: ID
+  user: ID
   categories: [ID!]
 }
 

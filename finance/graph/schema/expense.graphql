@@ -49,7 +49,7 @@ input NewExpense {
   metadata: Map
   status: String
   date: String!
-  owner: ID!
+  user: ID!
   notes: String
   categories: [ID!]
 }
@@ -63,7 +63,7 @@ input UpdateExpense {
   date: String
   amount: Float
   currency: String
-  owner: ID
+  user: ID
   notes: String
   categories: [ID!]
 }

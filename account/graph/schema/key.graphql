@@ -11,7 +11,7 @@ type Key {
   expires_at: String
   created_at: String!
   updated_at: String!
-  owner: User
+  user: User
 }
 
 type Keys {

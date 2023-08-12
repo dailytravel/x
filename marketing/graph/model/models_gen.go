@@ -76,7 +76,7 @@ type NewCampaign struct {
 }
 
 type NewLink struct {
-	Owner       *string                `json:"owner,omitempty"`
+	User        *string                `json:"user,omitempty"`
 	Title       *string                `json:"title,omitempty"`
 	Domain      string                 `json:"domain"`
 	Reference   string                 `json:"reference"`
@@ -159,7 +159,7 @@ type UpdateCampaign struct {
 }
 
 type UpdateLink struct {
-	Owner      *string                `json:"owner,omitempty"`
+	User       *string                `json:"user,omitempty"`
 	Title      *string                `json:"title,omitempty"`
 	Domain     *string                `json:"domain,omitempty"`
 	Reference  *string                `json:"reference,omitempty"`

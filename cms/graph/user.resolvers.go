@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/dailytravel/x/cms/graph/model"
 )
@@ -13,6 +14,11 @@ import (
 // ID is the resolver for the id field.
 func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) {
 	return obj.ID.Hex(), nil
+}
+
+// Comments is the resolver for the comments field.
+func (r *userResolver) Comments(ctx context.Context, obj *model.User) ([]*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: Comments - comments"))
 }
 
 // User returns UserResolver implementation.

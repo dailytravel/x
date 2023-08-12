@@ -14,7 +14,7 @@ type Portfolio struct {
 	Name        string              `json:"name" bson:"name"`
 	Color       string              `json:"color" bson:"color"`
 	Description *string             `json:"description,omitempty" bson:"description,omitempty"`
-	Owner       primitive.ObjectID  `json:"owner" bson:"owner"`
+	User        primitive.ObjectID  `json:"user" bson:"user"`
 	Metadata    primitive.M         `json:"metadata,omitempty" bson:"metadata,omitempty"`
 	Status      string              `json:"status" bson:"status"`
 	CreatedAt   primitive.Timestamp `json:"created_at" bson:"created_at"`
@@ -40,7 +40,7 @@ func (i *Portfolio) Collection() string {
 
 func (i *Portfolio) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},

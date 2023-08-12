@@ -9112,22 +9112,22 @@ func (ec *executionContext) unmarshalInputNewLink(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "title", "domain", "reference", "destination", "categories", "metadata"}
+	fieldsInOrder := [...]string{"user", "title", "domain", "reference", "destination", "categories", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "title":
 			var err error
 
@@ -9428,22 +9428,22 @@ func (ec *executionContext) unmarshalInputUpdateLink(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"owner", "title", "domain", "reference", "categories", "metadata"}
+	fieldsInOrder := [...]string{"user", "title", "domain", "reference", "categories", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "title":
 			var err error
 

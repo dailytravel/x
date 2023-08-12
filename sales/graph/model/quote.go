@@ -9,7 +9,7 @@ import (
 
 type Quote struct {
 	Model
-	Owner       primitive.ObjectID  `json:"owner,omitempty" bson:"owner,omitempty"`
+	User        primitive.ObjectID  `json:"user,omitempty" bson:"user,omitempty"`
 	Contact     primitive.ObjectID  `json:"contacts,omitempty" bson:"contacts,omitempty"`
 	Reference   string              `json:"reference,omitempty" bson:"reference,omitempty"`
 	Purchase    string              `json:"purchase,omitempty" bson:"purchase,omitempty"`

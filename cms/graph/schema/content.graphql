@@ -39,7 +39,7 @@ type Contents {
 
 input NewContent {
   parent: ID
-  owner: ID
+  user: ID
   locale: String!
   type: String!
   title: String
@@ -55,7 +55,7 @@ input NewContent {
 
 input UpdateContent {
   parent: ID
-  owner: ID
+  user: ID
   locale: String!
   type: String
   title: String

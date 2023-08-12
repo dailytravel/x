@@ -86,7 +86,6 @@ type ComplexityRoot struct {
 	}
 
 	Comment struct {
-		Attachments func(childComplexity int) int
 		Body        func(childComplexity int) int
 		Children    func(childComplexity int) int
 		Commentable func(childComplexity int) int
@@ -182,6 +181,7 @@ type ComplexityRoot struct {
 		FindFileByID     func(childComplexity int, id string) int
 		FindFollowByID   func(childComplexity int, id string) int
 		FindReactionByID func(childComplexity int, id string) int
+		FindUserByID     func(childComplexity int, id string) int
 	}
 
 	File struct {
@@ -193,7 +193,6 @@ type ComplexityRoot struct {
 		Locale      func(childComplexity int) int
 		Metadata    func(childComplexity int) int
 		Name        func(childComplexity int) int
-		Owner       func(childComplexity int) int
 		Provider    func(childComplexity int) int
 		Size        func(childComplexity int) int
 		Starred     func(childComplexity int) int
@@ -202,6 +201,7 @@ type ComplexityRoot struct {
 		URL         func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 		UpdatedBy   func(childComplexity int) int
+		User        func(childComplexity int) int
 	}
 
 	Files struct {
@@ -354,8 +354,9 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		ID   func(childComplexity int) int
-		Name func(childComplexity int) int
+		Comments func(childComplexity int) int
+		ID       func(childComplexity int) int
+		Name     func(childComplexity int) int
 	}
 
 	_Service struct {
@@ -390,7 +391,6 @@ type CommentResolver interface {
 	Reaction(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error)
 	CreatedBy(ctx context.Context, obj *model.Comment) (*model.User, error)
 	UpdatedBy(ctx context.Context, obj *model.Comment) (*model.User, error)
-	Attachments(ctx context.Context, obj *model.Comment) ([]*model.File, error)
 	Reactions(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error)
 }
 type ContentResolver interface {
@@ -433,6 +433,7 @@ type EntityResolver interface {
 	FindFileByID(ctx context.Context, id string) (*model.File, error)
 	FindFollowByID(ctx context.Context, id string) (*model.Follow, error)
 	FindReactionByID(ctx context.Context, id string) (*model.Reaction, error)
+	FindUserByID(ctx context.Context, id string) (*model.User, error)
 }
 type FileResolver interface {
 	ID(ctx context.Context, obj *model.File) (string, error)
@@ -443,7 +444,7 @@ type FileResolver interface {
 	UpdatedAt(ctx context.Context, obj *model.File) (string, error)
 	CreatedBy(ctx context.Context, obj *model.File) (*model.User, error)
 	UpdatedBy(ctx context.Context, obj *model.File) (*model.User, error)
-	Owner(ctx context.Context, obj *model.File) (*model.User, error)
+	User(ctx context.Context, obj *model.File) (*model.User, error)
 	Followers(ctx context.Context, obj *model.File) ([]*model.Follow, error)
 }
 type FollowResolver interface {
@@ -509,7 +510,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Category(ctx context.Context, id string) (*model.Category, error)
 	Categories(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
-	Comments(ctx context.Context, args map[string]interface{}) ([]*model.Comment, error)
+	Comments(ctx context.Context, args map[string]interface{}) (*model.Comments, error)
 	Comment(ctx context.Context, id string) (*model.Comment, error)
 	Content(ctx context.Context, id string) (*model.Content, error)
 	Contents(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
@@ -554,6 +555,8 @@ type TimezoneResolver interface {
 }
 type UserResolver interface {
 	ID(ctx context.Context, obj *model.User) (string, error)
+
+	Comments(ctx context.Context, obj *model.User) ([]*model.Comment, error)
 }
 
 type executableSchema struct {
@@ -675,13 +678,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Category.UpdatedAt(childComplexity), true
-
-	case "Comment.attachments":
-		if e.complexity.Comment.Attachments == nil {
-			break
-		}
-
-		return e.complexity.Comment.Attachments(childComplexity), true
 
 	case "Comment.body":
 		if e.complexity.Comment.Body == nil {
@@ -1210,6 +1206,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.FindReactionByID(childComplexity, args["id"].(string)), true
 
+	case "Entity.findUserByID":
+		if e.complexity.Entity.FindUserByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findUserByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindUserByID(childComplexity, args["id"].(string)), true
+
 	case "File.created_at":
 		if e.complexity.File.CreatedAt == nil {
 			break
@@ -1266,13 +1274,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.File.Name(childComplexity), true
 
-	case "File.owner":
-		if e.complexity.File.Owner == nil {
-			break
-		}
-
-		return e.complexity.File.Owner(childComplexity), true
-
 	case "File.provider":
 		if e.complexity.File.Provider == nil {
 			break
@@ -1328,6 +1329,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.File.UpdatedBy(childComplexity), true
+
+	case "File.user":
+		if e.complexity.File.User == nil {
+			break
+		}
+
+		return e.complexity.File.User(childComplexity), true
 
 	case "Files.count":
 		if e.complexity.Files.Count == nil {
@@ -2445,6 +2453,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Timezones.Data(childComplexity), true
 
+	case "User.comments":
+		if e.complexity.User.Comments == nil {
+			break
+		}
+
+		return e.complexity.User.Comments(childComplexity), true
+
 	case "User.id":
 		if e.complexity.User.ID == nil {
 			break
@@ -2665,6 +2680,7 @@ type Entity {
 	findFileByID(id: ID!,): File!
 	findFollowByID(id: ID!,): Follow!
 	findReactionByID(id: ID!,): Reaction!
+	findUserByID(id: ID!,): User!
 
 }
 
@@ -2805,6 +2821,21 @@ func (ec *executionContext) field_Entity_findFollowByID_args(ctx context.Context
 }
 
 func (ec *executionContext) field_Entity_findReactionByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findUserByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -5110,8 +5141,6 @@ func (ec *executionContext) fieldContext_Comment_parent(ctx context.Context, fie
 				return ec.fieldContext_Comment_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Comment_updated_by(ctx, field)
-			case "attachments":
-				return ec.fieldContext_Comment_attachments(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			}
@@ -5187,8 +5216,6 @@ func (ec *executionContext) fieldContext_Comment_children(ctx context.Context, f
 				return ec.fieldContext_Comment_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Comment_updated_by(ctx, field)
-			case "attachments":
-				return ec.fieldContext_Comment_attachments(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			}
@@ -5337,6 +5364,8 @@ func (ec *executionContext) fieldContext_Comment_created_by(ctx context.Context,
 				return ec.fieldContext_User_id(ctx, field)
 			case "name":
 				return ec.fieldContext_User_name(ctx, field)
+			case "comments":
+				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -5384,85 +5413,10 @@ func (ec *executionContext) fieldContext_Comment_updated_by(ctx context.Context,
 				return ec.fieldContext_User_id(ctx, field)
 			case "name":
 				return ec.fieldContext_User_name(ctx, field)
+			case "comments":
+				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Comment_attachments(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Comment_attachments(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Comment().Attachments(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.File)
-	fc.Result = res
-	return ec.marshalOFile2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐFile(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Comment_attachments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Comment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_File_id(ctx, field)
-			case "locale":
-				return ec.fieldContext_File_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_File_name(ctx, field)
-			case "description":
-				return ec.fieldContext_File_description(ctx, field)
-			case "type":
-				return ec.fieldContext_File_type(ctx, field)
-			case "size":
-				return ec.fieldContext_File_size(ctx, field)
-			case "provider":
-				return ec.fieldContext_File_provider(ctx, field)
-			case "url":
-				return ec.fieldContext_File_url(ctx, field)
-			case "metadata":
-				return ec.fieldContext_File_metadata(ctx, field)
-			case "starred":
-				return ec.fieldContext_File_starred(ctx, field)
-			case "status":
-				return ec.fieldContext_File_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_File_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_File_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_File_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
-			case "followers":
-				return ec.fieldContext_File_followers(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
 	}
 	return fc, nil
@@ -5633,8 +5587,6 @@ func (ec *executionContext) fieldContext_Comments_data(ctx context.Context, fiel
 				return ec.fieldContext_Comment_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Comment_updated_by(ctx, field)
-			case "attachments":
-				return ec.fieldContext_Comment_attachments(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			}
@@ -6411,8 +6363,6 @@ func (ec *executionContext) fieldContext_Content_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Comment_updated_by(ctx, field)
-			case "attachments":
-				return ec.fieldContext_Comment_attachments(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			}
@@ -7999,8 +7949,6 @@ func (ec *executionContext) fieldContext_Entity_findCommentByID(ctx context.Cont
 				return ec.fieldContext_Comment_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Comment_updated_by(ctx, field)
-			case "attachments":
-				return ec.fieldContext_Comment_attachments(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			}
@@ -8179,8 +8127,8 @@ func (ec *executionContext) fieldContext_Entity_findFileByID(ctx context.Context
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -8335,6 +8283,69 @@ func (ec *executionContext) fieldContext_Entity_findReactionByID(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Entity_findReactionByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Entity_findUserByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findUserByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindUserByID(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findUserByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "comments":
+				return ec.fieldContext_User_comments(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findUserByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8947,6 +8958,8 @@ func (ec *executionContext) fieldContext_File_created_by(ctx context.Context, fi
 				return ec.fieldContext_User_id(ctx, field)
 			case "name":
 				return ec.fieldContext_User_name(ctx, field)
+			case "comments":
+				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -8994,6 +9007,8 @@ func (ec *executionContext) fieldContext_File_updated_by(ctx context.Context, fi
 				return ec.fieldContext_User_id(ctx, field)
 			case "name":
 				return ec.fieldContext_User_name(ctx, field)
+			case "comments":
+				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -9001,8 +9016,8 @@ func (ec *executionContext) fieldContext_File_updated_by(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _File_owner(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_File_owner(ctx, field)
+func (ec *executionContext) _File_user(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_user(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9015,7 +9030,7 @@ func (ec *executionContext) _File_owner(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.File().Owner(rctx, obj)
+		return ec.resolvers.File().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9029,7 +9044,7 @@ func (ec *executionContext) _File_owner(ctx context.Context, field graphql.Colle
 	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_File_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_File_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "File",
 		Field:      field,
@@ -9041,6 +9056,8 @@ func (ec *executionContext) fieldContext_File_owner(ctx context.Context, field g
 				return ec.fieldContext_User_id(ctx, field)
 			case "name":
 				return ec.fieldContext_User_name(ctx, field)
+			case "comments":
+				return ec.fieldContext_User_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -9215,8 +9232,8 @@ func (ec *executionContext) fieldContext_Files_data(ctx context.Context, field g
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -10698,8 +10715,6 @@ func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Cont
 				return ec.fieldContext_Comment_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Comment_updated_by(ctx, field)
-			case "attachments":
-				return ec.fieldContext_Comment_attachments(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			}
@@ -10806,8 +10821,6 @@ func (ec *executionContext) fieldContext_Mutation_updateComment(ctx context.Cont
 				return ec.fieldContext_Comment_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Comment_updated_by(ctx, field)
-			case "attachments":
-				return ec.fieldContext_Comment_attachments(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			}
@@ -12098,8 +12111,8 @@ func (ec *executionContext) fieldContext_Mutation_createFile(ctx context.Context
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -12206,8 +12219,8 @@ func (ec *executionContext) fieldContext_Mutation_updateFile(ctx context.Context
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -13943,9 +13956,9 @@ func (ec *executionContext) _Query_comments(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Comment)
+	res := resTmp.(*model.Comments)
 	fc.Result = res
-	return ec.marshalOComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
+	return ec.marshalOComments2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐComments(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13956,42 +13969,12 @@ func (ec *executionContext) fieldContext_Query_comments(ctx context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Comment_id(ctx, field)
-			case "user":
-				return ec.fieldContext_Comment_user(ctx, field)
-			case "locale":
-				return ec.fieldContext_Comment_locale(ctx, field)
-			case "body":
-				return ec.fieldContext_Comment_body(ctx, field)
-			case "rating":
-				return ec.fieldContext_Comment_rating(ctx, field)
-			case "status":
-				return ec.fieldContext_Comment_status(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Comment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Comment_updated_at(ctx, field)
-			case "parent":
-				return ec.fieldContext_Comment_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Comment_children(ctx, field)
-			case "commentable":
-				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Comment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Comment_updated_by(ctx, field)
-			case "attachments":
-				return ec.fieldContext_Comment_attachments(ctx, field)
-			case "reactions":
-				return ec.fieldContext_Comment_reactions(ctx, field)
+			case "count":
+				return ec.fieldContext_Comments_count(ctx, field)
+			case "data":
+				return ec.fieldContext_Comments_data(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Comments", field.Name)
 		},
 	}
 	defer func() {
@@ -14074,8 +14057,6 @@ func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, fiel
 				return ec.fieldContext_Comment_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Comment_updated_by(ctx, field)
-			case "attachments":
-				return ec.fieldContext_Comment_attachments(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			}
@@ -14652,8 +14633,8 @@ func (ec *executionContext) fieldContext_Query_file(ctx context.Context, field g
 				return ec.fieldContext_File_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_File_updated_by(ctx, field)
-			case "owner":
-				return ec.fieldContext_File_owner(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
 			case "followers":
 				return ec.fieldContext_File_followers(ctx, field)
 			}
@@ -16698,6 +16679,81 @@ func (ec *executionContext) fieldContext_User_name(ctx context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _User_comments(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_comments(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().Comments(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Comment)
+	fc.Result = res
+	return ec.marshalOComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Comment_id(ctx, field)
+			case "user":
+				return ec.fieldContext_Comment_user(ctx, field)
+			case "locale":
+				return ec.fieldContext_Comment_locale(ctx, field)
+			case "body":
+				return ec.fieldContext_Comment_body(ctx, field)
+			case "rating":
+				return ec.fieldContext_Comment_rating(ctx, field)
+			case "status":
+				return ec.fieldContext_Comment_status(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Comment_metadata(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Comment_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Comment_updated_at(ctx, field)
+			case "parent":
+				return ec.fieldContext_Comment_parent(ctx, field)
+			case "children":
+				return ec.fieldContext_Comment_children(ctx, field)
+			case "commentable":
+				return ec.fieldContext_Comment_commentable(ctx, field)
+			case "reaction":
+				return ec.fieldContext_Comment_reaction(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Comment_created_by(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Comment_updated_by(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) __Service_sdl(ctx context.Context, field graphql.CollectedField, obj *fedruntime.Service) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext__Service_sdl(ctx, field)
 	if err != nil {
@@ -18712,7 +18768,7 @@ func (ec *executionContext) unmarshalInputNewContent(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "owner", "locale", "type", "title", "summary", "body", "slug", "categories", "images", "status", "commentable", "metadata"}
+	fieldsInOrder := [...]string{"parent", "user", "locale", "type", "title", "summary", "body", "slug", "categories", "images", "status", "commentable", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -18728,15 +18784,15 @@ func (ec *executionContext) unmarshalInputNewContent(ctx context.Context, obj in
 				return it, err
 			}
 			it.Parent = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "locale":
 			var err error
 
@@ -19078,7 +19134,7 @@ func (ec *executionContext) unmarshalInputNewFile(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"locale", "name", "description", "type", "size", "provider", "url", "metadata", "starred", "status", "owner", "categories"}
+	fieldsInOrder := [...]string{"locale", "name", "description", "type", "size", "provider", "url", "metadata", "starred", "status", "user", "categories"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -19175,15 +19231,15 @@ func (ec *executionContext) unmarshalInputNewFile(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Status = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "categories":
 			var err error
 
@@ -19715,7 +19771,7 @@ func (ec *executionContext) unmarshalInputUpdateContent(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "owner", "locale", "type", "title", "summary", "body", "slug", "categories", "images", "status", "commentable", "metadata"}
+	fieldsInOrder := [...]string{"parent", "user", "locale", "type", "title", "summary", "body", "slug", "categories", "images", "status", "commentable", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -19731,15 +19787,15 @@ func (ec *executionContext) unmarshalInputUpdateContent(ctx context.Context, obj
 				return it, err
 			}
 			it.Parent = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "locale":
 			var err error
 
@@ -20081,7 +20137,7 @@ func (ec *executionContext) unmarshalInputUpdateFile(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"locale", "name", "description", "type", "size", "provider", "url", "metadata", "starred", "status", "owner", "categories"}
+	fieldsInOrder := [...]string{"locale", "name", "description", "type", "size", "provider", "url", "metadata", "starred", "status", "user", "categories"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -20178,15 +20234,15 @@ func (ec *executionContext) unmarshalInputUpdateFile(ctx context.Context, obj in
 				return it, err
 			}
 			it.Status = data
-		case "owner":
+		case "user":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("owner"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Owner = data
+			it.User = data
 		case "categories":
 			var err error
 
@@ -21308,39 +21364,6 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 					}
 				}()
 				res = ec._Comment_updated_by(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "attachments":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Comment_attachments(ctx, field, obj)
 				return res
 			}
 
@@ -22663,6 +22686,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findUserByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findUserByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -22946,7 +22991,7 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "owner":
+		case "user":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -22955,7 +23000,7 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._File_owner(ctx, field, obj)
+				res = ec._File_user(ctx, field, obj)
 				return res
 			}
 
@@ -25070,6 +25115,39 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "name":
 			out.Values[i] = ec._User_name(ctx, field, obj)
+		case "comments":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_comments(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -25816,6 +25894,20 @@ func (ec *executionContext) unmarshalNUpdateTimezone2githubᚗcomᚋdailytravel�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNUser2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
+	return ec._User(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._User(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalN_Any2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
 	res, err := graphql.UnmarshalMap(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -26284,6 +26376,13 @@ func (ec *executionContext) marshalOComment2ᚖgithubᚗcomᚋdailytravelᚋxᚋ
 		return graphql.Null
 	}
 	return ec._Comment(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOComments2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐComments(ctx context.Context, sel ast.SelectionSet, v *model.Comments) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Comments(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOContent2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐContent(ctx context.Context, sel ast.SelectionSet, v []*model.Content) graphql.Marshaler {

@@ -1,6 +1,6 @@
 type Quote {
   id: ID!
-  owner: User!
+  user: User!
   locale: String!
   contact: Contact
   reference: String!
@@ -27,7 +27,7 @@ type Quotes {
 }
 
 input NewQuote {
-  owner: ID!
+  user: ID!
   contact: String
   locale: String!
   reference: String!
@@ -46,7 +46,7 @@ input NewQuote {
 }
 
 input UpdateQuote {
-  owner: ID
+  user: ID
   contact: String
   locale: String
   reference: String

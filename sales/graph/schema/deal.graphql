@@ -12,7 +12,7 @@ type Deal {
   lose_reason: String #competitor, features, price, other
   description: String!
   order: Int
-  owner: User
+  user: User
   contact: Contact!
   metadata: Map
   status: String! #open, won, lost, abandoned, negotiation
@@ -38,7 +38,7 @@ input NewDeal {
   lose_reason: String #competitor, features, price, other
   description: String!
   order: Int
-  owner_id: ID
+  user_id: ID
   contact_id: ID!
   metadata: Map
   status: String! #open, won, lost, abandoned, negotiation
@@ -57,7 +57,7 @@ input UpdateDeal {
   lose_reason: String #competitor, features, price, other
   description: String
   order: Int
-  owner_id: ID
+  user_id: ID
   contact_id: ID
   metadata: Map
   status: String #open, won, lost, abandoned, negotiation

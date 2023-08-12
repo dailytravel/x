@@ -50,9 +50,9 @@ func (r *fileResolver) UpdatedBy(ctx context.Context, obj *model.File) (*model.U
 	}, nil
 }
 
-// Owner is the resolver for the owner field.
-func (r *fileResolver) Owner(ctx context.Context, obj *model.File) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
+// User is the resolver for the user field.
+func (r *fileResolver) User(ctx context.Context, obj *model.File) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
 }
 
 // Followers is the resolver for the followers field.
@@ -94,3 +94,13 @@ func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error
 func (r *Resolver) File() FileResolver { return &fileResolver{r} }
 
 type fileResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *fileResolver) Owner(ctx context.Context, obj *model.File) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}

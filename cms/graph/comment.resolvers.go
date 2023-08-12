@@ -12,7 +12,9 @@ import (
 
 	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
+	"github.com/dailytravel/x/cms/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -126,11 +128,6 @@ func (r *commentResolver) UpdatedBy(ctx context.Context, obj *model.Comment) (*m
 	}, nil
 }
 
-// Attachments is the resolver for the attachments field.
-func (r *commentResolver) Attachments(ctx context.Context, obj *model.Comment) ([]*model.File, error) {
-	panic(fmt.Errorf("not implemented: Attachments - attachments"))
-}
-
 // Reactions is the resolver for the reactions field.
 func (r *commentResolver) Reactions(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error) {
 	panic(fmt.Errorf("not implemented: Reactions - reactions"))
@@ -157,13 +154,55 @@ func (r *mutationResolver) DeleteComments(ctx context.Context, ids []string) (ma
 }
 
 // Comments is the resolver for the comments field.
-func (r *queryResolver) Comments(ctx context.Context, args map[string]interface{}) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
+func (r *queryResolver) Comments(ctx context.Context, args map[string]interface{}) (*model.Comments, error) {
+	var items []*model.Comment
+	//find all items
+	cur, err := r.db.Collection("comments").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Comment
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("comments").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Comments{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Comment is the resolver for the comment field.
 func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comment - comment"))
+	var item *model.Comment
+	col := r.db.Collection(item.Collection())
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	err = col.FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Comment returns CommentResolver implementation.
