@@ -13,12 +13,63 @@ type Deal {
   description: String!
   order: Int
   owner: User
-  company: Organization
   contact: Contact!
   metadata: Map
   status: String! #open, won, lost, abandoned, negotiation
   created_at: String!
   updated_at: String!
-  created_by: User
-  updated_by: User
+}
+
+type Deals {
+  data: [Deal]
+  count: Int
+}
+
+input NewDeal {
+  type: String!
+  name: String!
+  amount: Float!
+  currency: String!
+  close_date: String!
+  pipeline_id: ID!
+  stage: String! #Qualified, Follow-up, Presentation, Contract Sent, Negotiation, Closed Won, Closed Lost
+  priority: String!
+  source: String! #advertising, call, email, other
+  lose_reason: String #competitor, features, price, other
+  description: String!
+  order: Int
+  owner_id: ID
+  contact_id: ID!
+  metadata: Map
+  status: String! #open, won, lost, abandoned, negotiation
+}
+
+input UpdateDeal {
+  type: String
+  name: String
+  amount: Float
+  currency: String
+  close_date: String
+  pipeline_id: ID
+  stage: String #Qualified, Follow-up, Presentation, Contract Sent, Negotiation, Closed Won, Closed Lost
+  priority: String
+  source: String #advertising, call, email, other
+  lose_reason: String #competitor, features, price, other
+  description: String
+  order: Int
+  owner_id: ID
+  contact_id: ID
+  metadata: Map
+  status: String #open, won, lost, abandoned, negotiation
+}
+
+extend type Query {
+  deal(id: ID!): Deal
+  deals(args: Map): Deals
+}
+
+extend type Mutation {
+  createDeal(input: NewDeal!): Deal
+  updateDeal(id: ID!, input: UpdateDeal!): Deal
+  deleteDeal(id: ID!): Deal
 }

@@ -13,17 +13,6 @@ type Activities struct {
 	Count int         `json:"count"`
 }
 
-type Activity struct {
-	ID          string                 `json:"id"`
-	User        *User                  `json:"user"`
-	Activitable map[string]interface{} `json:"activitable"`
-	Comment     *Comment               `json:"comment,omitempty"`
-	Action      string                 `json:"action"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      string                 `json:"status"`
-	CreatedAt   string                 `json:"created_at"`
-}
-
 type Campaign struct {
 	ID string `json:"id"`
 }
@@ -65,12 +54,6 @@ type UpdateResponse struct {
 	Campaign  *string                `json:"campaign,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
-
-type User struct {
-	ID string `json:"id"`
-}
-
-func (User) IsEntity() {}
 
 type ActivityAction string
 

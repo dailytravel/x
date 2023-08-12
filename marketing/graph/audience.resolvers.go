@@ -11,6 +11,31 @@ import (
 	"github.com/dailytravel/x/marketing/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *audienceResolver) ID(ctx context.Context, obj *model.Audience) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Segments is the resolver for the segments field.
+func (r *audienceResolver) Segments(ctx context.Context, obj *model.Audience) ([]*model.Segment, error) {
+	panic(fmt.Errorf("not implemented: Segments - segments"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *audienceResolver) Metadata(ctx context.Context, obj *model.Audience) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *audienceResolver) CreatedAt(ctx context.Context, obj *model.Audience) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *audienceResolver) UpdatedAt(ctx context.Context, obj *model.Audience) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
 // CreateAudience is the resolver for the createAudience field.
 func (r *mutationResolver) CreateAudience(ctx context.Context, input model.NewAudience) (*model.Audience, error) {
 	panic(fmt.Errorf("not implemented: CreateAudience - createAudience"))
@@ -40,3 +65,8 @@ func (r *queryResolver) Audience(ctx context.Context, id string) (*model.Audienc
 func (r *queryResolver) Audiences(ctx context.Context, args map[string]interface{}) ([]*model.Audience, error) {
 	panic(fmt.Errorf("not implemented: Audiences - audiences"))
 }
+
+// Audience returns AudienceResolver implementation.
+func (r *Resolver) Audience() AudienceResolver { return &audienceResolver{r} }
+
+type audienceResolver struct{ *Resolver }

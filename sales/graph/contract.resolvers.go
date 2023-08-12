@@ -11,6 +11,56 @@ import (
 	"github.com/dailytravel/x/sales/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *contractResolver) ID(ctx context.Context, obj *model.Contract) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Owner is the resolver for the owner field.
+func (r *contractResolver) Owner(ctx context.Context, obj *model.Contract) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}
+
+// Contact is the resolver for the contact field.
+func (r *contractResolver) Contact(ctx context.Context, obj *model.Contract) (*model.Contact, error) {
+	panic(fmt.Errorf("not implemented: Contact - contact"))
+}
+
+// StartDate is the resolver for the start_date field.
+func (r *contractResolver) StartDate(ctx context.Context, obj *model.Contract) (string, error) {
+	panic(fmt.Errorf("not implemented: StartDate - start_date"))
+}
+
+// EndDate is the resolver for the end_date field.
+func (r *contractResolver) EndDate(ctx context.Context, obj *model.Contract) (string, error) {
+	panic(fmt.Errorf("not implemented: EndDate - end_date"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *contractResolver) Metadata(ctx context.Context, obj *model.Contract) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *contractResolver) CreatedAt(ctx context.Context, obj *model.Contract) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *contractResolver) UpdatedAt(ctx context.Context, obj *model.Contract) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// Comments is the resolver for the comments field.
+func (r *contractResolver) Comments(ctx context.Context, obj *model.Contract) ([]*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: Comments - comments"))
+}
+
+// Followers is the resolver for the followers field.
+func (r *contractResolver) Followers(ctx context.Context, obj *model.Contract) ([]*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: Followers - followers"))
+}
+
 // CreateContract is the resolver for the createContract field.
 func (r *mutationResolver) CreateContract(ctx context.Context, input model.NewContract) (*model.Contract, error) {
 	panic(fmt.Errorf("not implemented: CreateContract - createContract"))
@@ -40,3 +90,8 @@ func (r *queryResolver) Contract(ctx context.Context, id string) (*model.Contrac
 func (r *queryResolver) Contracts(ctx context.Context, args map[string]interface{}) (*model.Contracts, error) {
 	panic(fmt.Errorf("not implemented: Contracts - contracts"))
 }
+
+// Contract returns ContractResolver implementation.
+func (r *Resolver) Contract() ContractResolver { return &contractResolver{r} }
+
+type contractResolver struct{ *Resolver }

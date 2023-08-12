@@ -12,6 +12,7 @@ import (
 
 	"github.com/dailytravel/x/cms/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -26,8 +27,27 @@ func (r *mutationResolver) UpdateReaction(ctx context.Context, id string, input 
 }
 
 // Reaction is the resolver for the reaction field.
-func (r *queryResolver) Reaction(ctx context.Context, reactable string, typeArg string) (*model.Reaction, error) {
-	panic(fmt.Errorf("not implemented: Reaction - reaction"))
+func (r *queryResolver) Reaction(ctx context.Context, reactable map[string]interface{}) (*model.Reaction, error) {
+	var item *model.Reaction
+	col := r.db.Collection(item.Collection())
+
+	//convert reactable to primitive.ObjectID and set it to reactable.ID
+	reactableID, err := primitive.ObjectIDFromHex(reactable["id"].(string))
+
+	filter := bson.M{"reactable": bson.M{
+		"_id":  reactableID,
+		"type": reactable["type"].(string),
+	}}
+
+	err = col.FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Reactions is the resolver for the reactions field.
@@ -41,7 +61,7 @@ func (r *reactionResolver) ID(ctx context.Context, obj *model.Reaction) (string,
 }
 
 // User is the resolver for the user field.
-func (r *reactionResolver) User(ctx context.Context, obj *model.Reaction) (*model.User, error) {
+func (r *reactionResolver) User(ctx context.Context, obj *model.Reaction) (string, error) {
 	panic(fmt.Errorf("not implemented: User - user"))
 }
 

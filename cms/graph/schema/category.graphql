@@ -12,8 +12,6 @@ type Category @key(fields: "id") {
   metadata: Map
   created_at: String!
   updated_at: String!
-  created_by: User
-  updated_by: User
 }
 
 type Categories {

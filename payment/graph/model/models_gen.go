@@ -52,13 +52,6 @@ type UpdatePayment struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type User struct {
-	ID   string  `json:"id"`
-	Name *string `json:"name,omitempty"`
-}
-
-func (User) IsEntity() {}
-
 type PaymentStatus string
 
 const (

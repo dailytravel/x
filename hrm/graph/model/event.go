@@ -24,7 +24,6 @@ type Event struct {
 	Color       string               `json:"color,omitempty" bson:"color,omitempty"`
 	ShowAs      string               `json:"show_as,omitempty" bson:"show_as,omitempty"`
 	Status      string               `json:"status,omitempty" bson:"status,omitempty"`
-	Attachments []primitive.ObjectID `json:"attachments,omitempty" bson:"attachments,omitempty"`
 	Reminders   []Reminder           `json:"reminders,omitempty" bson:"reminders,omitempty"`
 	Attendees   []primitive.ObjectID `json:"attendees,omitempty" bson:"attendees,omitempty"`
 	Recurrence  Recurrence           `json:"recurrence,omitempty" bson:"recurrence,omitempty"`

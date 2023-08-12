@@ -1,7 +1,6 @@
 type Contract {
   id: ID!
   owner: User!
-  organization: Organization
   contact: Contact!
   reference: String!
   description: String!
@@ -33,7 +32,6 @@ enum ContractStatus {
 
 input NewContract {
   owner: ID!
-  organization: ID
   contact: ID!
   reference: String!
   description: String!
@@ -48,7 +46,6 @@ input NewContract {
 
 input UpdateContract {
   owner: ID
-  organization: ID
   contact: ID
   reference: String
   description: String

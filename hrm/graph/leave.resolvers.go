@@ -7,13 +7,14 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/hrm/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *leaveResolver) ID(ctx context.Context, obj *model.Leave) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Owner is the resolver for the owner field.
@@ -33,27 +34,17 @@ func (r *leaveResolver) EndDate(ctx context.Context, obj *model.Leave) (*string,
 
 // Metadata is the resolver for the metadata field.
 func (r *leaveResolver) Metadata(ctx context.Context, obj *model.Leave) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *leaveResolver) CreatedAt(ctx context.Context, obj *model.Leave) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *leaveResolver) UpdatedAt(ctx context.Context, obj *model.Leave) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *leaveResolver) CreatedBy(ctx context.Context, obj *model.Leave) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *leaveResolver) UpdatedBy(ctx context.Context, obj *model.Leave) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateLeave is the resolver for the createLeave field.

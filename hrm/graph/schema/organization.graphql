@@ -1,3 +1,48 @@
-extend type Organization @key(fields: "id") {
-  id: ID! @external
+type Organization @key(fields: "id") {
+  id: ID!
+  manager: User
+  parent: Organization
+  name: String
+  description: String
+  type: String
+  status: String
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+}
+
+type Organizations {
+  data: [Organization]
+  count: Int
+}
+
+input NewOrganization {
+  manager: ID
+  parent: ID
+  name: String!
+  description: String
+  type: String
+  status: String
+  metadata: Map
+}
+
+input UpdateOrganization {
+  manager: ID
+  parent: ID
+  name: String
+  description: String
+  type: String
+  status: String
+  metadata: Map
+}
+
+extend type Query {
+  organizations(arg: Map): Organizations
+  organization(id: ID!): Organization
+}
+
+extend type Mutation {
+  createOrganization(input: NewOrganization!): Organization
+  updateOrganization(id: ID!, input: UpdateOrganization!): Organization
+  deleteOrganization(id: ID!): Organization
 }

@@ -1,0 +1,67 @@
+type Employee {
+  id: ID!
+  reference: String!
+  first_name: String!
+  last_name: String!
+  email: String!
+  phone: String!
+  address: String!
+  birthday: String
+  status: String
+  metadata: Map
+  hire_date: String
+  created_at: String!
+  updated_at: String!
+  user: User
+  organization: Organization!
+  position: Position
+  reviews: [Comment]
+}
+
+type Employees {
+  data: [Employee]
+  count: Int!
+}
+
+input NewEmployee {
+  reference: String!
+  first_name: String!
+  last_name: String!
+  email: String!
+  phone: String!
+  address: String!
+  birthday: String
+  status: String
+  metadata: Map
+  hire_date: String
+  user_id: ID
+  organization_id: ID!
+  position_id: ID
+}
+
+input UpdateEmployee {
+  reference: String
+  first_name: String
+  last_name: String
+  email: String
+  phone: String
+  address: String
+  birthday: String
+  status: String
+  metadata: Map
+  hire_date: String
+  user_id: ID
+  organization_id: ID
+  position_id: ID
+}
+
+extend type Query {
+  employee(id: ID!): Employee
+  employees(args: Map): Employees
+}
+
+extend type Mutation {
+  createEmployee(input: NewEmployee!): Employee
+  updateEmployee(id: ID!, input: UpdateEmployee!): Employee
+  deleteEmployee(id: ID!): Boolean
+}

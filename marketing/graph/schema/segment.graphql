@@ -2,7 +2,7 @@ type Segment {
   id: ID!
   name: String!
   description: String
-  rules: [Rule]
+  criteria: [SegmentCriteria!]!
   created_at: String!
   updated_at: String!
   created_by: User
@@ -14,10 +14,19 @@ type Segments {
   data: [Segment]
 }
 
-type Rule {
+type SegmentCriteria {
   field: String!
-  operator: String!
+  operator: SegmentOperator!
   value: String!
+}
+
+enum SegmentOperator {
+  EQUALS
+  NOT_EQUALS
+  CONTAINS
+  NOT_CONTAINS
+  GREATER_THAN
+  LESS_THAN
 }
 
 input SegmentInput {

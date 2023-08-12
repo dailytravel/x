@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/dailytravel/x/hrm/graph"
+	"github.com/dailytravel/x/notification/graph"
 )
 
 var (

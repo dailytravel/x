@@ -1,7 +1,6 @@
 type Contact @key(fields: "id") {
   id: ID!
   owner: User
-  reference: String
   type: String
   first_name: String
   last_name: String
@@ -16,7 +15,7 @@ type Contact @key(fields: "id") {
   website: String
   gender: Gender
   birthday: String
-  organization: Organization
+  company: Company
   job_title: String
   timezone: String
   language: String
@@ -101,9 +100,8 @@ enum ContactStatus {
 }
 
 input NewContact {
-  organization: ID
+  company: ID
   owner: ID
-  reference: String
   type: String
   first_name: String
   last_name: String
@@ -133,7 +131,7 @@ input NewContact {
 }
 
 input UpdateContact {
-  organization: ID
+  company: ID
   owner: ID
   reference: String
   type: String

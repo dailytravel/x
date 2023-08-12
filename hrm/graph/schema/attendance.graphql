@@ -7,8 +7,6 @@ type Attendance {
   status: String # "present", "absent", "late", etc.
   created_at: String!
   updated_at: String!
-  created_by: User
-  updated_by: User
   owner: User!
 }
 

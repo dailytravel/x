@@ -34,12 +34,20 @@ func (r *fileResolver) UpdatedAt(ctx context.Context, obj *model.File) (string, 
 
 // CreatedBy is the resolver for the created_by field.
 func (r *fileResolver) CreatedBy(ctx context.Context, obj *model.File) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	return &model.User{
+		Model: model.Model{
+			ID: obj.CreatedBy,
+		},
+	}, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *fileResolver) UpdatedBy(ctx context.Context, obj *model.File) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	return &model.User{
+		Model: model.Model{
+			ID: obj.UpdatedBy,
+		},
+	}, nil
 }
 
 // Owner is the resolver for the owner field.

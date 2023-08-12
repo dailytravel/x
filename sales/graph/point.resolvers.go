@@ -31,6 +31,36 @@ func (r *mutationResolver) DeletePoints(ctx context.Context, ids []string) (map[
 	panic(fmt.Errorf("not implemented: DeletePoints - deletePoints"))
 }
 
+// ID is the resolver for the id field.
+func (r *pointResolver) ID(ctx context.Context, obj *model.Point) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// User is the resolver for the user field.
+func (r *pointResolver) User(ctx context.Context, obj *model.Point) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
+// Target is the resolver for the target field.
+func (r *pointResolver) Target(ctx context.Context, obj *model.Point) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Target - target"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *pointResolver) Metadata(ctx context.Context, obj *model.Point) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *pointResolver) CreatedAt(ctx context.Context, obj *model.Point) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *pointResolver) UpdatedAt(ctx context.Context, obj *model.Point) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
 // Points is the resolver for the points field.
 func (r *queryResolver) Points(ctx context.Context, args map[string]interface{}) (*model.Points, error) {
 	panic(fmt.Errorf("not implemented: Points - points"))
@@ -40,3 +70,8 @@ func (r *queryResolver) Points(ctx context.Context, args map[string]interface{})
 func (r *queryResolver) Point(ctx context.Context, id string) (*model.Point, error) {
 	panic(fmt.Errorf("not implemented: Point - point"))
 }
+
+// Point returns PointResolver implementation.
+func (r *Resolver) Point() PointResolver { return &pointResolver{r} }
+
+type pointResolver struct{ *Resolver }

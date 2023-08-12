@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/reporting/graph/model"
 )
@@ -43,7 +44,7 @@ func (r *queryResolver) Response(ctx context.Context, id string) (*model.Respons
 
 // ID is the resolver for the id field.
 func (r *responseResolver) ID(ctx context.Context, obj *model.Response) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Campaign is the resolver for the campaign field.
@@ -53,17 +54,17 @@ func (r *responseResolver) Campaign(ctx context.Context, obj *model.Response) (*
 
 // Metadata is the resolver for the metadata field.
 func (r *responseResolver) Metadata(ctx context.Context, obj *model.Response) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *responseResolver) CreatedAt(ctx context.Context, obj *model.Response) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *responseResolver) UpdatedAt(ctx context.Context, obj *model.Response) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Response returns ResponseResolver implementation.

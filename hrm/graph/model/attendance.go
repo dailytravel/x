@@ -10,12 +10,12 @@ import (
 )
 
 type Attendance struct {
-	Model   `bson:",inline"`
-	Owner   primitive.ObjectID   `bson:"owner" json:"owner"`
-	TimeIn  primitive.Timestamp  `json:"time_in" bson:"time_in"`
-	TimeOut *primitive.Timestamp `json:"time_out" bson:"time_out"`
-	Notes   string               `json:"notes,omitempty" bson:"notes,omitempty"`
-	Status  string               `json:"status" bson:"status"`
+	Model    `bson:",inline"`
+	Employee primitive.ObjectID   `json:"employee" bson:"employee"`
+	TimeIn   primitive.Timestamp  `json:"time_in" bson:"time_in"`
+	TimeOut  *primitive.Timestamp `json:"time_out" bson:"time_out"`
+	Notes    string               `json:"notes,omitempty" bson:"notes,omitempty"`
+	Status   string               `json:"status" bson:"status"`
 }
 
 func (i *Attendance) MarshalBSON() ([]byte, error) {
@@ -37,7 +37,7 @@ func (i *Attendance) Collection() string {
 
 func (i *Attendance) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "employee", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "date", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "time_in", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "time_out", Value: 1}}, Options: options.Index()},

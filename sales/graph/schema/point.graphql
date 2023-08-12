@@ -1,4 +1,4 @@
-type Point @key(fields: "id") {
+type Point {
   id: ID!
   user: User!
   target: Map! #program, reward
@@ -8,8 +8,6 @@ type Point @key(fields: "id") {
   expires_at: String!
   created_at: String!
   updated_at: String!
-  created_by: User!
-  updated_by: User!
 }
 
 enum PointType {

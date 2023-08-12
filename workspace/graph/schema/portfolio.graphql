@@ -1,0 +1,16 @@
+type Portfolio {
+  id: ID!
+  name: String!
+  color: String!
+  description: String
+  boards: [Board!]!
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+}
+
+extend type Query {
+  portfolio(id: ID!): Portfolio
+  portfolios: [Portfolio!]!
+}

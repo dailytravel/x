@@ -6,11 +6,17 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
+	"github.com/dailytravel/x/cms/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ID is the resolver for the id field.
@@ -20,12 +26,38 @@ func (r *categoryResolver) ID(ctx context.Context, obj *model.Category) (string,
 
 // Parent is the resolver for the parent field.
 func (r *categoryResolver) Parent(ctx context.Context, obj *model.Category) (*model.Category, error) {
-	panic(fmt.Errorf("not implemented: Parent - parent"))
+	var item *model.Category
+
+	filter := bson.M{"parent": obj.Parent}
+	options := options.FindOne().SetProjection(bson.M{"_id": 1, "name": 1, "description": 1})
+
+	err := r.db.Collection(item.Collection()).FindOne(ctx, filter, options).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Children is the resolver for the children field.
 func (r *categoryResolver) Children(ctx context.Context, obj *model.Category) ([]*model.Category, error) {
-	panic(fmt.Errorf("not implemented: Children - children"))
+	var items []*model.Category
+	filter := bson.M{"parent": obj.ID}
+	options := options.Find().SetProjection(bson.M{"_id": 1, "name": 1, "description": 1})
+
+	cursor, err := r.db.Collection(obj.Collection()).Find(ctx, filter, options)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
 
 // Name is the resolver for the name field.
@@ -67,19 +99,36 @@ func (r *categoryResolver) UpdatedAt(ctx context.Context, obj *model.Category) (
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *categoryResolver) CreatedBy(ctx context.Context, obj *model.Category) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *categoryResolver) UpdatedBy(ctx context.Context, obj *model.Category) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
-}
-
 // CreateCategory is the resolver for the createCategory field.
 func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCategory) (*model.Category, error) {
-	panic(fmt.Errorf("not implemented: CreateCategory - createCategory"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Category{
+		Locale: input.Locale,
+		Name:   map[string]interface{}{input.Locale: input.Name},
+		Slug:   input.Slug,
+		Model: model.Model{
+			Metadata:  input.Metadata,
+			CreatedBy: *uid,
+			UpdatedBy: *uid,
+		},
+	}
+
+	if input.Description != nil {
+		item.Description = map[string]interface{}{input.Locale: input.Description}
+	}
+
+	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	item.ID = res.InsertedID.(primitive.ObjectID)
+
+	return item, nil
 }
 
 // UpdateCategory is the resolver for the updateCategory field.
@@ -89,17 +138,70 @@ func (r *mutationResolver) UpdateCategory(ctx context.Context, id string, input 
 
 // DeleteCategory is the resolver for the deleteCategory field.
 func (r *mutationResolver) DeleteCategory(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteCategory - deleteCategory"))
+	var item *model.Category
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": _id}
+
+	if err := r.db.Collection("categories").FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return map[string]interface{}{"id": id}, nil
 }
 
 // DeleteCategories is the resolver for the deleteCategories field.
 func (r *mutationResolver) DeleteCategories(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteCategories - deleteCategories"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_ids := make([]primitive.ObjectID, len(ids))
+	for i, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		_ids[i] = _id
+	}
+
+	filter := bson.M{"_id": bson.M{"$in": _ids}}
+	res, err := r.db.Collection("categories").UpdateMany(ctx, filter, bson.M{"$set": bson.M{"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())}, "deleted_by": uid}})
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"success": true,
+		"message": fmt.Sprintf("%d contacts deleted", res.ModifiedCount),
+	}, nil
 }
 
 // Category is the resolver for the category field.
 func (r *queryResolver) Category(ctx context.Context, id string) (*model.Category, error) {
-	panic(fmt.Errorf("not implemented: Category - category"))
+	var item *model.Category
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": _id}
+
+	if err := r.db.Collection("categories").FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Categories is the resolver for the categories field.
@@ -111,3 +213,20 @@ func (r *queryResolver) Categories(ctx context.Context, args map[string]interfac
 func (r *Resolver) Category() CategoryResolver { return &categoryResolver{r} }
 
 type categoryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *categoryResolver) CreatedBy(ctx context.Context, obj *model.Category) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+func (r *categoryResolver) UpdatedBy(ctx context.Context, obj *model.Category) (*model.User, error) {
+	return &model.User{
+		Model: model.Model{
+			ID: obj.UpdatedBy,
+		},
+	}, nil
+}

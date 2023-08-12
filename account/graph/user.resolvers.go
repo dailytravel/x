@@ -9,7 +9,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
+	"github.com/dailytravel/x/account/utils"
+	"github.com/go-redis/redis"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // CreateUser is the resolver for the createUser field.
@@ -34,17 +41,86 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.Socia
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": _id}
+
+	item := &model.User{
+		Model: model.Model{
+			UpdatedBy: *uid,
+		},
+	}
+
+	// item.SetLocale(input.Locale)
+	// item.SetName(input.Name)
+	// item.SetName(input.Name)
+	// item.SetEmail(input.Email)
+	// item.SetTimezone(input.Timezone)
+	// item.SetPhone(input.Phone)
+	// item.SetMetadata(input.Metadata)
+	// item.SetStatus(input.Status)
+	// item.SetRoles(input.Roles)
+
+	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, bson.M{"$set": item}).Decode(item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateAccount is the resolver for the updateAccount field.
 func (r *mutationResolver) UpdateAccount(ctx context.Context, input model.UpdateUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateAccount - updateAccount"))
+	var item *model.User
+
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// item.SetLocale(input.Locale)
+	// item.SetName(input.Name)
+	// item.SetName(input.Name)
+	// item.SetEmail(input.Email)
+	// item.SetTimezone(input.Timezone)
+	// item.SetPhone(input.Phone)
+	// item.SetMetadata(input.Metadata)
+	// item.SetStatus(input.Status)
+
+	filter := bson.M{"_id": uid}
+	update := bson.M{"$set": bson.M{"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())}, "deleted_by": uid}}
+
+	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, update).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteUser is the resolver for the deleteUser field.
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
+	var item *model.User
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the appointment by _id and delete it
+	if err := r.db.Collection(model.UserCollection).FindOneAndUpdate(ctx, bson.M{"_id": bson.M{"$eq": _id, "$ne": uid}, "roles": bson.M{"$nin": []string{"admin"}}}, bson.M{"$set": bson.M{"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())}, "deleted_by": uid}}, nil).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success"}, nil
 }
 
 // DeleteUsers is the resolver for the deleteUsers field.
@@ -54,27 +130,160 @@ func (r *mutationResolver) DeleteUsers(ctx context.Context, ids []string) (map[s
 
 // DeleteAccount is the resolver for the deleteAccount field.
 func (r *mutationResolver) DeleteAccount(ctx context.Context) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteAccount - deleteAccount"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	update := bson.M{"$set": bson.M{"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())}, "deleted_by": uid}}
+
+	// Find the appointment by _id and delete it
+	result, err := r.db.Collection(model.UserCollection).UpdateByID(ctx, uid, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // RestoreUser is the resolver for the restoreUser field.
 func (r *mutationResolver) RestoreUser(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: RestoreUser - restoreUser"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+		"$unset": bson.M{
+			"deleted_at": "",
+			"deleted_by": "",
+		},
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := r.db.Collection(model.UserCollection).UpdateByID(ctx, _id, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"status":        "success",
+		"modifiedCount": result.ModifiedCount,
+	}, nil
 }
 
 // ForgotPassword is the resolver for the forgotPassword field.
 func (r *mutationResolver) ForgotPassword(ctx context.Context, email string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: ForgotPassword - forgotPassword"))
+	// Find user by email
+	var user model.User
+	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, fmt.Errorf("failed to retrieve user: %s", err.Error())
+	}
+
+	// Generate a unique code for the user
+	code, err := utils.Base64(32, false)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate code: %s", err.Error())
+	}
+
+	// Store the code in Redis for 24 hours
+	err = r.redis.Set(ctx, code, user.ID.Hex(), time.Hour*24).Err()
+	if err != nil {
+		return nil, fmt.Errorf("failed to store code: %s", err.Error())
+	}
+
+	return map[string]interface{}{
+		"code": code,
+	}, nil
 }
 
 // ResetPassword is the resolver for the resetPassword field.
 func (r *mutationResolver) ResetPassword(ctx context.Context, token string, password string, passwordConfirmation string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: ResetPassword - resetPassword"))
+	// Retrieve email from Redis
+	email, err := r.redis.Get(ctx, token).Result()
+	if err == redis.Nil {
+		return nil, fmt.Errorf("invalid token")
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to retrieve token from Redis: %s", err.Error())
+	}
+
+	// Hash password
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash password: %s", err.Error())
+	}
+
+	// Update user password
+	result, err := r.db.Collection(model.UserCollection).UpdateOne(
+		ctx,
+		bson.M{"email": email},
+		bson.M{"$set": bson.M{"password": hash}},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update user password: %s", err.Error())
+	} else if result.ModifiedCount == 0 {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	// Delete token from Redis
+	deleted, err := r.redis.Del(ctx, token).Result()
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete token from Redis: %s", err.Error())
+	} else if deleted == 0 {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	return map[string]interface{}{
+		"code": nil,
+	}, nil
 }
 
 // UpdatePassword is the resolver for the updatePassword field.
 func (r *mutationResolver) UpdatePassword(ctx context.Context, input model.PasswordInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatePassword - updatePassword"))
+	var item *model.User
+
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	if input.Password != input.PasswordConfirmation {
+		return nil, fmt.Errorf("passwords do not match")
+	}
+
+	//find user by id
+	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": uid}, nil).Decode(&item); err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	//check password
+	if err := bcrypt.CompareHashAndPassword([]byte(item.Password), []byte(input.CurrentPassword)); err != nil {
+		return nil, fmt.Errorf("password is incorrect")
+	}
+
+	//hash password
+	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), 10)
+	if err != nil {
+		return nil, fmt.Errorf("password is incorrect")
+	}
+
+	//update password
+	if _, err := r.db.Collection(model.UserCollection).UpdateOne(ctx, bson.M{"_id": uid}, bson.M{"$set": bson.M{"password": string(hash)}}); err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	return item, nil
 }
 
 // Verify is the resolver for the verify field.
@@ -110,6 +319,11 @@ func (r *userResolver) CreatedAt(ctx context.Context, obj *model.User) (string, 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *userResolver) UpdatedAt(ctx context.Context, obj *model.User) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+}
+
+// Comments is the resolver for the comments field.
+func (r *userResolver) Comments(ctx context.Context, obj *model.User) ([]*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: Comments - comments"))
 }
 
 // User returns UserResolver implementation.

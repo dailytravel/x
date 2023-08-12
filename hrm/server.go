@@ -17,7 +17,6 @@ import (
 	"github.com/dailytravel/x/hrm/db"
 	"github.com/dailytravel/x/hrm/db/migrations"
 	"github.com/dailytravel/x/hrm/graph"
-	"github.com/dailytravel/x/hrm/pkg/mongo"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -72,7 +71,7 @@ func graphqlHandler() gin.HandlerFunc {
 
 func main() {
 	// connect MongoDB
-	client, err := mongo.ConnectDB()
+	client, err := db.ConnectDB()
 	if err != nil {
 		log.Fatal("Error connecting to MongoDB: ", err)
 	}

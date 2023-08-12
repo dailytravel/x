@@ -11,7 +11,7 @@ import (
 
 type Leave struct {
 	Model     `bson:",inline"`
-	Owner     primitive.ObjectID `json:"owner" bson:"owner"`
+	Employee  primitive.ObjectID `json:"employee" bson:"employee"`
 	Type      string             `json:"type" bson:"type"`
 	StartDate primitive.DateTime `json:"start_date" bson:"start_date"`
 	EndDate   primitive.DateTime `json:"end_date" bson:"end_date"`
@@ -38,7 +38,7 @@ func (i *Leave) Collection() string {
 
 func (i *Leave) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "employee", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "start_date", Value: 1}}, Options: options.Index()},

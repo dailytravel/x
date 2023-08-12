@@ -37,12 +37,6 @@ type UpdateWebhook struct {
 	Events  []*WebhookEventInput  `json:"events,omitempty"`
 }
 
-type User struct {
-	ID string `json:"id"`
-}
-
-func (User) IsEntity() {}
-
 type WebhookEvent struct {
 	ObjectID   string                `json:"object_id"`
 	ObjectType string                `json:"object_type"`

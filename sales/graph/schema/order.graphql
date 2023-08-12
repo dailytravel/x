@@ -9,8 +9,6 @@ type Order {
   cancelled_at: Int
   created_at: String!
   updated_at: String!
-  created_by: User
-  updated_by: User
 }
 
 type Orders {

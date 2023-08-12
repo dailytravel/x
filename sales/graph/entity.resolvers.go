@@ -6,32 +6,82 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/sales/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+// FindCompanyByID is the resolver for the findCompanyByID field.
+func (r *entityResolver) FindCompanyByID(ctx context.Context, id string) (*model.Company, error) {
+	var item *model.Company
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}
 
 // FindContactByID is the resolver for the findContactByID field.
 func (r *entityResolver) FindContactByID(ctx context.Context, id string) (*model.Contact, error) {
-	panic(fmt.Errorf("not implemented: FindContactByID - findContactByID"))
+	var item *model.Contact
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindMembershipByID is the resolver for the findMembershipByID field.
 func (r *entityResolver) FindMembershipByID(ctx context.Context, id string) (*model.Membership, error) {
-	panic(fmt.Errorf("not implemented: FindMembershipByID - findMembershipByID"))
-}
+	var item *model.Membership
 
-// FindOrganizationByID is the resolver for the findOrganizationByID field.
-func (r *entityResolver) FindOrganizationByID(ctx context.Context, id string) (*model.Organization, error) {
-	panic(fmt.Errorf("not implemented: FindOrganizationByID - findOrganizationByID"))
-}
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
 
-// FindPointByID is the resolver for the findPointByID field.
-func (r *entityResolver) FindPointByID(ctx context.Context, id string) (*model.Point, error) {
-	panic(fmt.Errorf("not implemented: FindPointByID - findPointByID"))
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Entity returns EntityResolver implementation.
 func (r *Resolver) Entity() EntityResolver { return &entityResolver{r} }
 
 type entityResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *entityResolver) FindPointByID(ctx context.Context, id string) (*model.Point, error) {
+	var item *model.Point
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}

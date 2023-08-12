@@ -8,38 +8,10 @@ import (
 	"strconv"
 )
 
-type Audience struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Segments    []*Segment             `json:"segments,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      string                 `json:"status"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-}
-
 type Audiences struct {
 	Data  []*Audience `json:"data,omitempty"`
 	Count int         `json:"count"`
 }
-
-type Campaign struct {
-	ID        string                 `json:"id"`
-	Owner     *User                  `json:"owner"`
-	Audience  *Audience              `json:"audience"`
-	Type      string                 `json:"type"`
-	Name      string                 `json:"name"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    string                 `json:"status"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	CreatedBy *User                  `json:"created_by,omitempty"`
-	UpdatedBy *User                  `json:"updated_by,omitempty"`
-	Responses []*Response            `json:"responses,omitempty"`
-}
-
-func (Campaign) IsEntity() {}
 
 type Campaigns struct {
 	Count int         `json:"count"`
@@ -51,6 +23,12 @@ type Category struct {
 }
 
 func (Category) IsEntity() {}
+
+type Comment struct {
+	ID string `json:"id"`
+}
+
+func (Comment) IsEntity() {}
 
 type CreateSegmentInput struct {
 	Name        string       `json:"name"`
@@ -66,7 +44,6 @@ func (Follow) IsEntity() {}
 
 type Link struct {
 	ID          string                 `json:"id"`
-	Owner       *User                  `json:"owner"`
 	Domain      string                 `json:"domain"`
 	Reference   string                 `json:"reference"`
 	Title       *string                `json:"title,omitempty"`
@@ -114,12 +91,6 @@ type Response struct {
 
 func (Response) IsEntity() {}
 
-type Rule struct {
-	Field    string `json:"field"`
-	Operator string `json:"operator"`
-	Value    string `json:"value"`
-}
-
 type RuleInput struct {
 	Field    string `json:"field"`
 	Operator string `json:"operator"`
@@ -143,14 +114,20 @@ type Schedule struct {
 }
 
 type Segment struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	Rules       []*Rule `json:"rules,omitempty"`
-	CreatedAt   string  `json:"created_at"`
-	UpdatedAt   string  `json:"updated_at"`
-	CreatedBy   *User   `json:"created_by,omitempty"`
-	UpdatedBy   *User   `json:"updated_by,omitempty"`
+	ID          string             `json:"id"`
+	Name        string             `json:"name"`
+	Description *string            `json:"description,omitempty"`
+	Criteria    []*SegmentCriteria `json:"criteria"`
+	CreatedAt   string             `json:"created_at"`
+	UpdatedAt   string             `json:"updated_at"`
+	CreatedBy   *User              `json:"created_by,omitempty"`
+	UpdatedBy   *User              `json:"updated_by,omitempty"`
+}
+
+type SegmentCriteria struct {
+	Field    string          `json:"field"`
+	Operator SegmentOperator `json:"operator"`
+	Value    string          `json:"value"`
 }
 
 type SegmentInput struct {
@@ -195,12 +172,6 @@ type UpdateSegmentInput struct {
 	Description *string      `json:"description,omitempty"`
 	Rules       []*RuleInput `json:"rules,omitempty"`
 }
-
-type User struct {
-	ID string `json:"id"`
-}
-
-func (User) IsEntity() {}
 
 type CampaignStatus string
 
@@ -287,5 +258,54 @@ func (e *CampaignType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e CampaignType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type SegmentOperator string
+
+const (
+	SegmentOperatorEquals      SegmentOperator = "EQUALS"
+	SegmentOperatorNotEquals   SegmentOperator = "NOT_EQUALS"
+	SegmentOperatorContains    SegmentOperator = "CONTAINS"
+	SegmentOperatorNotContains SegmentOperator = "NOT_CONTAINS"
+	SegmentOperatorGreaterThan SegmentOperator = "GREATER_THAN"
+	SegmentOperatorLessThan    SegmentOperator = "LESS_THAN"
+)
+
+var AllSegmentOperator = []SegmentOperator{
+	SegmentOperatorEquals,
+	SegmentOperatorNotEquals,
+	SegmentOperatorContains,
+	SegmentOperatorNotContains,
+	SegmentOperatorGreaterThan,
+	SegmentOperatorLessThan,
+}
+
+func (e SegmentOperator) IsValid() bool {
+	switch e {
+	case SegmentOperatorEquals, SegmentOperatorNotEquals, SegmentOperatorContains, SegmentOperatorNotContains, SegmentOperatorGreaterThan, SegmentOperatorLessThan:
+		return true
+	}
+	return false
+}
+
+func (e SegmentOperator) String() string {
+	return string(e)
+}
+
+func (e *SegmentOperator) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SegmentOperator(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SegmentOperator", str)
+	}
+	return nil
+}
+
+func (e SegmentOperator) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

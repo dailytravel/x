@@ -8,6 +8,4 @@ type Payroll {
   status: String!
   created_at: String!
   updated_at: String!
-  created_by: User!
-  updated_by: User!
 }

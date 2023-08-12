@@ -1,6 +1,5 @@
 type Conversation {
   id: ID!
-  owner: User!
   type: String! # DIRECT or GROUP
   name: String
   description: String

@@ -8,35 +8,210 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
+	"github.com/dailytravel/x/account/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+// ID is the resolver for the id field.
+func (r *invitationResolver) ID(ctx context.Context, obj *model.Invitation) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Sender is the resolver for the sender field.
+func (r *invitationResolver) Sender(ctx context.Context, obj *model.Invitation) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Sender - sender"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *invitationResolver) Metadata(ctx context.Context, obj *model.Invitation) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *invitationResolver) CreatedAt(ctx context.Context, obj *model.Invitation) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *invitationResolver) UpdatedAt(ctx context.Context, obj *model.Invitation) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
 
 // CreateInvitation is the resolver for the createInvitation field.
 func (r *mutationResolver) CreateInvitation(ctx context.Context, input model.NewInvitation) (*model.Invitation, error) {
-	panic(fmt.Errorf("not implemented: CreateInvitation - createInvitation"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new Invitation object using the input data
+	item := &model.Invitation{
+		Sender: *uid,
+	}
+
+	// Save the new Invitation to the database
+	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set the ID of the new Invitation from the inserted document
+	item.ID = res.InsertedID.(primitive.ObjectID)
+
+	return item, nil
 }
 
 // UpdateInvitation is the resolver for the updateInvitation field.
 func (r *mutationResolver) UpdateInvitation(ctx context.Context, id string, input model.UpdateInvitation) (*model.Invitation, error) {
-	panic(fmt.Errorf("not implemented: UpdateInvitation - updateInvitation"))
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create an update filter
+	filter := bson.M{"_id": objID}
+
+	// Create an update set with the fields to be updated
+	update := bson.M{}
+	// if input.Role != nil {
+	// 	update["role"] = input.Role
+	// }
+
+	if input.Status != nil {
+		update["status"] = input.Status
+	}
+
+	// Define options for the update operation
+	updateOptions := options.Update().SetUpsert(false)
+
+	// Perform the update operation
+	_, err = r.db.Collection("invitations").UpdateOne(ctx, filter, bson.M{"$set": update}, updateOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch the updated Invitation from the database and return it
+	updatedInvitation := &model.Invitation{}
+	err = r.db.Collection("invitations").FindOne(ctx, filter).Decode(updatedInvitation)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedInvitation, nil
 }
 
 // DeleteInvitation is the resolver for the deleteInvitation field.
 func (r *mutationResolver) DeleteInvitation(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteInvitation - deleteInvitation"))
+	var item *model.Invitation
+
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the appointment by _id and delete it
+	result, err := r.db.Collection(item.Collection()).DeleteOne(ctx, bson.M{"_id": uid})
+	if err != nil {
+		return nil, err
+	}
+
+	if result.DeletedCount == 0 {
+		return map[string]interface{}{
+			"deleted": false,
+			"error":   "document not found",
+		}, nil
+	}
+
+	return map[string]interface{}{
+		"success": true,
+	}, nil
 }
 
 // DeleteInvitations is the resolver for the deleteInvitations field.
 func (r *mutationResolver) DeleteInvitations(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteInvitations - deleteInvitations"))
+	var itemsToDelete []primitive.ObjectID
+
+	// Convert the list of IDs to ObjectIDs
+	for _, id := range ids {
+		objID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		itemsToDelete = append(itemsToDelete, objID)
+	}
+
+	// Delete the invitations with the specified IDs
+	result, err := r.db.Collection("invitations").DeleteMany(ctx, bson.M{"_id": bson.M{"$in": itemsToDelete}})
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if any documents were deleted
+	if result.DeletedCount == 0 {
+		return map[string]interface{}{
+			"deleted": false,
+			"error":   "no documents found",
+		}, nil
+	}
+
+	// Return a success response
+	return map[string]interface{}{
+		"success": true,
+	}, nil
 }
 
 // Invitations is the resolver for the invitations field.
 func (r *queryResolver) Invitations(ctx context.Context, args map[string]interface{}) (*model.Invitations, error) {
-	panic(fmt.Errorf("not implemented: Invitations - invitations"))
+	var items []*model.Invitation
+	// Perform the database query with the constructed filter
+	cursor, err := r.db.Collection("invitations").Find(ctx, utils.Query(args))
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	// Iterate through the cursor and decode results into Invitation objects
+	for cursor.Next(ctx) {
+		var invitation *model.Invitation
+		if err := cursor.Decode(&invitation); err != nil {
+			return nil, err
+		}
+		items = append(items, invitation)
+	}
+
+	//get total count
+	count, err := r.db.Collection(model.RoleCollection).CountDocuments(ctx, r.model.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Invitations{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Invitation is the resolver for the invitation field.
 func (r *queryResolver) Invitation(ctx context.Context, id string) (*model.Invitation, error) {
-	panic(fmt.Errorf("not implemented: Invitation - invitation"))
+	item := &model.Invitation{}
+	col := r.db.Collection(model.InvitationCollection)
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := col.FindOne(ctx, bson.M{"_id": _id}).Decode(item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
+
+// Invitation returns InvitationResolver implementation.
+func (r *Resolver) Invitation() InvitationResolver { return &invitationResolver{r} }
+
+type invitationResolver struct{ *Resolver }

@@ -11,7 +11,7 @@ import (
 
 type Salary struct {
 	Model     `bson:",inline"`
-	Owner     primitive.ObjectID `json:"owner" bson:"owner"`
+	Employee  primitive.ObjectID `json:"employee" bson:"employee"`
 	Amount    float64            `json:"amount" bson:"amount"`
 	Currency  string             `json:"currency" bson:"currency"`
 	StartDate primitive.DateTime `json:"start_date" bson:"start_date"`
@@ -38,7 +38,7 @@ func (i *Salary) Collection() string {
 
 func (i *Salary) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "employee", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "start_date", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "end_date", Value: 1}}, Options: options.Index()},

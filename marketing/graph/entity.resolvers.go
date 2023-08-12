@@ -6,14 +6,26 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/marketing/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // FindCampaignByID is the resolver for the findCampaignByID field.
 func (r *entityResolver) FindCampaignByID(ctx context.Context, id string) (*model.Campaign, error) {
-	panic(fmt.Errorf("not implemented: FindCampaignByID - findCampaignByID"))
+	var item *model.Campaign
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Entity returns EntityResolver implementation.

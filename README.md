@@ -67,4 +67,4 @@
     - Activity
 
 rm -rf account cms sales search hrm marketing finance reporting service automation config
-./init.sh account cms sales search hrm marketing finance reporting service automation config
+./init.sh account cms configuration sales hrm marketing finance reporting workspace payment search notification

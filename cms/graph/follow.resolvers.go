@@ -21,7 +21,7 @@ func (r *followResolver) ID(ctx context.Context, obj *model.Follow) (string, err
 }
 
 // User is the resolver for the user field.
-func (r *followResolver) User(ctx context.Context, obj *model.Follow) (*model.User, error) {
+func (r *followResolver) User(ctx context.Context, obj *model.Follow) (string, error) {
 	panic(fmt.Errorf("not implemented: User - user"))
 }
 
@@ -48,16 +48,6 @@ func (r *followResolver) CreatedAt(ctx context.Context, obj *model.Follow) (stri
 // UpdatedAt is the resolver for the updated_at field.
 func (r *followResolver) UpdatedAt(ctx context.Context, obj *model.Follow) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *followResolver) CreatedBy(ctx context.Context, obj *model.Follow) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *followResolver) UpdatedBy(ctx context.Context, obj *model.Follow) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CreateFollow is the resolver for the createFollow field.

@@ -33,7 +33,7 @@ func (r *mutationResolver) DeletePrices(ctx context.Context, ids []string) (map[
 
 // ID is the resolver for the id field.
 func (r *priceResolver) ID(ctx context.Context, obj *model.Price) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Product is the resolver for the product field.
@@ -48,7 +48,7 @@ func (r *priceResolver) StartDate(ctx context.Context, obj *model.Price) (*strin
 
 // Metadata is the resolver for the metadata field.
 func (r *priceResolver) Metadata(ctx context.Context, obj *model.Price) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Price is the resolver for the price field.

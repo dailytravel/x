@@ -1,0 +1,5 @@
+extend type Reaction @key(fields: "id") {
+  id: ID! @external
+  user: ID! @external
+  owner: User @provides(fields: "id")
+}

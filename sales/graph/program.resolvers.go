@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
 )
@@ -33,7 +34,7 @@ func (r *mutationResolver) DeletePrograms(ctx context.Context, ids []string) (*b
 
 // ID is the resolver for the id field.
 func (r *programResolver) ID(ctx context.Context, obj *model.Program) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Type is the resolver for the type field.
@@ -53,27 +54,17 @@ func (r *programResolver) Description(ctx context.Context, obj *model.Program) (
 
 // Metadata is the resolver for the metadata field.
 func (r *programResolver) Metadata(ctx context.Context, obj *model.Program) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *programResolver) CreatedAt(ctx context.Context, obj *model.Program) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *programResolver) UpdatedAt(ctx context.Context, obj *model.Program) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *programResolver) CreatedBy(ctx context.Context, obj *model.Program) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *programResolver) UpdatedBy(ctx context.Context, obj *model.Program) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Program is the resolver for the program field.

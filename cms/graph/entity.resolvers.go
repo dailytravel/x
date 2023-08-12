@@ -6,39 +6,106 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/cms/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // FindCategoryByID is the resolver for the findCategoryByID field.
 func (r *entityResolver) FindCategoryByID(ctx context.Context, id string) (*model.Category, error) {
-	panic(fmt.Errorf("not implemented: FindCategoryByID - findCategoryByID"))
+	var item *model.Category
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindCommentByID is the resolver for the findCommentByID field.
 func (r *entityResolver) FindCommentByID(ctx context.Context, id string) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: FindCommentByID - findCommentByID"))
+	var item *model.Comment
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindContentByID is the resolver for the findContentByID field.
 func (r *entityResolver) FindContentByID(ctx context.Context, id string) (*model.Content, error) {
-	panic(fmt.Errorf("not implemented: FindContentByID - findContentByID"))
+	var item *model.Content
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindFileByID is the resolver for the findFileByID field.
 func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.File, error) {
-	panic(fmt.Errorf("not implemented: FindFileByID - findFileByID"))
+	var item *model.File
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindFollowByID is the resolver for the findFollowByID field.
 func (r *entityResolver) FindFollowByID(ctx context.Context, id string) (*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: FindFollowByID - findFollowByID"))
+	var item *model.Follow
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindReactionByID is the resolver for the findReactionByID field.
 func (r *entityResolver) FindReactionByID(ctx context.Context, id string) (*model.Reaction, error) {
-	panic(fmt.Errorf("not implemented: FindReactionByID - findReactionByID"))
+	var item *model.Reaction
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Entity returns EntityResolver implementation.

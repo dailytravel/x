@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -87,9 +86,10 @@ func (m *User) Migrate() error {
 				}
 
 				rolesSlice := email["roles"].([]string)
-				roles := make([]*string, len(rolesSlice))
+				roles := make([]string, len(rolesSlice))
 				for i, role := range rolesSlice {
-					roles[i] = pointer.String(role)
+					r := role // Create a copy of the string
+					roles[i] = r
 				}
 				item.Roles = roles
 				item.Password = "abc@123"

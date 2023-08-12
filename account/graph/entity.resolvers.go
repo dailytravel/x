@@ -11,6 +11,27 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// FindCommentByID is the resolver for the findCommentByID field.
+func (r *entityResolver) FindCommentByID(ctx context.Context, id string) (*model.Comment, error) {
+	return &model.Comment{
+		ID: primitive.NewObjectID().Hex(),
+	}, nil
+}
+
+// FindFollowByID is the resolver for the findFollowByID field.
+func (r *entityResolver) FindFollowByID(ctx context.Context, id string) (*model.Follow, error) {
+	return &model.Follow{
+		ID: primitive.NewObjectID().Hex(),
+	}, nil
+}
+
+// FindReactionByID is the resolver for the findReactionByID field.
+func (r *entityResolver) FindReactionByID(ctx context.Context, id string) (*model.Reaction, error) {
+	return &model.Reaction{
+		ID: primitive.NewObjectID().Hex(),
+	}, nil
+}
+
 // FindUserByID is the resolver for the findUserByID field.
 func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
 	_id, err := primitive.ObjectIDFromHex(id)

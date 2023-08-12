@@ -7,13 +7,14 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/notification/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *messageResolver) ID(ctx context.Context, obj *model.Message) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Conversation is the resolver for the conversation field.
@@ -21,19 +22,14 @@ func (r *messageResolver) Conversation(ctx context.Context, obj *model.Message) 
 	panic(fmt.Errorf("not implemented: Conversation - conversation"))
 }
 
-// Owner is the resolver for the owner field.
-func (r *messageResolver) Owner(ctx context.Context, obj *model.Message) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
-}
-
 // CreatedAt is the resolver for the created_at field.
 func (r *messageResolver) CreatedAt(ctx context.Context, obj *model.Message) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *messageResolver) UpdatedAt(ctx context.Context, obj *model.Message) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Recipients is the resolver for the recipients field.

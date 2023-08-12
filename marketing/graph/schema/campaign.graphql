@@ -1,6 +1,5 @@
 type Campaign @key(fields: "id") {
   id: ID!
-  owner: User!
   audience: Audience!
   type: String!
   name: String!

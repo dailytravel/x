@@ -19,11 +19,27 @@ type Clients struct {
 	Count int       `json:"count"`
 }
 
+type Comment struct {
+	ID    string `json:"id"`
+	User  string `json:"user"`
+	Owner *User  `json:"owner,omitempty"`
+}
+
+func (Comment) IsEntity() {}
+
 type Contact struct {
 	ID string `json:"id"`
 }
 
 func (Contact) IsEntity() {}
+
+type Follow struct {
+	ID    string `json:"id"`
+	User  string `json:"user"`
+	Owner *User  `json:"owner,omitempty"`
+}
+
+func (Follow) IsEntity() {}
 
 type Identity struct {
 	ID          string                 `json:"id"`
@@ -37,17 +53,6 @@ type Identity struct {
 	Status      string                 `json:"status"`
 	CreatedAt   string                 `json:"created_at"`
 	UpdatedAt   string                 `json:"updated_at"`
-}
-
-type Invitation struct {
-	ID        string                 `json:"id"`
-	Sender    *User                  `json:"sender"`
-	Recipient string                 `json:"recipient"`
-	Roles     []string               `json:"roles"`
-	Status    string                 `json:"status"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
 }
 
 type Invitations struct {
@@ -92,13 +97,10 @@ type NewClient struct {
 }
 
 type NewInvitation struct {
-	Email     string                 `json:"email"`
-	FirstName *string                `json:"firstName,omitempty"`
-	LastName  *string                `json:"lastName,omitempty"`
-	Role      string                 `json:"role"`
-	Team      string                 `json:"team"`
-	Inviter   string                 `json:"inviter"`
+	Recipient string                 `json:"recipient"`
+	Roles     []string               `json:"roles"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Status    *string                `json:"status,omitempty"`
 }
 
 type NewKey struct {
@@ -118,15 +120,11 @@ type NewRole struct {
 }
 
 type NewUser struct {
-	Locale   string                 `json:"locale"`
-	Name     string                 `json:"name"`
-	Email    string                 `json:"email"`
-	Phone    *string                `json:"phone,omitempty"`
-	Password string                 `json:"password"`
-	Roles    []*string              `json:"roles,omitempty"`
-	Timezone *string                `json:"timezone,omitempty"`
-	Status   *string                `json:"status,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Name     string    `json:"name"`
+	Email    string    `json:"email"`
+	Password string    `json:"password"`
+	Roles    []*string `json:"roles,omitempty"`
+	Mfa      *MFAInput `json:"mfa,omitempty"`
 }
 
 type Organization struct {
@@ -159,6 +157,14 @@ type Point struct {
 
 func (Point) IsEntity() {}
 
+type Reaction struct {
+	ID    string `json:"id"`
+	User  string `json:"user"`
+	Owner *User  `json:"owner,omitempty"`
+}
+
+func (Reaction) IsEntity() {}
+
 type RegisterInput struct {
 	Locale   string `json:"locale"`
 	Name     string `json:"name"`
@@ -182,14 +188,8 @@ type UpdateClient struct {
 }
 
 type UpdateInvitation struct {
-	Email     *string                `json:"email,omitempty"`
-	FirstName *string                `json:"firstName,omitempty"`
-	LastName  *string                `json:"lastName,omitempty"`
-	Role      *string                `json:"role,omitempty"`
-	Status    *string                `json:"status,omitempty"`
-	Team      *string                `json:"team,omitempty"`
-	Inviter   *string                `json:"inviter,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Roles  []string `json:"roles"`
+	Status *string  `json:"status,omitempty"`
 }
 
 type UpdatePermission struct {
@@ -204,15 +204,11 @@ type UpdateRole struct {
 }
 
 type UpdateUser struct {
-	Locale   *string                `json:"locale,omitempty"`
-	Name     *string                `json:"name,omitempty"`
-	Email    *string                `json:"email,omitempty"`
-	Phone    *string                `json:"phone,omitempty"`
-	Roles    []*string              `json:"roles,omitempty"`
-	Photos   []*string              `json:"photos,omitempty"`
-	Timezone *string                `json:"timezone,omitempty"`
-	Status   *string                `json:"status,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Name     *string   `json:"name,omitempty"`
+	Email    *string   `json:"email,omitempty"`
+	Password *string   `json:"password,omitempty"`
+	Roles    []*string `json:"roles,omitempty"`
+	Mfa      *MFAInput `json:"mfa,omitempty"`
 }
 
 type Users struct {

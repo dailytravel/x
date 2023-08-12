@@ -19,7 +19,6 @@ type Event {
   owner: User!
   followers: [Follow]
   attendees: [User]
-  attachments: [File]
   reminders: [Reminder]
   recurrence: Recurrence
 }

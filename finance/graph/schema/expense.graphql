@@ -15,7 +15,6 @@ type Expense {
   updated_at: String!
   created_by: User
   updated_by: User
-  owner: User!
 }
 
 enum ExpenseType {

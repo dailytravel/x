@@ -7,13 +7,16 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/hrm/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // ID is the resolver for the id field.
 func (r *eventResolver) ID(ctx context.Context, obj *model.Event) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Start is the resolver for the start field.
@@ -28,22 +31,23 @@ func (r *eventResolver) End(ctx context.Context, obj *model.Event) (int, error) 
 
 // CreatedAt is the resolver for the created_at field.
 func (r *eventResolver) CreatedAt(ctx context.Context, obj *model.Event) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *eventResolver) UpdatedAt(ctx context.Context, obj *model.Event) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreatedBy is the resolver for the created_by field.
 func (r *eventResolver) CreatedBy(ctx context.Context, obj *model.Event) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	r.User()
+	return &model.User{}, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *eventResolver) UpdatedBy(ctx context.Context, obj *model.Event) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	return &model.User{}, nil
 }
 
 // Owner is the resolver for the owner field.
@@ -61,11 +65,6 @@ func (r *eventResolver) Attendees(ctx context.Context, obj *model.Event) ([]*mod
 	panic(fmt.Errorf("not implemented: Attendees - attendees"))
 }
 
-// Attachments is the resolver for the attachments field.
-func (r *eventResolver) Attachments(ctx context.Context, obj *model.Event) ([]*model.File, error) {
-	panic(fmt.Errorf("not implemented: Attachments - attachments"))
-}
-
 // CreateEvent is the resolver for the createEvent field.
 func (r *mutationResolver) CreateEvent(ctx context.Context, input model.NewEvent) (*model.Event, error) {
 	panic(fmt.Errorf("not implemented: CreateEvent - createEvent"))
@@ -78,7 +77,30 @@ func (r *mutationResolver) UpdateEvent(ctx context.Context, id string, input mod
 
 // DeleteEvent is the resolver for the deleteEvent field.
 func (r *mutationResolver) DeleteEvent(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteEvent - deleteEvent"))
+	// user := auth.User(ctx)
+	// if user == nil {
+	// 	return nil, fmt.Errorf("unauthorized")
+	// }
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	var deleted model.Event
+
+	if err := r.db.Collection(deleted.Collection()).FindOneAndUpdate(ctx, filter, bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": "user.ID",
+		},
+	}).Decode(&deleted); err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"id": id}, nil
 }
 
 // DeleteEvents is the resolver for the deleteEvents field.

@@ -13,7 +13,7 @@ import (
 
 // ID is the resolver for the id field.
 func (r *inventoryResolver) ID(ctx context.Context, obj *model.Inventory) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Product is the resolver for the product field.

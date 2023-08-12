@@ -13,12 +13,12 @@ import (
 
 // ID is the resolver for the id field.
 func (r *logResolver) ID(ctx context.Context, obj *model.Log) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *logResolver) Metadata(ctx context.Context, obj *model.Log) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Timestamp is the resolver for the Timestamp field.

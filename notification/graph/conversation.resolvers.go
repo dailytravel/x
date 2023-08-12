@@ -7,23 +7,19 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/notification/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *conversationResolver) ID(ctx context.Context, obj *model.Conversation) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
-}
-
-// Owner is the resolver for the owner field.
-func (r *conversationResolver) Owner(ctx context.Context, obj *model.Conversation) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
+	return obj.ID.Hex(), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *conversationResolver) Metadata(ctx context.Context, obj *model.Conversation) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Message is the resolver for the message field.
@@ -33,12 +29,12 @@ func (r *conversationResolver) Message(ctx context.Context, obj *model.Conversat
 
 // CreatedAt is the resolver for the created_at field.
 func (r *conversationResolver) CreatedAt(ctx context.Context, obj *model.Conversation) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *conversationResolver) UpdatedAt(ctx context.Context, obj *model.Conversation) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Followers is the resolver for the followers field.

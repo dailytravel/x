@@ -80,12 +80,6 @@ type UpdateInvoice struct {
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type User struct {
-	ID string `json:"id"`
-}
-
-func (User) IsEntity() {}
-
 type ExpenseStatus string
 
 const (

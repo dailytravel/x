@@ -7,13 +7,14 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *couponResolver) ID(ctx context.Context, obj *model.Coupon) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // StartDate is the resolver for the start_date field.
@@ -33,27 +34,17 @@ func (r *couponResolver) Products(ctx context.Context, obj *model.Coupon) ([]*mo
 
 // Metadata is the resolver for the metadata field.
 func (r *couponResolver) Metadata(ctx context.Context, obj *model.Coupon) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *couponResolver) CreatedAt(ctx context.Context, obj *model.Coupon) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *couponResolver) UpdatedAt(ctx context.Context, obj *model.Coupon) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *couponResolver) CreatedBy(ctx context.Context, obj *model.Coupon) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *couponResolver) UpdatedBy(ctx context.Context, obj *model.Coupon) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateCoupon is the resolver for the createCoupon field.

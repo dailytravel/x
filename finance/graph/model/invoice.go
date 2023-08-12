@@ -22,6 +22,8 @@ type Invoice struct {
 	Status    string              `json:"status" bson:"status"`
 }
 
+func (Invoice) IsEntity() {}
+
 func (i *Invoice) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 

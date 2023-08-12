@@ -54,6 +54,11 @@ type EducationInput struct {
 	Description *string `json:"description,omitempty"`
 }
 
+type Employees struct {
+	Data  []*Employee `json:"data,omitempty"`
+	Count int         `json:"count"`
+}
+
 type Events struct {
 	Count int      `json:"count"`
 	Data  []*Event `json:"data,omitempty"`
@@ -92,11 +97,6 @@ type Geo struct {
 	Lng float64 `json:"lng"`
 }
 
-type Jobs struct {
-	Map   []*Job `json:"map,omitempty"`
-	Count *int   `json:"count,omitempty"`
-}
-
 type Language struct {
 	Name        string       `json:"name"`
 	Proficiency *Proficiency `json:"proficiency,omitempty"`
@@ -132,6 +132,22 @@ type NewAttendance struct {
 	Status   string                 `json:"status"`
 }
 
+type NewEmployee struct {
+	Reference      string                 `json:"reference"`
+	FirstName      string                 `json:"first_name"`
+	LastName       string                 `json:"last_name"`
+	Email          string                 `json:"email"`
+	Phone          string                 `json:"phone"`
+	Address        string                 `json:"address"`
+	Birthday       *string                `json:"birthday,omitempty"`
+	Status         *string                `json:"status,omitempty"`
+	Metadata       map[string]interface{} `json:"metadata,omitempty"`
+	HireDate       *string                `json:"hire_date,omitempty"`
+	UserID         *string                `json:"user_id,omitempty"`
+	OrganizationID string                 `json:"organization_id"`
+	PositionID     *string                `json:"position_id,omitempty"`
+}
+
 type NewEvent struct {
 	Owner       *string          `json:"owner,omitempty"`
 	Type        string           `json:"type"`
@@ -152,17 +168,6 @@ type NewEvent struct {
 	Attachments []*string        `json:"attachments,omitempty"`
 }
 
-type NewJob struct {
-	Organization string                 `json:"organization"`
-	Locale       string                 `json:"locale"`
-	Title        string                 `json:"title"`
-	Description  string                 `json:"description"`
-	Location     string                 `json:"location"`
-	Salary       string                 `json:"salary"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
-	Status       string                 `json:"status"`
-}
-
 type NewLeave struct {
 	Owner     string                 `json:"owner"`
 	Type      string                 `json:"type"`
@@ -173,8 +178,27 @@ type NewLeave struct {
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
+type NewOrganization struct {
+	Manager     *string                `json:"manager,omitempty"`
+	Parent      *string                `json:"parent,omitempty"`
+	Name        string                 `json:"name"`
+	Description *string                `json:"description,omitempty"`
+	Type        *string                `json:"type,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewPosition struct {
+	Locale      string                 `json:"locale"`
+	Title       string                 `json:"title"`
+	Description string                 `json:"description"`
+	Salary      string                 `json:"salary"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      string                 `json:"status"`
+}
+
 type NewSalary struct {
-	Owner     string                 `json:"owner"`
+	Employee  string                 `json:"employee"`
 	Amount    float64                `json:"amount"`
 	Currency  string                 `json:"currency"`
 	StartDate string                 `json:"start_date"`
@@ -182,13 +206,15 @@ type NewSalary struct {
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type Organization struct {
-	ID string `json:"id"`
+type Organizations struct {
+	Data  []*Organization `json:"data,omitempty"`
+	Count *int            `json:"count,omitempty"`
 }
 
-func (Organization) IsEntity() {}
-
-
+type Positions struct {
+	Map   []*Position `json:"map,omitempty"`
+	Count *int        `json:"count,omitempty"`
+}
 
 type Project struct {
 	Name        string  `json:"name"`
@@ -256,6 +282,22 @@ type UpdateAttendance struct {
 	Status   *string                `json:"status,omitempty"`
 }
 
+type UpdateEmployee struct {
+	Reference      *string                `json:"reference,omitempty"`
+	FirstName      *string                `json:"first_name,omitempty"`
+	LastName       *string                `json:"last_name,omitempty"`
+	Email          *string                `json:"email,omitempty"`
+	Phone          *string                `json:"phone,omitempty"`
+	Address        *string                `json:"address,omitempty"`
+	Birthday       *string                `json:"birthday,omitempty"`
+	Status         *string                `json:"status,omitempty"`
+	Metadata       map[string]interface{} `json:"metadata,omitempty"`
+	HireDate       *string                `json:"hire_date,omitempty"`
+	UserID         *string                `json:"user_id,omitempty"`
+	OrganizationID *string                `json:"organization_id,omitempty"`
+	PositionID     *string                `json:"position_id,omitempty"`
+}
+
 type UpdateEvent struct {
 	Owner       *string          `json:"owner,omitempty"`
 	Type        *string          `json:"type,omitempty"`
@@ -276,17 +318,6 @@ type UpdateEvent struct {
 	Attachments []*string        `json:"attachments,omitempty"`
 }
 
-type UpdateJob struct {
-	Organization *string                `json:"organization,omitempty"`
-	Locale       string                 `json:"locale"`
-	Title        *string                `json:"title,omitempty"`
-	Description  *string                `json:"description,omitempty"`
-	Location     *string                `json:"location,omitempty"`
-	Salary       *string                `json:"salary,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
-	Status       *string                `json:"status,omitempty"`
-}
-
 type UpdateLeave struct {
 	Type      *string                `json:"type,omitempty"`
 	StartDate *string                `json:"start_date,omitempty"`
@@ -294,6 +325,26 @@ type UpdateLeave struct {
 	Reason    *string                `json:"reason,omitempty"`
 	Status    *string                `json:"status,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type UpdateOrganization struct {
+	Manager     *string                `json:"manager,omitempty"`
+	Parent      *string                `json:"parent,omitempty"`
+	Name        *string                `json:"name,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Type        *string                `json:"type,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type UpdatePosition struct {
+	Locale      string                 `json:"locale"`
+	Title       *string                `json:"title,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Location    *string                `json:"location,omitempty"`
+	Salary      *string                `json:"salary,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      *string                `json:"status,omitempty"`
 }
 
 type UpdateResume struct {
@@ -315,12 +366,6 @@ type UpdateSalary struct {
 	EndDate   *string                `json:"end_date,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
-
-type User struct {
-	ID string `json:"id"`
-}
-
-func (User) IsEntity() {}
 
 type AttendanceStatus string
 

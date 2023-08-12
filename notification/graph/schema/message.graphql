@@ -1,7 +1,6 @@
 type Message {
   id: ID!
   conversation: Conversation!
-  owner: User!
   subject: String!
   body: String!
   status: String!

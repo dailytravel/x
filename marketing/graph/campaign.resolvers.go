@@ -11,6 +11,46 @@ import (
 	"github.com/dailytravel/x/marketing/graph/model"
 )
 
+// ID is the resolver for the id field.
+func (r *campaignResolver) ID(ctx context.Context, obj *model.Campaign) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// Audience is the resolver for the audience field.
+func (r *campaignResolver) Audience(ctx context.Context, obj *model.Campaign) (*model.Audience, error) {
+	panic(fmt.Errorf("not implemented: Audience - audience"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *campaignResolver) Metadata(ctx context.Context, obj *model.Campaign) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *campaignResolver) CreatedAt(ctx context.Context, obj *model.Campaign) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *campaignResolver) UpdatedAt(ctx context.Context, obj *model.Campaign) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *campaignResolver) CreatedBy(ctx context.Context, obj *model.Campaign) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *campaignResolver) UpdatedBy(ctx context.Context, obj *model.Campaign) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Responses is the resolver for the responses field.
+func (r *campaignResolver) Responses(ctx context.Context, obj *model.Campaign) ([]*model.Response, error) {
+	panic(fmt.Errorf("not implemented: Responses - responses"))
+}
+
 // CreateCampaign is the resolver for the createCampaign field.
 func (r *mutationResolver) CreateCampaign(ctx context.Context, input model.NewCampaign) (*model.Campaign, error) {
 	panic(fmt.Errorf("not implemented: CreateCampaign - createCampaign"))
@@ -40,3 +80,8 @@ func (r *queryResolver) Campaigns(ctx context.Context, args map[string]interface
 func (r *queryResolver) Campaign(ctx context.Context, id string) (*model.Campaign, error) {
 	panic(fmt.Errorf("not implemented: Campaign - campaign"))
 }
+
+// Campaign returns CampaignResolver implementation.
+func (r *Resolver) Campaign() CampaignResolver { return &campaignResolver{r} }
+
+type campaignResolver struct{ *Resolver }

@@ -1,6 +1,5 @@
-type Invoice {
+type Invoice @key(fields: "id") {
   id: ID!
-  owner: User!
   reference: String!
   template: String!
   amount: Int!
@@ -12,8 +11,6 @@ type Invoice {
   status: String
   created_at: String!
   updated_at: String!
-  created_by: User
-  updated_by: User
 }
 
 type Invoices {

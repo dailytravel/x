@@ -1,6 +1,5 @@
 type Link {
   id: ID!
-  owner: User!
   domain: String!
   reference: String!
   title: String

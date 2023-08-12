@@ -7,13 +7,14 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/finance/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *expenseResolver) ID(ctx context.Context, obj *model.Expense) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Followers is the resolver for the followers field.
@@ -28,7 +29,7 @@ func (r *expenseResolver) Comments(ctx context.Context, obj *model.Expense) ([]*
 
 // Metadata is the resolver for the metadata field.
 func (r *expenseResolver) Metadata(ctx context.Context, obj *model.Expense) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Date is the resolver for the date field.
@@ -38,27 +39,30 @@ func (r *expenseResolver) Date(ctx context.Context, obj *model.Expense) (string,
 
 // CreatedAt is the resolver for the created_at field.
 func (r *expenseResolver) CreatedAt(ctx context.Context, obj *model.Expense) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *expenseResolver) UpdatedAt(ctx context.Context, obj *model.Expense) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreatedBy is the resolver for the created_by field.
 func (r *expenseResolver) CreatedBy(ctx context.Context, obj *model.Expense) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	return &model.User{
+		Model: model.Model{
+			ID: obj.CreatedBy,
+		},
+	}, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *expenseResolver) UpdatedBy(ctx context.Context, obj *model.Expense) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
-}
-
-// Owner is the resolver for the owner field.
-func (r *expenseResolver) Owner(ctx context.Context, obj *model.Expense) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
+	return &model.User{
+		Model: model.Model{
+			ID: obj.UpdatedBy,
+		},
+	}, nil
 }
 
 // CreateExpense is the resolver for the createExpense field.

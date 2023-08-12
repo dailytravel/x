@@ -7,15 +7,9 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/golang-jwt/jwt/v4"
-)
-
-var (
-	token *jwt.Token
-	err   error
 )
 
 // CreateToken takes some claims and a private key (either rsa or ec) and returns a signed json web token
@@ -43,7 +37,7 @@ func CreateToken(claims map[string]interface{}, kid string, key interface{}) (st
 	return "", errors.New("invalid private key")
 }
 
-func Payload(u *model.User, k *model.Key, clientID string, expiresIn int) (*model.Payload, error) {
+func Payload(claims jwt.MapClaims, k *model.Key, clientID string, expiresIn int) (*model.Payload, error) {
 	privBlock, _ := pem.Decode([]byte(k.Certificate))
 	if privBlock == nil {
 		return nil, fmt.Errorf("error decoding private key PEM block")
@@ -54,26 +48,12 @@ func Payload(u *model.User, k *model.Key, clientID string, expiresIn int) (*mode
 	}
 
 	//generate token
-	access_token, err := CreateToken(jwt.MapClaims(map[string]interface{}{
-		"sub":      u.ID.Hex(),
-		"email":    u.Email,
-		"locale":   u.Locale,
-		"timezone": u.Timezone,
-		"name":     u.Name,
-		"roles":    u.Roles,
-		"azp":      clientID,
-		"iat":      time.Now().Unix(),
-		"exp":      time.Now().Add(time.Minute * time.Duration(8600)).Unix(),
-	}), k.Kid, privKey)
+	access_token, err := CreateToken(claims, k.Kid, privKey)
 	if err != nil {
 		return nil, fmt.Errorf("token not found")
 	}
 
-	refresh_token, err := CreateToken(jwt.MapClaims(map[string]interface{}{
-		"sub": u.ID.Hex(),
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Hour * 24 * 90).Unix(),
-	}), k.Kid, privKey)
+	refresh_token, err := CreateToken(claims, k.Kid, privKey)
 	if err != nil {
 		return nil, fmt.Errorf("token not found")
 	}

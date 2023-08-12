@@ -7,18 +7,14 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/finance/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *invoiceResolver) ID(ctx context.Context, obj *model.Invoice) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
-}
-
-// Owner is the resolver for the owner field.
-func (r *invoiceResolver) Owner(ctx context.Context, obj *model.Invoice) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
+	return obj.ID.Hex(), nil
 }
 
 // Amount is the resolver for the amount field.
@@ -38,27 +34,17 @@ func (r *invoiceResolver) DueDate(ctx context.Context, obj *model.Invoice) (stri
 
 // Metadata is the resolver for the metadata field.
 func (r *invoiceResolver) Metadata(ctx context.Context, obj *model.Invoice) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *invoiceResolver) CreatedAt(ctx context.Context, obj *model.Invoice) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *invoiceResolver) UpdatedAt(ctx context.Context, obj *model.Invoice) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *invoiceResolver) CreatedBy(ctx context.Context, obj *model.Invoice) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *invoiceResolver) UpdatedBy(ctx context.Context, obj *model.Invoice) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateInvoice is the resolver for the createInvoice field.

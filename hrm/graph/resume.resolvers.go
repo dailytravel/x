@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/hrm/graph/model"
 )
@@ -43,7 +44,7 @@ func (r *queryResolver) Resumes(ctx context.Context, args map[string]interface{}
 
 // ID is the resolver for the id field.
 func (r *resumeResolver) ID(ctx context.Context, obj *model.Resume) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // User is the resolver for the user field.
@@ -53,17 +54,17 @@ func (r *resumeResolver) User(ctx context.Context, obj *model.Resume) (*model.Us
 
 // Metadata is the resolver for the metadata field.
 func (r *resumeResolver) Metadata(ctx context.Context, obj *model.Resume) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *resumeResolver) CreatedAt(ctx context.Context, obj *model.Resume) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *resumeResolver) UpdatedAt(ctx context.Context, obj *model.Resume) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Resume returns ResumeResolver implementation.

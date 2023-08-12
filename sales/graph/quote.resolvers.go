@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
 )
@@ -43,7 +44,7 @@ func (r *queryResolver) Quote(ctx context.Context, id string) (*model.Quote, err
 
 // ID is the resolver for the id field.
 func (r *quoteResolver) ID(ctx context.Context, obj *model.Quote) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Owner is the resolver for the owner field.
@@ -63,7 +64,7 @@ func (r *quoteResolver) ValidUntil(ctx context.Context, obj *model.Quote) (int, 
 
 // Metadata is the resolver for the metadata field.
 func (r *quoteResolver) Metadata(ctx context.Context, obj *model.Quote) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Billing is the resolver for the billing field.
@@ -73,22 +74,12 @@ func (r *quoteResolver) Billing(ctx context.Context, obj *model.Quote) (map[stri
 
 // CreatedAt is the resolver for the created_at field.
 func (r *quoteResolver) CreatedAt(ctx context.Context, obj *model.Quote) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *quoteResolver) UpdatedAt(ctx context.Context, obj *model.Quote) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *quoteResolver) CreatedBy(ctx context.Context, obj *model.Quote) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *quoteResolver) UpdatedBy(ctx context.Context, obj *model.Quote) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Quote returns QuoteResolver implementation.

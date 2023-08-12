@@ -3,10 +3,12 @@ package utils
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -136,4 +138,17 @@ func Options(args map[string]interface{}) *options.FindOptions {
 	}
 
 	return options
+}
+
+func UID(claims jwt.MapClaims) (*primitive.ObjectID, error) {
+	if claims == nil {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	uid, err := primitive.ObjectIDFromHex(claims["sub"].(string))
+	if err != nil {
+		return nil, fmt.Errorf("invalid id")
+	}
+
+	return &uid, nil
 }

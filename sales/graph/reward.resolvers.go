@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
 )
@@ -43,7 +44,7 @@ func (r *queryResolver) Reward(ctx context.Context, id string) (*model.Reward, e
 
 // ID is the resolver for the id field.
 func (r *rewardResolver) ID(ctx context.Context, obj *model.Reward) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Tier is the resolver for the tier field.
@@ -63,7 +64,7 @@ func (r *rewardResolver) Description(ctx context.Context, obj *model.Reward) (st
 
 // Metadata is the resolver for the metadata field.
 func (r *rewardResolver) Metadata(ctx context.Context, obj *model.Reward) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // ExpiresAt is the resolver for the expires_at field.
@@ -73,22 +74,12 @@ func (r *rewardResolver) ExpiresAt(ctx context.Context, obj *model.Reward) (*str
 
 // CreatedAt is the resolver for the created_at field.
 func (r *rewardResolver) CreatedAt(ctx context.Context, obj *model.Reward) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *rewardResolver) UpdatedAt(ctx context.Context, obj *model.Reward) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *rewardResolver) CreatedBy(ctx context.Context, obj *model.Reward) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *rewardResolver) UpdatedBy(ctx context.Context, obj *model.Reward) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Reward returns RewardResolver implementation.

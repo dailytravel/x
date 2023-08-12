@@ -7,18 +7,14 @@ type Content @key(fields: "id") {
   body: String!
   slug: String!
   status: String!
-  reviewable: Boolean
+  commentable: Boolean!
   metadata: Map
   created_at: String!
   updated_at: String!
-  published_at: Int!
-  created_by: User!
-  updated_by: User!
-  owner: User!
+  published_at: String!
   parent: Content
   followers: [Follow]
   comments: [Comment]
-  attachments: [File]
 }
 
 enum ContentType {

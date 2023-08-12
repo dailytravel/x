@@ -21,24 +21,15 @@ type Invitations {
 }
 
 input NewInvitation {
-  email: String!
-  firstName: String
-  lastName: String
-  role: String!
-  team: ID!
-  inviter: ID!
+  recipient: String!
+  roles: [String!]!
   metadata: Map
+  status: String
 }
 
 input UpdateInvitation {
-  email: String
-  firstName: String
-  lastName: String
-  role: String
+  roles: [String!]!
   status: String
-  team: ID
-  inviter: ID
-  metadata: Map
 }
 
 extend type Query {

@@ -16,10 +16,9 @@ import (
 
 type Contact struct {
 	Model        `bson:",inline"`
-	Owner        primitive.ObjectID  `bson:"owner,omitempty" json:"owner,omitempty"`
-	Organization primitive.ObjectID  `json:"organization,omitempty" bson:"organization,omitempty"`
-	Type         string              `json:"type,omitempty" bson:"type,omitempty"`
-	Reference    string              `json:"reference,omitempty" bson:"reference,omitempty"`
+	Owner        primitive.ObjectID  `bson:"owner" json:"owner"`
+	Company      *primitive.ObjectID `bson:"company,omitempty" json:"company,omitempty"`
+	Reference    string              `json:"reference" bson:"reference"`
 	FirstName    string              `json:"first_name,omitempty" bson:"first_name,omitempty"`
 	LastName     string              `json:"last_name,omitempty" bson:"last_name,omitempty"`
 	Birthday     primitive.DateTime  `json:"birthday,omitempty" bson:"birthday,omitempty"`
@@ -43,7 +42,7 @@ type Contact struct {
 	Notes        string              `json:"notes,omitempty" bson:"notes,omitempty"`
 	Stage        string              `json:"stage,omitempty" bson:"stage,omitempty"`
 	Labels       []string            `json:"labels,omitempty" bson:"labels,omitempty"`
-	Status       string              `json:"status,omitempty" bson:"status,omitempty"`
+	Status       string              `json:"status" bson:"status"`
 	Reviewable   bool                `json:"reviewable,omitempty" bson:"reviewable,omitempty"`
 	LastActivity primitive.Timestamp `json:"last_activity,omitempty" bson:"last_activity,omitempty"`
 }
@@ -70,8 +69,7 @@ func (i *Contact) Collection() string {
 func (i *Contact) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "owner", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "organization", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "reference", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
+		{Keys: bson.D{{Key: "company", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "first_name", Value: "text"}, {Key: "last_name", Value: "text"}}, Options: options.Index().SetWeights(bson.M{"first_name": 2, "last_name": 1})},
 		{Keys: bson.D{{Key: "source", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "phone", Value: 1}}, Options: options.Index()},
@@ -90,8 +88,7 @@ func (i *Contact) Schema() interface{} {
 		Name: i.Collection(),
 		Fields: []api.Field{
 			{Name: "owner", Type: "string"},
-			{Name: "organization", Type: "string", Optional: pointer.True()},
-			{Name: "reference", Type: "string", Optional: pointer.True()},
+			{Name: "company", Type: "string", Optional: pointer.True()},
 			{Name: "first_name", Type: "string", Optional: pointer.True()},
 			{Name: "last_name", Type: "string", Optional: pointer.True()},
 			{Name: "job_title", Type: "string", Optional: pointer.True()},
@@ -128,9 +125,7 @@ func (i *Contact) Document() map[string]interface{} {
 	document := map[string]interface{}{
 		"id":            i.ID,
 		"owner":         i.Owner,
-		"organization":  i.Organization,
-		"type":          i.Type,
-		"reference":     i.Reference,
+		"company":       i.Company,
 		"first_name":    i.FirstName,
 		"last_name":     i.LastName,
 		"job_title":     i.JobTitle,
@@ -244,21 +239,9 @@ func (i *Contact) SetOwner(id *string) {
 	}
 }
 
-func (i *Contact) SetOrganization(id *string) {
-	if id != nil {
-		i.Organization, _ = primitive.ObjectIDFromHex(*id)
-	}
-}
-
 func (i *Contact) SetReference(r *string) {
 	if r != nil {
 		i.Reference = *r
-	}
-}
-
-func (i *Contact) SetType(t *string) {
-	if t != nil {
-		i.Type = *t
 	}
 }
 

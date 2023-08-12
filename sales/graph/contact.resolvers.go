@@ -7,13 +7,14 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *contactResolver) ID(ctx context.Context, obj *model.Contact) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Owner is the resolver for the owner field.
@@ -21,14 +22,19 @@ func (r *contactResolver) Owner(ctx context.Context, obj *model.Contact) (*model
 	panic(fmt.Errorf("not implemented: Owner - owner"))
 }
 
+// Type is the resolver for the type field.
+func (r *contactResolver) Type(ctx context.Context, obj *model.Contact) (*string, error) {
+	panic(fmt.Errorf("not implemented: Type - type"))
+}
+
 // Birthday is the resolver for the birthday field.
 func (r *contactResolver) Birthday(ctx context.Context, obj *model.Contact) (*string, error) {
 	panic(fmt.Errorf("not implemented: Birthday - birthday"))
 }
 
-// Organization is the resolver for the organization field.
-func (r *contactResolver) Organization(ctx context.Context, obj *model.Contact) (*model.Organization, error) {
-	panic(fmt.Errorf("not implemented: Organization - organization"))
+// Company is the resolver for the company field.
+func (r *contactResolver) Company(ctx context.Context, obj *model.Contact) (*model.Company, error) {
+	panic(fmt.Errorf("not implemented: Company - company"))
 }
 
 // Rating is the resolver for the rating field.
@@ -38,7 +44,7 @@ func (r *contactResolver) Rating(ctx context.Context, obj *model.Contact) (*int,
 
 // Metadata is the resolver for the metadata field.
 func (r *contactResolver) Metadata(ctx context.Context, obj *model.Contact) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // LastActivity is the resolver for the last_activity field.
@@ -48,12 +54,12 @@ func (r *contactResolver) LastActivity(ctx context.Context, obj *model.Contact) 
 
 // CreatedAt is the resolver for the created_at field.
 func (r *contactResolver) CreatedAt(ctx context.Context, obj *model.Contact) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *contactResolver) UpdatedAt(ctx context.Context, obj *model.Contact) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Followers is the resolver for the followers field.

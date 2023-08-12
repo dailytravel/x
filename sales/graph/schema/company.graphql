@@ -1,0 +1,79 @@
+type Company @key(fields: "id") {
+  id: ID!
+  name: String!
+  description: String
+  type: String! # "team", "company", or "department"
+  parent: Company
+  children: [Company]
+  industry: String
+  employees: Int
+  revenue: Float
+  city: String
+  state: String
+  zip: String
+  country: String
+  timezone: String
+  phone: String
+  website: String
+  metadata: Map
+  status: String!
+  last_activity: Int!
+  created_at: String!
+  updated_at: String!
+}
+
+type Companies {
+  data: [Company]
+  count: Int!
+}
+
+input NewCompany {
+  owner: ID
+  name: String!
+  description: String
+  type: String! # "team", "company", or "department"
+  parent: ID
+  industry: String
+  employees: Int
+  revenue: Float
+  city: String
+  state: String
+  zip: String
+  country: String
+  timezone: String
+  phone: String
+  website: String
+  metadata: Map
+  status: String!
+}
+
+input UpdateCompany {
+  owner: ID
+  name: String
+  description: String
+  type: String # "team", "company", or "department"
+  parent: ID
+  industry: String
+  employees: Int
+  revenue: Float
+  city: String
+  zip: String
+  state: String
+  country: String
+  timezone: String
+  phone: String
+  website: String
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  companies(args: Map): Companies
+  company(id: ID!): Company @api
+}
+
+extend type Mutation {
+  createCompany(input: NewCompany!): Company @auth
+  updateCompany(id: ID!, input: UpdateCompany!): Company @auth
+  deleteCompany(id: ID!): Map @auth
+}

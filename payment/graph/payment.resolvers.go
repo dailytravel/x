@@ -28,7 +28,47 @@ func (r *mutationResolver) DeletePayment(ctx context.Context, id string) (*bool,
 
 // ID is the resolver for the id field.
 func (r *paymentResolver) ID(ctx context.Context, obj *model.Payment) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
+}
+
+// Date is the resolver for the date field.
+func (r *paymentResolver) Date(ctx context.Context, obj *model.Payment) (string, error) {
+	panic(fmt.Errorf("not implemented: Date - date"))
+}
+
+// User is the resolver for the user field.
+func (r *paymentResolver) User(ctx context.Context, obj *model.Payment) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
+// Invoice is the resolver for the invoice field.
+func (r *paymentResolver) Invoice(ctx context.Context, obj *model.Payment) (*model.Invoice, error) {
+	panic(fmt.Errorf("not implemented: Invoice - invoice"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *paymentResolver) Metadata(ctx context.Context, obj *model.Payment) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *paymentResolver) CreatedAt(ctx context.Context, obj *model.Payment) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *paymentResolver) UpdatedAt(ctx context.Context, obj *model.Payment) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *paymentResolver) CreatedBy(ctx context.Context, obj *model.Payment) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *paymentResolver) UpdatedBy(ctx context.Context, obj *model.Payment) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // Payment is the resolver for the payment field.

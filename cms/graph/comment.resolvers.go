@@ -10,9 +10,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ID is the resolver for the id field.
@@ -20,9 +22,19 @@ func (r *commentResolver) ID(ctx context.Context, obj *model.Comment) (string, e
 	return obj.ID.Hex(), nil
 }
 
-// Content is the resolver for the content field.
-func (r *commentResolver) Content(ctx context.Context, obj *model.Comment) (string, error) {
-	panic(fmt.Errorf("not implemented: Content - content"))
+// User is the resolver for the user field.
+func (r *commentResolver) User(ctx context.Context, obj *model.Comment) (string, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
+// Body is the resolver for the body field.
+func (r *commentResolver) Body(ctx context.Context, obj *model.Comment) (string, error) {
+	locale := auth.Locale(ctx)
+	if body, ok := obj.Body[locale].(string); ok {
+		return body, nil
+	}
+
+	return obj.Body[obj.Locale].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -42,12 +54,38 @@ func (r *commentResolver) UpdatedAt(ctx context.Context, obj *model.Comment) (st
 
 // Parent is the resolver for the parent field.
 func (r *commentResolver) Parent(ctx context.Context, obj *model.Comment) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Parent - parent"))
+	var item *model.Comment
+
+	filter := bson.M{"parent": obj.Parent}
+	options := options.FindOne().SetProjection(bson.M{"_id": 1, "name": 1, "description": 1})
+
+	err := r.db.Collection(item.Collection()).FindOne(ctx, filter, options).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Children is the resolver for the children field.
 func (r *commentResolver) Children(ctx context.Context, obj *model.Comment) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Children - children"))
+	var items []*model.Comment
+	filter := bson.M{"parent": obj.ID}
+	options := options.Find().SetProjection(bson.M{"_id": 1, "name": 1, "description": 1})
+
+	cursor, err := r.db.Collection(obj.Collection()).Find(ctx, filter, options)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
 
 // Commentable is the resolver for the commentable field.
@@ -65,11 +103,6 @@ func (r *commentResolver) Commentable(ctx context.Context, obj *model.Comment) (
 	return item, nil
 }
 
-// Owner is the resolver for the owner field.
-func (r *commentResolver) Owner(ctx context.Context, obj *model.Comment) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
-}
-
 // Reaction is the resolver for the reaction field.
 func (r *commentResolver) Reaction(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error) {
 	panic(fmt.Errorf("not implemented: Reaction - reaction"))
@@ -77,12 +110,20 @@ func (r *commentResolver) Reaction(ctx context.Context, obj *model.Comment) ([]*
 
 // CreatedBy is the resolver for the created_by field.
 func (r *commentResolver) CreatedBy(ctx context.Context, obj *model.Comment) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	return &model.User{
+		Model: model.Model{
+			ID: obj.CreatedBy,
+		},
+	}, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *commentResolver) UpdatedBy(ctx context.Context, obj *model.Comment) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	return &model.User{
+		Model: model.Model{
+			ID: obj.UpdatedBy,
+		},
+	}, nil
 }
 
 // Attachments is the resolver for the attachments field.

@@ -1,0 +1,40 @@
+type List {
+  id: ID!
+  name: String!
+  board: Board!
+  order: Int!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+  tasks: [Task]
+}
+
+type Lists {
+  count: Int!
+  data: [List]
+}
+
+input NewList {
+  name: String!
+  board: ID!
+  order: Int
+  metadata: Map
+}
+
+input UpdateList {
+  name: String
+  order: Int
+  metadata: Map
+}
+
+extend type Query {
+  list(id: ID!): List @auth
+  lists(board: ID!): Lists @auth
+}
+
+extend type Mutation {
+  createList(input: NewList!): List @auth
+  updateList(id: ID!, input: UpdateList!): List @auth
+  deleteList(id: ID!): Map @auth
+  deleteLists(ids: [ID!]!): Map @auth
+}

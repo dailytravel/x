@@ -64,7 +64,7 @@ type NewComment struct {
 	CommentableID   string                 `json:"commentableId"`
 	CommentableType string                 `json:"commentableType"`
 	Locale          string                 `json:"locale"`
-	Content         *string                `json:"content,omitempty"`
+	Body            *string                `json:"body,omitempty"`
 	Rating          *int                   `json:"rating,omitempty"`
 	Metadata        map[string]interface{} `json:"metadata,omitempty"`
 	Status          *string                `json:"status,omitempty"`
@@ -151,9 +151,8 @@ type NewLocale struct {
 }
 
 type NewReaction struct {
-	ReactableID   string `json:"reactableId"`
-	ReactableType string `json:"reactableType"`
-	Action        string `json:"action"`
+	Reactable map[string]interface{} `json:"reactable"`
+	Action    string                 `json:"action"`
 }
 
 type NewTaxonomy struct {
@@ -195,7 +194,7 @@ type UpdateCategory struct {
 type UpdateComment struct {
 	Parent      *string                `json:"parent,omitempty"`
 	Locale      string                 `json:"locale"`
-	Content     *string                `json:"content,omitempty"`
+	Body        *string                `json:"body,omitempty"`
 	Rating      *int                   `json:"rating,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
@@ -291,13 +290,6 @@ type UpdateTimezone struct {
 	Description *string                `json:"description,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
-
-type User struct {
-	ID   string  `json:"id"`
-	Name *string `json:"name,omitempty"`
-}
-
-func (User) IsEntity() {}
 
 type ContentStatus string
 

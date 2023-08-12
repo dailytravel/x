@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
 )
 
@@ -19,22 +20,32 @@ func (r *contentResolver) ID(ctx context.Context, obj *model.Content) (string, e
 
 // Title is the resolver for the title field.
 func (r *contentResolver) Title(ctx context.Context, obj *model.Content) (string, error) {
-	panic(fmt.Errorf("not implemented: Title - title"))
+	locale := auth.Locale(ctx)
+	if title, ok := obj.Title[locale].(string); ok {
+		return title, nil
+	}
+
+	return obj.Title[obj.Locale].(string), nil
 }
 
 // Summary is the resolver for the summary field.
 func (r *contentResolver) Summary(ctx context.Context, obj *model.Content) (string, error) {
-	panic(fmt.Errorf("not implemented: Summary - summary"))
+	locale := auth.Locale(ctx)
+	if summary, ok := obj.Summary[locale].(string); ok {
+		return summary, nil
+	}
+
+	return obj.Summary[obj.Locale].(string), nil
 }
 
 // Body is the resolver for the body field.
 func (r *contentResolver) Body(ctx context.Context, obj *model.Content) (string, error) {
-	panic(fmt.Errorf("not implemented: Body - body"))
-}
+	locale := auth.Locale(ctx)
+	if body, ok := obj.Body[locale].(string); ok {
+		return body, nil
+	}
 
-// Reviewable is the resolver for the reviewable field.
-func (r *contentResolver) Reviewable(ctx context.Context, obj *model.Content) (*bool, error) {
-	panic(fmt.Errorf("not implemented: Reviewable - reviewable"))
+	return obj.Body[obj.Locale].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -53,23 +64,8 @@ func (r *contentResolver) UpdatedAt(ctx context.Context, obj *model.Content) (st
 }
 
 // PublishedAt is the resolver for the published_at field.
-func (r *contentResolver) PublishedAt(ctx context.Context, obj *model.Content) (int, error) {
-	panic(fmt.Errorf("not implemented: PublishedAt - published_at"))
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *contentResolver) CreatedBy(ctx context.Context, obj *model.Content) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *contentResolver) UpdatedBy(ctx context.Context, obj *model.Content) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
-}
-
-// Owner is the resolver for the owner field.
-func (r *contentResolver) Owner(ctx context.Context, obj *model.Content) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
+func (r *contentResolver) PublishedAt(ctx context.Context, obj *model.Content) (string, error) {
+	return time.Unix(int64(obj.PublishedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Parent is the resolver for the parent field.
@@ -85,11 +81,6 @@ func (r *contentResolver) Followers(ctx context.Context, obj *model.Content) ([]
 // Comments is the resolver for the comments field.
 func (r *contentResolver) Comments(ctx context.Context, obj *model.Content) ([]*model.Comment, error) {
 	panic(fmt.Errorf("not implemented: Comments - comments"))
-}
-
-// Attachments is the resolver for the attachments field.
-func (r *contentResolver) Attachments(ctx context.Context, obj *model.Content) ([]*model.File, error) {
-	panic(fmt.Errorf("not implemented: Attachments - attachments"))
 }
 
 // CreateContent is the resolver for the createContent field.
