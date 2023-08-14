@@ -1,0 +1,54 @@
+type Conversation {
+  id: ID!
+  type: String! # DIRECT or GROUP
+  name: String
+  description: String
+  labels: [String!]
+  status: String!
+  metadata: Map
+  message: Message #last message
+  created_at: String!
+  updated_at: String!
+  messages: [Message!]
+  uid: String!
+  created_by: String
+  updated_by: String
+}
+
+enum ConversationStatus {
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+type Conversations {
+  data: [Conversation]
+  count: Int!
+}
+
+input NewConversation {
+  type: String!
+  name: String
+  description: String
+  metadata: Map
+}
+
+input UpdateConversation {
+  type: String
+  name: String
+  description: String
+  metadata: Map
+}
+
+extend type Query {
+  conversation(id: ID!): Conversation @auth
+  conversations(args: Map): Map @auth
+}
+
+extend type Mutation {
+  createConversation(input: NewConversation!): Conversation
+  updateConversation(id: ID!, input: UpdateConversation!): Conversation @auth
+  leaveConversation(id: ID!): Conversation @auth
+  deleteConversation(id: ID!): Map @auth
+  deleteConversations(ids: [ID!]!): Map @auth
+}

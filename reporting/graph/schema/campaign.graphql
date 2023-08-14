@@ -1,3 +1,0 @@
-extend type Campaign @key(fields: "id") {
-  id: ID! @external
-}

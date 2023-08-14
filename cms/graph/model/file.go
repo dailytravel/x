@@ -16,7 +16,7 @@ import (
 
 type File struct {
 	Model       `bson:",inline"`
-	User        primitive.ObjectID `bson:"user" json:"user"`
+	UID         primitive.ObjectID `bson:"uid" json:"uid"`
 	Locale      string             `json:"locale" bson:"locale"`
 	Name        string             `json:"name" bson:"name"`
 	Description string             `json:"description,omitempty" bson:"description,omitempty"`
@@ -52,7 +52,7 @@ func (i *File) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "name", Value: "text"}}, Options: options.Index().SetWeights(bson.D{{Key: "name", Value: 1}})},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "locale", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "starred", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
@@ -63,7 +63,7 @@ func (i *File) Schema() interface{} {
 	return &api.CollectionSchema{
 		Name: i.Collection(),
 		Fields: []api.Field{
-			{Name: "user", Type: "string", Facet: pointer.True()},
+			{Name: "uid", Type: "string", Facet: pointer.True()},
 			{Name: "type", Type: "string", Facet: pointer.True(), Optional: pointer.True()},
 			{Name: "name", Type: "string"},
 			{Name: "description", Type: "string", Optional: pointer.True()},
@@ -84,7 +84,7 @@ func (i *File) Schema() interface{} {
 func (i *File) Document() map[string]interface{} {
 	document := map[string]interface{}{
 		"id":          i.ID,
-		"user":        i.User,
+		"user":        i.UID,
 		"locale":      i.Locale,
 		"name":        i.Name,
 		"description": i.Description,

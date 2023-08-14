@@ -3,8 +3,6 @@ package model
 import (
 	"time"
 
-	"github.com/typesense/typesense-go/typesense/api"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,16 +11,12 @@ import (
 
 type Log struct {
 	Model     `bson:",inline"`
-	User      primitive.ObjectID  `bson:"user" json:"user"`
-	Message   string              `json:"message" bson:"message"`
-	Status    string              `json:"status" bson:"status"`
-	Method    string              `json:"method" bson:"method"`
-	Latency   int64               `json:"latency" bson:"latency"`
-	Path      string              `json:"path" bson:"path"`
+	UID       *primitive.ObjectID `json:"uid,omitempty" bson:"uid,omitempty"`
 	URL       string              `json:"url" bson:"url"`
+	UTM       primitive.M         `json:"utm,omitempty" bson:"utm,omitempty"`
 	UserAgent string              `json:"user_agent" bson:"user_agent"`
 	ClientIP  string              `json:"client_ip" bson:"client_ip"`
-	Timestamp primitive.Timestamp `json:"timestamp" bson:"timestamp"`
+	Status    string              `json:"status" bson:"status"`
 }
 
 func (i *Log) MarshalBSON() ([]byte, error) {
@@ -44,23 +38,8 @@ func (i *Log) Collection() string {
 
 func (i *Log) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "method", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "client_ip", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "timestamp", Value: 1}}, Options: options.Index()},
-	}
-}
-
-func (i *Log) Schema() interface{} {
-	return &api.CollectionSchema{
-		Name: i.Collection(),
-		Fields: []api.Field{
-			{Name: "message", Type: "string"},
-			{Name: "method", Type: "string", Facet: pointer.True()},
-			{Name: "client_ip", Type: "string", Facet: pointer.True()},
-			{Name: "path", Type: "string", Facet: pointer.True()},
-			{Name: "status", Type: "int32", Facet: pointer.True()},
-			{Name: "timestamp", Type: "int64", Facet: pointer.True()},
-		},
-		DefaultSortingField: pointer.String("timestamp"),
+		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
 	}
 }

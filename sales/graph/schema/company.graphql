@@ -20,6 +20,9 @@ type Company @key(fields: "id") {
   last_activity: Int!
   created_at: String!
   updated_at: String!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Companies {

@@ -7,6 +7,9 @@ type List {
   created_at: String!
   updated_at: String!
   tasks: [Task]
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Lists {

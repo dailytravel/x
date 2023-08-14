@@ -8,12 +8,11 @@ import (
 )
 
 type Activity struct {
-	Model       `bson:",inline"`
-	User        primitive.ObjectID `json:"user" bson:"user"`
-	Activitable Activitable        `json:"activitable" bson:"activitable"`
-	Action      string             `json:"action" bson:"action"`
-	Metadata    primitive.M        `json:"metadata,omitempty" bson:"metadata,omitempty"`
-	Status      string             `json:"status" bson:"status"`
+	Model    `bson:",inline"`
+	UID      primitive.ObjectID `json:"uid" bson:"uid"`
+	Target   primitive.ObjectID `json:"target" bson:"target"`
+	Action   string             `json:"action" bson:"action"`
+	Metadata primitive.M        `json:"metadata,omitempty" bson:"metadata,omitempty"`
 }
 
 type Activitable struct {

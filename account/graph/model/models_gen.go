@@ -8,38 +8,10 @@ import (
 	"strconv"
 )
 
-type Board struct {
-	ID string `json:"id"`
-}
-
-func (Board) IsEntity() {}
-
 type Clients struct {
 	Data  []*Client `json:"data,omitempty"`
 	Count int       `json:"count"`
 }
-
-type Comment struct {
-	ID    string `json:"id"`
-	User  string `json:"user"`
-	Owner *User  `json:"owner,omitempty"`
-}
-
-func (Comment) IsEntity() {}
-
-type Contact struct {
-	ID string `json:"id"`
-}
-
-func (Contact) IsEntity() {}
-
-type Follow struct {
-	ID    string `json:"id"`
-	User  string `json:"user"`
-	Owner *User  `json:"owner,omitempty"`
-}
-
-func (Follow) IsEntity() {}
 
 type Identity struct {
 	ID          string                 `json:"id"`
@@ -81,7 +53,12 @@ type MFAInput struct {
 }
 
 type Membership struct {
-	ID string `json:"id"`
+	UID       string `json:"uid"`
+	CreatedBy string `json:"created_by"`
+	UpdatedBy string `json:"updated_by"`
+	User      *User  `json:"user,omitempty"`
+	Created   *User  `json:"created,omitempty"`
+	Updated   *User  `json:"updated,omitempty"`
 }
 
 func (Membership) IsEntity() {}
@@ -127,8 +104,24 @@ type NewUser struct {
 	Mfa      *MFAInput `json:"mfa,omitempty"`
 }
 
+type Order struct {
+	UID       string `json:"uid"`
+	CreatedBy string `json:"created_by"`
+	UpdatedBy string `json:"updated_by"`
+	User      *User  `json:"user,omitempty"`
+	Created   *User  `json:"created,omitempty"`
+	Updated   *User  `json:"updated,omitempty"`
+}
+
+func (Order) IsEntity() {}
+
 type Organization struct {
-	ID string `json:"id"`
+	UID       string `json:"uid"`
+	CreatedBy string `json:"created_by"`
+	UpdatedBy string `json:"updated_by"`
+	User      *User  `json:"user,omitempty"`
+	Created   *User  `json:"created,omitempty"`
+	Updated   *User  `json:"updated,omitempty"`
 }
 
 func (Organization) IsEntity() {}
@@ -157,13 +150,16 @@ type Point struct {
 
 func (Point) IsEntity() {}
 
-type Reaction struct {
-	ID    string `json:"id"`
-	User  string `json:"user"`
-	Owner *User  `json:"owner,omitempty"`
+type Quote struct {
+	UID       string `json:"uid"`
+	CreatedBy string `json:"created_by"`
+	UpdatedBy string `json:"updated_by"`
+	User      *User  `json:"user,omitempty"`
+	Created   *User  `json:"created,omitempty"`
+	Updated   *User  `json:"updated,omitempty"`
 }
 
-func (Reaction) IsEntity() {}
+func (Quote) IsEntity() {}
 
 type RegisterInput struct {
 	Locale   string `json:"locale"`
@@ -219,6 +215,17 @@ type Users struct {
 type VerifyEmailInput struct {
 	Token string `json:"token"`
 }
+
+type Wishlist struct {
+	UID       string `json:"uid"`
+	CreatedBy string `json:"created_by"`
+	UpdatedBy string `json:"updated_by"`
+	User      *User  `json:"user,omitempty"`
+	Created   *User  `json:"created,omitempty"`
+	Updated   *User  `json:"updated,omitempty"`
+}
+
+func (Wishlist) IsEntity() {}
 
 type InvitationStatus string
 

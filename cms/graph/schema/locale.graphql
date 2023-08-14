@@ -4,13 +4,11 @@ type Locale {
   locale: String!
   code: String!
   order: Int!
-  rtl: Boolean!
-  date_format: String!
-  time_format: String!
-  week_start: Int!
   metadata: Map
   created_at: String!
   updated_at: String!
+  created_by: ID
+  updated_by: ID
 }
 
 type Locales {

@@ -11,10 +11,9 @@ type Content @key(fields: "id") {
   metadata: Map
   created_at: String!
   updated_at: String!
-  published_at: String!
+  created_by: ID
+  updated_by: ID
   parent: Content
-  followers: [Follow]
-  comments: [Comment]
 }
 
 enum ContentType {

@@ -7,6 +7,7 @@ function cleanup {
   kill "$ACCOUNT_PID"
   kill "$CMS_PID"
   kill "$CONFIG_PID"
+  kill "$COMMUNITY_PID"
   kill "$FINANCE_PID"
   kill "$HRM_PID"
   kill "$MARKETING_PID"
@@ -22,10 +23,10 @@ function cleanup {
 (cd account && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd cms && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd configuration && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd community && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd finance && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd hrm && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd marketing && GOOS=linux GOARCH=amd64 go build -v -o app .)
-(cd notification && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd payment && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd reporting && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd sales && GOOS=linux GOARCH=amd64 go build -v -o app .)
@@ -36,10 +37,10 @@ function cleanup {
 ./account/app & ACCOUNT_PID=$!
 ./cms/app & CMS_PID=$!
 ./configuration/app & CONFIG_PID=$!
+./community/app & COMMUNITY_PID=$!
 ./finance/app & FINANCE_PID=$!
 ./hrm/app & HRM_PID=$!
 ./marketing/app & MARKETING_PID=$!
-./notification/app & NOTIFICATION_PID=$!
 ./payment/app & PAYMENT_PID=$!
 ./reporting/app & REPORTING_PID=$!
 ./sales/app & SALES_PID=$!
@@ -52,7 +53,7 @@ trap cleanup EXIT
 timeout=30
 interval=1
 elapsed=0
-all_pids=($ACCOUNT_PID $CMS_PID $CONFIG_PID $FINANCE_PID $HRM_PID $MARKETING_PID $REPORTING_PID $SALES_PID $SEARCH_PID $SERVICE_PID)
+all_pids=($ACCOUNT_PID $CMS_PID $CONFIG_PID $COMMUNITY_PID $FINANCE_PID $HRM_PID $MARKETING_PID $PAYMENT_PID $REPORTING_PID $SALES_PID $SEARCH_PID $WORKSPACE_PID)
 
 # Loop until all servers are running or timeout occurs
 while true; do

@@ -13,11 +13,6 @@ type Categories struct {
 	Data  []*Category `json:"data,omitempty"`
 }
 
-type Comments struct {
-	Count int        `json:"count"`
-	Data  []*Comment `json:"data,omitempty"`
-}
-
 type Contents struct {
 	Count int        `json:"count"`
 	Data  []*Content `json:"data,omitempty"`
@@ -38,11 +33,6 @@ type Files struct {
 	Data  []*File `json:"data,omitempty"`
 }
 
-type Follows struct {
-	Count int       `json:"count"`
-	Data  []*Follow `json:"data,omitempty"`
-}
-
 type Locales struct {
 	Count int       `json:"count"`
 	Data  []*Locale `json:"data,omitempty"`
@@ -57,18 +47,6 @@ type NewCategory struct {
 	Taxonomy    string                 `json:"taxonomy"`
 	Order       *int                   `json:"order,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type NewComment struct {
-	Parent          *string                `json:"parent,omitempty"`
-	CommentableID   string                 `json:"commentableId"`
-	CommentableType string                 `json:"commentableType"`
-	Locale          string                 `json:"locale"`
-	Body            *string                `json:"body,omitempty"`
-	Rating          *int                   `json:"rating,omitempty"`
-	Metadata        map[string]interface{} `json:"metadata,omitempty"`
-	Status          *string                `json:"status,omitempty"`
-	Attachments     []*string              `json:"attachments,omitempty"`
 }
 
 type NewContent struct {
@@ -129,14 +107,6 @@ type NewFile struct {
 	Categories  []string               `json:"categories,omitempty"`
 }
 
-type NewFollow struct {
-	User           string `json:"user"`
-	FollowableID   string `json:"followableId"`
-	FollowableType string `json:"followableType"`
-	Role           string `json:"role"`
-	Status         string `json:"status"`
-}
-
 type NewLocale struct {
 	ID         *string                `json:"id,omitempty"`
 	Name       string                 `json:"name"`
@@ -148,11 +118,6 @@ type NewLocale struct {
 	TimeFormat string                 `json:"time_format"`
 	WeekStart  int                    `json:"week_start"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type NewReaction struct {
-	Reactable map[string]interface{} `json:"reactable"`
-	Action    string                 `json:"action"`
 }
 
 type NewTaxonomy struct {
@@ -167,11 +132,6 @@ type NewTimezone struct {
 	Name     string                 `json:"name"`
 	Offset   int                    `json:"offset"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type Reactions struct {
-	Data  []*Reaction `json:"data,omitempty"`
-	Count int         `json:"count"`
 }
 
 type Timezones struct {
@@ -189,16 +149,6 @@ type UpdateCategory struct {
 	Taxonomy    *string                `json:"taxonomy,omitempty"`
 	Order       *int                   `json:"order,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateComment struct {
-	Parent      *string                `json:"parent,omitempty"`
-	Locale      string                 `json:"locale"`
-	Body        *string                `json:"body,omitempty"`
-	Rating      *int                   `json:"rating,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      *string                `json:"status,omitempty"`
-	Attachments []*string              `json:"attachments,omitempty"`
 }
 
 type UpdateContent struct {
@@ -259,11 +209,6 @@ type UpdateFile struct {
 	Categories  []string               `json:"categories,omitempty"`
 }
 
-type UpdateFollow struct {
-	Role   *string `json:"role,omitempty"`
-	Status *string `json:"status,omitempty"`
-}
-
 type UpdateLocale struct {
 	Name       *string                `json:"name,omitempty"`
 	Locale     string                 `json:"locale"`
@@ -274,10 +219,6 @@ type UpdateLocale struct {
 	TimeFormat *string                `json:"time_format,omitempty"`
 	WeekStart  *int                   `json:"week_start,omitempty"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateReaction struct {
-	Type string `json:"type"`
 }
 
 type UpdateTaxonomy struct {
@@ -421,142 +362,5 @@ func (e *CurrencyStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e CurrencyStatus) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type FollowRole string
-
-const (
-	FollowRoleViewer    FollowRole = "VIEWER"
-	FollowRoleCommenter FollowRole = "COMMENTER"
-	FollowRoleEditor    FollowRole = "EDITOR"
-)
-
-var AllFollowRole = []FollowRole{
-	FollowRoleViewer,
-	FollowRoleCommenter,
-	FollowRoleEditor,
-}
-
-func (e FollowRole) IsValid() bool {
-	switch e {
-	case FollowRoleViewer, FollowRoleCommenter, FollowRoleEditor:
-		return true
-	}
-	return false
-}
-
-func (e FollowRole) String() string {
-	return string(e)
-}
-
-func (e *FollowRole) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = FollowRole(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid FollowRole", str)
-	}
-	return nil
-}
-
-func (e FollowRole) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type FollowStatus string
-
-const (
-	FollowStatusPending  FollowStatus = "PENDING"
-	FollowStatusAccepted FollowStatus = "ACCEPTED"
-	FollowStatusRejected FollowStatus = "REJECTED"
-)
-
-var AllFollowStatus = []FollowStatus{
-	FollowStatusPending,
-	FollowStatusAccepted,
-	FollowStatusRejected,
-}
-
-func (e FollowStatus) IsValid() bool {
-	switch e {
-	case FollowStatusPending, FollowStatusAccepted, FollowStatusRejected:
-		return true
-	}
-	return false
-}
-
-func (e FollowStatus) String() string {
-	return string(e)
-}
-
-func (e *FollowStatus) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = FollowStatus(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid FollowStatus", str)
-	}
-	return nil
-}
-
-func (e FollowStatus) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type ReactionType string
-
-const (
-	ReactionTypeNone  ReactionType = "NONE"
-	ReactionTypeLike  ReactionType = "LIKE"
-	ReactionTypeLove  ReactionType = "LOVE"
-	ReactionTypeWow   ReactionType = "WOW"
-	ReactionTypeHaha  ReactionType = "HAHA"
-	ReactionTypeSorry ReactionType = "SORRY"
-	ReactionTypeAngry ReactionType = "ANGRY"
-)
-
-var AllReactionType = []ReactionType{
-	ReactionTypeNone,
-	ReactionTypeLike,
-	ReactionTypeLove,
-	ReactionTypeWow,
-	ReactionTypeHaha,
-	ReactionTypeSorry,
-	ReactionTypeAngry,
-}
-
-func (e ReactionType) IsValid() bool {
-	switch e {
-	case ReactionTypeNone, ReactionTypeLike, ReactionTypeLove, ReactionTypeWow, ReactionTypeHaha, ReactionTypeSorry, ReactionTypeAngry:
-		return true
-	}
-	return false
-}
-
-func (e ReactionType) String() string {
-	return string(e)
-}
-
-func (e *ReactionType) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = ReactionType(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid ReactionType", str)
-	}
-	return nil
-}
-
-func (e ReactionType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

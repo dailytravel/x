@@ -48,6 +48,28 @@ func (r *localeResolver) UpdatedAt(ctx context.Context, obj *model.Locale) (stri
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// CreatedBy is the resolver for the created_by field.
+func (r *localeResolver) CreatedBy(ctx context.Context, obj *model.Locale) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *localeResolver) UpdatedBy(ctx context.Context, obj *model.Locale) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
+}
+
 // CreateLocale is the resolver for the createLocale field.
 func (r *mutationResolver) CreateLocale(ctx context.Context, input model.NewLocale) (*model.Locale, error) {
 	var item *model.Locale

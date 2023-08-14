@@ -4,13 +4,13 @@ type Payment {
   currency: String!
   date: String!
   status: String!
-  user: User!
-  invoice: Invoice!
   metadata: Map
   created_at: String!
   updated_at: String!
-  created_by: User
-  updated_by: User
+  invoice: ID!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 enum PaymentStatus {

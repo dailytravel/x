@@ -6,6 +6,8 @@ type Price {
   regular: Float!
   sale: Float
   metadata: Map
+  created_by: ID
+  updated_by: ID
 }
 
 type Prices {

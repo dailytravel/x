@@ -37,6 +37,30 @@ func (r *portfolioResolver) UpdatedAt(ctx context.Context, obj *model.Portfolio)
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// UID is the resolver for the uid field.
+func (r *portfolioResolver) UID(ctx context.Context, obj *model.Portfolio) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *portfolioResolver) CreatedBy(ctx context.Context, obj *model.Portfolio) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+	return &createdBy, nil
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *portfolioResolver) UpdatedBy(ctx context.Context, obj *model.Portfolio) (*string, error) {
+	return &model.User{
+		Model: model.Model{
+			ID: obj.UpdatedBy,
+		},
+	}, nil
+}
+
 // Portfolio is the resolver for the portfolio field.
 func (r *queryResolver) Portfolio(ctx context.Context, id string) (*model.Portfolio, error) {
 	panic(fmt.Errorf("not implemented: Portfolio - portfolio"))
@@ -51,27 +75,3 @@ func (r *queryResolver) Portfolios(ctx context.Context) ([]*model.Portfolio, err
 func (r *Resolver) Portfolio() PortfolioResolver { return &portfolioResolver{r} }
 
 type portfolioResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *portfolioResolver) Owner(ctx context.Context, obj *model.Portfolio) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
-}
-func (r *portfolioResolver) CreatedBy(ctx context.Context, obj *model.Portfolio) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.CreatedBy,
-		},
-	}, nil
-}
-func (r *portfolioResolver) UpdatedBy(ctx context.Context, obj *model.Portfolio) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.UpdatedBy,
-		},
-	}, nil
-}

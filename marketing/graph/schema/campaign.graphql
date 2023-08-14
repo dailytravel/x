@@ -7,8 +7,9 @@ type Campaign @key(fields: "id") {
   status: String!
   created_at: String!
   updated_at: String!
-  created_by: User
-  updated_by: User
+  uid: ID!
+  created_by: ID
+  updated_by: ID
   responses: [Response]
 }
 

@@ -9,6 +9,8 @@ type Leave {
   metadata: Map
   created_at: String!
   updated_at: String!
+  created_by: ID!
+  updated_by: ID!
 }
 
 type Leaves {

@@ -1,6 +1,5 @@
 type Order {
   id: ID!
-  user: User
   reference: String!
   total: Float!
   currency: String!
@@ -9,6 +8,9 @@ type Order {
   cancelled_at: Int
   created_at: String!
   updated_at: String!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Orders {

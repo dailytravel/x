@@ -11,6 +11,10 @@ type Invoice @key(fields: "id") {
   status: String
   created_at: String!
   updated_at: String!
+  uid: ID!
+  contact: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Invoices {

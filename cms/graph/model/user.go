@@ -1,8 +1,7 @@
 package model
 
 type User struct {
-	Model `bson:",inline"`
-	Name  string `json:"name"`
+	ID string `json:"id" bson:"_id"`
 }
 
 func (User) IsEntity() {}

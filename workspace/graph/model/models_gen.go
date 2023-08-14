@@ -19,18 +19,6 @@ type Comment struct {
 
 func (Comment) IsEntity() {}
 
-type Employee struct {
-	ID string `json:"id"`
-}
-
-func (Employee) IsEntity() {}
-
-type Follow struct {
-	ID string `json:"id"`
-}
-
-func (Follow) IsEntity() {}
-
 type Goals struct {
 	Count int     `json:"count"`
 	Data  []*Goal `json:"data,omitempty"`
@@ -106,12 +94,6 @@ type NewTask struct {
 	Status     *string                `json:"status,omitempty"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
-
-type Reaction struct {
-	ID string `json:"id"`
-}
-
-func (Reaction) IsEntity() {}
 
 type Tasks struct {
 	Data  []*Task `json:"data,omitempty"`

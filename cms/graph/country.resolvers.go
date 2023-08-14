@@ -48,6 +48,16 @@ func (r *countryResolver) UpdatedAt(ctx context.Context, obj *model.Country) (st
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// CreatedBy is the resolver for the created_by field.
+func (r *countryResolver) CreatedBy(ctx context.Context, obj *model.Country) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *countryResolver) UpdatedBy(ctx context.Context, obj *model.Country) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateCountry is the resolver for the createCountry field.
 func (r *mutationResolver) CreateCountry(ctx context.Context, input model.NewCountry) (*model.Country, error) {
 	var item *model.Country

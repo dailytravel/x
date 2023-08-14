@@ -11,10 +11,12 @@ type Board @key(fields: "id") {
   starred: Boolean!
   order: Int!
   status: String!
-  followers: [Follow]
   created_at: String!
   updated_at: String!
   lists: [List]
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 enum BoardType {

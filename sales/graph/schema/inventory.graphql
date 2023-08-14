@@ -3,6 +3,8 @@ type Inventory {
   product: Product!
   date: Int!
   quantity: Int
+  created_by: ID
+  updated_by: ID
 }
 
 type Inventories {

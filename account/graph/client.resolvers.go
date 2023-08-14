@@ -6,10 +6,13 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
@@ -19,7 +22,16 @@ func (r *clientResolver) ID(ctx context.Context, obj *model.Client) (string, err
 
 // User is the resolver for the user field.
 func (r *clientResolver) User(ctx context.Context, obj *model.Client) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	var item *model.User
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": obj.UID}).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": obj.UID})
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Metadata is the resolver for the metadata field.

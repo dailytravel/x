@@ -12,12 +12,14 @@ type Deal {
   lose_reason: String #competitor, features, price, other
   description: String!
   order: Int
-  user: User
   contact: Contact!
   metadata: Map
   status: String! #open, won, lost, abandoned, negotiation
   created_at: String!
   updated_at: String!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Deals {

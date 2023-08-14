@@ -1,27 +1,13 @@
-#logger
 type Log {
   id: ID!
-  message: String
-  method: String!
-  latency: Int!
-  path: String!
-  status: String!
-  metadata: Map
-  Timestamp: Int!
-  user: User
+  uid: ID!
   url: String!
-  user_agent: String!
-  client_ip: String!
-}
-
-enum RequestMethod {
-  GET
-  POST
-  PUT
-  DELETE
-  HEAD
-  OPTIONS
-  PATCH
+  utm: Map
+  metadata: Map
+  status: String!
+  client_ip: String
+  user_agent: String
+  created_at: String
 }
 
 type Logs {

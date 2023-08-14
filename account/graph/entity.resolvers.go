@@ -11,24 +11,219 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// FindCommentByID is the resolver for the findCommentByID field.
-func (r *entityResolver) FindCommentByID(ctx context.Context, id string) (*model.Comment, error) {
+// FindBoardByUIDAndCreatedByAndUpdatedBy is the resolver for the findBoardByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindBoardByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Board, error) {
+	return &model.Board{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindCampaignByUIDAndCreatedByAndUpdatedBy is the resolver for the findCampaignByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindCampaignByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Campaign, error) {
+	return &model.Campaign{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindCommentByUIDAndCreatedByAndUpdatedBy is the resolver for the findCommentByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindCommentByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Comment, error) {
 	return &model.Comment{
-		ID: primitive.NewObjectID().Hex(),
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
 	}, nil
 }
 
-// FindFollowByID is the resolver for the findFollowByID field.
-func (r *entityResolver) FindFollowByID(ctx context.Context, id string) (*model.Follow, error) {
+// FindCompanyByUIDAndCreatedByAndUpdatedBy is the resolver for the findCompanyByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindCompanyByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Company, error) {
+	return &model.Company{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindContactByUIDAndCreatedByAndUpdatedBy is the resolver for the findContactByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindContactByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Contact, error) {
+	return &model.Contact{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindContentByUIDAndCreatedByAndUpdatedBy is the resolver for the findContentByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindContentByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Content, error) {
+	return &model.Content{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindContractByUIDAndCreatedByAndUpdatedBy is the resolver for the findContractByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindContractByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Contract, error) {
+	return &model.Contract{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindCouponByUIDAndCreatedByAndUpdatedBy is the resolver for the findCouponByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindCouponByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Coupon, error) {
+	return &model.Coupon{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindDealByUIDAndCreatedByAndUpdatedBy is the resolver for the findDealByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindDealByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Deal, error) {
+	return &model.Deal{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindExpenseByUIDAndCreatedByAndUpdatedBy is the resolver for the findExpenseByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindExpenseByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Expense, error) {
+	return &model.Expense{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindFileByUIDAndCreatedByAndUpdatedBy is the resolver for the findFileByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindFileByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.File, error) {
+	return &model.File{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindFollowByUIDAndCreatedByAndUpdatedBy is the resolver for the findFollowByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindFollowByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Follow, error) {
 	return &model.Follow{
-		ID: primitive.NewObjectID().Hex(),
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
 	}, nil
 }
 
-// FindReactionByID is the resolver for the findReactionByID field.
-func (r *entityResolver) FindReactionByID(ctx context.Context, id string) (*model.Reaction, error) {
+// FindGoalByUIDAndCreatedByAndUpdatedBy is the resolver for the findGoalByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindGoalByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Goal, error) {
+	return &model.Goal{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindInvoiceByUIDAndCreatedByAndUpdatedBy is the resolver for the findInvoiceByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindInvoiceByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Invoice, error) {
+	return &model.Invoice{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindLinkByUIDAndCreatedByAndUpdatedBy is the resolver for the findLinkByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindLinkByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Link, error) {
+	return &model.Link{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindListByUIDAndCreatedByAndUpdatedBy is the resolver for the findListByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindListByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.List, error) {
+	return &model.List{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindMembershipByUIDAndCreatedByAndUpdatedBy is the resolver for the findMembershipByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindMembershipByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Membership, error) {
+	return &model.Membership{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindOrderByUIDAndCreatedByAndUpdatedBy is the resolver for the findOrderByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindOrderByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Order, error) {
+	return &model.Order{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindOrganizationByUIDAndCreatedByAndUpdatedBy is the resolver for the findOrganizationByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindOrganizationByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Organization, error) {
+	return &model.Organization{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindPaymentByUIDAndCreatedByAndUpdatedBy is the resolver for the findPaymentByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindPaymentByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Payment, error) {
+	return &model.Payment{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindPortfolioByUIDAndCreatedByAndUpdatedBy is the resolver for the findPortfolioByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindPortfolioByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Portfolio, error) {
+	return &model.Portfolio{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindQuoteByUIDAndCreatedByAndUpdatedBy is the resolver for the findQuoteByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindQuoteByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Quote, error) {
+	return &model.Quote{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindReactionByUIDAndCreatedByAndUpdatedBy is the resolver for the findReactionByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindReactionByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Reaction, error) {
 	return &model.Reaction{
-		ID: primitive.NewObjectID().Hex(),
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
+	}, nil
+}
+
+// FindTaskByUIDAndCreatedByAndUpdatedBy is the resolver for the findTaskByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindTaskByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Task, error) {
+	return &model.Task{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
 	}, nil
 }
 
@@ -43,6 +238,15 @@ func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.Us
 		Model: model.Model{
 			ID: _id,
 		},
+	}, nil
+}
+
+// FindWishlistByUIDAndCreatedByAndUpdatedBy is the resolver for the findWishlistByUIDAndCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindWishlistByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Wishlist, error) {
+	return &model.Wishlist{
+		UID:       uid,
+		CreatedBy: createdBy,
+		UpdatedBy: updatedBy,
 	}, nil
 }
 

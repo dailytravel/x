@@ -7,14 +7,13 @@ package graph
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/dailytravel/x/workspace/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *listResolver) ID(ctx context.Context, obj *model.List) (string, error) {
-	return obj.ID.Hex(), nil
+	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
 // Board is the resolver for the board field.
@@ -24,7 +23,7 @@ func (r *listResolver) Board(ctx context.Context, obj *model.List) (*model.Board
 
 // Metadata is the resolver for the metadata field.
 func (r *listResolver) Metadata(ctx context.Context, obj *model.List) (map[string]interface{}, error) {
-	return obj.Metadata, nil
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -34,12 +33,27 @@ func (r *listResolver) CreatedAt(ctx context.Context, obj *model.List) (string, 
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *listResolver) UpdatedAt(ctx context.Context, obj *model.List) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
 // Tasks is the resolver for the tasks field.
 func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Task, error) {
 	panic(fmt.Errorf("not implemented: Tasks - tasks"))
+}
+
+// UID is the resolver for the uid field.
+func (r *listResolver) UID(ctx context.Context, obj *model.List) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *listResolver) CreatedBy(ctx context.Context, obj *model.List) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *listResolver) UpdatedBy(ctx context.Context, obj *model.List) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CreateList is the resolver for the createList field.
@@ -76,24 +90,3 @@ func (r *queryResolver) Lists(ctx context.Context, board string) (*model.Lists, 
 func (r *Resolver) List() ListResolver { return &listResolver{r} }
 
 type listResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *listResolver) CreatedBy(ctx context.Context, obj *model.List) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.CreatedBy,
-		},
-	}, nil
-}
-func (r *listResolver) UpdatedBy(ctx context.Context, obj *model.List) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.UpdatedBy,
-		},
-	}, nil
-}

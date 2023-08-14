@@ -48,6 +48,16 @@ func (r *currencyResolver) UpdatedAt(ctx context.Context, obj *model.Currency) (
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// CreatedBy is the resolver for the created_by field.
+func (r *currencyResolver) CreatedBy(ctx context.Context, obj *model.Currency) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *currencyResolver) UpdatedBy(ctx context.Context, obj *model.Currency) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateCurrency is the resolver for the createCurrency field.
 func (r *mutationResolver) CreateCurrency(ctx context.Context, input model.NewCurrency) (*model.Currency, error) {
 	var item *model.Currency

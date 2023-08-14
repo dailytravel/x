@@ -1,6 +1,5 @@
 type Membership @key(fields: "id") {
   id: ID!
-  user: User!
   tier: Tier! #silver, gold, platinum
   number: String!
   since: String!
@@ -12,4 +11,7 @@ type Membership @key(fields: "id") {
   status: String!
   created_at: String!
   updated_at: String!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }

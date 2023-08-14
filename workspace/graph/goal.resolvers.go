@@ -27,11 +27,6 @@ func (r *goalResolver) DueDate(ctx context.Context, obj *model.Goal) (string, er
 	panic(fmt.Errorf("not implemented: DueDate - due_date"))
 }
 
-// IsCompany is the resolver for the is_company field.
-func (r *goalResolver) IsCompany(ctx context.Context, obj *model.Goal) (bool, error) {
-	panic(fmt.Errorf("not implemented: IsCompany - is_company"))
-}
-
 // Metadata is the resolver for the metadata field.
 func (r *goalResolver) Metadata(ctx context.Context, obj *model.Goal) (map[string]interface{}, error) {
 	return obj.Metadata, nil
@@ -57,9 +52,24 @@ func (r *goalResolver) Time(ctx context.Context, obj *model.Goal) (*model.Time, 
 	panic(fmt.Errorf("not implemented: Time - time"))
 }
 
-// Followers is the resolver for the followers field.
-func (r *goalResolver) Followers(ctx context.Context, obj *model.Goal) ([]*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Followers - followers"))
+// UID is the resolver for the uid field.
+func (r *goalResolver) UID(ctx context.Context, obj *model.Goal) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
+}
+
+// Organization is the resolver for the organization field.
+func (r *goalResolver) Organization(ctx context.Context, obj *model.Goal) (*string, error) {
+	panic(fmt.Errorf("not implemented: Organization - organization"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *goalResolver) CreatedBy(ctx context.Context, obj *model.Goal) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *goalResolver) UpdatedBy(ctx context.Context, obj *model.Goal) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CreateGoal is the resolver for the createGoal field.

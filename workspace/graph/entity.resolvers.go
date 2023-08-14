@@ -16,6 +16,11 @@ func (r *entityResolver) FindBoardByID(ctx context.Context, id string) (*model.B
 	panic(fmt.Errorf("not implemented: FindBoardByID - findBoardByID"))
 }
 
+// FindUserByID is the resolver for the findUserByID field.
+func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: FindUserByID - findUserByID"))
+}
+
 // Entity returns EntityResolver implementation.
 func (r *Resolver) Entity() EntityResolver { return &entityResolver{r} }
 

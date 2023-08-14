@@ -145,6 +145,28 @@ func (r *timezoneResolver) UpdatedAt(ctx context.Context, obj *model.Timezone) (
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// CreatedBy is the resolver for the created_by field.
+func (r *timezoneResolver) CreatedBy(ctx context.Context, obj *model.Timezone) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *timezoneResolver) UpdatedBy(ctx context.Context, obj *model.Timezone) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
+}
+
 // Timezone returns TimezoneResolver implementation.
 func (r *Resolver) Timezone() TimezoneResolver { return &timezoneResolver{r} }
 

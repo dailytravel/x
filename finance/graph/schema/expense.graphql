@@ -13,8 +13,9 @@ type Expense {
   notes: String
   created_at: String!
   updated_at: String!
-  created_by: User
-  updated_by: User
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 enum ExpenseType {

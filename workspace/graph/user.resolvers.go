@@ -16,6 +16,31 @@ func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) 
 	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
+// Goals is the resolver for the goals field.
+func (r *userResolver) Goals(ctx context.Context, obj *model.User) ([]*model.Goal, error) {
+	panic(fmt.Errorf("not implemented: Goals - goals"))
+}
+
+// Portfolios is the resolver for the portfolios field.
+func (r *userResolver) Portfolios(ctx context.Context, obj *model.User) ([]*model.Portfolio, error) {
+	panic(fmt.Errorf("not implemented: Portfolios - portfolios"))
+}
+
+// Boards is the resolver for the boards field.
+func (r *userResolver) Boards(ctx context.Context, obj *model.User) ([]*model.Board, error) {
+	panic(fmt.Errorf("not implemented: Boards - boards"))
+}
+
+// Lists is the resolver for the lists field.
+func (r *userResolver) Lists(ctx context.Context, obj *model.User) ([]*model.List, error) {
+	panic(fmt.Errorf("not implemented: Lists - lists"))
+}
+
+// Tasks is the resolver for the tasks field.
+func (r *userResolver) Tasks(ctx context.Context, obj *model.User) ([]*model.Task, error) {
+	panic(fmt.Errorf("not implemented: Tasks - tasks"))
+}
+
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 

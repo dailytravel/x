@@ -47,11 +47,6 @@ func (r *taskResolver) ID(ctx context.Context, obj *model.Task) (string, error) 
 	return obj.ID.Hex(), nil
 }
 
-// User is the resolver for the user field.
-func (r *taskResolver) User(ctx context.Context, obj *model.Task) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}
-
 // Parent is the resolver for the parent field.
 func (r *taskResolver) Parent(ctx context.Context, obj *model.Task) (*model.Task, error) {
 	panic(fmt.Errorf("not implemented: Parent - parent"))
@@ -92,46 +87,30 @@ func (r *taskResolver) UpdatedAt(ctx context.Context, obj *model.Task) (string, 
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// Comments is the resolver for the comments field.
-func (r *taskResolver) Comments(ctx context.Context, obj *model.Task) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
+// UID is the resolver for the uid field.
+func (r *taskResolver) UID(ctx context.Context, obj *model.Task) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
-// Followers is the resolver for the followers field.
-func (r *taskResolver) Followers(ctx context.Context, obj *model.Task) ([]*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Followers - followers"))
-}
-
-// Reactions is the resolver for the reactions field.
-func (r *taskResolver) Reactions(ctx context.Context, obj *model.Task) ([]*model.Reaction, error) {
-	panic(fmt.Errorf("not implemented: Reactions - reactions"))
-}
-
-// Task returns TaskResolver implementation.
-func (r *Resolver) Task() TaskResolver { return &taskResolver{r} }
-
-type taskResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *taskResolver) Owner(ctx context.Context, obj *model.Task) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
-}
-func (r *taskResolver) CreatedBy(ctx context.Context, obj *model.Task) (*model.User, error) {
+// CreatedBy is the resolver for the created_by field.
+func (r *taskResolver) CreatedBy(ctx context.Context, obj *model.Task) (*string, error) {
 	return &model.User{
 		Model: model.Model{
 			ID: obj.CreatedBy,
 		},
 	}, nil
 }
-func (r *taskResolver) UpdatedBy(ctx context.Context, obj *model.Task) (*model.User, error) {
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *taskResolver) UpdatedBy(ctx context.Context, obj *model.Task) (*string, error) {
 	return &model.User{
 		Model: model.Model{
 			ID: obj.UpdatedBy,
 		},
 	}, nil
 }
+
+// Task returns TaskResolver implementation.
+func (r *Resolver) Task() TaskResolver { return &taskResolver{r} }
+
+type taskResolver struct{ *Resolver }

@@ -11,9 +11,9 @@ import (
 
 type Client struct {
 	Model       `bson:",inline"`
-	User        primitive.ObjectID  `json:"user,omitempty" bson:"user,omitempty"`
-	Type        string              `json:"type,omitempty" bson:"type,omitempty"`
-	Name        string              `json:"name,omitempty" bson:"name,omitempty"`
+	UID         primitive.ObjectID  `json:"uid" bson:"uid"`
+	Type        string              `json:"type" bson:"type"`
+	Name        string              `json:"name" bson:"name"`
 	Description string              `json:"description,omitempty" bson:"description,omitempty"`
 	Secret      string              `json:"secret" bson:"secret"`
 	Domains     []string            `json:"domains,omitempty" bson:"domains,omitempty"`
@@ -23,7 +23,7 @@ type Client struct {
 	Permissions []string            `json:"permissions,omitempty" bson:"permissions,omitempty"`
 	LastUsed    primitive.Timestamp `json:"last_used,omitempty" bson:"last_used,omitempty"`
 	ExpiresAt   primitive.Timestamp `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
-	Status      string              `json:"status,omitempty" bson:"status,omitempty"`
+	Status      string              `json:"status" bson:"status"`
 }
 
 func (i *Client) MarshalBSON() ([]byte, error) {

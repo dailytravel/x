@@ -1,0 +1,44 @@
+type Reaction @key(fields: "id") {
+  id: ID!
+  uid: ID!
+  reactable: Map!
+  action: String!
+  created_at: String!
+  updated_at: String!
+  created_by: ID
+  updated_by: ID
+}
+
+type Reactions {
+  data: [Reaction]
+  count: Int!
+}
+
+enum ReactionType {
+  NONE
+  LIKE
+  LOVE
+  WOW
+  HAHA
+  SORRY
+  ANGRY
+}
+
+input NewReaction {
+  reactable: Map!
+  action: String!
+}
+
+input UpdateReaction {
+  type: String!
+}
+
+extend type Query {
+  reaction(reactable: Map!): Reaction
+  reactions(args: Map): Reactions
+}
+
+extend type Mutation {
+  createReaction(input: NewReaction!): Reaction @auth
+  updateReaction(id: ID!, input: UpdateReaction!): Reaction @auth
+}

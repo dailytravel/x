@@ -63,24 +63,31 @@ func (r *contentResolver) UpdatedAt(ctx context.Context, obj *model.Content) (st
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// PublishedAt is the resolver for the published_at field.
-func (r *contentResolver) PublishedAt(ctx context.Context, obj *model.Content) (string, error) {
-	return time.Unix(int64(obj.PublishedAt.T), 0).Format(time.RFC3339), nil
+// CreatedBy is the resolver for the created_by field.
+func (r *contentResolver) CreatedBy(ctx context.Context, obj *model.Content) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *contentResolver) UpdatedBy(ctx context.Context, obj *model.Content) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // Parent is the resolver for the parent field.
 func (r *contentResolver) Parent(ctx context.Context, obj *model.Content) (*model.Content, error) {
 	panic(fmt.Errorf("not implemented: Parent - parent"))
-}
-
-// Followers is the resolver for the followers field.
-func (r *contentResolver) Followers(ctx context.Context, obj *model.Content) ([]*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Followers - followers"))
-}
-
-// Comments is the resolver for the comments field.
-func (r *contentResolver) Comments(ctx context.Context, obj *model.Content) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
 }
 
 // CreateContent is the resolver for the createContent field.

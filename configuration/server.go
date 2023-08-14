@@ -23,7 +23,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const defaultPort = "4003"
+const defaultPort = "4004"
 
 func init() {
 	os.Setenv("GIN_MODE", "release")

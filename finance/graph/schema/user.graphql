@@ -1,3 +1,5 @@
 extend type User @key(fields: "id") {
   id: ID! @external
+  expenses: [Expense]
+  invoices: [Invoice]
 }

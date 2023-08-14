@@ -1,11 +1,13 @@
 type Wishlist {
   id: ID!
-  user: User!
-  product: Content!
   metadata: Map
   status: String!
   created_at: String!
   updated_at: String!
+  product: ID!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 enum WishlistStatus {

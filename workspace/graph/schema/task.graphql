@@ -1,7 +1,6 @@
 type Task {
   id: ID!
   name: String!
-  user: User
   parent: Task
   subtasks: [Task]
   list: List!
@@ -15,9 +14,9 @@ type Task {
   metadata: Map
   created_at: String!
   updated_at: String!
-  comments: [Comment]
-  followers: [Follow]
-  reactions: [Reaction]
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Tasks {

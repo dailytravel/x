@@ -1,0 +1,27 @@
+type Notification {
+  id: ID!
+  uid: ID!
+  type: String!
+  locale: String!
+  read_at: Int
+  created_at: String!
+  updated_at: String!
+  notifiable: Map!
+  metadata: Map
+}
+
+type Notifications {
+  data: [Notification]
+  count: Int!
+}
+
+extend type Query {
+  notifications(args: Map): Notifications @auth
+  notification(id: ID!): Notification! @auth
+}
+
+extend type Mutation {
+  updateNotification(args: Map!): Map @auth
+  deleteNotification(id: ID!): Map @auth
+  deleteNotifications(ids: [ID!]!): Map @auth
+}

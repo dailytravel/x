@@ -1,5 +1,6 @@
 type Client {
   id: ID!
+  uid: ID!
   user: User
   type: String!
   name: String!

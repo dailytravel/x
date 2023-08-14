@@ -1,0 +1,8 @@
+extend type User @key(fields: "id") {
+  id: ID! @external
+  notifications: [Notification]
+  conversations: [Conversation]
+  comments: [Comment]
+  reactions: [Reaction]
+  following: [Follow]
+}

@@ -1,6 +1,5 @@
 type Point {
   id: ID!
-  user: User!
   target: Map! #program, reward
   points: Int!
   type: PointType!
@@ -8,6 +7,9 @@ type Point {
   expires_at: String!
   created_at: String!
   updated_at: String!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 enum PointType {

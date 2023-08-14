@@ -99,6 +99,28 @@ func (r *categoryResolver) UpdatedAt(ctx context.Context, obj *model.Category) (
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// CreatedBy is the resolver for the created_by field.
+func (r *categoryResolver) CreatedBy(ctx context.Context, obj *model.Category) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *categoryResolver) UpdatedBy(ctx context.Context, obj *model.Category) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
+}
+
 // CreateCategory is the resolver for the createCategory field.
 func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCategory) (*model.Category, error) {
 	uid, err := utils.UID(auth.Auth(ctx))
@@ -112,8 +134,8 @@ func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCa
 		Slug:   input.Slug,
 		Model: model.Model{
 			Metadata:  input.Metadata,
-			CreatedBy: *uid,
-			UpdatedBy: *uid,
+			CreatedBy: uid,
+			UpdatedBy: uid,
 		},
 	}
 
@@ -213,20 +235,3 @@ func (r *queryResolver) Categories(ctx context.Context, args map[string]interfac
 func (r *Resolver) Category() CategoryResolver { return &categoryResolver{r} }
 
 type categoryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *categoryResolver) CreatedBy(ctx context.Context, obj *model.Category) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-func (r *categoryResolver) UpdatedBy(ctx context.Context, obj *model.Category) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.UpdatedBy,
-		},
-	}, nil
-}

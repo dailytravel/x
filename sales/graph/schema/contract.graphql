@@ -1,6 +1,5 @@
 type Contract {
   id: ID!
-  user: User!
   contact: Contact!
   reference: String!
   description: String!
@@ -13,8 +12,9 @@ type Contract {
   status: String! #"draft" | "active" | "completed" | "canceled";
   created_at: String!
   updated_at: String!
-  comments: [Comment]
-  followers: [Follow]
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Contracts {

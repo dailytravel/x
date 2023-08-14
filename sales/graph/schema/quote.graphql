@@ -1,6 +1,5 @@
 type Quote {
   id: ID!
-  user: User!
   locale: String!
   contact: Contact
   reference: String!
@@ -19,6 +18,9 @@ type Quote {
   status: String
   created_at: String!
   updated_at: String!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Quotes {

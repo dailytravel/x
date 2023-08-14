@@ -1,0 +1,8 @@
+extend type Content @key(fields: "uid created_by updated_by") {
+  uid: ID! @external
+  created_by: ID! @external
+  updated_by: ID! @external
+  user: User
+  created: User
+  updated: User
+}

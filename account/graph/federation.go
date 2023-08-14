@@ -80,6 +80,62 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 		}()
 
 		switch typeName {
+		case "Board":
+			resolverName, err := entityResolverNameForBoard(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Board": %w`, err)
+			}
+			switch resolverName {
+
+			case "findBoardByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findBoardByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findBoardByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findBoardByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindBoardByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Board": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Campaign":
+			resolverName, err := entityResolverNameForCampaign(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Campaign": %w`, err)
+			}
+			switch resolverName {
+
+			case "findCampaignByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findCampaignByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findCampaignByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findCampaignByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindCampaignByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Campaign": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
 		case "Comment":
 			resolverName, err := entityResolverNameForComment(ctx, rep)
 			if err != nil {
@@ -87,14 +143,246 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 			}
 			switch resolverName {
 
-			case "findCommentByID":
-				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+			case "findCommentByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
 				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findCommentByID(): %w`, err)
+					return fmt.Errorf(`unmarshalling param 0 for findCommentByUIDAndCreatedByAndUpdatedBy(): %w`, err)
 				}
-				entity, err := ec.resolvers.Entity().FindCommentByID(ctx, id0)
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findCommentByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findCommentByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindCommentByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
 				if err != nil {
 					return fmt.Errorf(`resolving Entity "Comment": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Company":
+			resolverName, err := entityResolverNameForCompany(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Company": %w`, err)
+			}
+			switch resolverName {
+
+			case "findCompanyByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findCompanyByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findCompanyByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findCompanyByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindCompanyByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Company": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Contact":
+			resolverName, err := entityResolverNameForContact(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Contact": %w`, err)
+			}
+			switch resolverName {
+
+			case "findContactByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findContactByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findContactByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findContactByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindContactByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Contact": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Content":
+			resolverName, err := entityResolverNameForContent(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Content": %w`, err)
+			}
+			switch resolverName {
+
+			case "findContentByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findContentByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findContentByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findContentByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindContentByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Content": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Contract":
+			resolverName, err := entityResolverNameForContract(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Contract": %w`, err)
+			}
+			switch resolverName {
+
+			case "findContractByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findContractByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findContractByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findContractByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindContractByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Contract": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Coupon":
+			resolverName, err := entityResolverNameForCoupon(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Coupon": %w`, err)
+			}
+			switch resolverName {
+
+			case "findCouponByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findCouponByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findCouponByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findCouponByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindCouponByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Coupon": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Deal":
+			resolverName, err := entityResolverNameForDeal(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Deal": %w`, err)
+			}
+			switch resolverName {
+
+			case "findDealByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findDealByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findDealByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findDealByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindDealByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Deal": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Expense":
+			resolverName, err := entityResolverNameForExpense(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Expense": %w`, err)
+			}
+			switch resolverName {
+
+			case "findExpenseByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findExpenseByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findExpenseByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findExpenseByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindExpenseByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Expense": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "File":
+			resolverName, err := entityResolverNameForFile(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "File": %w`, err)
+			}
+			switch resolverName {
+
+			case "findFileByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findFileByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findFileByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findFileByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindFileByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "File": %w`, err)
 				}
 
 				list[idx[i]] = entity
@@ -107,14 +395,302 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 			}
 			switch resolverName {
 
-			case "findFollowByID":
-				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+			case "findFollowByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
 				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findFollowByID(): %w`, err)
+					return fmt.Errorf(`unmarshalling param 0 for findFollowByUIDAndCreatedByAndUpdatedBy(): %w`, err)
 				}
-				entity, err := ec.resolvers.Entity().FindFollowByID(ctx, id0)
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findFollowByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findFollowByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindFollowByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
 				if err != nil {
 					return fmt.Errorf(`resolving Entity "Follow": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Goal":
+			resolverName, err := entityResolverNameForGoal(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Goal": %w`, err)
+			}
+			switch resolverName {
+
+			case "findGoalByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findGoalByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findGoalByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findGoalByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindGoalByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Goal": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Invoice":
+			resolverName, err := entityResolverNameForInvoice(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Invoice": %w`, err)
+			}
+			switch resolverName {
+
+			case "findInvoiceByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findInvoiceByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findInvoiceByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findInvoiceByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindInvoiceByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Invoice": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Link":
+			resolverName, err := entityResolverNameForLink(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Link": %w`, err)
+			}
+			switch resolverName {
+
+			case "findLinkByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findLinkByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findLinkByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findLinkByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindLinkByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Link": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "List":
+			resolverName, err := entityResolverNameForList(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "List": %w`, err)
+			}
+			switch resolverName {
+
+			case "findListByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findListByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findListByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findListByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindListByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "List": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Membership":
+			resolverName, err := entityResolverNameForMembership(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Membership": %w`, err)
+			}
+			switch resolverName {
+
+			case "findMembershipByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findMembershipByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findMembershipByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findMembershipByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindMembershipByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Membership": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Order":
+			resolverName, err := entityResolverNameForOrder(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Order": %w`, err)
+			}
+			switch resolverName {
+
+			case "findOrderByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findOrderByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findOrderByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findOrderByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindOrderByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Order": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Organization":
+			resolverName, err := entityResolverNameForOrganization(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Organization": %w`, err)
+			}
+			switch resolverName {
+
+			case "findOrganizationByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findOrganizationByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findOrganizationByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findOrganizationByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindOrganizationByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Organization": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Payment":
+			resolverName, err := entityResolverNameForPayment(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Payment": %w`, err)
+			}
+			switch resolverName {
+
+			case "findPaymentByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findPaymentByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findPaymentByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findPaymentByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindPaymentByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Payment": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Portfolio":
+			resolverName, err := entityResolverNameForPortfolio(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Portfolio": %w`, err)
+			}
+			switch resolverName {
+
+			case "findPortfolioByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findPortfolioByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findPortfolioByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findPortfolioByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindPortfolioByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Portfolio": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Quote":
+			resolverName, err := entityResolverNameForQuote(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Quote": %w`, err)
+			}
+			switch resolverName {
+
+			case "findQuoteByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findQuoteByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findQuoteByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findQuoteByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindQuoteByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Quote": %w`, err)
 				}
 
 				list[idx[i]] = entity
@@ -127,14 +703,50 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 			}
 			switch resolverName {
 
-			case "findReactionByID":
-				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+			case "findReactionByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
 				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findReactionByID(): %w`, err)
+					return fmt.Errorf(`unmarshalling param 0 for findReactionByUIDAndCreatedByAndUpdatedBy(): %w`, err)
 				}
-				entity, err := ec.resolvers.Entity().FindReactionByID(ctx, id0)
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findReactionByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findReactionByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindReactionByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
 				if err != nil {
 					return fmt.Errorf(`resolving Entity "Reaction": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Task":
+			resolverName, err := entityResolverNameForTask(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Task": %w`, err)
+			}
+			switch resolverName {
+
+			case "findTaskByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findTaskByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findTaskByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findTaskByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindTaskByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Task": %w`, err)
 				}
 
 				list[idx[i]] = entity
@@ -155,6 +767,34 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				entity, err := ec.resolvers.Entity().FindUserByID(ctx, id0)
 				if err != nil {
 					return fmt.Errorf(`resolving Entity "User": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Wishlist":
+			resolverName, err := entityResolverNameForWishlist(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Wishlist": %w`, err)
+			}
+			switch resolverName {
+
+			case "findWishlistByUIDAndCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findWishlistByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 1 for findWishlistByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 2 for findWishlistByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindWishlistByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Wishlist": %w`, err)
 				}
 
 				list[idx[i]] = entity
@@ -229,6 +869,56 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 	}
 }
 
+func entityResolverNameForBoard(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findBoardByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Board", ErrTypeNotFound)
+}
+
+func entityResolverNameForCampaign(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findCampaignByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Campaign", ErrTypeNotFound)
+}
+
 func entityResolverNameForComment(ctx context.Context, rep map[string]interface{}) (string, error) {
 	for {
 		var (
@@ -238,12 +928,220 @@ func entityResolverNameForComment(ctx context.Context, rep map[string]interface{
 		)
 		_ = val
 		m = rep
-		if _, ok = m["id"]; !ok {
+		if _, ok = m["uid"]; !ok {
 			break
 		}
-		return "findCommentByID", nil
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findCommentByUIDAndCreatedByAndUpdatedBy", nil
 	}
 	return "", fmt.Errorf("%w for Comment", ErrTypeNotFound)
+}
+
+func entityResolverNameForCompany(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findCompanyByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Company", ErrTypeNotFound)
+}
+
+func entityResolverNameForContact(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findContactByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Contact", ErrTypeNotFound)
+}
+
+func entityResolverNameForContent(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findContentByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Content", ErrTypeNotFound)
+}
+
+func entityResolverNameForContract(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findContractByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Contract", ErrTypeNotFound)
+}
+
+func entityResolverNameForCoupon(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findCouponByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Coupon", ErrTypeNotFound)
+}
+
+func entityResolverNameForDeal(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findDealByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Deal", ErrTypeNotFound)
+}
+
+func entityResolverNameForExpense(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findExpenseByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Expense", ErrTypeNotFound)
+}
+
+func entityResolverNameForFile(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findFileByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for File", ErrTypeNotFound)
 }
 
 func entityResolverNameForFollow(ctx context.Context, rep map[string]interface{}) (string, error) {
@@ -255,12 +1153,270 @@ func entityResolverNameForFollow(ctx context.Context, rep map[string]interface{}
 		)
 		_ = val
 		m = rep
-		if _, ok = m["id"]; !ok {
+		if _, ok = m["uid"]; !ok {
 			break
 		}
-		return "findFollowByID", nil
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findFollowByUIDAndCreatedByAndUpdatedBy", nil
 	}
 	return "", fmt.Errorf("%w for Follow", ErrTypeNotFound)
+}
+
+func entityResolverNameForGoal(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findGoalByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Goal", ErrTypeNotFound)
+}
+
+func entityResolverNameForInvoice(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findInvoiceByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Invoice", ErrTypeNotFound)
+}
+
+func entityResolverNameForLink(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findLinkByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Link", ErrTypeNotFound)
+}
+
+func entityResolverNameForList(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findListByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for List", ErrTypeNotFound)
+}
+
+func entityResolverNameForMembership(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findMembershipByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Membership", ErrTypeNotFound)
+}
+
+func entityResolverNameForOrder(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findOrderByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Order", ErrTypeNotFound)
+}
+
+func entityResolverNameForOrganization(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findOrganizationByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Organization", ErrTypeNotFound)
+}
+
+func entityResolverNameForPayment(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findPaymentByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Payment", ErrTypeNotFound)
+}
+
+func entityResolverNameForPortfolio(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findPortfolioByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Portfolio", ErrTypeNotFound)
+}
+
+func entityResolverNameForQuote(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findQuoteByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Quote", ErrTypeNotFound)
 }
 
 func entityResolverNameForReaction(ctx context.Context, rep map[string]interface{}) (string, error) {
@@ -272,12 +1428,45 @@ func entityResolverNameForReaction(ctx context.Context, rep map[string]interface
 		)
 		_ = val
 		m = rep
-		if _, ok = m["id"]; !ok {
+		if _, ok = m["uid"]; !ok {
 			break
 		}
-		return "findReactionByID", nil
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findReactionByUIDAndCreatedByAndUpdatedBy", nil
 	}
 	return "", fmt.Errorf("%w for Reaction", ErrTypeNotFound)
+}
+
+func entityResolverNameForTask(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findTaskByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Task", ErrTypeNotFound)
 }
 
 func entityResolverNameForUser(ctx context.Context, rep map[string]interface{}) (string, error) {
@@ -295,4 +1484,29 @@ func entityResolverNameForUser(ctx context.Context, rep map[string]interface{}) 
 		return "findUserByID", nil
 	}
 	return "", fmt.Errorf("%w for User", ErrTypeNotFound)
+}
+
+func entityResolverNameForWishlist(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["created_by"]; !ok {
+			break
+		}
+		m = rep
+		if _, ok = m["updated_by"]; !ok {
+			break
+		}
+		return "findWishlistByUIDAndCreatedByAndUpdatedBy", nil
+	}
+	return "", fmt.Errorf("%w for Wishlist", ErrTypeNotFound)
 }

@@ -32,11 +32,6 @@ func (r *boardResolver) Metadata(ctx context.Context, obj *model.Board) (map[str
 	return obj.Metadata, nil
 }
 
-// Followers is the resolver for the followers field.
-func (r *boardResolver) Followers(ctx context.Context, obj *model.Board) ([]*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Followers - followers"))
-}
-
 // CreatedAt is the resolver for the created_at field.
 func (r *boardResolver) CreatedAt(ctx context.Context, obj *model.Board) (string, error) {
 	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
@@ -50,6 +45,21 @@ func (r *boardResolver) UpdatedAt(ctx context.Context, obj *model.Board) (string
 // Lists is the resolver for the lists field.
 func (r *boardResolver) Lists(ctx context.Context, obj *model.Board) ([]*model.List, error) {
 	panic(fmt.Errorf("not implemented: Lists - lists"))
+}
+
+// UID is the resolver for the uid field.
+func (r *boardResolver) UID(ctx context.Context, obj *model.Board) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *boardResolver) CreatedBy(ctx context.Context, obj *model.Board) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *boardResolver) UpdatedBy(ctx context.Context, obj *model.Board) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CreateBoard is the resolver for the createBoard field.

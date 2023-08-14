@@ -1,5 +1,8 @@
-extend type Comment @key(fields: "id") {
-  id: ID! @external
-  user: ID! @external
-  owner: User @provides(fields: "id")
+extend type Comment @key(fields: "uid created_by updated_by") {
+  uid: ID! @external
+  created_by: ID! @external
+  updated_by: ID! @external
+  user: User
+  created: User
+  updated: User
 }

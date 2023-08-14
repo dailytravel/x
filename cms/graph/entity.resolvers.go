@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/cms/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,22 +15,6 @@ import (
 // FindCategoryByID is the resolver for the findCategoryByID field.
 func (r *entityResolver) FindCategoryByID(ctx context.Context, id string) (*model.Category, error) {
 	var item *model.Category
-
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
-}
-
-// FindCommentByID is the resolver for the findCommentByID field.
-func (r *entityResolver) FindCommentByID(ctx context.Context, id string) (*model.Comment, error) {
-	var item *model.Comment
 
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -77,41 +60,11 @@ func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.Fi
 	return item, nil
 }
 
-// FindFollowByID is the resolver for the findFollowByID field.
-func (r *entityResolver) FindFollowByID(ctx context.Context, id string) (*model.Follow, error) {
-	var item *model.Follow
-
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
-}
-
-// FindReactionByID is the resolver for the findReactionByID field.
-func (r *entityResolver) FindReactionByID(ctx context.Context, id string) (*model.Reaction, error) {
-	var item *model.Reaction
-
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
-}
-
 // FindUserByID is the resolver for the findUserByID field.
 func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: FindUserByID - findUserByID"))
+	return &model.User{
+		ID: id,
+	}, nil
 }
 
 // Entity returns EntityResolver implementation.
