@@ -9,6 +9,9 @@ type Link {
   created_at: String!
   updated_at: String!
   categories: [Category]
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Links {

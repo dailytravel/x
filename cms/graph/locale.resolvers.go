@@ -119,11 +119,11 @@ func (r *mutationResolver) DeleteLocale(ctx context.Context, id string) (map[str
 	}
 	res, err := r.db.Collection("locales").DeleteOne(ctx, bson.M{"_id": _id})
 	if err != nil {
-		return nil, fmt.Errorf("error deleting log: %v", err)
+		return nil, fmt.Errorf("error deleting locale: %v", err)
 	}
 
 	if res.DeletedCount == 0 {
-		return nil, fmt.Errorf("log not found")
+		return nil, fmt.Errorf("locale not found")
 	}
 
 	return map[string]interface{}{
@@ -145,11 +145,11 @@ func (r *mutationResolver) DeleteLocales(ctx context.Context, ids []string) (map
 
 	res, err := r.db.Collection("locales").DeleteMany(ctx, bson.M{"_id": bson.M{"$in": _ids}})
 	if err != nil {
-		return nil, fmt.Errorf("error deleting log: %v", err)
+		return nil, fmt.Errorf("error deleting locale: %v", err)
 	}
 
 	if res.DeletedCount == 0 {
-		return nil, fmt.Errorf("log not found")
+		return nil, fmt.Errorf("locale not found")
 	}
 
 	return map[string]interface{}{
@@ -189,12 +189,10 @@ func (r *queryResolver) Locales(ctx context.Context, args map[string]interface{}
 // Locale is the resolver for the Locale field.
 func (r *queryResolver) Locale(ctx context.Context, code string) (*model.Locale, error) {
 	var item *model.Locale
-	col := r.db.Collection(item.Collection())
 
 	filter := bson.M{"code": code}
 
-	err := col.FindOne(ctx, filter).Decode(&item)
-	if err != nil {
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, fmt.Errorf("no document found for filter %v", filter)
 		}

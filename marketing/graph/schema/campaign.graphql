@@ -10,7 +10,6 @@ type Campaign @key(fields: "id") {
   uid: ID!
   created_by: ID
   updated_by: ID
-  responses: [Response]
 }
 
 type Campaigns {

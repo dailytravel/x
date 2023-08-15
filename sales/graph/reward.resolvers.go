@@ -82,6 +82,16 @@ func (r *rewardResolver) UpdatedAt(ctx context.Context, obj *model.Reward) (stri
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// CreatedBy is the resolver for the created_by field.
+func (r *rewardResolver) CreatedBy(ctx context.Context, obj *model.Reward) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *rewardResolver) UpdatedBy(ctx context.Context, obj *model.Reward) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // Reward returns RewardResolver implementation.
 func (r *Resolver) Reward() RewardResolver { return &rewardResolver{r} }
 

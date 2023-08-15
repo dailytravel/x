@@ -9,7 +9,6 @@ type Migrator interface {
 func AutoMigrate() error {
 	migrators := []Migrator{
 		&Attendance{Database: db.Database},
-		&Event{Database: db.Database},
 		&Leave{Database: db.Database},
 		&Payroll{Database: db.Database},
 		&Resume{Database: db.Database},

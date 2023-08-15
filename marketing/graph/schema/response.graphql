@@ -1,3 +1,0 @@
-extend type Response @key(fields: "id") {
-  id: ID! @external
-}

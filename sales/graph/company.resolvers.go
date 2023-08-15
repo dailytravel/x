@@ -46,6 +46,21 @@ func (r *companyResolver) UpdatedAt(ctx context.Context, obj *model.Company) (st
 	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
+// UID is the resolver for the uid field.
+func (r *companyResolver) UID(ctx context.Context, obj *model.Company) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *companyResolver) CreatedBy(ctx context.Context, obj *model.Company) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *companyResolver) UpdatedBy(ctx context.Context, obj *model.Company) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateCompany is the resolver for the createCompany field.
 func (r *mutationResolver) CreateCompany(ctx context.Context, input model.NewCompany) (*model.Company, error) {
 	panic(fmt.Errorf("not implemented: CreateCompany - createCompany"))

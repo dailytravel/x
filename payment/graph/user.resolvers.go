@@ -6,19 +6,35 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/payment/graph/model"
 )
 
-// ID is the resolver for the id field.
-func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
-}
+// Payments is the resolver for the payments field.
+func (r *userResolver) Payments(ctx context.Context, obj *model.User) ([]*model.Payment, error) {
+	var items []*model.Payment
 
-// Name is the resolver for the name field.
-func (r *userResolver) Name(ctx context.Context, obj *model.User) (*string, error) {
-	panic(fmt.Errorf("not implemented: Name - name"))
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("payments").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Payment
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // User returns UserResolver implementation.

@@ -6,39 +6,145 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/workspace/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-// ID is the resolver for the id field.
-func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
-}
 
 // Goals is the resolver for the goals field.
 func (r *userResolver) Goals(ctx context.Context, obj *model.User) ([]*model.Goal, error) {
-	panic(fmt.Errorf("not implemented: Goals - goals"))
+	var items []*model.Goal
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("goals").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Goal
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Portfolios is the resolver for the portfolios field.
 func (r *userResolver) Portfolios(ctx context.Context, obj *model.User) ([]*model.Portfolio, error) {
-	panic(fmt.Errorf("not implemented: Portfolios - portfolios"))
+	var items []*model.Portfolio
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("portfolios").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Portfolio
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Boards is the resolver for the boards field.
 func (r *userResolver) Boards(ctx context.Context, obj *model.User) ([]*model.Board, error) {
-	panic(fmt.Errorf("not implemented: Boards - boards"))
+	var items []*model.Board
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("boards").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Board
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Lists is the resolver for the lists field.
 func (r *userResolver) Lists(ctx context.Context, obj *model.User) ([]*model.List, error) {
-	panic(fmt.Errorf("not implemented: Lists - lists"))
+	var items []*model.List
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("lists").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.List
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Tasks is the resolver for the tasks field.
 func (r *userResolver) Tasks(ctx context.Context, obj *model.User) ([]*model.Task, error) {
-	panic(fmt.Errorf("not implemented: Tasks - tasks"))
+	var items []*model.Task
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("tasks").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Task
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // User returns UserResolver implementation.

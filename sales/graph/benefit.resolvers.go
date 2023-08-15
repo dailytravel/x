@@ -23,7 +23,7 @@ func (r *benefitResolver) Description(ctx context.Context, obj *model.Benefit) (
 
 // Metadata is the resolver for the metadata field.
 func (r *benefitResolver) Metadata(ctx context.Context, obj *model.Benefit) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -34,6 +34,31 @@ func (r *benefitResolver) CreatedAt(ctx context.Context, obj *model.Benefit) (st
 // UpdatedAt is the resolver for the updated_at field.
 func (r *benefitResolver) UpdatedAt(ctx context.Context, obj *model.Benefit) (string, error) {
 	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// CreateBenefit is the resolver for the createBenefit field.
+func (r *mutationResolver) CreateBenefit(ctx context.Context, input model.NewBenefit) (*model.Benefit, error) {
+	panic(fmt.Errorf("not implemented: CreateBenefit - createBenefit"))
+}
+
+// UpdateBenefit is the resolver for the updateBenefit field.
+func (r *mutationResolver) UpdateBenefit(ctx context.Context, id string, input model.UpdateBenefit) (*model.Benefit, error) {
+	panic(fmt.Errorf("not implemented: UpdateBenefit - updateBenefit"))
+}
+
+// DeleteBenefit is the resolver for the deleteBenefit field.
+func (r *mutationResolver) DeleteBenefit(ctx context.Context, id string) (*bool, error) {
+	panic(fmt.Errorf("not implemented: DeleteBenefit - deleteBenefit"))
+}
+
+// Benefits is the resolver for the benefits field.
+func (r *queryResolver) Benefits(ctx context.Context, args map[string]interface{}) ([]*model.Benefit, error) {
+	panic(fmt.Errorf("not implemented: Benefits - benefits"))
+}
+
+// Benefit is the resolver for the benefit field.
+func (r *queryResolver) Benefit(ctx context.Context, id string) (*model.Benefit, error) {
+	panic(fmt.Errorf("not implemented: Benefit - benefit"))
 }
 
 // Benefit returns BenefitResolver implementation.

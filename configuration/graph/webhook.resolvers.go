@@ -7,11 +7,8 @@ package graph
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/dailytravel/x/configuration/graph/model"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CreateWebhook is the resolver for the createWebhook field.
@@ -26,48 +23,12 @@ func (r *mutationResolver) UpdateWebhook(ctx context.Context, id string, input m
 
 // DeleteWebhook is the resolver for the deleteWebhook field.
 func (r *mutationResolver) DeleteWebhook(ctx context.Context, id string) (map[string]interface{}, error) {
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-	res, err := r.db.Collection("webhooks").DeleteOne(ctx, bson.M{"_id": _id})
-	if err != nil {
-		return nil, fmt.Errorf("error deleting log: %v", err)
-	}
-
-	if res.DeletedCount == 0 {
-		return nil, fmt.Errorf("log not found")
-	}
-
-	return map[string]interface{}{
-		"status": "success",
-	}, nil
+	panic(fmt.Errorf("not implemented: DeleteWebhook - deleteWebhook"))
 }
 
 // DeleteWebhooks is the resolver for the deleteWebhooks field.
 func (r *mutationResolver) DeleteWebhooks(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	var _ids []primitive.ObjectID
-
-	for _, id := range ids {
-		_id, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			return nil, err
-		}
-		_ids = append(_ids, _id)
-	}
-
-	res, err := r.db.Collection("webhooks").DeleteMany(ctx, bson.M{"_id": bson.M{"$in": _ids}})
-	if err != nil {
-		return nil, fmt.Errorf("error deleting log: %v", err)
-	}
-
-	if res.DeletedCount == 0 {
-		return nil, fmt.Errorf("log not found")
-	}
-
-	return map[string]interface{}{
-		"status": "success",
-	}, nil
+	panic(fmt.Errorf("not implemented: DeleteWebhooks - deleteWebhooks"))
 }
 
 // Webhooks is the resolver for the webhooks field.
@@ -82,7 +43,7 @@ func (r *queryResolver) Webhook(ctx context.Context, id string) (*model.Webhook,
 
 // ID is the resolver for the id field.
 func (r *webhookResolver) ID(ctx context.Context, obj *model.Webhook) (string, error) {
-	return obj.ID.Hex(), nil
+	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
 // Headers is the resolver for the headers field.
@@ -97,30 +58,22 @@ func (r *webhookResolver) Events(ctx context.Context, obj *model.Webhook) ([]*mo
 
 // CreatedAt is the resolver for the created_at field.
 func (r *webhookResolver) CreatedAt(ctx context.Context, obj *model.Webhook) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *webhookResolver) UpdatedAt(ctx context.Context, obj *model.Webhook) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
 // CreatedBy is the resolver for the created_by field.
 func (r *webhookResolver) CreatedBy(ctx context.Context, obj *model.Webhook) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.CreatedBy,
-		},
-	}, nil
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *webhookResolver) UpdatedBy(ctx context.Context, obj *model.Webhook) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.UpdatedBy,
-		},
-	}, nil
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // Webhook returns WebhookResolver implementation.

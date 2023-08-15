@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/dailytravel/x/workspace/graph/model"
 )
@@ -44,7 +43,7 @@ func (r *queryResolver) Tasks(ctx context.Context, list string) (*model.Tasks, e
 
 // ID is the resolver for the id field.
 func (r *taskResolver) ID(ctx context.Context, obj *model.Task) (string, error) {
-	return obj.ID.Hex(), nil
+	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
 // Parent is the resolver for the parent field.
@@ -84,30 +83,22 @@ func (r *taskResolver) CreatedAt(ctx context.Context, obj *model.Task) (string, 
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *taskResolver) UpdatedAt(ctx context.Context, obj *model.Task) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
 // UID is the resolver for the uid field.
 func (r *taskResolver) UID(ctx context.Context, obj *model.Task) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.ID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.
 func (r *taskResolver) CreatedBy(ctx context.Context, obj *model.Task) (*string, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.CreatedBy,
-		},
-	}, nil
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *taskResolver) UpdatedBy(ctx context.Context, obj *model.Task) (*string, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.UpdatedBy,
-		},
-	}, nil
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // Task returns TaskResolver implementation.

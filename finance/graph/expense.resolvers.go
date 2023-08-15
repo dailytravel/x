@@ -7,14 +7,13 @@ package graph
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/dailytravel/x/finance/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *expenseResolver) ID(ctx context.Context, obj *model.Expense) (string, error) {
-	return obj.ID.Hex(), nil
+	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
 // Followers is the resolver for the followers field.
@@ -39,30 +38,27 @@ func (r *expenseResolver) Date(ctx context.Context, obj *model.Expense) (string,
 
 // CreatedAt is the resolver for the created_at field.
 func (r *expenseResolver) CreatedAt(ctx context.Context, obj *model.Expense) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *expenseResolver) UpdatedAt(ctx context.Context, obj *model.Expense) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// UID is the resolver for the uid field.
+func (r *expenseResolver) UID(ctx context.Context, obj *model.Expense) (string, error) {
+	return obj.ID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.
-func (r *expenseResolver) CreatedBy(ctx context.Context, obj *model.Expense) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.CreatedBy,
-		},
-	}, nil
+func (r *expenseResolver) CreatedBy(ctx context.Context, obj *model.Expense) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
 }
 
 // UpdatedBy is the resolver for the updated_by field.
-func (r *expenseResolver) UpdatedBy(ctx context.Context, obj *model.Expense) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.UpdatedBy,
-		},
-	}, nil
+func (r *expenseResolver) UpdatedBy(ctx context.Context, obj *model.Expense) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CreateExpense is the resolver for the createExpense field.

@@ -6,14 +6,62 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/finance/graph/model"
 )
 
-// ID is the resolver for the id field.
-func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+// Expenses is the resolver for the expenses field.
+func (r *userResolver) Expenses(ctx context.Context, obj *model.User) ([]*model.Expense, error) {
+	var items []*model.Expense
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("expenses").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Expense
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
+}
+
+// Invoices is the resolver for the invoices field.
+func (r *userResolver) Invoices(ctx context.Context, obj *model.User) ([]*model.Invoice, error) {
+	var items []*model.Invoice
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("invoices").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Invoice
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // User returns UserResolver implementation.

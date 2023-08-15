@@ -1,6 +1,5 @@
 type Organization @key(fields: "id") {
   id: ID!
-  manager: User
   parent: Organization
   name: String
   description: String
@@ -9,6 +8,9 @@ type Organization @key(fields: "id") {
   metadata: Map
   created_at: String!
   updated_at: String!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Organizations {

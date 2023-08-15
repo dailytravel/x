@@ -6,12 +6,11 @@ echo "The server is initializing..."
 function cleanup {
   kill "$ACCOUNT_PID"
   kill "$CMS_PID"
-  kill "$CONFIG_PID"
   kill "$COMMUNITY_PID"
+  kill "$CONFIG_PID"
   kill "$FINANCE_PID"
   kill "$HRM_PID"
   kill "$MARKETING_PID"
-  kill "$NOTIFICATION_PID"
   kill "$PAYMENT_PID" 
   kill "$REPORTING_PID"
   kill "$SALES_PID"
@@ -22,8 +21,8 @@ function cleanup {
 # Build each Go service
 (cd account && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd cms && GOOS=linux GOARCH=amd64 go build -v -o app .)
-(cd configuration && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd community && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd configuration && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd finance && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd hrm && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd marketing && GOOS=linux GOARCH=amd64 go build -v -o app .)

@@ -15,7 +15,9 @@ type Employee {
   user: User
   organization: Organization!
   position: Position
-  reviews: [Comment]
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Employees {

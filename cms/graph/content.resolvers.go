@@ -63,6 +63,11 @@ func (r *contentResolver) UpdatedAt(ctx context.Context, obj *model.Content) (st
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// UID is the resolver for the uid field.
+func (r *contentResolver) UID(ctx context.Context, obj *model.Content) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
 // CreatedBy is the resolver for the created_by field.
 func (r *contentResolver) CreatedBy(ctx context.Context, obj *model.Content) (*string, error) {
 	if obj.CreatedBy == nil {

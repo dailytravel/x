@@ -36,11 +36,6 @@ func (r *pointResolver) ID(ctx context.Context, obj *model.Point) (string, error
 	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
-// User is the resolver for the user field.
-func (r *pointResolver) User(ctx context.Context, obj *model.Point) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}
-
 // Target is the resolver for the target field.
 func (r *pointResolver) Target(ctx context.Context, obj *model.Point) (map[string]interface{}, error) {
 	panic(fmt.Errorf("not implemented: Target - target"))
@@ -48,7 +43,7 @@ func (r *pointResolver) Target(ctx context.Context, obj *model.Point) (map[strin
 
 // Metadata is the resolver for the metadata field.
 func (r *pointResolver) Metadata(ctx context.Context, obj *model.Point) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -59,6 +54,21 @@ func (r *pointResolver) CreatedAt(ctx context.Context, obj *model.Point) (string
 // UpdatedAt is the resolver for the updated_at field.
 func (r *pointResolver) UpdatedAt(ctx context.Context, obj *model.Point) (string, error) {
 	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+
+// UID is the resolver for the uid field.
+func (r *pointResolver) UID(ctx context.Context, obj *model.Point) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *pointResolver) CreatedBy(ctx context.Context, obj *model.Point) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *pointResolver) UpdatedBy(ctx context.Context, obj *model.Point) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // Points is the resolver for the points field.
@@ -75,3 +85,13 @@ func (r *queryResolver) Point(ctx context.Context, id string) (*model.Point, err
 func (r *Resolver) Point() PointResolver { return &pointResolver{r} }
 
 type pointResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *pointResolver) User(ctx context.Context, obj *model.Point) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}

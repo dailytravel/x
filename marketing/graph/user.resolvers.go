@@ -6,14 +6,64 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/marketing/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// ID is the resolver for the id field.
-func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+// Campaigns is the resolver for the campaigns field.
+func (r *userResolver) Campaigns(ctx context.Context, obj *model.User) ([]*model.Campaign, error) {
+	var items []*model.Campaign
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("campaigns").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Campaign
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
+}
+
+// Links is the resolver for the links field.
+func (r *userResolver) Links(ctx context.Context, obj *model.User) ([]*model.Link, error) {
+	var items []*model.Link
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("links").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Link
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // User returns UserResolver implementation.

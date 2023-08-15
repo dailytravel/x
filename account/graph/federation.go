@@ -304,34 +304,6 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				list[idx[i]] = entity
 				return nil
 			}
-		case "Deal":
-			resolverName, err := entityResolverNameForDeal(ctx, rep)
-			if err != nil {
-				return fmt.Errorf(`finding resolver for Entity "Deal": %w`, err)
-			}
-			switch resolverName {
-
-			case "findDealByUIDAndCreatedByAndUpdatedBy":
-				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findDealByUIDAndCreatedByAndUpdatedBy(): %w`, err)
-				}
-				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 1 for findDealByUIDAndCreatedByAndUpdatedBy(): %w`, err)
-				}
-				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 2 for findDealByUIDAndCreatedByAndUpdatedBy(): %w`, err)
-				}
-				entity, err := ec.resolvers.Entity().FindDealByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
-				if err != nil {
-					return fmt.Errorf(`resolving Entity "Deal": %w`, err)
-				}
-
-				list[idx[i]] = entity
-				return nil
-			}
 		case "Expense":
 			resolverName, err := entityResolverNameForExpense(ctx, rep)
 			if err != nil {
@@ -1067,31 +1039,6 @@ func entityResolverNameForCoupon(ctx context.Context, rep map[string]interface{}
 		return "findCouponByUIDAndCreatedByAndUpdatedBy", nil
 	}
 	return "", fmt.Errorf("%w for Coupon", ErrTypeNotFound)
-}
-
-func entityResolverNameForDeal(ctx context.Context, rep map[string]interface{}) (string, error) {
-	for {
-		var (
-			m   map[string]interface{}
-			val interface{}
-			ok  bool
-		)
-		_ = val
-		m = rep
-		if _, ok = m["uid"]; !ok {
-			break
-		}
-		m = rep
-		if _, ok = m["created_by"]; !ok {
-			break
-		}
-		m = rep
-		if _, ok = m["updated_by"]; !ok {
-			break
-		}
-		return "findDealByUIDAndCreatedByAndUpdatedBy", nil
-	}
-	return "", fmt.Errorf("%w for Deal", ErrTypeNotFound)
 }
 
 func entityResolverNameForExpense(ctx context.Context, rep map[string]interface{}) (string, error) {

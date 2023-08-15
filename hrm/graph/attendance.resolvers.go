@@ -22,6 +22,11 @@ func (r *attendanceResolver) ID(ctx context.Context, obj *model.Attendance) (str
 	return obj.ID.Hex(), nil
 }
 
+// Employee is the resolver for the employee field.
+func (r *attendanceResolver) Employee(ctx context.Context, obj *model.Attendance) (string, error) {
+	panic(fmt.Errorf("not implemented: Employee - employee"))
+}
+
 // TimeIn is the resolver for the time_in field.
 func (r *attendanceResolver) TimeIn(ctx context.Context, obj *model.Attendance) (string, error) {
 	return time.Unix(int64(obj.TimeIn.T), 0).Format(time.RFC3339), nil
@@ -47,9 +52,14 @@ func (r *attendanceResolver) UpdatedAt(ctx context.Context, obj *model.Attendanc
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// Owner is the resolver for the owner field.
-func (r *attendanceResolver) Owner(ctx context.Context, obj *model.Attendance) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
+// CreatedBy is the resolver for the created_by field.
+func (r *attendanceResolver) CreatedBy(ctx context.Context, obj *model.Attendance) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *attendanceResolver) UpdatedBy(ctx context.Context, obj *model.Attendance) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CheckIn is the resolver for the checkIn field.
@@ -196,3 +206,13 @@ func (r *queryResolver) Attendances(ctx context.Context, args map[string]interfa
 func (r *Resolver) Attendance() AttendanceResolver { return &attendanceResolver{r} }
 
 type attendanceResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *attendanceResolver) Owner(ctx context.Context, obj *model.Attendance) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Owner - owner"))
+}

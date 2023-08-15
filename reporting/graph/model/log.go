@@ -13,10 +13,12 @@ type Log struct {
 	Model     `bson:",inline"`
 	UID       *primitive.ObjectID `json:"uid,omitempty" bson:"uid,omitempty"`
 	URL       string              `json:"url" bson:"url"`
-	UTM       primitive.M         `json:"utm,omitempty" bson:"utm,omitempty"`
-	UserAgent string              `json:"user_agent" bson:"user_agent"`
-	ClientIP  string              `json:"client_ip" bson:"client_ip"`
+	Referrer  *string             `json:"referrer,omitempty" bson:"referrer,omitempty"`
+	Title     *string             `json:"title,omitempty" bson:"title,omitempty"`
+	Utm       primitive.M         `json:"utm,omitempty" bson:"utm,omitempty"`
 	Status    string              `json:"status" bson:"status"`
+	ClientIP  *string             `json:"client_ip,omitempty" bson:"client_ip,omitempty"`
+	UserAgent *string             `json:"user_agent,omitempty" bson:"user_agent,omitempty"`
 }
 
 func (i *Log) MarshalBSON() ([]byte, error) {

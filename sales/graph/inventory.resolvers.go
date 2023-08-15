@@ -26,6 +26,16 @@ func (r *inventoryResolver) Date(ctx context.Context, obj *model.Inventory) (int
 	panic(fmt.Errorf("not implemented: Date - date"))
 }
 
+// CreatedBy is the resolver for the created_by field.
+func (r *inventoryResolver) CreatedBy(ctx context.Context, obj *model.Inventory) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *inventoryResolver) UpdatedBy(ctx context.Context, obj *model.Inventory) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateInventory is the resolver for the createInventory field.
 func (r *mutationResolver) CreateInventory(ctx context.Context, input model.NewInventory) (*model.Inventory, error) {
 	panic(fmt.Errorf("not implemented: CreateInventory - createInventory"))

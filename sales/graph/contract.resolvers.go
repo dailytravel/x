@@ -16,11 +16,6 @@ func (r *contractResolver) ID(ctx context.Context, obj *model.Contract) (string,
 	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
-// User is the resolver for the user field.
-func (r *contractResolver) User(ctx context.Context, obj *model.Contract) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}
-
 // Contact is the resolver for the contact field.
 func (r *contractResolver) Contact(ctx context.Context, obj *model.Contract) (*model.Contact, error) {
 	panic(fmt.Errorf("not implemented: Contact - contact"))
@@ -38,7 +33,7 @@ func (r *contractResolver) EndDate(ctx context.Context, obj *model.Contract) (st
 
 // Metadata is the resolver for the metadata field.
 func (r *contractResolver) Metadata(ctx context.Context, obj *model.Contract) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -51,14 +46,19 @@ func (r *contractResolver) UpdatedAt(ctx context.Context, obj *model.Contract) (
 	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
-// Comments is the resolver for the comments field.
-func (r *contractResolver) Comments(ctx context.Context, obj *model.Contract) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
+// UID is the resolver for the uid field.
+func (r *contractResolver) UID(ctx context.Context, obj *model.Contract) (string, error) {
+	return obj.ID.Hex(), nil
 }
 
-// Followers is the resolver for the followers field.
-func (r *contractResolver) Followers(ctx context.Context, obj *model.Contract) ([]*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Followers - followers"))
+// CreatedBy is the resolver for the created_by field.
+func (r *contractResolver) CreatedBy(ctx context.Context, obj *model.Contract) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *contractResolver) UpdatedBy(ctx context.Context, obj *model.Contract) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CreateContract is the resolver for the createContract field.
@@ -95,13 +95,3 @@ func (r *queryResolver) Contracts(ctx context.Context, args map[string]interface
 func (r *Resolver) Contract() ContractResolver { return &contractResolver{r} }
 
 type contractResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *contractResolver) Owner(ctx context.Context, obj *model.Contract) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
-}

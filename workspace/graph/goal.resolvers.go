@@ -54,7 +54,7 @@ func (r *goalResolver) Time(ctx context.Context, obj *model.Goal) (*model.Time, 
 
 // UID is the resolver for the uid field.
 func (r *goalResolver) UID(ctx context.Context, obj *model.Goal) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.ID.Hex(), nil
 }
 
 // Organization is the resolver for the organization field.

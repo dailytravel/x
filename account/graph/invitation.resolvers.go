@@ -28,7 +28,7 @@ func (r *invitationResolver) Sender(ctx context.Context, obj *model.Invitation) 
 
 // Metadata is the resolver for the metadata field.
 func (r *invitationResolver) Metadata(ctx context.Context, obj *model.Invitation) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.

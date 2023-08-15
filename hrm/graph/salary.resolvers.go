@@ -42,11 +42,6 @@ func (r *salaryResolver) ID(ctx context.Context, obj *model.Salary) (string, err
 	return obj.ID.Hex(), nil
 }
 
-// Employee is the resolver for the employee field.
-func (r *salaryResolver) Employee(ctx context.Context, obj *model.Salary) (*model.Employee, error) {
-	panic(fmt.Errorf("not implemented: Employee - employee"))
-}
-
 // StartDate is the resolver for the start_date field.
 func (r *salaryResolver) StartDate(ctx context.Context, obj *model.Salary) (string, error) {
 	panic(fmt.Errorf("not implemented: StartDate - start_date"))
@@ -70,6 +65,21 @@ func (r *salaryResolver) CreatedAt(ctx context.Context, obj *model.Salary) (stri
 // UpdatedAt is the resolver for the updated_at field.
 func (r *salaryResolver) UpdatedAt(ctx context.Context, obj *model.Salary) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+}
+
+// Employee is the resolver for the employee field.
+func (r *salaryResolver) Employee(ctx context.Context, obj *model.Salary) (string, error) {
+	panic(fmt.Errorf("not implemented: Employee - employee"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *salaryResolver) CreatedBy(ctx context.Context, obj *model.Salary) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *salaryResolver) UpdatedBy(ctx context.Context, obj *model.Salary) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // Salary returns SalaryResolver implementation.

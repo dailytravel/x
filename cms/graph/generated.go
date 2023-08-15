@@ -98,6 +98,7 @@ type ComplexityRoot struct {
 		Summary     func(childComplexity int) int
 		Title       func(childComplexity int) int
 		Type        func(childComplexity int) int
+		UID         func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 		UpdatedBy   func(childComplexity int) int
 	}
@@ -318,6 +319,7 @@ type ContentResolver interface {
 	Metadata(ctx context.Context, obj *model.Content) (map[string]interface{}, error)
 	CreatedAt(ctx context.Context, obj *model.Content) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.Content) (string, error)
+	UID(ctx context.Context, obj *model.Content) (string, error)
 	CreatedBy(ctx context.Context, obj *model.Content) (*string, error)
 	UpdatedBy(ctx context.Context, obj *model.Content) (*string, error)
 	Parent(ctx context.Context, obj *model.Content) (*model.Content, error)
@@ -669,6 +671,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Content.Type(childComplexity), true
+
+	case "Content.uid":
+		if e.complexity.Content.UID == nil {
+			break
+		}
+
+		return e.complexity.Content.UID(childComplexity), true
 
 	case "Content.updated_at":
 		if e.complexity.Content.UpdatedAt == nil {
@@ -4448,6 +4457,50 @@ func (ec *executionContext) fieldContext_Content_updated_at(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Content_uid(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Content_uid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Content().UID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Content_uid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Content",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Content_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Content_created_by(ctx, field)
 	if err != nil {
@@ -4590,6 +4643,8 @@ func (ec *executionContext) fieldContext_Content_parent(ctx context.Context, fie
 				return ec.fieldContext_Content_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Content_updated_at(ctx, field)
+			case "uid":
+				return ec.fieldContext_Content_uid(ctx, field)
 			case "created_by":
 				return ec.fieldContext_Content_created_by(ctx, field)
 			case "updated_by":
@@ -4707,6 +4762,8 @@ func (ec *executionContext) fieldContext_Contents_data(ctx context.Context, fiel
 				return ec.fieldContext_Content_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Content_updated_at(ctx, field)
+			case "uid":
+				return ec.fieldContext_Content_uid(ctx, field)
 			case "created_by":
 				return ec.fieldContext_Content_created_by(ctx, field)
 			case "updated_by":
@@ -6348,6 +6405,8 @@ func (ec *executionContext) fieldContext_Entity_findContentByID(ctx context.Cont
 				return ec.fieldContext_Content_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Content_updated_at(ctx, field)
+			case "uid":
+				return ec.fieldContext_Content_uid(ctx, field)
 			case "created_by":
 				return ec.fieldContext_Content_created_by(ctx, field)
 			case "updated_by":
@@ -8305,6 +8364,8 @@ func (ec *executionContext) fieldContext_Mutation_createContent(ctx context.Cont
 				return ec.fieldContext_Content_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Content_updated_at(ctx, field)
+			case "uid":
+				return ec.fieldContext_Content_uid(ctx, field)
 			case "created_by":
 				return ec.fieldContext_Content_created_by(ctx, field)
 			case "updated_by":
@@ -8409,6 +8470,8 @@ func (ec *executionContext) fieldContext_Mutation_updateContent(ctx context.Cont
 				return ec.fieldContext_Content_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Content_updated_at(ctx, field)
+			case "uid":
+				return ec.fieldContext_Content_uid(ctx, field)
 			case "created_by":
 				return ec.fieldContext_Content_created_by(ctx, field)
 			case "updated_by":
@@ -10829,6 +10892,8 @@ func (ec *executionContext) fieldContext_Query_content(ctx context.Context, fiel
 				return ec.fieldContext_Content_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Content_updated_at(ctx, field)
+			case "uid":
+				return ec.fieldContext_Content_uid(ctx, field)
 			case "created_by":
 				return ec.fieldContext_Content_created_by(ctx, field)
 			case "updated_by":
@@ -12861,6 +12926,8 @@ func (ec *executionContext) fieldContext_User_contents(ctx context.Context, fiel
 				return ec.fieldContext_Content_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_Content_updated_at(ctx, field)
+			case "uid":
+				return ec.fieldContext_Content_uid(ctx, field)
 			case "created_by":
 				return ec.fieldContext_Content_created_by(ctx, field)
 			case "updated_by":
@@ -17095,6 +17162,42 @@ func (ec *executionContext) _Content(ctx context.Context, sel ast.SelectionSet, 
 					}
 				}()
 				res = ec._Content_updated_at(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "uid":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Content_uid(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

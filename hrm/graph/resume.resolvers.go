@@ -47,11 +47,6 @@ func (r *resumeResolver) ID(ctx context.Context, obj *model.Resume) (string, err
 	return obj.ID.Hex(), nil
 }
 
-// User is the resolver for the user field.
-func (r *resumeResolver) User(ctx context.Context, obj *model.Resume) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}
-
 // Metadata is the resolver for the metadata field.
 func (r *resumeResolver) Metadata(ctx context.Context, obj *model.Resume) (map[string]interface{}, error) {
 	return obj.Metadata, nil
@@ -67,7 +62,32 @@ func (r *resumeResolver) UpdatedAt(ctx context.Context, obj *model.Resume) (stri
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// UID is the resolver for the uid field.
+func (r *resumeResolver) UID(ctx context.Context, obj *model.Resume) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *resumeResolver) CreatedBy(ctx context.Context, obj *model.Resume) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *resumeResolver) UpdatedBy(ctx context.Context, obj *model.Resume) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // Resume returns ResumeResolver implementation.
 func (r *Resolver) Resume() ResumeResolver { return &resumeResolver{r} }
 
 type resumeResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *resumeResolver) User(ctx context.Context, obj *model.Resume) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}

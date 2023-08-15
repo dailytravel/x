@@ -8,11 +8,10 @@ import (
 	"strconv"
 )
 
-type Comment struct {
-	ID string `json:"id"`
+type Benefits struct {
+	Data  []*Benefit `json:"data,omitempty"`
+	Count *int       `json:"count,omitempty"`
 }
-
-func (Comment) IsEntity() {}
 
 type Companies struct {
 	Data  []*Company `json:"data,omitempty"`
@@ -23,12 +22,6 @@ type Contacts struct {
 	Count int        `json:"count"`
 	Data  []*Contact `json:"data,omitempty"`
 }
-
-type Content struct {
-	ID string `json:"id"`
-}
-
-func (Content) IsEntity() {}
 
 type Contracts struct {
 	Data  []*Contract `json:"data,omitempty"`
@@ -45,11 +38,6 @@ type DateRange struct {
 	EndDate   *int    `json:"end_date,omitempty"`
 }
 
-type Deals struct {
-	Data  []*Deal `json:"data,omitempty"`
-	Count *int    `json:"count,omitempty"`
-}
-
 type Email struct {
 	Personal *string `json:"personal,omitempty"`
 	Work     *string `json:"work,omitempty"`
@@ -62,15 +50,15 @@ type EmailInput struct {
 	Other    *string `json:"other,omitempty"`
 }
 
-type Follow struct {
-	ID string `json:"id"`
-}
-
-func (Follow) IsEntity() {}
-
 type Inventories struct {
 	Data  []*Inventory `json:"data,omitempty"`
 	Count *int         `json:"count,omitempty"`
+}
+
+type NewBenefit struct {
+	Locale      string                 `json:"locale"`
+	Description string                 `json:"description"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewCompany struct {
@@ -152,25 +140,6 @@ type NewCoupon struct {
 	MaxUses     *int                   `json:"max_uses,omitempty"`
 	MinPurchase *float64               `json:"min_purchase,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type NewDeal struct {
-	Type        string                 `json:"type"`
-	Name        string                 `json:"name"`
-	Amount      float64                `json:"amount"`
-	Currency    string                 `json:"currency"`
-	CloseDate   string                 `json:"close_date"`
-	PipelineID  string                 `json:"pipeline_id"`
-	Stage       string                 `json:"stage"`
-	Priority    string                 `json:"priority"`
-	Source      string                 `json:"source"`
-	LoseReason  *string                `json:"lose_reason,omitempty"`
-	Description string                 `json:"description"`
-	Order       *int                   `json:"order,omitempty"`
-	UserID      *string                `json:"user_id,omitempty"`
-	ContactID   string                 `json:"contact_id"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      string                 `json:"status"`
 }
 
 type NewInventory struct {
@@ -363,6 +332,12 @@ type Transactions struct {
 	Count int            `json:"count"`
 }
 
+type UpdateBenefit struct {
+	Locale      *string                `json:"locale,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type UpdateCompany struct {
 	User        *string                `json:"user,omitempty"`
 	Name        *string                `json:"name,omitempty"`
@@ -443,25 +418,6 @@ type UpdateCoupon struct {
 	MaxUses     *int                   `json:"max_uses,omitempty"`
 	MinPurchase *float64               `json:"min_purchase,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateDeal struct {
-	Type        *string                `json:"type,omitempty"`
-	Name        *string                `json:"name,omitempty"`
-	Amount      *float64               `json:"amount,omitempty"`
-	Currency    *string                `json:"currency,omitempty"`
-	CloseDate   *string                `json:"close_date,omitempty"`
-	PipelineID  *string                `json:"pipeline_id,omitempty"`
-	Stage       *string                `json:"stage,omitempty"`
-	Priority    *string                `json:"priority,omitempty"`
-	Source      *string                `json:"source,omitempty"`
-	LoseReason  *string                `json:"lose_reason,omitempty"`
-	Description *string                `json:"description,omitempty"`
-	Order       *int                   `json:"order,omitempty"`
-	UserID      *string                `json:"user_id,omitempty"`
-	ContactID   *string                `json:"contact_id,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      *string                `json:"status,omitempty"`
 }
 
 type UpdateInventory struct {
@@ -573,12 +529,14 @@ type UpdateWishlist struct {
 
 type Wishlist struct {
 	ID        string                 `json:"id"`
-	User      *User                  `json:"user"`
-	Product   *Content               `json:"product"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	Status    string                 `json:"status"`
 	CreatedAt string                 `json:"created_at"`
 	UpdatedAt string                 `json:"updated_at"`
+	Product   string                 `json:"product"`
+	UID       string                 `json:"uid"`
+	CreatedBy *string                `json:"created_by,omitempty"`
+	UpdatedBy *string                `json:"updated_by,omitempty"`
 }
 
 type Wishlists struct {

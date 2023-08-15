@@ -6,52 +6,148 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/community/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-// ID is the resolver for the id field.
-func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
-}
 
 // Notifications is the resolver for the notifications field.
 func (r *userResolver) Notifications(ctx context.Context, obj *model.User) ([]*model.Notification, error) {
-	panic(fmt.Errorf("not implemented: Notifications - notifications"))
+	var items []*model.Notification
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("notifications").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Notification
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Conversations is the resolver for the conversations field.
 func (r *userResolver) Conversations(ctx context.Context, obj *model.User) ([]*model.Conversation, error) {
-	panic(fmt.Errorf("not implemented: Conversations - conversations"))
+	var items []*model.Conversation
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("conversations").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Conversation
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Comments is the resolver for the comments field.
 func (r *userResolver) Comments(ctx context.Context, obj *model.User) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
+	var items []*model.Comment
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("comments").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Comment
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Reactions is the resolver for the reactions field.
 func (r *userResolver) Reactions(ctx context.Context, obj *model.User) ([]*model.Reaction, error) {
-	panic(fmt.Errorf("not implemented: Reactions - reactions"))
+	var items []*model.Reaction
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("reactions").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Reaction
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Following is the resolver for the following field.
 func (r *userResolver) Following(ctx context.Context, obj *model.User) ([]*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Following - following"))
+	var items []*model.Follow
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("follows").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Follow
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
 type userResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *userResolver) Name(ctx context.Context, obj *model.User) (*string, error) {
-	panic(fmt.Errorf("not implemented: Name - name"))
-}

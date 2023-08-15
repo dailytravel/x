@@ -26,7 +26,7 @@ func init() {
 	os.Setenv("GIN_MODE", "release")
 	os.Setenv("PORT", "4003")
 	os.Setenv("DB_HOST", "localhost")
-	os.Setenv("DB_NAME", "notification")
+	os.Setenv("DB_NAME", "community")
 	os.Setenv("MONGODB_URI", "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1")
 }
 

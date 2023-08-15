@@ -31,11 +31,6 @@ func (r *organizationResolver) ID(ctx context.Context, obj *model.Organization) 
 	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
-// Manager is the resolver for the manager field.
-func (r *organizationResolver) Manager(ctx context.Context, obj *model.Organization) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Manager - manager"))
-}
-
 // Parent is the resolver for the parent field.
 func (r *organizationResolver) Parent(ctx context.Context, obj *model.Organization) (*model.Organization, error) {
 	panic(fmt.Errorf("not implemented: Parent - parent"))
@@ -56,6 +51,21 @@ func (r *organizationResolver) UpdatedAt(ctx context.Context, obj *model.Organiz
 	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
+// UID is the resolver for the uid field.
+func (r *organizationResolver) UID(ctx context.Context, obj *model.Organization) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *organizationResolver) CreatedBy(ctx context.Context, obj *model.Organization) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *organizationResolver) UpdatedBy(ctx context.Context, obj *model.Organization) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // Organizations is the resolver for the organizations field.
 func (r *queryResolver) Organizations(ctx context.Context, arg map[string]interface{}) (*model.Organizations, error) {
 	panic(fmt.Errorf("not implemented: Organizations - organizations"))
@@ -70,3 +80,13 @@ func (r *queryResolver) Organization(ctx context.Context, id string) (*model.Org
 func (r *Resolver) Organization() OrganizationResolver { return &organizationResolver{r} }
 
 type organizationResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *organizationResolver) Manager(ctx context.Context, obj *model.Organization) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Manager - manager"))
+}

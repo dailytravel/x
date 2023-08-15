@@ -27,11 +27,6 @@ func (r *couponResolver) EndDate(ctx context.Context, obj *model.Coupon) (int, e
 	panic(fmt.Errorf("not implemented: EndDate - end_date"))
 }
 
-// Products is the resolver for the products field.
-func (r *couponResolver) Products(ctx context.Context, obj *model.Coupon) ([]*model.Content, error) {
-	panic(fmt.Errorf("not implemented: Products - products"))
-}
-
 // Metadata is the resolver for the metadata field.
 func (r *couponResolver) Metadata(ctx context.Context, obj *model.Coupon) (map[string]interface{}, error) {
 	return obj.Metadata, nil
@@ -45,6 +40,21 @@ func (r *couponResolver) CreatedAt(ctx context.Context, obj *model.Coupon) (stri
 // UpdatedAt is the resolver for the updated_at field.
 func (r *couponResolver) UpdatedAt(ctx context.Context, obj *model.Coupon) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+}
+
+// UID is the resolver for the uid field.
+func (r *couponResolver) UID(ctx context.Context, obj *model.Coupon) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *couponResolver) CreatedBy(ctx context.Context, obj *model.Coupon) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *couponResolver) UpdatedBy(ctx context.Context, obj *model.Coupon) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CreateCoupon is the resolver for the createCoupon field.

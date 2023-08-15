@@ -9,7 +9,6 @@ type Coupon {
   currency: String!
   start_date: String!
   end_date: Int!
-  products: [Content]
   max_uses: Int
   min_purchase: Float
   uses: Int

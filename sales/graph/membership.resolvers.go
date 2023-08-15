@@ -17,11 +17,6 @@ func (r *membershipResolver) ID(ctx context.Context, obj *model.Membership) (str
 	return obj.ID.Hex(), nil
 }
 
-// User is the resolver for the user field.
-func (r *membershipResolver) User(ctx context.Context, obj *model.Membership) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}
-
 // Tier is the resolver for the tier field.
 func (r *membershipResolver) Tier(ctx context.Context, obj *model.Membership) (*model.Tier, error) {
 	panic(fmt.Errorf("not implemented: Tier - tier"))
@@ -67,7 +62,32 @@ func (r *membershipResolver) UpdatedAt(ctx context.Context, obj *model.Membershi
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// UID is the resolver for the uid field.
+func (r *membershipResolver) UID(ctx context.Context, obj *model.Membership) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *membershipResolver) CreatedBy(ctx context.Context, obj *model.Membership) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *membershipResolver) UpdatedBy(ctx context.Context, obj *model.Membership) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // Membership returns MembershipResolver implementation.
 func (r *Resolver) Membership() MembershipResolver { return &membershipResolver{r} }
 
 type membershipResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *membershipResolver) User(ctx context.Context, obj *model.Membership) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}

@@ -1,6 +1,5 @@
 type Product {
   id: ID!
-  content: Content!
   sku: String!
   locale: String!
   type: String!

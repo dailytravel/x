@@ -13,13 +13,42 @@ type Comments struct {
 	Data  []*Comment `json:"data,omitempty"`
 }
 
+type Contact struct {
+	ID       string     `json:"id"`
+	Comments []*Comment `json:"comments,omitempty"`
+}
+
+func (Contact) IsEntity() {}
+
+type Content struct {
+	ID       string     `json:"id"`
+	Comments []*Comment `json:"comments,omitempty"`
+}
+
+func (Content) IsEntity() {}
+
 type Conversations struct {
 	Data  []*Conversation `json:"data,omitempty"`
 	Count int             `json:"count"`
 }
 
+type Deal struct {
+	ID       string     `json:"id"`
+	Comments []*Comment `json:"comments,omitempty"`
+}
+
+func (Deal) IsEntity() {}
+
+type Expense struct {
+	ID       string     `json:"id"`
+	Comments []*Comment `json:"comments,omitempty"`
+}
+
+func (Expense) IsEntity() {}
+
 type File struct {
-	ID string `json:"id"`
+	ID       string     `json:"id"`
+	Comments []*Comment `json:"comments,omitempty"`
 }
 
 func (File) IsEntity() {}
@@ -80,6 +109,13 @@ type Notifications struct {
 	Count int             `json:"count"`
 }
 
+type Quote struct {
+	ID       string     `json:"id"`
+	Comments []*Comment `json:"comments,omitempty"`
+}
+
+func (Quote) IsEntity() {}
+
 type Reactions struct {
 	Data  []*Reaction `json:"data,omitempty"`
 	Count int         `json:"count"`
@@ -95,6 +131,13 @@ type Recipients struct {
 	Count int          `json:"count"`
 	Data  []*Recipient `json:"data,omitempty"`
 }
+
+type Task struct {
+	ID       string     `json:"id"`
+	Comments []*Comment `json:"comments,omitempty"`
+}
+
+func (Task) IsEntity() {}
 
 type UpdateComment struct {
 	Parent      *string                `json:"parent,omitempty"`

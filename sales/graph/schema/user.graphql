@@ -6,7 +6,6 @@ extend type User @key(fields: "id") {
   companies: [Company]
   contacts: [Contact]
   contracts: [Contract]
-  deals: [Deal]
   quotes: [Quote]
   points: [Point]
   orders: [Order]

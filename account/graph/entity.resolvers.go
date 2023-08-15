@@ -83,15 +83,6 @@ func (r *entityResolver) FindCouponByUIDAndCreatedByAndUpdatedBy(ctx context.Con
 	}, nil
 }
 
-// FindDealByUIDAndCreatedByAndUpdatedBy is the resolver for the findDealByUIDAndCreatedByAndUpdatedBy field.
-func (r *entityResolver) FindDealByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Deal, error) {
-	return &model.Deal{
-		UID:       uid,
-		CreatedBy: createdBy,
-		UpdatedBy: updatedBy,
-	}, nil
-}
-
 // FindExpenseByUIDAndCreatedByAndUpdatedBy is the resolver for the findExpenseByUIDAndCreatedByAndUpdatedBy field.
 func (r *entityResolver) FindExpenseByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Expense, error) {
 	return &model.Expense{

@@ -17,11 +17,6 @@ func (r *contactResolver) ID(ctx context.Context, obj *model.Contact) (string, e
 	return obj.ID.Hex(), nil
 }
 
-// User is the resolver for the user field.
-func (r *contactResolver) User(ctx context.Context, obj *model.Contact) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}
-
 // Type is the resolver for the type field.
 func (r *contactResolver) Type(ctx context.Context, obj *model.Contact) (*string, error) {
 	panic(fmt.Errorf("not implemented: Type - type"))
@@ -62,9 +57,19 @@ func (r *contactResolver) UpdatedAt(ctx context.Context, obj *model.Contact) (st
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// Followers is the resolver for the followers field.
-func (r *contactResolver) Followers(ctx context.Context, obj *model.Contact) ([]*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Followers - followers"))
+// UID is the resolver for the uid field.
+func (r *contactResolver) UID(ctx context.Context, obj *model.Contact) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *contactResolver) CreatedBy(ctx context.Context, obj *model.Contact) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *contactResolver) UpdatedBy(ctx context.Context, obj *model.Contact) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CreateContact is the resolver for the createContact field.
@@ -120,13 +125,3 @@ func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionRes
 
 type contactResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *contactResolver) Owner(ctx context.Context, obj *model.Contact) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
-}

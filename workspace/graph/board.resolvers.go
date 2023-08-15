@@ -49,7 +49,7 @@ func (r *boardResolver) Lists(ctx context.Context, obj *model.Board) ([]*model.L
 
 // UID is the resolver for the uid field.
 func (r *boardResolver) UID(ctx context.Context, obj *model.Board) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.ID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.

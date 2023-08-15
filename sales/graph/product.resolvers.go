@@ -37,11 +37,6 @@ func (r *productResolver) ID(ctx context.Context, obj *model.Product) (string, e
 	return obj.ID.Hex(), nil
 }
 
-// Content is the resolver for the content field.
-func (r *productResolver) Content(ctx context.Context, obj *model.Product) (*model.Content, error) {
-	panic(fmt.Errorf("not implemented: Content - content"))
-}
-
 // Name is the resolver for the name field.
 func (r *productResolver) Name(ctx context.Context, obj *model.Product) (string, error) {
 	panic(fmt.Errorf("not implemented: Name - name"))
@@ -75,6 +70,21 @@ func (r *productResolver) CreatedAt(ctx context.Context, obj *model.Product) (st
 // UpdatedAt is the resolver for the updated_at field.
 func (r *productResolver) UpdatedAt(ctx context.Context, obj *model.Product) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+}
+
+// UID is the resolver for the uid field.
+func (r *productResolver) UID(ctx context.Context, obj *model.Product) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *productResolver) CreatedBy(ctx context.Context, obj *model.Product) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *productResolver) UpdatedBy(ctx context.Context, obj *model.Product) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // Product is the resolver for the product field.

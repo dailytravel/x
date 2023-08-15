@@ -59,11 +59,6 @@ type Employees struct {
 	Count int         `json:"count"`
 }
 
-type Events struct {
-	Count int      `json:"count"`
-	Data  []*Event `json:"data,omitempty"`
-}
-
 type Experience struct {
 	Title       string  `json:"title"`
 	Company     string  `json:"company"`
@@ -80,23 +75,6 @@ type ExperienceInput struct {
 	Description *string `json:"description,omitempty"`
 }
 
-type File struct {
-	ID string `json:"id"`
-}
-
-func (File) IsEntity() {}
-
-type Follow struct {
-	ID string `json:"id"`
-}
-
-func (Follow) IsEntity() {}
-
-type Geo struct {
-	Lat float64 `json:"lat"`
-	Lng float64 `json:"lng"`
-}
-
 type Language struct {
 	Name        string       `json:"name"`
 	Proficiency *Proficiency `json:"proficiency,omitempty"`
@@ -110,17 +88,6 @@ type LanguageInput struct {
 type Leaves struct {
 	Data  []*Leave `json:"data,omitempty"`
 	Count int      `json:"count"`
-}
-
-type Location struct {
-	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	Street      *string `json:"street,omitempty"`
-	City        *string `json:"city,omitempty"`
-	State       *string `json:"state,omitempty"`
-	Zip         *string `json:"zip,omitempty"`
-	Country     *string `json:"country,omitempty"`
-	Geo         *Geo    `json:"geo,omitempty"`
 }
 
 type NewAttendance struct {
@@ -146,26 +113,6 @@ type NewEmployee struct {
 	UserID         *string                `json:"user_id,omitempty"`
 	OrganizationID string                 `json:"organization_id"`
 	PositionID     *string                `json:"position_id,omitempty"`
-}
-
-type NewEvent struct {
-	Owner       *string          `json:"owner,omitempty"`
-	Type        string           `json:"type"`
-	Locale      *string          `json:"locale,omitempty"`
-	Title       string           `json:"title"`
-	Location    *string          `json:"location,omitempty"`
-	Start       int              `json:"start"`
-	End         int              `json:"end"`
-	Timezone    string           `json:"timezone"`
-	AllDay      *bool            `json:"all_day,omitempty"`
-	Description *string          `json:"description,omitempty"`
-	Color       *string          `json:"color,omitempty"`
-	ShowAs      *string          `json:"show_as,omitempty"`
-	Status      *string          `json:"status,omitempty"`
-	Attendees   []*string        `json:"attendees,omitempty"`
-	Reminders   []*ReminderInput `json:"reminders,omitempty"`
-	Recurrence  *RecurrenceInput `json:"recurrence,omitempty"`
-	Attachments []*string        `json:"attachments,omitempty"`
 }
 
 type NewLeave struct {
@@ -230,13 +177,6 @@ type ProjectInput struct {
 	EndDate     *string `json:"endDate,omitempty"`
 }
 
-type RecurrenceInput struct {
-	Frequency  string `json:"frequency"`
-	Interval   int    `json:"interval"`
-	EndDate    *int   `json:"end_date,omitempty"`
-	Exceptions []*int `json:"exceptions,omitempty"`
-}
-
 type Reference struct {
 	Name         string  `json:"name"`
 	Relationship string  `json:"relationship"`
@@ -249,18 +189,6 @@ type ReferenceInput struct {
 	Relationship string  `json:"relationship"`
 	Email        string  `json:"email"`
 	Phone        *string `json:"phone,omitempty"`
-}
-
-type Reminder struct {
-	Method string   `json:"method"`
-	Time   int      `json:"time"`
-	Unit   TimeUnit `json:"unit"`
-}
-
-type ReminderInput struct {
-	Method string   `json:"method"`
-	Time   int      `json:"time"`
-	Unit   TimeUnit `json:"unit"`
 }
 
 type Resumes struct {
@@ -296,26 +224,6 @@ type UpdateEmployee struct {
 	UserID         *string                `json:"user_id,omitempty"`
 	OrganizationID *string                `json:"organization_id,omitempty"`
 	PositionID     *string                `json:"position_id,omitempty"`
-}
-
-type UpdateEvent struct {
-	Owner       *string          `json:"owner,omitempty"`
-	Type        *string          `json:"type,omitempty"`
-	Locale      *string          `json:"locale,omitempty"`
-	Title       *string          `json:"title,omitempty"`
-	Location    *string          `json:"location,omitempty"`
-	Description *string          `json:"description,omitempty"`
-	Start       *int             `json:"start,omitempty"`
-	End         *int             `json:"end,omitempty"`
-	Timezone    *string          `json:"timezone,omitempty"`
-	AllDay      *bool            `json:"all_day,omitempty"`
-	Color       *string          `json:"color,omitempty"`
-	ShowAs      *string          `json:"show_as,omitempty"`
-	Status      *string          `json:"status,omitempty"`
-	Attendees   []*string        `json:"attendees,omitempty"`
-	Reminders   []*ReminderInput `json:"reminders,omitempty"`
-	Recurrence  *RecurrenceInput `json:"recurrence,omitempty"`
-	Attachments []*string        `json:"attachments,omitempty"`
 }
 
 type UpdateLeave struct {
@@ -562,50 +470,5 @@ func (e *Proficiency) UnmarshalGQL(v interface{}) error {
 }
 
 func (e Proficiency) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type TimeUnit string
-
-const (
-	TimeUnitMinutes TimeUnit = "MINUTES"
-	TimeUnitHours   TimeUnit = "HOURS"
-	TimeUnitDays    TimeUnit = "DAYS"
-	TimeUnitWeeks   TimeUnit = "WEEKS"
-)
-
-var AllTimeUnit = []TimeUnit{
-	TimeUnitMinutes,
-	TimeUnitHours,
-	TimeUnitDays,
-	TimeUnitWeeks,
-}
-
-func (e TimeUnit) IsValid() bool {
-	switch e {
-	case TimeUnitMinutes, TimeUnitHours, TimeUnitDays, TimeUnitWeeks:
-		return true
-	}
-	return false
-}
-
-func (e TimeUnit) String() string {
-	return string(e)
-}
-
-func (e *TimeUnit) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = TimeUnit(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid TimeUnit", str)
-	}
-	return nil
-}
-
-func (e TimeUnit) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

@@ -36,16 +36,6 @@ func (r *paymentResolver) Date(ctx context.Context, obj *model.Payment) (string,
 	panic(fmt.Errorf("not implemented: Date - date"))
 }
 
-// User is the resolver for the user field.
-func (r *paymentResolver) User(ctx context.Context, obj *model.Payment) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}
-
-// Invoice is the resolver for the invoice field.
-func (r *paymentResolver) Invoice(ctx context.Context, obj *model.Payment) (*model.Invoice, error) {
-	panic(fmt.Errorf("not implemented: Invoice - invoice"))
-}
-
 // Metadata is the resolver for the metadata field.
 func (r *paymentResolver) Metadata(ctx context.Context, obj *model.Payment) (map[string]interface{}, error) {
 	panic(fmt.Errorf("not implemented: Metadata - metadata"))
@@ -61,13 +51,23 @@ func (r *paymentResolver) UpdatedAt(ctx context.Context, obj *model.Payment) (st
 	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
+// Invoice is the resolver for the invoice field.
+func (r *paymentResolver) Invoice(ctx context.Context, obj *model.Payment) (string, error) {
+	panic(fmt.Errorf("not implemented: Invoice - invoice"))
+}
+
+// UID is the resolver for the uid field.
+func (r *paymentResolver) UID(ctx context.Context, obj *model.Payment) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
 // CreatedBy is the resolver for the created_by field.
-func (r *paymentResolver) CreatedBy(ctx context.Context, obj *model.Payment) (*model.User, error) {
+func (r *paymentResolver) CreatedBy(ctx context.Context, obj *model.Payment) (*string, error) {
 	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
 }
 
 // UpdatedBy is the resolver for the updated_by field.
-func (r *paymentResolver) UpdatedBy(ctx context.Context, obj *model.Payment) (*model.User, error) {
+func (r *paymentResolver) UpdatedBy(ctx context.Context, obj *model.Payment) (*string, error) {
 	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 

@@ -47,6 +47,26 @@ func (r *invoiceResolver) UpdatedAt(ctx context.Context, obj *model.Invoice) (st
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// UID is the resolver for the uid field.
+func (r *invoiceResolver) UID(ctx context.Context, obj *model.Invoice) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// Contact is the resolver for the contact field.
+func (r *invoiceResolver) Contact(ctx context.Context, obj *model.Invoice) (string, error) {
+	panic(fmt.Errorf("not implemented: Contact - contact"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *invoiceResolver) CreatedBy(ctx context.Context, obj *model.Invoice) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *invoiceResolver) UpdatedBy(ctx context.Context, obj *model.Invoice) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateInvoice is the resolver for the createInvoice field.
 func (r *mutationResolver) CreateInvoice(ctx context.Context, input model.NewInvoice) (*model.Invoice, error) {
 	panic(fmt.Errorf("not implemented: CreateInvoice - createInvoice"))

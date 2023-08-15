@@ -100,6 +100,106 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				list[idx[i]] = entity
 				return nil
 			}
+		case "Contact":
+			resolverName, err := entityResolverNameForContact(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Contact": %w`, err)
+			}
+			switch resolverName {
+
+			case "findContactByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findContactByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindContactByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Contact": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Content":
+			resolverName, err := entityResolverNameForContent(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Content": %w`, err)
+			}
+			switch resolverName {
+
+			case "findContentByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findContentByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindContentByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Content": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Deal":
+			resolverName, err := entityResolverNameForDeal(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Deal": %w`, err)
+			}
+			switch resolverName {
+
+			case "findDealByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findDealByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindDealByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Deal": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Expense":
+			resolverName, err := entityResolverNameForExpense(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Expense": %w`, err)
+			}
+			switch resolverName {
+
+			case "findExpenseByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findExpenseByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindExpenseByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Expense": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "File":
+			resolverName, err := entityResolverNameForFile(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "File": %w`, err)
+			}
+			switch resolverName {
+
+			case "findFileByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findFileByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindFileByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "File": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
 		case "Follow":
 			resolverName, err := entityResolverNameForFollow(ctx, rep)
 			if err != nil {
@@ -120,6 +220,26 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				list[idx[i]] = entity
 				return nil
 			}
+		case "Quote":
+			resolverName, err := entityResolverNameForQuote(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Quote": %w`, err)
+			}
+			switch resolverName {
+
+			case "findQuoteByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findQuoteByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindQuoteByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Quote": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
 		case "Reaction":
 			resolverName, err := entityResolverNameForReaction(ctx, rep)
 			if err != nil {
@@ -135,6 +255,26 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				entity, err := ec.resolvers.Entity().FindReactionByID(ctx, id0)
 				if err != nil {
 					return fmt.Errorf(`resolving Entity "Reaction": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Task":
+			resolverName, err := entityResolverNameForTask(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Task": %w`, err)
+			}
+			switch resolverName {
+
+			case "findTaskByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findTaskByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindTaskByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Task": %w`, err)
 				}
 
 				list[idx[i]] = entity
@@ -246,6 +386,91 @@ func entityResolverNameForComment(ctx context.Context, rep map[string]interface{
 	return "", fmt.Errorf("%w for Comment", ErrTypeNotFound)
 }
 
+func entityResolverNameForContact(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findContactByID", nil
+	}
+	return "", fmt.Errorf("%w for Contact", ErrTypeNotFound)
+}
+
+func entityResolverNameForContent(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findContentByID", nil
+	}
+	return "", fmt.Errorf("%w for Content", ErrTypeNotFound)
+}
+
+func entityResolverNameForDeal(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findDealByID", nil
+	}
+	return "", fmt.Errorf("%w for Deal", ErrTypeNotFound)
+}
+
+func entityResolverNameForExpense(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findExpenseByID", nil
+	}
+	return "", fmt.Errorf("%w for Expense", ErrTypeNotFound)
+}
+
+func entityResolverNameForFile(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findFileByID", nil
+	}
+	return "", fmt.Errorf("%w for File", ErrTypeNotFound)
+}
+
 func entityResolverNameForFollow(ctx context.Context, rep map[string]interface{}) (string, error) {
 	for {
 		var (
@@ -263,6 +488,23 @@ func entityResolverNameForFollow(ctx context.Context, rep map[string]interface{}
 	return "", fmt.Errorf("%w for Follow", ErrTypeNotFound)
 }
 
+func entityResolverNameForQuote(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findQuoteByID", nil
+	}
+	return "", fmt.Errorf("%w for Quote", ErrTypeNotFound)
+}
+
 func entityResolverNameForReaction(ctx context.Context, rep map[string]interface{}) (string, error) {
 	for {
 		var (
@@ -278,6 +520,23 @@ func entityResolverNameForReaction(ctx context.Context, rep map[string]interface
 		return "findReactionByID", nil
 	}
 	return "", fmt.Errorf("%w for Reaction", ErrTypeNotFound)
+}
+
+func entityResolverNameForTask(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findTaskByID", nil
+	}
+	return "", fmt.Errorf("%w for Task", ErrTypeNotFound)
 }
 
 func entityResolverNameForUser(ctx context.Context, rep map[string]interface{}) (string, error) {

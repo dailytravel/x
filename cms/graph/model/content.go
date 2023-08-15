@@ -16,18 +16,17 @@ import (
 
 type Content struct {
 	Model       `bson:",inline"`
-	User        primitive.ObjectID   `json:"user" bson:"user"`
-	Parent      primitive.ObjectID   `json:"parent,omitempty" bson:"parent,omitempty"`
-	Slug        string               `json:"slug" bson:"slug"`
-	Locale      string               `json:"locale" bson:"locale"`
-	Type        string               `json:"type" bson:"type"`
-	Title       primitive.M          `json:"title" bson:"title"`
-	Summary     primitive.M          `json:"summary" bson:"summary"`
-	Body        primitive.M          `json:"body" bson:"body"`
-	Status      string               `json:"status" bson:"status"`
-	Commentable bool                 `json:"commentable" bson:"commentable"`
-	Metadata    primitive.M          `json:"metadata" bson:"metadata"`
-	Attachments []primitive.ObjectID `json:"attachments,omitempty" bson:"attachments,omitempty"`
+	UID         primitive.ObjectID `json:"uid" bson:"uid"`
+	Parent      primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
+	Slug        string             `json:"slug" bson:"slug"`
+	Locale      string             `json:"locale" bson:"locale"`
+	Type        string             `json:"type" bson:"type"`
+	Title       primitive.M        `json:"title" bson:"title"`
+	Summary     primitive.M        `json:"summary" bson:"summary"`
+	Body        primitive.M        `json:"body" bson:"body"`
+	Status      string             `json:"status" bson:"status"`
+	Commentable bool               `json:"commentable" bson:"commentable"`
+	Metadata    primitive.M        `json:"metadata" bson:"metadata"`
 }
 
 func (Content) IsEntity() {}
@@ -86,8 +85,8 @@ func (i *Content) Schema() interface{} {
 
 func (i *Content) Document() map[string]interface{} {
 	document := map[string]interface{}{
-		"id":         i.ID.Hex(),
-		"user":       i.User.Hex(),
+		"id":         i.ID,
+		"uid":        i.UID,
 		"locale":     i.Locale,
 		"type":       i.Type,
 		"title":      i.Title,
@@ -99,7 +98,7 @@ func (i *Content) Document() map[string]interface{} {
 	}
 
 	if i.Parent != primitive.NilObjectID {
-		document["parent"] = i.Parent.Hex()
+		document["parent"] = i.Parent
 	}
 
 	return document
@@ -165,82 +164,4 @@ func (i *Content) Delete(collection typesense.CollectionInterface, documentKey p
 	}
 
 	return nil
-}
-
-func (i *Content) Setuser(id *string) {
-	if id != nil {
-		i.User, _ = primitive.ObjectIDFromHex(*id)
-	}
-}
-
-func (i *Content) SetParent(id *string) {
-	if id != nil {
-		i.Parent, _ = primitive.ObjectIDFromHex(*id)
-	}
-}
-
-func (i *Content) SetType(t *string) {
-	if t != nil {
-		i.Type = *t
-	}
-}
-
-func (i *Content) SetLocale(l *string) {
-	if l != nil {
-		i.Locale = *l
-	}
-}
-
-func (i *Content) SetSlug(s *string) {
-	if s != nil {
-		i.Slug = *s
-	}
-}
-
-func (i *Content) SetTitle(locale string, t *string) {
-	if t != nil {
-		i.Title[locale] = *t
-	}
-}
-
-func (i *Content) SetSummary(locale string, s *string) {
-	if s != nil {
-		i.Summary[locale] = *s
-	}
-}
-
-func (i *Content) SetBody(locale string, b *string) {
-	if b != nil {
-		i.Body[locale] = *b
-	}
-}
-
-func (i *Content) SetStatus(s *string) {
-	if s != nil {
-		i.Status = *s
-	}
-}
-
-// func (i *Content) SetCommentStatus(s *string) {
-// 	if s != nil {
-// 		i.CommentStatus = *s
-// 	}
-// }
-
-// func (i *Content) SetCommentCount(c *int) {
-// 	if c != nil {
-// 		i.CommentCount = *c
-// 	}
-// }
-
-func (i *Content) SetMetadata(m map[string]interface{}) {
-	if m != nil {
-		if i.Metadata == nil {
-			i.Metadata = make(map[string]interface{})
-		}
-
-		for k, v := range m {
-			i.Metadata[k] = v
-		}
-	}
 }

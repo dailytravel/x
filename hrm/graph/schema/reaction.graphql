@@ -1,3 +1,0 @@
-extend type Reaction @key(fields: "id") {
-  id: ID! @external
-}

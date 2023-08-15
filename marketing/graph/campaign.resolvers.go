@@ -23,7 +23,7 @@ func (r *campaignResolver) Audience(ctx context.Context, obj *model.Campaign) (*
 
 // Metadata is the resolver for the metadata field.
 func (r *campaignResolver) Metadata(ctx context.Context, obj *model.Campaign) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -36,19 +36,19 @@ func (r *campaignResolver) UpdatedAt(ctx context.Context, obj *model.Campaign) (
 	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
+// UID is the resolver for the uid field.
+func (r *campaignResolver) UID(ctx context.Context, obj *model.Campaign) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
 // CreatedBy is the resolver for the created_by field.
-func (r *campaignResolver) CreatedBy(ctx context.Context, obj *model.Campaign) (*model.User, error) {
+func (r *campaignResolver) CreatedBy(ctx context.Context, obj *model.Campaign) (*string, error) {
 	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
 }
 
 // UpdatedBy is the resolver for the updated_by field.
-func (r *campaignResolver) UpdatedBy(ctx context.Context, obj *model.Campaign) (*model.User, error) {
+func (r *campaignResolver) UpdatedBy(ctx context.Context, obj *model.Campaign) (*string, error) {
 	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
-}
-
-// Responses is the resolver for the responses field.
-func (r *campaignResolver) Responses(ctx context.Context, obj *model.Campaign) ([]*model.Response, error) {
-	panic(fmt.Errorf("not implemented: Responses - responses"))
 }
 
 // CreateCampaign is the resolver for the createCampaign field.

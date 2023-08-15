@@ -34,7 +34,7 @@ func (r *notificationResolver) ID(ctx context.Context, obj *model.Notification) 
 
 // UID is the resolver for the uid field.
 func (r *notificationResolver) UID(ctx context.Context, obj *model.Notification) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.ID.Hex(), nil
 }
 
 // ReadAt is the resolver for the read_at field.

@@ -82,6 +82,16 @@ func (r *tierResolver) UpdatedAt(ctx context.Context, obj *model.Tier) (string, 
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// CreatedBy is the resolver for the created_by field.
+func (r *tierResolver) CreatedBy(ctx context.Context, obj *model.Tier) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *tierResolver) UpdatedBy(ctx context.Context, obj *model.Tier) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // Tier returns TierResolver implementation.
 func (r *Resolver) Tier() TierResolver { return &tierResolver{r} }
 

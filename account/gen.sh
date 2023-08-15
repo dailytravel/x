@@ -1,7 +1,5 @@
 #!/bin/bash
-
-clear
-
+echo "Generating GraphQL files in account"
 go mod tidy
 go run github.com/99designs/gqlgen generate
-echo "Generated GraphQL files"
+echo "Done!"

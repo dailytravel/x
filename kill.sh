@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define an array of port numbers to kill processes on
-ports=(4001 4002 4003 4004 4005 4006 4007 4008 4009 4010)
+ports=(4001 4002 4003 4004 4005 4006 4007 4008 4009 4010 4011 4012)
 
 # Loop through each port and kill the process (if exists)
 for port in "${ports[@]}"; do

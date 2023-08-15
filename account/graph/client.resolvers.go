@@ -20,6 +20,11 @@ func (r *clientResolver) ID(ctx context.Context, obj *model.Client) (string, err
 	return obj.ID.Hex(), nil
 }
 
+// UID is the resolver for the uid field.
+func (r *clientResolver) UID(ctx context.Context, obj *model.Client) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
+}
+
 // User is the resolver for the user field.
 func (r *clientResolver) User(ctx context.Context, obj *model.Client) (*model.User, error) {
 	var item *model.User

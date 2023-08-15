@@ -44,7 +44,7 @@ func (r *conversationResolver) Messages(ctx context.Context, obj *model.Conversa
 
 // UID is the resolver for the uid field.
 func (r *conversationResolver) UID(ctx context.Context, obj *model.Conversation) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.ID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.

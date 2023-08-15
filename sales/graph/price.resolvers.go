@@ -51,6 +51,16 @@ func (r *priceResolver) Metadata(ctx context.Context, obj *model.Price) (map[str
 	return obj.Metadata, nil
 }
 
+// CreatedBy is the resolver for the created_by field.
+func (r *priceResolver) CreatedBy(ctx context.Context, obj *model.Price) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *priceResolver) UpdatedBy(ctx context.Context, obj *model.Price) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // Price is the resolver for the price field.
 func (r *queryResolver) Price(ctx context.Context, id string) (*model.Price, error) {
 	panic(fmt.Errorf("not implemented: Price - price"))

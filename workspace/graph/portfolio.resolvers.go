@@ -7,14 +7,13 @@ package graph
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/dailytravel/x/workspace/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *portfolioResolver) ID(ctx context.Context, obj *model.Portfolio) (string, error) {
-	return obj.ID.Hex(), nil
+	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
 // Boards is the resolver for the boards field.
@@ -34,31 +33,22 @@ func (r *portfolioResolver) CreatedAt(ctx context.Context, obj *model.Portfolio)
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *portfolioResolver) UpdatedAt(ctx context.Context, obj *model.Portfolio) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
 // UID is the resolver for the uid field.
 func (r *portfolioResolver) UID(ctx context.Context, obj *model.Portfolio) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.ID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.
 func (r *portfolioResolver) CreatedBy(ctx context.Context, obj *model.Portfolio) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	createdBy := obj.CreatedBy.Hex()
-	return &createdBy, nil
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *portfolioResolver) UpdatedBy(ctx context.Context, obj *model.Portfolio) (*string, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.UpdatedBy,
-		},
-	}, nil
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // Portfolio is the resolver for the portfolio field.

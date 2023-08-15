@@ -47,6 +47,16 @@ func (r *leaveResolver) UpdatedAt(ctx context.Context, obj *model.Leave) (string
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// CreatedBy is the resolver for the created_by field.
+func (r *leaveResolver) CreatedBy(ctx context.Context, obj *model.Leave) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *leaveResolver) UpdatedBy(ctx context.Context, obj *model.Leave) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
 // CreateLeave is the resolver for the createLeave field.
 func (r *mutationResolver) CreateLeave(ctx context.Context, input model.NewLeave) (*model.Leave, error) {
 	panic(fmt.Errorf("not implemented: CreateLeave - createLeave"))

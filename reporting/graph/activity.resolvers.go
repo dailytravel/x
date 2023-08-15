@@ -9,34 +9,26 @@ import (
 	"fmt"
 
 	"github.com/dailytravel/x/reporting/graph/model"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ID is the resolver for the id field.
 func (r *activityResolver) ID(ctx context.Context, obj *model.Activity) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
-}
-
-// User is the resolver for the user field.
-func (r *activityResolver) User(ctx context.Context, obj *model.Activity) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}
-
-// Activitable is the resolver for the activitable field.
-func (r *activityResolver) Activitable(ctx context.Context, obj *model.Activity) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Activitable - activitable"))
-}
-
-// Comment is the resolver for the comment field.
-func (r *activityResolver) Comment(ctx context.Context, obj *model.Activity) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comment - comment"))
+	return obj.ID.Hex(), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *activityResolver) Metadata(ctx context.Context, obj *model.Activity) (map[string]interface{}, error) {
 	return obj.Metadata, nil
+}
+
+// UID is the resolver for the uid field.
+func (r *activityResolver) UID(ctx context.Context, obj *model.Activity) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// Target is the resolver for the target field.
+func (r *activityResolver) Target(ctx context.Context, obj *model.Activity) (string, error) {
+	return obj.Target.Hex(), nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -46,53 +38,12 @@ func (r *activityResolver) CreatedAt(ctx context.Context, obj *model.Activity) (
 
 // Activity is the resolver for the activity field.
 func (r *queryResolver) Activity(ctx context.Context, id string) (*model.Activity, error) {
-	var item *model.Activity
-
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
+	panic(fmt.Errorf("not implemented: Activity - activity"))
 }
 
 // Activities is the resolver for the activities field.
-func (r *queryResolver) Activities(ctx context.Context, id string, typeArg string, limit *int, page *int) (*model.Activities, error) {
-	var items []*model.Activity
-
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	filter := bson.M{"object._id": _id, "object.type": typeArg}
-	opts := options.Find().SetSort(bson.M{"created_at": -1})
-
-	cur, err := r.db.Collection("activities").Find(ctx, filter, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	for cur.Next(ctx) {
-		var item *model.Activity
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-
-		items = append(items, item)
-	}
-
-	//get count
-	count, err := r.db.Collection("activities").CountDocuments(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	return &model.Activities{Data: items, Count: int(count)}, nil
+func (r *queryResolver) Activities(ctx context.Context, args map[string]interface{}) (*model.Activities, error) {
+	panic(fmt.Errorf("not implemented: Activities - activities"))
 }
 
 // Activity returns ActivityResolver implementation.

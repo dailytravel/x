@@ -53,6 +53,9 @@ type Link struct {
 	CreatedAt   string                 `json:"created_at"`
 	UpdatedAt   string                 `json:"updated_at"`
 	Categories  []*Category            `json:"categories,omitempty"`
+	UID         string                 `json:"uid"`
+	CreatedBy   *string                `json:"created_by,omitempty"`
+	UpdatedBy   *string                `json:"updated_by,omitempty"`
 }
 
 type Links struct {
@@ -84,12 +87,6 @@ type NewLink struct {
 	Categories  []string               `json:"categories,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
-
-type Response struct {
-	ID string `json:"id"`
-}
-
-func (Response) IsEntity() {}
 
 type RuleInput struct {
 	Field    string `json:"field"`

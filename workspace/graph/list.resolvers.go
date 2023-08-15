@@ -23,7 +23,7 @@ func (r *listResolver) Board(ctx context.Context, obj *model.List) (*model.Board
 
 // Metadata is the resolver for the metadata field.
 func (r *listResolver) Metadata(ctx context.Context, obj *model.List) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -43,7 +43,7 @@ func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Tas
 
 // UID is the resolver for the uid field.
 func (r *listResolver) UID(ctx context.Context, obj *model.List) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.ID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.

@@ -23,7 +23,7 @@ func (r *audienceResolver) Segments(ctx context.Context, obj *model.Audience) ([
 
 // Metadata is the resolver for the metadata field.
 func (r *audienceResolver) Metadata(ctx context.Context, obj *model.Audience) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.

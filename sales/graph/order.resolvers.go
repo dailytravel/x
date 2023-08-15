@@ -37,11 +37,6 @@ func (r *orderResolver) ID(ctx context.Context, obj *model.Order) (string, error
 	return obj.ID.Hex(), nil
 }
 
-// User is the resolver for the user field.
-func (r *orderResolver) User(ctx context.Context, obj *model.Order) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}
-
 // Total is the resolver for the total field.
 func (r *orderResolver) Total(ctx context.Context, obj *model.Order) (float64, error) {
 	panic(fmt.Errorf("not implemented: Total - total"))
@@ -60,6 +55,21 @@ func (r *orderResolver) CreatedAt(ctx context.Context, obj *model.Order) (string
 // UpdatedAt is the resolver for the updated_at field.
 func (r *orderResolver) UpdatedAt(ctx context.Context, obj *model.Order) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+}
+
+// UID is the resolver for the uid field.
+func (r *orderResolver) UID(ctx context.Context, obj *model.Order) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *orderResolver) CreatedBy(ctx context.Context, obj *model.Order) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *orderResolver) UpdatedBy(ctx context.Context, obj *model.Order) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // Order is the resolver for the order field.
@@ -83,6 +93,9 @@ type orderResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *orderResolver) User(ctx context.Context, obj *model.Order) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
 func (r *orderResolver) Owner(ctx context.Context, obj *model.Order) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: Owner - owner"))
 }

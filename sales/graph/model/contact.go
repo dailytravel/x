@@ -52,7 +52,7 @@ func (Contact) IsEntity() {}
 func (i *Contact) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.UpdatedBy == primitive.NilObjectID {
+	if i.UpdatedBy == nil {
 		i.CreatedAt = now
 	}
 

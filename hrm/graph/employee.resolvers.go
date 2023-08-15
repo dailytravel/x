@@ -61,9 +61,19 @@ func (r *employeeResolver) Position(ctx context.Context, obj *model.Employee) (*
 	panic(fmt.Errorf("not implemented: Position - position"))
 }
 
-// Reviews is the resolver for the reviews field.
-func (r *employeeResolver) Reviews(ctx context.Context, obj *model.Employee) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Reviews - reviews"))
+// UID is the resolver for the uid field.
+func (r *employeeResolver) UID(ctx context.Context, obj *model.Employee) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *employeeResolver) CreatedBy(ctx context.Context, obj *model.Employee) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *employeeResolver) UpdatedBy(ctx context.Context, obj *model.Employee) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CreateEmployee is the resolver for the createEmployee field.
@@ -95,3 +105,13 @@ func (r *queryResolver) Employees(ctx context.Context, args map[string]interface
 func (r *Resolver) Employee() EmployeeResolver { return &employeeResolver{r} }
 
 type employeeResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *employeeResolver) Reviews(ctx context.Context, obj *model.Employee) ([]*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: Reviews - reviews"))
+}

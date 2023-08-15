@@ -11,6 +11,7 @@ type Content @key(fields: "id") {
   metadata: Map
   created_at: String!
   updated_at: String!
+  uid: ID!
   created_by: ID
   updated_by: ID
   parent: Content
