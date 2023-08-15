@@ -7,19 +7,18 @@ package graph
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/dailytravel/x/community/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *conversationResolver) ID(ctx context.Context, obj *model.Conversation) (string, error) {
-	return obj.ID.Hex(), nil
+	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *conversationResolver) Metadata(ctx context.Context, obj *model.Conversation) (map[string]interface{}, error) {
-	return obj.Metadata, nil
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
 }
 
 // Message is the resolver for the message field.
@@ -29,12 +28,12 @@ func (r *conversationResolver) Message(ctx context.Context, obj *model.Conversat
 
 // CreatedAt is the resolver for the created_at field.
 func (r *conversationResolver) CreatedAt(ctx context.Context, obj *model.Conversation) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *conversationResolver) UpdatedAt(ctx context.Context, obj *model.Conversation) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
 }
 
 // Messages is the resolver for the messages field.
@@ -44,7 +43,7 @@ func (r *conversationResolver) Messages(ctx context.Context, obj *model.Conversa
 
 // UID is the resolver for the uid field.
 func (r *conversationResolver) UID(ctx context.Context, obj *model.Conversation) (string, error) {
-	return obj.ID.Hex(), nil
+	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
 // CreatedBy is the resolver for the created_by field.
@@ -55,6 +54,16 @@ func (r *conversationResolver) CreatedBy(ctx context.Context, obj *model.Convers
 // UpdatedBy is the resolver for the updated_by field.
 func (r *conversationResolver) UpdatedBy(ctx context.Context, obj *model.Conversation) (*string, error) {
 	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}
+
+// Followers is the resolver for the followers field.
+func (r *conversationResolver) Followers(ctx context.Context, obj *model.Conversation) ([]*model.Follow, error) {
+	panic(fmt.Errorf("not implemented: Followers - followers"))
+}
+
+// Comments is the resolver for the comments field.
+func (r *conversationResolver) Comments(ctx context.Context, obj *model.Conversation) ([]*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: Comments - comments"))
 }
 
 // CreateConversation is the resolver for the createConversation field.
@@ -96,13 +105,3 @@ func (r *queryResolver) Conversations(ctx context.Context, args map[string]inter
 func (r *Resolver) Conversation() ConversationResolver { return &conversationResolver{r} }
 
 type conversationResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *conversationResolver) Followers(ctx context.Context, obj *model.Conversation) ([]*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Followers - followers"))
-}

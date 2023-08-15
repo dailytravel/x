@@ -16,7 +16,7 @@ import (
 
 type Contact struct {
 	Model        `bson:",inline"`
-	User         primitive.ObjectID  `bson:"user" json:"user"`
+	UID          primitive.ObjectID  `bson:"uid" json:"uid"`
 	Company      *primitive.ObjectID `bson:"company,omitempty" json:"company,omitempty"`
 	Reference    string              `json:"reference" bson:"reference"`
 	FirstName    string              `json:"first_name,omitempty" bson:"first_name,omitempty"`
@@ -68,7 +68,7 @@ func (i *Contact) Collection() string {
 
 func (i *Contact) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "company", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "first_name", Value: "text"}, {Key: "last_name", Value: "text"}}, Options: options.Index().SetWeights(bson.M{"first_name": 2, "last_name": 1})},
 		{Keys: bson.D{{Key: "source", Value: 1}}, Options: options.Index()},
@@ -87,7 +87,7 @@ func (i *Contact) Schema() interface{} {
 	return &api.CollectionSchema{
 		Name: i.Collection(),
 		Fields: []api.Field{
-			{Name: "user", Type: "string"},
+			{Name: "uid", Type: "string"},
 			{Name: "company", Type: "string", Optional: pointer.True()},
 			{Name: "first_name", Type: "string", Optional: pointer.True()},
 			{Name: "last_name", Type: "string", Optional: pointer.True()},
@@ -124,7 +124,7 @@ func (i *Contact) Document() map[string]interface{} {
 
 	document := map[string]interface{}{
 		"id":            i.ID,
-		"user":          i.User,
+		"uid":           i.UID,
 		"company":       i.Company,
 		"first_name":    i.FirstName,
 		"last_name":     i.LastName,
@@ -231,168 +231,4 @@ func (i *Contact) Delete(collection typesense.CollectionInterface, documentKey p
 	}
 
 	return nil
-}
-
-func (i *Contact) Setuser(id *string) {
-	if id != nil {
-		i.User, _ = primitive.ObjectIDFromHex(*id)
-	}
-}
-
-func (i *Contact) SetReference(r *string) {
-	if r != nil {
-		i.Reference = *r
-	}
-}
-
-func (i *Contact) SetFirstName(f *string) {
-	if f != nil {
-		i.FirstName = *f
-	}
-}
-
-func (i *Contact) SetLastName(l *string) {
-	if l != nil {
-		i.LastName = *l
-	}
-}
-
-func (i *Contact) SetJobTitle(j *string) {
-	if j != nil {
-		i.JobTitle = *j
-	}
-}
-
-func (c *Contact) SetBirthday(b *string) {
-	if b != nil {
-		birthdayTime, err := time.Parse(time.RFC3339, *b)
-		if err == nil {
-			c.Birthday = primitive.NewDateTimeFromTime(birthdayTime)
-		}
-	}
-}
-
-func (c *Contact) SetGender(g *string) {
-	c.Gender = Gender(*g)
-}
-
-func (c *Contact) SetEmail(e Email) {
-	c.Email = e
-}
-
-func (c *Contact) SetPhone(p Phone) {
-	c.Phone = p
-}
-
-func (c *Contact) SetStreet(s *string) {
-	if s != nil {
-		c.Street = *s
-	}
-}
-
-func (c *Contact) SetCity(ct *string) {
-	if ct != nil {
-		c.City = *ct
-	}
-}
-
-func (c *Contact) SetZip(z *string) {
-	if z != nil {
-		c.Zip = *z
-	}
-}
-
-func (c *Contact) SetState(st *string) {
-	if st != nil {
-		c.State = *st
-	}
-}
-
-func (c *Contact) SetCountry(co *string) {
-	if co != nil {
-		c.Country = *co
-	}
-}
-
-func (c *Contact) SetWebsite(w *string) {
-	if w != nil {
-		c.Website = *w
-	}
-}
-
-func (c *Contact) SetSource(s *string) {
-	if s != nil {
-		c.Source = *s
-	}
-}
-
-func (c *Contact) SetPicture(picture *string) {
-	if picture != nil {
-		c.Picture = *picture
-	}
-}
-
-func (c *Contact) SetRevenue(r float64) {
-	c.Revenue = r
-}
-
-func (c *Contact) SetTimezone(tz *string) {
-	if tz != nil {
-		c.Timezone = *tz
-	}
-}
-
-func (c *Contact) SetLanguage(lang *string) {
-	if lang != nil {
-		c.Language = *lang
-	}
-}
-
-func (c *Contact) SetSubscribed(sub bool) {
-	c.Subscribed = sub
-}
-
-func (c *Contact) SetNotes(notes *string) {
-	if notes != nil {
-		c.Notes = *notes
-	}
-}
-
-func (c *Contact) SetStage(stage *string) {
-	if stage != nil {
-		c.Stage = *stage
-	}
-}
-
-func (c *Contact) SetStatus(status *string) {
-	if status != nil {
-		c.Status = *status
-	}
-}
-
-func (c *Contact) SetLastActivity(t *primitive.Timestamp) {
-	if t != nil {
-		c.LastActivity = *t
-	}
-}
-
-func (c *Contact) SetMetadata(m map[string]interface{}) {
-	if m != nil {
-		if c.Metadata == nil {
-			c.Metadata = make(map[string]interface{})
-		}
-
-		for k, v := range m {
-			c.Metadata[k] = v
-		}
-	}
-}
-
-func (c *Contact) SetLabels(labels []*string) {
-	c.Labels = make([]string, len(labels))
-	for i, v := range labels {
-		if v != nil {
-			c.Labels[i] = *v
-		}
-	}
 }

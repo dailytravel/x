@@ -71,7 +71,6 @@ type ComplexityRoot struct {
 		Metadata    func(childComplexity int) int
 		Parent      func(childComplexity int) int
 		Rating      func(childComplexity int) int
-		Reaction    func(childComplexity int) int
 		Reactions   func(childComplexity int) int
 		Status      func(childComplexity int) int
 		UID         func(childComplexity int) int
@@ -95,9 +94,11 @@ type ComplexityRoot struct {
 	}
 
 	Conversation struct {
+		Comments    func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
 		CreatedBy   func(childComplexity int) int
 		Description func(childComplexity int) int
+		Followers   func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Labels      func(childComplexity int) int
 		Message     func(childComplexity int) int
@@ -116,16 +117,10 @@ type ComplexityRoot struct {
 		Data  func(childComplexity int) int
 	}
 
-	Deal struct {
-		Comments func(childComplexity int) int
-		ID       func(childComplexity int) int
-	}
-
 	Entity struct {
 		FindCommentByID  func(childComplexity int, id string) int
 		FindContactByID  func(childComplexity int, id string) int
 		FindContentByID  func(childComplexity int, id string) int
-		FindDealByID     func(childComplexity int, id string) int
 		FindExpenseByID  func(childComplexity int, id string) int
 		FindFileByID     func(childComplexity int, id string) int
 		FindFollowByID   func(childComplexity int, id string) int
@@ -150,6 +145,7 @@ type ComplexityRoot struct {
 		CreatedBy  func(childComplexity int) int
 		Followable func(childComplexity int) int
 		ID         func(childComplexity int) int
+		Muted      func(childComplexity int) int
 		Role       func(childComplexity int) int
 		Status     func(childComplexity int) int
 		UID        func(childComplexity int) int
@@ -164,7 +160,6 @@ type ComplexityRoot struct {
 
 	Message struct {
 		Body         func(childComplexity int) int
-		Comments     func(childComplexity int) int
 		Conversation func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
 		ID           func(childComplexity int) int
@@ -309,7 +304,6 @@ type CommentResolver interface {
 	Parent(ctx context.Context, obj *model.Comment) (*model.Comment, error)
 	Children(ctx context.Context, obj *model.Comment) ([]*model.Comment, error)
 	Commentable(ctx context.Context, obj *model.Comment) (map[string]interface{}, error)
-	Reaction(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error)
 	Reactions(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error)
 	CreatedBy(ctx context.Context, obj *model.Comment) (*string, error)
 	UpdatedBy(ctx context.Context, obj *model.Comment) (*string, error)
@@ -325,12 +319,13 @@ type ConversationResolver interface {
 	UID(ctx context.Context, obj *model.Conversation) (string, error)
 	CreatedBy(ctx context.Context, obj *model.Conversation) (*string, error)
 	UpdatedBy(ctx context.Context, obj *model.Conversation) (*string, error)
+	Followers(ctx context.Context, obj *model.Conversation) ([]*model.Follow, error)
+	Comments(ctx context.Context, obj *model.Conversation) ([]*model.Comment, error)
 }
 type EntityResolver interface {
 	FindCommentByID(ctx context.Context, id string) (*model.Comment, error)
 	FindContactByID(ctx context.Context, id string) (*model.Contact, error)
 	FindContentByID(ctx context.Context, id string) (*model.Content, error)
-	FindDealByID(ctx context.Context, id string) (*model.Deal, error)
 	FindExpenseByID(ctx context.Context, id string) (*model.Expense, error)
 	FindFileByID(ctx context.Context, id string) (*model.File, error)
 	FindFollowByID(ctx context.Context, id string) (*model.Follow, error)
@@ -356,7 +351,6 @@ type MessageResolver interface {
 	CreatedAt(ctx context.Context, obj *model.Message) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.Message) (string, error)
 	Recipients(ctx context.Context, obj *model.Message) ([]*model.Recipient, error)
-	Comments(ctx context.Context, obj *model.Message) ([]*model.Comment, error)
 }
 type MutationResolver interface {
 	CreateComment(ctx context.Context, input model.NewComment) (*model.Comment, error)
@@ -522,13 +516,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.Rating(childComplexity), true
 
-	case "Comment.reaction":
-		if e.complexity.Comment.Reaction == nil {
-			break
-		}
-
-		return e.complexity.Comment.Reaction(childComplexity), true
-
 	case "Comment.reactions":
 		if e.complexity.Comment.Reactions == nil {
 			break
@@ -606,6 +593,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Content.ID(childComplexity), true
 
+	case "Conversation.comments":
+		if e.complexity.Conversation.Comments == nil {
+			break
+		}
+
+		return e.complexity.Conversation.Comments(childComplexity), true
+
 	case "Conversation.created_at":
 		if e.complexity.Conversation.CreatedAt == nil {
 			break
@@ -626,6 +620,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Conversation.Description(childComplexity), true
+
+	case "Conversation.followers":
+		if e.complexity.Conversation.Followers == nil {
+			break
+		}
+
+		return e.complexity.Conversation.Followers(childComplexity), true
 
 	case "Conversation.id":
 		if e.complexity.Conversation.ID == nil {
@@ -718,20 +719,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Conversations.Data(childComplexity), true
 
-	case "Deal.comments":
-		if e.complexity.Deal.Comments == nil {
-			break
-		}
-
-		return e.complexity.Deal.Comments(childComplexity), true
-
-	case "Deal.id":
-		if e.complexity.Deal.ID == nil {
-			break
-		}
-
-		return e.complexity.Deal.ID(childComplexity), true
-
 	case "Entity.findCommentByID":
 		if e.complexity.Entity.FindCommentByID == nil {
 			break
@@ -767,18 +754,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.FindContentByID(childComplexity, args["id"].(string)), true
-
-	case "Entity.findDealByID":
-		if e.complexity.Entity.FindDealByID == nil {
-			break
-		}
-
-		args, err := ec.field_Entity_findDealByID_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Entity.FindDealByID(childComplexity, args["id"].(string)), true
 
 	case "Entity.findExpenseByID":
 		if e.complexity.Entity.FindExpenseByID == nil {
@@ -920,6 +895,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Follow.ID(childComplexity), true
 
+	case "Follow.muted":
+		if e.complexity.Follow.Muted == nil {
+			break
+		}
+
+		return e.complexity.Follow.Muted(childComplexity), true
+
 	case "Follow.role":
 		if e.complexity.Follow.Role == nil {
 			break
@@ -975,13 +957,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Message.Body(childComplexity), true
-
-	case "Message.comments":
-		if e.complexity.Message.Comments == nil {
-			break
-		}
-
-		return e.complexity.Message.Comments(childComplexity), true
 
 	case "Message.conversation":
 		if e.complexity.Message.Conversation == nil {
@@ -1928,7 +1903,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/comment.graphql" "schema/contact.graphql" "schema/content.graphql" "schema/conversation.graphql" "schema/deal.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/follow.graphql" "schema/message.graphql" "schema/notification.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/recipient.graphql" "schema/task.graphql" "schema/user.graphql"
+//go:embed "schema.graphqls" "schema/comment.graphql" "schema/contact.graphql" "schema/content.graphql" "schema/conversation.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/follow.graphql" "schema/message.graphql" "schema/notification.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/recipient.graphql" "schema/task.graphql" "schema/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1945,7 +1920,6 @@ var sources = []*ast.Source{
 	{Name: "schema/contact.graphql", Input: sourceData("schema/contact.graphql"), BuiltIn: false},
 	{Name: "schema/content.graphql", Input: sourceData("schema/content.graphql"), BuiltIn: false},
 	{Name: "schema/conversation.graphql", Input: sourceData("schema/conversation.graphql"), BuiltIn: false},
-	{Name: "schema/deal.graphql", Input: sourceData("schema/deal.graphql"), BuiltIn: false},
 	{Name: "schema/expense.graphql", Input: sourceData("schema/expense.graphql"), BuiltIn: false},
 	{Name: "schema/file.graphql", Input: sourceData("schema/file.graphql"), BuiltIn: false},
 	{Name: "schema/follow.graphql", Input: sourceData("schema/follow.graphql"), BuiltIn: false},
@@ -1994,14 +1968,13 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Comment | Contact | Content | Deal | Expense | File | Follow | Quote | Reaction | Task | User
+union _Entity = Comment | Contact | Content | Expense | File | Follow | Quote | Reaction | Task | User
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
 		findCommentByID(id: ID!,): Comment!
 	findContactByID(id: ID!,): Contact!
 	findContentByID(id: ID!,): Content!
-	findDealByID(id: ID!,): Deal!
 	findExpenseByID(id: ID!,): Expense!
 	findFileByID(id: ID!,): File!
 	findFollowByID(id: ID!,): Follow!
@@ -2104,21 +2077,6 @@ func (ec *executionContext) field_Entity_findContactByID_args(ctx context.Contex
 }
 
 func (ec *executionContext) field_Entity_findContentByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Entity_findDealByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -3386,8 +3344,6 @@ func (ec *executionContext) fieldContext_Comment_parent(ctx context.Context, fie
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -3461,8 +3417,6 @@ func (ec *executionContext) fieldContext_Comment_children(ctx context.Context, f
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -3515,65 +3469,6 @@ func (ec *executionContext) fieldContext_Comment_commentable(ctx context.Context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Map does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Comment_reaction(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Comment_reaction(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Comment().Reaction(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Reaction)
-	fc.Result = res
-	return ec.marshalOReaction2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐReaction(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Comment_reaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Comment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Reaction_id(ctx, field)
-			case "uid":
-				return ec.fieldContext_Reaction_uid(ctx, field)
-			case "reactable":
-				return ec.fieldContext_Reaction_reactable(ctx, field)
-			case "action":
-				return ec.fieldContext_Reaction_action(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Reaction_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Reaction_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Reaction_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Reaction_updated_by(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
 		},
 	}
 	return fc, nil
@@ -3824,8 +3719,6 @@ func (ec *executionContext) fieldContext_Comments_data(ctx context.Context, fiel
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -3943,8 +3836,6 @@ func (ec *executionContext) fieldContext_Contact_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -4062,8 +3953,6 @@ func (ec *executionContext) fieldContext_Content_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -4425,8 +4314,6 @@ func (ec *executionContext) fieldContext_Conversation_message(ctx context.Contex
 				return ec.fieldContext_Message_updated_at(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
-			case "comments":
-				return ec.fieldContext_Message_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
 		},
@@ -4574,8 +4461,6 @@ func (ec *executionContext) fieldContext_Conversation_messages(ctx context.Conte
 				return ec.fieldContext_Message_updated_at(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
-			case "comments":
-				return ec.fieldContext_Message_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
 		},
@@ -4709,6 +4594,142 @@ func (ec *executionContext) fieldContext_Conversation_updated_by(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Conversation_followers(ctx context.Context, field graphql.CollectedField, obj *model.Conversation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Conversation_followers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Conversation().Followers(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Follow)
+	fc.Result = res
+	return ec.marshalOFollow2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐFollow(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Conversation_followers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Conversation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Follow_id(ctx, field)
+			case "uid":
+				return ec.fieldContext_Follow_uid(ctx, field)
+			case "followable":
+				return ec.fieldContext_Follow_followable(ctx, field)
+			case "role":
+				return ec.fieldContext_Follow_role(ctx, field)
+			case "muted":
+				return ec.fieldContext_Follow_muted(ctx, field)
+			case "status":
+				return ec.fieldContext_Follow_status(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Follow_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Follow_updated_at(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Follow_created_by(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Follow_updated_by(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Follow", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Conversation_comments(ctx context.Context, field graphql.CollectedField, obj *model.Conversation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Conversation_comments(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Conversation().Comments(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Comment)
+	fc.Result = res
+	return ec.marshalOComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Conversation_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Conversation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Comment_id(ctx, field)
+			case "uid":
+				return ec.fieldContext_Comment_uid(ctx, field)
+			case "locale":
+				return ec.fieldContext_Comment_locale(ctx, field)
+			case "body":
+				return ec.fieldContext_Comment_body(ctx, field)
+			case "rating":
+				return ec.fieldContext_Comment_rating(ctx, field)
+			case "status":
+				return ec.fieldContext_Comment_status(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Comment_metadata(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Comment_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Comment_updated_at(ctx, field)
+			case "parent":
+				return ec.fieldContext_Comment_parent(ctx, field)
+			case "children":
+				return ec.fieldContext_Comment_children(ctx, field)
+			case "commentable":
+				return ec.fieldContext_Comment_commentable(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
+			case "created_by":
+				return ec.fieldContext_Comment_created_by(ctx, field)
+			case "updated_by":
+				return ec.fieldContext_Comment_updated_by(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Conversations_data(ctx context.Context, field graphql.CollectedField, obj *model.Conversations) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Conversations_data(ctx, field)
 	if err != nil {
@@ -4773,6 +4794,10 @@ func (ec *executionContext) fieldContext_Conversations_data(ctx context.Context,
 				return ec.fieldContext_Conversation_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Conversation_updated_by(ctx, field)
+			case "followers":
+				return ec.fieldContext_Conversation_followers(ctx, field)
+			case "comments":
+				return ec.fieldContext_Conversation_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Conversation", field.Name)
 		},
@@ -4819,125 +4844,6 @@ func (ec *executionContext) fieldContext_Conversations_count(ctx context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Deal_id(ctx context.Context, field graphql.CollectedField, obj *model.Deal) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Deal_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Deal_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Deal",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Deal_comments(ctx context.Context, field graphql.CollectedField, obj *model.Deal) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Deal_comments(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Comments, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Comment)
-	fc.Result = res
-	return ec.marshalOComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Deal_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Deal",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Comment_id(ctx, field)
-			case "uid":
-				return ec.fieldContext_Comment_uid(ctx, field)
-			case "locale":
-				return ec.fieldContext_Comment_locale(ctx, field)
-			case "body":
-				return ec.fieldContext_Comment_body(ctx, field)
-			case "rating":
-				return ec.fieldContext_Comment_rating(ctx, field)
-			case "status":
-				return ec.fieldContext_Comment_status(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Comment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Comment_updated_at(ctx, field)
-			case "parent":
-				return ec.fieldContext_Comment_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Comment_children(ctx, field)
-			case "commentable":
-				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
-			case "reactions":
-				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Comment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Comment_updated_by(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
 	}
 	return fc, nil
@@ -5006,8 +4912,6 @@ func (ec *executionContext) fieldContext_Entity_findCommentByID(ctx context.Cont
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -5148,67 +5052,6 @@ func (ec *executionContext) fieldContext_Entity_findContentByID(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Entity_findContentByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Entity_findDealByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Entity_findDealByID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Entity().FindDealByID(rctx, fc.Args["id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Deal)
-	fc.Result = res
-	return ec.marshalNDeal2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐDeal(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Entity_findDealByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Entity",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Deal_id(ctx, field)
-			case "comments":
-				return ec.fieldContext_Deal_comments(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Deal", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Entity_findDealByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5384,6 +5227,8 @@ func (ec *executionContext) fieldContext_Entity_findFollowByID(ctx context.Conte
 				return ec.fieldContext_Follow_followable(ctx, field)
 			case "role":
 				return ec.fieldContext_Follow_role(ctx, field)
+			case "muted":
+				return ec.fieldContext_Follow_muted(ctx, field)
 			case "status":
 				return ec.fieldContext_Follow_status(ctx, field)
 			case "created_at":
@@ -5780,8 +5625,6 @@ func (ec *executionContext) fieldContext_Expense_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -5899,8 +5742,6 @@ func (ec *executionContext) fieldContext_File_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -6082,6 +5923,47 @@ func (ec *executionContext) fieldContext_Follow_role(ctx context.Context, field 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Follow_muted(ctx context.Context, field graphql.CollectedField, obj *model.Follow) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Follow_muted(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Muted, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Follow_muted(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Follow",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -6389,6 +6271,8 @@ func (ec *executionContext) fieldContext_Follows_data(ctx context.Context, field
 				return ec.fieldContext_Follow_followable(ctx, field)
 			case "role":
 				return ec.fieldContext_Follow_role(ctx, field)
+			case "muted":
+				return ec.fieldContext_Follow_muted(ctx, field)
 			case "status":
 				return ec.fieldContext_Follow_status(ctx, field)
 			case "created_at":
@@ -6517,6 +6401,10 @@ func (ec *executionContext) fieldContext_Message_conversation(ctx context.Contex
 				return ec.fieldContext_Conversation_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Conversation_updated_by(ctx, field)
+			case "followers":
+				return ec.fieldContext_Conversation_followers(ctx, field)
+			case "comments":
+				return ec.fieldContext_Conversation_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Conversation", field.Name)
 		},
@@ -6802,84 +6690,6 @@ func (ec *executionContext) fieldContext_Message_recipients(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Message_comments(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Message_comments(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Message().Comments(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Comment)
-	fc.Result = res
-	return ec.marshalNComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐCommentᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Message_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Message",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Comment_id(ctx, field)
-			case "uid":
-				return ec.fieldContext_Comment_uid(ctx, field)
-			case "locale":
-				return ec.fieldContext_Comment_locale(ctx, field)
-			case "body":
-				return ec.fieldContext_Comment_body(ctx, field)
-			case "rating":
-				return ec.fieldContext_Comment_rating(ctx, field)
-			case "status":
-				return ec.fieldContext_Comment_status(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Comment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Comment_updated_at(ctx, field)
-			case "parent":
-				return ec.fieldContext_Comment_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Comment_children(ctx, field)
-			case "commentable":
-				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
-			case "reactions":
-				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Comment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Comment_updated_by(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Messages_data(ctx context.Context, field graphql.CollectedField, obj *model.Messages) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Messages_data(ctx, field)
 	if err != nil {
@@ -6932,8 +6742,6 @@ func (ec *executionContext) fieldContext_Messages_data(ctx context.Context, fiel
 				return ec.fieldContext_Message_updated_at(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
-			case "comments":
-				return ec.fieldContext_Message_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
 		},
@@ -7065,8 +6873,6 @@ func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Cont
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -7171,8 +6977,6 @@ func (ec *executionContext) fieldContext_Mutation_updateComment(ctx context.Cont
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -7405,6 +7209,10 @@ func (ec *executionContext) fieldContext_Mutation_createConversation(ctx context
 				return ec.fieldContext_Conversation_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Conversation_updated_by(ctx, field)
+			case "followers":
+				return ec.fieldContext_Conversation_followers(ctx, field)
+			case "comments":
+				return ec.fieldContext_Conversation_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Conversation", field.Name)
 		},
@@ -7507,6 +7315,10 @@ func (ec *executionContext) fieldContext_Mutation_updateConversation(ctx context
 				return ec.fieldContext_Conversation_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Conversation_updated_by(ctx, field)
+			case "followers":
+				return ec.fieldContext_Conversation_followers(ctx, field)
+			case "comments":
+				return ec.fieldContext_Conversation_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Conversation", field.Name)
 		},
@@ -7609,6 +7421,10 @@ func (ec *executionContext) fieldContext_Mutation_leaveConversation(ctx context.
 				return ec.fieldContext_Conversation_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Conversation_updated_by(ctx, field)
+			case "followers":
+				return ec.fieldContext_Conversation_followers(ctx, field)
+			case "comments":
+				return ec.fieldContext_Conversation_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Conversation", field.Name)
 		},
@@ -7835,6 +7651,8 @@ func (ec *executionContext) fieldContext_Mutation_createFollow(ctx context.Conte
 				return ec.fieldContext_Follow_followable(ctx, field)
 			case "role":
 				return ec.fieldContext_Follow_role(ctx, field)
+			case "muted":
+				return ec.fieldContext_Follow_muted(ctx, field)
 			case "status":
 				return ec.fieldContext_Follow_status(ctx, field)
 			case "created_at":
@@ -7927,6 +7745,8 @@ func (ec *executionContext) fieldContext_Mutation_updateFollow(ctx context.Conte
 				return ec.fieldContext_Follow_followable(ctx, field)
 			case "role":
 				return ec.fieldContext_Follow_role(ctx, field)
+			case "muted":
+				return ec.fieldContext_Follow_muted(ctx, field)
 			case "status":
 				return ec.fieldContext_Follow_status(ctx, field)
 			case "created_at":
@@ -8099,8 +7919,6 @@ func (ec *executionContext) fieldContext_Mutation_createMessage(ctx context.Cont
 				return ec.fieldContext_Message_updated_at(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
-			case "comments":
-				return ec.fieldContext_Message_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
 		},
@@ -8191,8 +8009,6 @@ func (ec *executionContext) fieldContext_Mutation_updateMessage(ctx context.Cont
 				return ec.fieldContext_Message_updated_at(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
-			case "comments":
-				return ec.fieldContext_Message_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
 		},
@@ -9680,8 +9496,6 @@ func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, fiel
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -9790,6 +9604,10 @@ func (ec *executionContext) fieldContext_Query_conversation(ctx context.Context,
 				return ec.fieldContext_Conversation_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Conversation_updated_by(ctx, field)
+			case "followers":
+				return ec.fieldContext_Conversation_followers(ctx, field)
+			case "comments":
+				return ec.fieldContext_Conversation_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Conversation", field.Name)
 		},
@@ -9924,6 +9742,8 @@ func (ec *executionContext) fieldContext_Query_follows(ctx context.Context, fiel
 				return ec.fieldContext_Follow_followable(ctx, field)
 			case "role":
 				return ec.fieldContext_Follow_role(ctx, field)
+			case "muted":
+				return ec.fieldContext_Follow_muted(ctx, field)
 			case "status":
 				return ec.fieldContext_Follow_status(ctx, field)
 			case "created_at":
@@ -9996,6 +9816,8 @@ func (ec *executionContext) fieldContext_Query_follow(ctx context.Context, field
 				return ec.fieldContext_Follow_followable(ctx, field)
 			case "role":
 				return ec.fieldContext_Follow_role(ctx, field)
+			case "muted":
+				return ec.fieldContext_Follow_muted(ctx, field)
 			case "status":
 				return ec.fieldContext_Follow_status(ctx, field)
 			case "created_at":
@@ -10096,8 +9918,6 @@ func (ec *executionContext) fieldContext_Query_message(ctx context.Context, fiel
 				return ec.fieldContext_Message_updated_at(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
-			case "comments":
-				return ec.fieldContext_Message_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
 		},
@@ -10989,8 +10809,6 @@ func (ec *executionContext) fieldContext_Quote_comments(ctx context.Context, fie
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -11610,8 +11428,6 @@ func (ec *executionContext) fieldContext_Recipient_message(ctx context.Context, 
 				return ec.fieldContext_Message_updated_at(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
-			case "comments":
-				return ec.fieldContext_Message_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
 		},
@@ -11951,8 +11767,6 @@ func (ec *executionContext) fieldContext_Task_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -12135,6 +11949,10 @@ func (ec *executionContext) fieldContext_User_conversations(ctx context.Context,
 				return ec.fieldContext_Conversation_created_by(ctx, field)
 			case "updated_by":
 				return ec.fieldContext_Conversation_updated_by(ctx, field)
+			case "followers":
+				return ec.fieldContext_Conversation_followers(ctx, field)
+			case "comments":
+				return ec.fieldContext_Conversation_comments(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Conversation", field.Name)
 		},
@@ -12202,8 +12020,6 @@ func (ec *executionContext) fieldContext_User_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_children(ctx, field)
 			case "commentable":
 				return ec.fieldContext_Comment_commentable(ctx, field)
-			case "reaction":
-				return ec.fieldContext_Comment_reaction(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "created_by":
@@ -12320,6 +12136,8 @@ func (ec *executionContext) fieldContext_User_following(ctx context.Context, fie
 				return ec.fieldContext_Follow_followable(ctx, field)
 			case "role":
 				return ec.fieldContext_Follow_role(ctx, field)
+			case "muted":
+				return ec.fieldContext_Follow_muted(ctx, field)
 			case "status":
 				return ec.fieldContext_Follow_status(ctx, field)
 			case "created_at":
@@ -14158,7 +13976,7 @@ func (ec *executionContext) unmarshalInputNewComment(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "commentableId", "commentableType", "locale", "body", "rating", "metadata", "status", "attachments"}
+	fieldsInOrder := [...]string{"parent", "commentable", "locale", "body", "rating", "metadata", "status", "attachments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14174,24 +13992,15 @@ func (ec *executionContext) unmarshalInputNewComment(ctx context.Context, obj in
 				return it, err
 			}
 			it.Parent = data
-		case "commentableId":
+		case "commentable":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentableId"))
-			data, err := ec.unmarshalNID2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentable"))
+			data, err := ec.unmarshalNMap2map(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.CommentableID = data
-		case "commentableType":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentableType"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CommentableType = data
+			it.Commentable = data
 		case "locale":
 			var err error
 
@@ -14315,7 +14124,7 @@ func (ec *executionContext) unmarshalInputNewFollow(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "followableId", "followableType", "role", "status"}
+	fieldsInOrder := [...]string{"user", "followable", "role", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14331,24 +14140,15 @@ func (ec *executionContext) unmarshalInputNewFollow(ctx context.Context, obj int
 				return it, err
 			}
 			it.User = data
-		case "followableId":
+		case "followable":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("followableId"))
-			data, err := ec.unmarshalNID2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("followable"))
+			data, err := ec.unmarshalNMap2map(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.FollowableID = data
-		case "followableType":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("followableType"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.FollowableType = data
+			it.Followable = data
 		case "role":
 			var err error
 
@@ -14790,22 +14590,22 @@ func (ec *executionContext) unmarshalInputUpdateReaction(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type"}
+	fieldsInOrder := [...]string{"action"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "type":
+		case "action":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("action"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Type = data
+			it.Action = data
 		}
 	}
 
@@ -14841,13 +14641,6 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._Content(ctx, sel, obj)
-	case model.Deal:
-		return ec._Deal(ctx, sel, &obj)
-	case *model.Deal:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Deal(ctx, sel, obj)
 	case model.Expense:
 		return ec._Expense(ctx, sel, &obj)
 	case *model.Expense:
@@ -15221,39 +15014,6 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "reaction":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Comment_reaction(ctx, field, obj)
 				return res
 			}
 
@@ -15858,6 +15618,72 @@ func (ec *executionContext) _Conversation(ctx context.Context, sel ast.Selection
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "followers":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Conversation_followers(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "comments":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Conversation_comments(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15899,47 +15725,6 @@ func (ec *executionContext) _Conversations(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var dealImplementors = []string{"Deal", "_Entity"}
-
-func (ec *executionContext) _Deal(ctx context.Context, sel ast.SelectionSet, obj *model.Deal) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, dealImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Deal")
-		case "id":
-			out.Values[i] = ec._Deal_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "comments":
-			out.Values[i] = ec._Deal_comments(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16036,28 +15821,6 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 					}
 				}()
 				res = ec._Entity_findContentByID(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "findDealByID":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Entity_findDealByID(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -16450,6 +16213,8 @@ func (ec *executionContext) _Follow(ctx context.Context, sel ast.SelectionSet, o
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "role":
 			out.Values[i] = ec._Follow_role(ctx, field, obj)
+		case "muted":
+			out.Values[i] = ec._Follow_muted(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._Follow_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -16837,42 +16602,6 @@ func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, 
 					}
 				}()
 				res = ec._Message_recipients(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "comments":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Message_comments(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -19080,50 +18809,6 @@ func (ec *executionContext) marshalNComment2githubᚗcomᚋdailytravelᚋxᚋcom
 	return ec._Comment(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐCommentᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNComment2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐComment(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
 func (ec *executionContext) marshalNComment2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v *model.Comment) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -19174,20 +18859,6 @@ func (ec *executionContext) marshalNConversation2ᚖgithubᚗcomᚋdailytravel�
 		return graphql.Null
 	}
 	return ec._Conversation(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNDeal2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐDeal(ctx context.Context, sel ast.SelectionSet, v model.Deal) graphql.Marshaler {
-	return ec._Deal(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNDeal2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐDeal(ctx context.Context, sel ast.SelectionSet, v *model.Deal) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Deal(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNExpense2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐExpense(ctx context.Context, sel ast.SelectionSet, v model.Expense) graphql.Marshaler {

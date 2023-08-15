@@ -11,7 +11,6 @@ type Comment @key(fields: "id") {
   parent: Comment
   children: [Comment]
   commentable: Map!
-  reaction: [Reaction]
   reactions: [Reaction]
   created_by: ID
   updated_by: ID
@@ -24,8 +23,7 @@ type Comments {
 
 input NewComment {
   parent: ID
-  commentableId: ID!
-  commentableType: String!
+  commentable: Map!
   locale: String!
   body: String
   rating: Int

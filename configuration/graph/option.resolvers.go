@@ -10,23 +10,80 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/configuration/graph/model"
+	"github.com/dailytravel/x/configuration/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreateOption is the resolver for the createOption field.
 func (r *mutationResolver) CreateOption(ctx context.Context, input model.NewOption) (*model.Option, error) {
-	panic(fmt.Errorf("not implemented: CreateOption - createOption"))
+	item := &model.Option{
+		Name: input.Name,
+		Data: input.Data,
+	}
+
+	result, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve the inserted option document from the result
+	insertedID := result.InsertedID.(primitive.ObjectID)
+	filter := bson.M{"_id": insertedID}
+	createdOption := &model.Option{}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(createdOption)
+	if err != nil {
+		return nil, err
+	}
+
+	return createdOption, nil
 }
 
 // UpdateOption is the resolver for the updateOption field.
 func (r *mutationResolver) UpdateOption(ctx context.Context, id string, input model.UpdateOption) (*model.Option, error) {
-	panic(fmt.Errorf("not implemented: UpdateOption - updateOption"))
+	// Convert the ID string to a MongoDB ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+	item := &model.Option{}
+
+	if input.Name != nil {
+		item.Name = *input.Name
+	}
+
+	if input.Data != nil {
+		item.Data = *input.Data
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, bson.M{"$set": item}).Decode(item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpsertOption is the resolver for the upsertOption field.
 func (r *mutationResolver) UpsertOption(ctx context.Context, name string, data *string) (*model.Option, error) {
-	panic(fmt.Errorf("not implemented: UpsertOption - upsertOption"))
+	filter := bson.M{"name": name}
+	update := bson.M{"$set": bson.M{"name": name}}
+
+	opts := options.Update().SetUpsert(true)
+
+	_, err := r.db.Collection("options").UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Option{
+		Name: name,
+		Data: *data,
+	}
+
+	return item, nil
 }
 
 // DeleteOption is the resolver for the deleteOption field.
@@ -92,12 +149,56 @@ func (r *optionResolver) UpdatedAt(ctx context.Context, obj *model.Option) (stri
 
 // Option is the resolver for the option field.
 func (r *queryResolver) Option(ctx context.Context, name string) (*model.Option, error) {
-	panic(fmt.Errorf("not implemented: Option - option"))
+	// Define the filter to match the provided name
+	filter := bson.M{"name": name}
+
+	// Perform the find operation
+	result := r.db.Collection("options").FindOne(ctx, filter)
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+
+	// Decode the option document into a model.Option object
+	option := &model.Option{}
+	err := result.Decode(option)
+	if err != nil {
+		return nil, err
+	}
+
+	return option, nil
 }
 
 // Options is the resolver for the options field.
 func (r *queryResolver) Options(ctx context.Context, args map[string]interface{}) (*model.Options, error) {
-	panic(fmt.Errorf("not implemented: Options - options"))
+	var items []*model.Option
+
+	opts := utils.Options(args)
+	opts.SetSort(bson.M{"created_at": -1})
+
+	//find all items
+	cur, err := r.db.Collection("options").Find(ctx, utils.Query(args), opts)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Option
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("options").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Options{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Option returns OptionResolver implementation.

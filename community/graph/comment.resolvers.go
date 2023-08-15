@@ -105,14 +105,23 @@ func (r *commentResolver) Commentable(ctx context.Context, obj *model.Comment) (
 	return item, nil
 }
 
-// Reaction is the resolver for the reaction field.
-func (r *commentResolver) Reaction(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error) {
-	panic(fmt.Errorf("not implemented: Reaction - reaction"))
-}
-
 // Reactions is the resolver for the reactions field.
 func (r *commentResolver) Reactions(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error) {
-	panic(fmt.Errorf("not implemented: Reactions - reactions"))
+	var items []*model.Reaction
+
+	filter := bson.M{"reactable._id": obj.ID, "reactable.type": obj.Collection()}
+	options := options.Find().SetProjection(bson.M{"_id": 1, "name": 1, "description": 1})
+
+	cursor, err := r.db.Collection("reactions").Find(ctx, filter, options)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
 
 // CreatedBy is the resolver for the created_by field.
@@ -139,22 +148,162 @@ func (r *commentResolver) UpdatedBy(ctx context.Context, obj *model.Comment) (*s
 
 // CreateComment is the resolver for the createComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewComment) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: CreateComment - createComment"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(input.Commentable["id"].(string))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Comment{
+		UID:    *uid,
+		Locale: input.Locale,
+		Commentable: model.Commentable{
+			ID:   _id,
+			Type: input.Commentable["type"].(string),
+		},
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
+	}
+
+	if input.Parent != nil {
+		parent, err := primitive.ObjectIDFromHex(*input.Parent)
+		if err != nil {
+			return nil, err
+		}
+
+		item.Parent = parent
+	}
+
+	if input.Body != nil {
+		item.Body[input.Locale] = input.Body
+	}
+
+	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	item.ID = res.InsertedID.(primitive.ObjectID)
+
+	return item, nil
 }
 
 // UpdateComment is the resolver for the updateComment field.
 func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input model.UpdateComment) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: UpdateComment - updateComment"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	item := &model.Comment{}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		return nil, err
+	}
+
+	if input.Body != nil {
+		item.Body[input.Locale] = input.Body
+	}
+
+	item.UpdatedBy = uid
+
+	// Update the contact
+	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item}, nil); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteComment is the resolver for the deleteComment field.
 func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteComment - deleteComment"))
+	var item *model.Comment
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the comment by _id and delete it
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": time.Now(),
+			"updated_by": uid,
+		},
+	}
+	result := r.db.Collection("comments").FindOneAndUpdate(
+		ctx,
+		bson.M{"_id": _id},
+		update,
+	)
+	err = result.Decode(&item)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"success": true,
+	}, nil
 }
 
 // DeleteComments is the resolver for the deleteComments field.
 func (r *mutationResolver) DeleteComments(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteComments - deleteComments"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	var deletedCount int64
+
+	// Convert string IDs to ObjectIDs
+	objectIDs := make([]primitive.ObjectID, len(ids))
+	for i, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs[i] = _id
+	}
+
+	// Update all comments with the given IDs
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": time.Now(),
+			"updated_by": uid,
+		},
+	}
+	result, err := r.db.Collection("comments").UpdateMany(
+		ctx,
+		bson.M{"_id": bson.M{"$in": objectIDs}},
+		update,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.MatchedCount > 0 {
+		deletedCount = result.ModifiedCount
+	}
+
+	return map[string]interface{}{
+		"deletedCount": deletedCount,
+	}, nil
 }
 
 // Comments is the resolver for the comments field.

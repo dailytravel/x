@@ -32,13 +32,6 @@ type Conversations struct {
 	Count int             `json:"count"`
 }
 
-type Deal struct {
-	ID       string     `json:"id"`
-	Comments []*Comment `json:"comments,omitempty"`
-}
-
-func (Deal) IsEntity() {}
-
 type Expense struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`
@@ -64,15 +57,14 @@ type Messages struct {
 }
 
 type NewComment struct {
-	Parent          *string                `json:"parent,omitempty"`
-	CommentableID   string                 `json:"commentableId"`
-	CommentableType string                 `json:"commentableType"`
-	Locale          string                 `json:"locale"`
-	Body            *string                `json:"body,omitempty"`
-	Rating          *int                   `json:"rating,omitempty"`
-	Metadata        map[string]interface{} `json:"metadata,omitempty"`
-	Status          *string                `json:"status,omitempty"`
-	Attachments     []*string              `json:"attachments,omitempty"`
+	Parent      *string                `json:"parent,omitempty"`
+	Commentable map[string]interface{} `json:"commentable"`
+	Locale      string                 `json:"locale"`
+	Body        *string                `json:"body,omitempty"`
+	Rating      *int                   `json:"rating,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Attachments []*string              `json:"attachments,omitempty"`
 }
 
 type NewConversation struct {
@@ -83,11 +75,10 @@ type NewConversation struct {
 }
 
 type NewFollow struct {
-	User           string `json:"user"`
-	FollowableID   string `json:"followableId"`
-	FollowableType string `json:"followableType"`
-	Role           string `json:"role"`
-	Status         string `json:"status"`
+	User       string                 `json:"user"`
+	Followable map[string]interface{} `json:"followable"`
+	Role       string                 `json:"role"`
+	Status     string                 `json:"status"`
 }
 
 type NewMessage struct {
@@ -171,7 +162,7 @@ type UpdateMessage struct {
 }
 
 type UpdateReaction struct {
-	Type string `json:"type"`
+	Action string `json:"action"`
 }
 
 type ConversationStatus string

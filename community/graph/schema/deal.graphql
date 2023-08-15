@@ -1,4 +1,0 @@
-extend type Deal @key(fields: "id") {
-  id: ID! @external
-  comments: [Comment]
-}

@@ -30,7 +30,7 @@ input NewReaction {
 }
 
 input UpdateReaction {
-  type: String!
+  action: String!
 }
 
 extend type Query {

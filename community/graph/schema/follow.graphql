@@ -3,6 +3,7 @@ type Follow @key(fields: "id") {
   uid: ID!
   followable: Map! #contact with followable._id and followable.type
   role: String
+  muted: Boolean
   status: String!
   created_at: String!
   updated_at: String!
@@ -29,8 +30,7 @@ enum FollowStatus {
 
 input NewFollow {
   user: ID!
-  followableId: ID!
-  followableType: String!
+  followable: Map!
   role: String!
   status: String!
 }

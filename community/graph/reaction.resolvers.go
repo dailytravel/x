@@ -10,7 +10,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/community/auth"
 	"github.com/dailytravel/x/community/graph/model"
+	"github.com/dailytravel/x/community/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,12 +20,68 @@ import (
 
 // CreateReaction is the resolver for the createReaction field.
 func (r *mutationResolver) CreateReaction(ctx context.Context, input model.NewReaction) (*model.Reaction, error) {
-	panic(fmt.Errorf("not implemented: CreateReaction - createReaction"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert reactable ID to primitive.ObjectID
+	reactableID, ok := input.Reactable["id"].(string)
+	if !ok {
+		return nil, fmt.Errorf("invalid reactable ID")
+	}
+	_id, err := primitive.ObjectIDFromHex(reactableID)
+	if err != nil {
+		return nil, err
+	}
+
+	reaction := &model.Reaction{
+		UID:       *uid,
+		Action:    input.Action,
+		Reactable: model.Reactable{ID: _id, Type: input.Reactable["type"].(string)},
+	}
+
+	// Perform the insertion into the database
+	_, err = r.db.Collection("reactions").InsertOne(ctx, reaction)
+	if err != nil {
+		return nil, err
+	}
+
+	return reaction, nil
 }
 
 // UpdateReaction is the resolver for the updateReaction field.
 func (r *mutationResolver) UpdateReaction(ctx context.Context, id string, input model.UpdateReaction) (*model.Reaction, error) {
-	panic(fmt.Errorf("not implemented: UpdateReaction - updateReaction"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch the existing reaction entry
+	filter := bson.M{"_id": _id, "uid": uid}
+	item := &model.Reaction{
+		Action: input.Action,
+	}
+	err = r.db.Collection("reactions").FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Perform the update in the database
+	update := bson.M{
+		"$set": item,
+	}
+	_, err = r.db.Collection("reactions").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Reaction is the resolver for the reaction field.
@@ -31,18 +89,26 @@ func (r *queryResolver) Reaction(ctx context.Context, reactable map[string]inter
 	var item *model.Reaction
 	col := r.db.Collection(item.Collection())
 
-	//convert reactable to primitive.ObjectID and set it to reactable.ID
+	// Convert reactable to primitive.ObjectID and set it to reactable.ID
 	reactableID, err := primitive.ObjectIDFromHex(reactable["id"].(string))
+	if err != nil {
+		return nil, err
+	}
+
+	reactableType, ok := reactable["type"].(string)
+	if !ok {
+		return nil, fmt.Errorf("reactable type assertion failed")
+	}
 
 	filter := bson.M{"reactable": bson.M{
 		"_id":  reactableID,
-		"type": reactable["type"].(string),
+		"type": reactableType,
 	}}
 
 	err = col.FindOne(ctx, filter).Decode(&item)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("no document found for filter %v", filter)
+			return nil, fmt.Errorf("no reaction document found for filter %v", filter)
 		}
 		return nil, err
 	}
@@ -52,7 +118,49 @@ func (r *queryResolver) Reaction(ctx context.Context, reactable map[string]inter
 
 // Reactions is the resolver for the reactions field.
 func (r *queryResolver) Reactions(ctx context.Context, args map[string]interface{}) (*model.Reactions, error) {
-	panic(fmt.Errorf("not implemented: Reactions - reactions"))
+	col := r.db.Collection("reactions")
+	var items []*model.Reaction
+
+	// Build the filter based on the provided arguments
+	filter := bson.M{}
+
+	if reactableID, ok := args["reactableID"].(string); ok {
+		reactableObjID, err := primitive.ObjectIDFromHex(reactableID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid reactableID: %v", err)
+		}
+		filter["reactable._id"] = reactableObjID
+	}
+
+	if reactableType, ok := args["reactableType"].(string); ok {
+		filter["reactable.type"] = reactableType
+	}
+
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("error querying reactions: %v", err)
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var reaction model.Reaction
+		if err := cursor.Decode(&reaction); err != nil {
+			return nil, fmt.Errorf("error decoding reaction: %v", err)
+		}
+		items = append(items, &reaction)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, fmt.Errorf("cursor error: %v", err)
+	}
+
+	// Get total count
+	count, err := col.CountDocuments(ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("error getting count: %v", err)
+	}
+
+	return &model.Reactions{Data: items, Count: int(count)}, nil
 }
 
 // ID is the resolver for the id field.

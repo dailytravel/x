@@ -8,6 +8,8 @@ import (
 	"context"
 
 	"github.com/dailytravel/x/finance/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Expenses is the resolver for the expenses field.

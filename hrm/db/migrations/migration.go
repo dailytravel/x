@@ -10,6 +10,7 @@ func AutoMigrate() error {
 	migrators := []Migrator{
 		&Attendance{Database: db.Database},
 		&Leave{Database: db.Database},
+		&Organization{Database: db.Database},
 		&Payroll{Database: db.Database},
 		&Resume{Database: db.Database},
 		&Salary{Database: db.Database},

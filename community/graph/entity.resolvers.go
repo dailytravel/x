@@ -6,64 +6,124 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/dailytravel/x/community/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // FindCommentByID is the resolver for the findCommentByID field.
 func (r *entityResolver) FindCommentByID(ctx context.Context, id string) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: FindCommentByID - findCommentByID"))
+	var item *model.Comment
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindContactByID is the resolver for the findContactByID field.
 func (r *entityResolver) FindContactByID(ctx context.Context, id string) (*model.Contact, error) {
-	panic(fmt.Errorf("not implemented: FindContactByID - findContactByID"))
+	return &model.Contact{
+		ID: id,
+	}, nil
 }
 
 // FindContentByID is the resolver for the findContentByID field.
 func (r *entityResolver) FindContentByID(ctx context.Context, id string) (*model.Content, error) {
-	panic(fmt.Errorf("not implemented: FindContentByID - findContentByID"))
-}
-
-// FindDealByID is the resolver for the findDealByID field.
-func (r *entityResolver) FindDealByID(ctx context.Context, id string) (*model.Deal, error) {
-	panic(fmt.Errorf("not implemented: FindDealByID - findDealByID"))
+	return &model.Content{
+		ID: id,
+	}, nil
 }
 
 // FindExpenseByID is the resolver for the findExpenseByID field.
 func (r *entityResolver) FindExpenseByID(ctx context.Context, id string) (*model.Expense, error) {
-	panic(fmt.Errorf("not implemented: FindExpenseByID - findExpenseByID"))
+	return &model.Expense{
+		ID: id,
+	}, nil
 }
 
 // FindFileByID is the resolver for the findFileByID field.
 func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.File, error) {
-	panic(fmt.Errorf("not implemented: FindFileByID - findFileByID"))
+	return &model.File{
+		ID: id,
+	}, nil
 }
 
 // FindFollowByID is the resolver for the findFollowByID field.
 func (r *entityResolver) FindFollowByID(ctx context.Context, id string) (*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: FindFollowByID - findFollowByID"))
+	var item *model.Follow
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindQuoteByID is the resolver for the findQuoteByID field.
 func (r *entityResolver) FindQuoteByID(ctx context.Context, id string) (*model.Quote, error) {
-	panic(fmt.Errorf("not implemented: FindQuoteByID - findQuoteByID"))
+	return &model.Quote{
+		ID: id,
+	}, nil
 }
 
 // FindReactionByID is the resolver for the findReactionByID field.
 func (r *entityResolver) FindReactionByID(ctx context.Context, id string) (*model.Reaction, error) {
-	panic(fmt.Errorf("not implemented: FindReactionByID - findReactionByID"))
+	var item *model.Reaction
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindTaskByID is the resolver for the findTaskByID field.
 func (r *entityResolver) FindTaskByID(ctx context.Context, id string) (*model.Task, error) {
-	panic(fmt.Errorf("not implemented: FindTaskByID - findTaskByID"))
+	return &model.Task{
+		ID: id}, nil
 }
 
 // FindUserByID is the resolver for the findUserByID field.
 func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: FindUserByID - findUserByID"))
+	return &model.User{
+		ID: id,
+	}, nil
 }
 
 // Entity returns EntityResolver implementation.

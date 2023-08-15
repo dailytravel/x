@@ -1,0 +1,53 @@
+type Log {
+  id: ID!
+  uid: ID
+  url: String!
+  referrer: String
+  title: String
+  utm: Map
+  metadata: Map
+  status: String!
+  client_ip: String
+  user_agent: String
+  created_at: String
+}
+
+type Logs {
+  data: [Log]
+  count: Int!
+}
+
+input NewLog {
+  uid: ID
+  url: String!
+  referrer: String
+  title: String
+  utm: Map
+  metadata: Map
+  status: String!
+  client_ip: String
+  user_agent: String
+}
+
+input UpdateLog {
+  url: String
+  referrer: String
+  title: String
+  utm: Map
+  metadata: Map
+  status: String
+  client_ip: String
+  user_agent: String
+}
+
+extend type Query {
+  log(id: ID!): Log @auth(requires: [ADMIN])
+  logs(args: Map): Logs
+}
+
+extend type Mutation {
+  createLog(input: NewLog!): Log
+  updateLog(id: ID!, input: UpdateLog!): Log
+  deleteLog(id: ID!): Map @auth(requires: [ADMIN])
+  deleteLogs(ids: [ID]!): Map @auth(requires: [ADMIN])
+}

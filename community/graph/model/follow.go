@@ -14,6 +14,7 @@ type Follow struct {
 	UID        primitive.ObjectID `bson:"uid" json:"uid"`
 	Followable Followable         `json:"followable" bson:"followable"`
 	Role       string             `json:"role" bson:"role"`
+	Muted      bool               `json:"muted" bson:"muted"`
 	Status     string             `json:"status" bson:"status"`
 }
 

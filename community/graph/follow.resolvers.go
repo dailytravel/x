@@ -7,11 +7,13 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/community/auth"
 	"github.com/dailytravel/x/community/graph/model"
+	"github.com/dailytravel/x/community/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -74,27 +76,174 @@ func (r *followResolver) UpdatedBy(ctx context.Context, obj *model.Follow) (*str
 
 // CreateFollow is the resolver for the createFollow field.
 func (r *mutationResolver) CreateFollow(ctx context.Context, input model.NewFollow) (*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: CreateFollow - createFollow"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(input.Followable["id"].(string))
+	if err != nil {
+		return nil, err
+	}
+
+	follow := &model.Follow{
+		UID:    *uid,
+		Role:   input.Role,
+		Status: input.Status,
+		Followable: model.Followable{
+			ID:   _id,
+			Type: input.Followable["type"].(string),
+		},
+	}
+
+	// Perform the insertion into the database
+	_, err = r.db.Collection("follows").InsertOne(ctx, follow)
+	if err != nil {
+		return nil, err
+	}
+
+	return follow, nil
 }
 
 // UpdateFollow is the resolver for the updateFollow field.
 func (r *mutationResolver) UpdateFollow(ctx context.Context, id string, input model.UpdateFollow) (*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: UpdateFollow - updateFollow"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch the existing follow entry
+	filter := bson.M{"_id": _id, "uid": uid}
+	existingFollow := &model.Follow{}
+	err = r.db.Collection("follows").FindOne(ctx, filter).Decode(existingFollow)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update fields based on input
+	if input.Role != nil {
+		existingFollow.Role = *input.Role
+	}
+	if input.Status != nil {
+		existingFollow.Status = *input.Status
+	}
+
+	// Perform the update in the database
+	update := bson.M{
+		"$set": existingFollow,
+	}
+	_, err = r.db.Collection("follows").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return existingFollow, nil
 }
 
 // DeleteFollow is the resolver for the deleteFollow field.
 func (r *mutationResolver) DeleteFollow(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteFollow - deleteFollow"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Delete the follow entry
+	filter := bson.M{"_id": _id, "uid": uid}
+	result, err := r.db.Collection("follows").DeleteOne(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.DeletedCount == 0 {
+		return map[string]interface{}{
+			"deleted": false,
+			"error":   "follow not found",
+		}, nil
+	}
+
+	return map[string]interface{}{
+		"success": true,
+	}, nil
 }
 
 // Follows is the resolver for the follows field.
 func (r *queryResolver) Follows(ctx context.Context, ids []string) ([]*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Follows - follows"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert string IDs to ObjectIDs
+	objectIDs := make([]primitive.ObjectID, len(ids))
+	for i, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs[i] = _id
+	}
+
+	// Query for follows based on the provided IDs and the user's UID
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}, "uid": uid}
+	cursor, err := r.db.Collection("follows").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var follows []*model.Follow
+	for cursor.Next(ctx) {
+		var follow model.Follow
+		if err := cursor.Decode(&follow); err != nil {
+			return nil, err
+		}
+		follows = append(follows, &follow)
+	}
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return follows, nil
 }
 
 // Follow is the resolver for the follow field.
 func (r *queryResolver) Follow(ctx context.Context, id string) (*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Follow - follow"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Query for a single follow entry based on the provided ID and the user's UID
+	filter := bson.M{"_id": _id, "uid": uid}
+	result := r.db.Collection("follows").FindOne(ctx, filter)
+	if result.Err() != nil {
+		if result.Err() == mongo.ErrNoDocuments {
+			return nil, nil // Follow not found, return nil without an error
+		}
+		return nil, result.Err()
+	}
+
+	var follow model.Follow
+	if err := result.Decode(&follow); err != nil {
+		return nil, err
+	}
+
+	return &follow, nil
 }
 
 // Follow returns FollowResolver implementation.
