@@ -1,6 +1,6 @@
 type Contact @key(fields: "id") {
   id: ID!
-  type: String
+  type: String!
   first_name: String
   last_name: String
   email: Email

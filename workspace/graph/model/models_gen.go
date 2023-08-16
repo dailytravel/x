@@ -30,10 +30,12 @@ type Lists struct {
 }
 
 type Metric struct {
-	Initial float64 `json:"initial"`
-	Target  float64 `json:"target"`
-	Actual  float64 `json:"actual"`
-	Unit    string  `json:"unit"`
+	Precision *int     `json:"precision,omitempty"`
+	Unit      *string  `json:"unit,omitempty"`
+	Initial   *float64 `json:"initial,omitempty"`
+	Target    *float64 `json:"target,omitempty"`
+	Current   *float64 `json:"current,omitempty"`
+	Source    *string  `json:"source,omitempty"`
 }
 
 type NewBoard struct {
@@ -55,8 +57,6 @@ type NewGoal struct {
 	Name         string                 `json:"name"`
 	Notes        *string                `json:"notes,omitempty"`
 	Time         string                 `json:"time"`
-	StartDate    string                 `json:"start_date"`
-	DueDate      string                 `json:"due_date"`
 	IsCompany    *bool                  `json:"is_company,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	Status       *string                `json:"status,omitempty"`
@@ -70,13 +70,6 @@ type NewList struct {
 	Board    string                 `json:"board"`
 	Order    *int                   `json:"order,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type NewMetric struct {
-	Initial float64 `json:"initial"`
-	Target  float64 `json:"target"`
-	Actual  float64 `json:"actual"`
-	Unit    string  `json:"unit"`
 }
 
 type NewTask struct {
@@ -132,8 +125,6 @@ type UpdateGoal struct {
 	Name         *string                `json:"name,omitempty"`
 	Notes        *string                `json:"notes,omitempty"`
 	Time         *string                `json:"time,omitempty"`
-	StartOn      *int                   `json:"start_on,omitempty"`
-	DueOn        *int                   `json:"due_on,omitempty"`
 	IsCompany    *bool                  `json:"is_company,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	Status       *string                `json:"status,omitempty"`
@@ -146,10 +137,6 @@ type UpdateList struct {
 	Name     *string                `json:"name,omitempty"`
 	Order    *int                   `json:"order,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateMetric struct {
-	Actual float64 `json:"actual"`
 }
 
 type UpdateTask struct {

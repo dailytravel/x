@@ -18,7 +18,7 @@ type Contact struct {
 	Model        `bson:",inline"`
 	UID          primitive.ObjectID  `bson:"uid" json:"uid"`
 	Company      *primitive.ObjectID `bson:"company,omitempty" json:"company,omitempty"`
-	Reference    string              `json:"reference" bson:"reference"`
+	Type         string              `bson:"type" json:"type"`
 	FirstName    string              `json:"first_name,omitempty" bson:"first_name,omitempty"`
 	LastName     string              `json:"last_name,omitempty" bson:"last_name,omitempty"`
 	Birthday     primitive.DateTime  `json:"birthday,omitempty" bson:"birthday,omitempty"`
@@ -69,6 +69,7 @@ func (i *Contact) Collection() string {
 func (i *Contact) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "company", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "first_name", Value: "text"}, {Key: "last_name", Value: "text"}}, Options: options.Index().SetWeights(bson.M{"first_name": 2, "last_name": 1})},
 		{Keys: bson.D{{Key: "source", Value: 1}}, Options: options.Index()},
@@ -125,6 +126,7 @@ func (i *Contact) Document() map[string]interface{} {
 	document := map[string]interface{}{
 		"id":            i.ID,
 		"uid":           i.UID,
+		"type":          i.Type,
 		"company":       i.Company,
 		"first_name":    i.FirstName,
 		"last_name":     i.LastName,

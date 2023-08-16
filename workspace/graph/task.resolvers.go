@@ -6,69 +6,384 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"time"
 
+	"github.com/dailytravel/x/workspace/auth"
 	"github.com/dailytravel/x/workspace/graph/model"
+	"github.com/dailytravel/x/workspace/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) (*model.Task, error) {
-	panic(fmt.Errorf("not implemented: CreateTask - createTask"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new task
+	item := &model.Task{
+		Name:     input.Name,
+		Priority: input.Priority,
+		Notes:    input.Notes,
+		Order:    *input.Order,
+		Status:   *input.Status,
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+			Metadata:  input.Metadata,
+		},
+	}
+
+	for _, label := range input.Labels {
+		item.Labels = append(item.Labels, *label)
+	}
+
+	if input.Parent != nil {
+		_id, err := primitive.ObjectIDFromHex(*input.Parent)
+		if err != nil {
+			return nil, err
+		}
+		item.Parent = &_id
+	}
+
+	if input.List != nil {
+		_id, err := primitive.ObjectIDFromHex(*input.List)
+		if err != nil {
+			return nil, err
+		}
+
+		item.List = &_id
+	}
+
+	// Handle StartDate and DueDate input
+	handleDate := func(dateStr *string, targetDate *primitive.DateTime) {
+		if dateStr != nil {
+			dateTime, err := time.Parse(time.RFC3339, *dateStr)
+			if err == nil {
+				date := primitive.NewDateTimeFromTime(dateTime)
+				*targetDate = date
+			}
+		}
+	}
+
+	handleDate(input.StartDate, item.StartDate)
+	handleDate(input.DueDate, item.DueDate)
+
+	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	item.ID = res.InsertedID.(primitive.ObjectID)
+
+	return item, nil
 }
 
 // UpdateTask is the resolver for the updateTask field.
+// UpdateTask is the resolver for the updateTask field.
 func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input model.UpdateTask) (*model.Task, error) {
-	panic(fmt.Errorf("not implemented: UpdateTask - updateTask"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve the existing task using its ID
+	item := &model.Task{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update the task fields based on the input
+	if input.Name != nil {
+		item.Name = *input.Name
+	}
+
+	if input.Priority != nil {
+		item.Priority = input.Priority
+	}
+
+	if input.Notes != nil {
+		item.Notes = input.Notes
+	}
+
+	if input.Order != nil {
+		item.Order = *input.Order
+	}
+
+	if input.Status != nil {
+		item.Status = *input.Status
+	}
+
+	for _, label := range input.Labels {
+		item.Labels = append(item.Labels, *label)
+	}
+
+	if input.Parent != nil {
+		_id, err := primitive.ObjectIDFromHex(*input.Parent)
+		if err != nil {
+			return nil, err
+		}
+		item.Parent = &_id
+	}
+
+	if input.List != nil {
+		_id, err := primitive.ObjectIDFromHex(*input.List)
+		if err != nil {
+			return nil, err
+		}
+		item.List = &_id
+	}
+
+	item.UpdatedBy = uid
+
+	// Handle StartDate and DueDate input
+	handleDate := func(dateStr *string, targetDate *primitive.DateTime) {
+		if dateStr != nil {
+			dateTime, err := time.Parse(time.RFC3339, *dateStr)
+			if err == nil {
+				date := primitive.NewDateTimeFromTime(dateTime)
+				*targetDate = date
+			}
+		}
+	}
+
+	handleDate(input.StartDate, item.StartDate)
+	handleDate(input.DueDate, item.DueDate)
+
+	// Update the task in the database
+	update := bson.M{"$set": item}
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
+
+	var updatedTask model.Task
+	err = r.db.Collection("tasks").FindOneAndUpdate(ctx, filter, update, opts).Decode(&updatedTask)
+	if err != nil {
+		return nil, err
+	}
+
+	return &updatedTask, nil
 }
 
 // DeleteTask is the resolver for the deleteTask field.
 func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteTask - deleteTask"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve the task using its ID
+	task := &model.Task{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(task.Collection()).FindOne(ctx, filter).Decode(task)
+	if err != nil {
+		return nil, err
+	}
+
+	// Archive the task by updating its status or setting a "deleted" flag
+	archiveFields := bson.M{
+		"status":     "archived",
+		"updated_by": uid,
+		"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+	}
+
+	update := bson.M{"$set": archiveFields}
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
+
+	var archivedTask model.Task
+	err = r.db.Collection("tasks").FindOneAndUpdate(ctx, filter, update, opts).Decode(&archivedTask)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"success": true}, nil
 }
 
 // DeleteTasks is the resolver for the deleteTasks field.
 func (r *mutationResolver) DeleteTasks(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteTasks - deleteTasks"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+	archiveFields := bson.M{
+		"status":     "archived",
+		"updated_by": uid,
+		"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+	}
+	update := bson.M{"$set": archiveFields}
+
+	_, err = r.db.Collection("tasks").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"success": true}, nil
 }
 
 // Task is the resolver for the task field.
 func (r *queryResolver) Task(ctx context.Context, id string) (*model.Task, error) {
-	panic(fmt.Errorf("not implemented: Task - task"))
+	var item *model.Task
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		return nil, nil
+	}
+
+	return item, nil
 }
 
 // Tasks is the resolver for the tasks field.
 func (r *queryResolver) Tasks(ctx context.Context, list string) (*model.Tasks, error) {
-	panic(fmt.Errorf("not implemented: Tasks - tasks"))
+	var items []*model.Task
+
+	_id, err := primitive.ObjectIDFromHex(list)
+	if err != nil {
+		return nil, err
+	}
+
+	opts := options.Find().SetSort(bson.M{"order": 1})
+	opts.SetSort(bson.M{"created_at": -1})
+
+	filter := bson.M{"list": _id}
+	//find all items
+	cur, err := r.db.Collection("tasks").Find(ctx, filter, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Task
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("tasks").CountDocuments(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Tasks{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // ID is the resolver for the id field.
 func (r *taskResolver) ID(ctx context.Context, obj *model.Task) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Parent is the resolver for the parent field.
 func (r *taskResolver) Parent(ctx context.Context, obj *model.Task) (*model.Task, error) {
-	panic(fmt.Errorf("not implemented: Parent - parent"))
+	var item *model.Task
+
+	filter := bson.M{"_id": obj.Parent}
+	options := options.FindOne().SetProjection(bson.M{"_id": 1, "name": 1})
+
+	err := r.db.Collection(item.Collection()).FindOne(ctx, filter, options).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
+
 }
 
 // Subtasks is the resolver for the subtasks field.
 func (r *taskResolver) Subtasks(ctx context.Context, obj *model.Task) ([]*model.Task, error) {
-	panic(fmt.Errorf("not implemented: Subtasks - subtasks"))
+	var items []*model.Task
+
+	filter := bson.M{"parent": obj.ID}
+	opts := options.Find().SetSort(bson.M{"order": 1})
+
+	cur, err := r.db.Collection("tasks").Find(ctx, filter, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item model.Task
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, &item)
+	}
+
+	return items, nil
 }
 
 // List is the resolver for the list field.
 func (r *taskResolver) List(ctx context.Context, obj *model.Task) (*model.List, error) {
-	panic(fmt.Errorf("not implemented: List - list"))
+	var item *model.List
+
+	filter := bson.M{"_id": obj.List}
+	options := options.FindOne().SetProjection(bson.M{"_id": 1, "name": 1})
+
+	err := r.db.Collection(item.Collection()).FindOne(ctx, filter, options).Decode(&item)
+	if err != nil {
+		return nil, nil
+	}
+
+	return item, nil
 }
 
 // StartDate is the resolver for the start_date field.
 func (r *taskResolver) StartDate(ctx context.Context, obj *model.Task) (*string, error) {
-	panic(fmt.Errorf("not implemented: StartDate - start_date"))
+	if obj.StartDate == nil {
+		return nil, nil
+	}
+
+	startDate := time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339)
+	return &startDate, nil
 }
 
 // DueDate is the resolver for the due_date field.
 func (r *taskResolver) DueDate(ctx context.Context, obj *model.Task) (*string, error) {
-	panic(fmt.Errorf("not implemented: DueDate - due_date"))
+	if obj.DueDate == nil {
+		return nil, nil
+	}
+
+	dueDate := time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339)
+	return &dueDate, nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -78,12 +393,12 @@ func (r *taskResolver) Metadata(ctx context.Context, obj *model.Task) (map[strin
 
 // CreatedAt is the resolver for the created_at field.
 func (r *taskResolver) CreatedAt(ctx context.Context, obj *model.Task) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *taskResolver) UpdatedAt(ctx context.Context, obj *model.Task) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
@@ -93,12 +408,24 @@ func (r *taskResolver) UID(ctx context.Context, obj *model.Task) (string, error)
 
 // CreatedBy is the resolver for the created_by field.
 func (r *taskResolver) CreatedBy(ctx context.Context, obj *model.Task) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *taskResolver) UpdatedBy(ctx context.Context, obj *model.Task) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // Task returns TaskResolver implementation.

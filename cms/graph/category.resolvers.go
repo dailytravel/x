@@ -62,26 +62,42 @@ func (r *categoryResolver) Children(ctx context.Context, obj *model.Category) ([
 
 // Name is the resolver for the name field.
 func (r *categoryResolver) Name(ctx context.Context, obj *model.Category) (string, error) {
+	// Get the locale from the context
 	locale := auth.Locale(ctx)
+
+	// Try to retrieve the name for the requested locale
 	if name, ok := obj.Name[locale].(string); ok {
 		return name, nil
 	}
 
-	return obj.Name[obj.Locale].(string), nil
+	// If the name is not found for the requested locale,
+	// fallback to the category's default locale
+	if name, ok := obj.Name[obj.Locale].(string); ok {
+		return name, nil
+	}
+
+	// Return an error if the name is not found for any locale
+	return "", errors.New("Name not found for any locale")
 }
 
 // Description is the resolver for the description field.
 func (r *categoryResolver) Description(ctx context.Context, obj *model.Category) (*string, error) {
+	// Get the locale from the context
 	locale := auth.Locale(ctx)
+
+	// Try to retrieve the description for the requested locale
 	if description, ok := obj.Description[locale].(string); ok {
 		return &description, nil
 	}
 
+	// If the description is not found for the requested locale,
+	// fallback to the category's default locale
 	if description, ok := obj.Description[obj.Locale].(string); ok {
 		return &description, nil
 	}
 
-	return nil, nil // or return nil, errors.New("Description not found for any locale")
+	// Return an error if the name is not found for any locale
+	return nil, errors.New("Description not found for any locale")
 }
 
 // Metadata is the resolver for the metadata field.
@@ -140,10 +156,10 @@ func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCa
 	}
 
 	if input.Description != nil {
-		item.Description = map[string]interface{}{input.Locale: input.Description}
+		item.Description = map[string]interface{}{input.Locale: *input.Description}
 	}
 
-	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil)
+	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +171,49 @@ func (r *mutationResolver) CreateCategory(ctx context.Context, input model.NewCa
 
 // UpdateCategory is the resolver for the updateCategory field.
 func (r *mutationResolver) UpdateCategory(ctx context.Context, id string, input model.UpdateCategory) (*model.Category, error) {
-	panic(fmt.Errorf("not implemented: UpdateCategory - updateCategory"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch the existing category entry
+	filter := bson.M{"_id": _id}
+	existingCategory := &model.Category{}
+	err = r.db.Collection(existingCategory.Collection()).FindOne(ctx, filter).Decode(existingCategory)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update fields based on input
+	if input.Name != nil {
+		existingCategory.Name[input.Locale] = *input.Name
+	}
+	if input.Slug != nil {
+		existingCategory.Slug = input.Slug
+	}
+	if input.Description != nil {
+		existingCategory.Description[input.Locale] = *input.Description
+	}
+	if input.Metadata != nil {
+		existingCategory.Metadata = input.Metadata
+	}
+	existingCategory.UpdatedBy = uid
+
+	// Perform the update in the database
+	update := bson.M{
+		"$set": existingCategory,
+	}
+	_, err = r.db.Collection(existingCategory.Collection()).UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return existingCategory, nil
 }
 
 // DeleteCategory is the resolver for the deleteCategory field.
@@ -228,7 +286,18 @@ func (r *queryResolver) Category(ctx context.Context, id string) (*model.Categor
 
 // Categories is the resolver for the categories field.
 func (r *queryResolver) Categories(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Categories - categories"))
+	res, err := r.ts.Collection("categories").Documents().Search(utils.Params(args))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert struct to map
+	results, err := utils.StructToMap(res)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 // Category returns CategoryResolver implementation.

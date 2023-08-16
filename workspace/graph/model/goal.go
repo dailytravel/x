@@ -11,14 +11,12 @@ import (
 
 type Goal struct {
 	Model        `bson:",inline"`
-	User         primitive.ObjectID  `bson:"user" json:"user"`
-	Parent       primitive.ObjectID  `json:"parent,omitempty" bson:"parent,omitempty"`
-	Organization primitive.ObjectID  `json:"organization" bson:"organization"`
+	UID          primitive.ObjectID  `bson:"uid" json:"uid"`
+	Parent       *primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
+	Organization *primitive.ObjectID `json:"organization,omitempty" bson:"organization,omitempty"`
 	Time         primitive.ObjectID  `json:"time" bson:"time"`
 	Name         string              `json:"name" bson:"name"`
-	Notes        string              `json:"notes,omitempty" bson:"notes,omitempty"`
-	StartDate    primitive.Timestamp `json:"start_date" bson:"start_date"`
-	DueDate      primitive.Timestamp `json:"due_date" bson:"due_date"`
+	Notes        *string             `json:"notes,omitempty" bson:"notes,omitempty"`
 	Status       string              `json:"status" bson:"status"`
 }
 

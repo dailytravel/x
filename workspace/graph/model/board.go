@@ -11,12 +11,12 @@ import (
 
 type Board struct {
 	Model        `bson:",inline"`
-	User         primitive.ObjectID  `json:"user" bson:"user"`
-	Organization primitive.ObjectID  `json:"organization" bson:"organization"`
-	Portfolio    primitive.ObjectID  `json:"portfolio" bson:"portfolio"`
+	UID          primitive.ObjectID  `json:"uid" bson:"uid"`
+	Organization *primitive.ObjectID `json:"organization,omitempty" bson:"organization,omitempty"`
+	Portfolio    *primitive.ObjectID `json:"portfolio,omitempty" bson:"portfolio,omitempty"`
 	Type         string              `json:"type" bson:"type"`
-	Title        string              `json:"title,omitempty" bson:"title,omitempty"`
-	Description  string              `json:"description,omitempty" bson:"description,omitempty"`
+	Title        string              `json:"title" bson:"title"`
+	Description  *string             `json:"description,omitempty" bson:"description,omitempty"`
 	IsTemplate   bool                `json:"is_template,omitempty" bson:"is_template,omitempty"`
 	DueDate      primitive.Timestamp `json:"due_date,omitempty" bson:"due_date,omitempty"`
 	Starred      bool                `json:"starred,omitempty" bson:"starred,omitempty"`
@@ -46,7 +46,7 @@ func (i *Board) Collection() string {
 
 func (i *Board) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "organization", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "starred", Value: 1}}, Options: options.Index()},

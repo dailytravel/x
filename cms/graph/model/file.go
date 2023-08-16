@@ -18,8 +18,8 @@ type File struct {
 	Model       `bson:",inline"`
 	UID         primitive.ObjectID `bson:"uid" json:"uid"`
 	Locale      string             `json:"locale" bson:"locale"`
-	Name        string             `json:"name" bson:"name"`
-	Description string             `json:"description,omitempty" bson:"description,omitempty"`
+	Name        primitive.M        `json:"name" bson:"name"`
+	Description primitive.M        `json:"description,omitempty" bson:"description,omitempty"`
 	Type        string             `json:"type" bson:"type"`
 	Size        int64              `json:"size" bson:"size"`
 	Provider    string             `json:"provider" bson:"provider"`

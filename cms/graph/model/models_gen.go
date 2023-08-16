@@ -103,7 +103,6 @@ type NewFile struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Starred     *bool                  `json:"starred,omitempty"`
 	Status      *string                `json:"status,omitempty"`
-	User        *string                `json:"user,omitempty"`
 	Categories  []string               `json:"categories,omitempty"`
 }
 
@@ -195,17 +194,12 @@ type UpdateCurrency struct {
 }
 
 type UpdateFile struct {
-	Locale      *string                `json:"locale,omitempty"`
+	Locale      string                 `json:"locale"`
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
-	Type        *string                `json:"type,omitempty"`
-	Size        *int                   `json:"size,omitempty"`
-	Provider    *string                `json:"provider,omitempty"`
-	URL         *string                `json:"url,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Starred     *bool                  `json:"starred,omitempty"`
 	Status      *string                `json:"status,omitempty"`
-	User        *string                `json:"user,omitempty"`
 	Categories  []string               `json:"categories,omitempty"`
 }
 

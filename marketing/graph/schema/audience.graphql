@@ -28,18 +28,6 @@ input UpdateAudience {
   metadata: Map
 }
 
-input CreateSegmentInput {
-  name: String!
-  description: String
-  rules: [RuleInput]!
-}
-
-input UpdateSegmentInput {
-  name: String
-  description: String
-  rules: [RuleInput]
-}
-
 extend type Query {
   audience(id: ID!): Audience @auth(requires: [ADMIN])
   audiences(args: Map): [Audience] @auth(requires: [ADMIN])

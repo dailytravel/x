@@ -2,8 +2,6 @@ type Goal {
   id: ID!
   name: String!
   notes: String
-  start_date: String!
-  due_date: String!
   metadata: Map
   status: String
   created_at: String!
@@ -29,29 +27,18 @@ type Goals {
 }
 
 type Metric {
-  initial: Float!
-  target: Float!
-  actual: Float!
-  unit: String!
-}
-
-input NewMetric {
-  initial: Float!
-  target: Float!
-  actual: Float!
-  unit: String!
-}
-
-input UpdateMetric {
-  actual: Float!
+  precision: Int
+  unit: String
+  initial: Float
+  target: Float
+  current: Float
+  source: String
 }
 
 input NewGoal {
   name: String!
   notes: String
   time: String!
-  start_date: String!
-  due_date: String!
   is_company: Boolean
   metadata: Map
   status: String
@@ -64,8 +51,6 @@ input UpdateGoal {
   name: String
   notes: String
   time: String
-  start_on: Int
-  due_on: Int
   is_company: Boolean
   metadata: Map
   status: String
@@ -84,6 +69,4 @@ extend type Mutation {
   updateGoal(id: ID!, input: UpdateGoal!): Goal @auth
   deleteGoal(id: ID!): Map @auth
   deleteGoals(ids: [ID!]!): Map @auth
-  createGoalMetric(id: ID!, input: NewMetric!): Goal @auth
-  updateGoalMetric(id: ID!, input: UpdateMetric!): Goal @auth
 }

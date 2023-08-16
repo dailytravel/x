@@ -11,6 +11,7 @@ import (
 
 type List struct {
 	Model `bson:",inline"`
+	UID   primitive.ObjectID `json:"uid" bson:"uid"`
 	Board primitive.ObjectID `json:"board" bson:"board"`
 	Name  string             `json:"name" bson:"name"`
 	Order int                `json:"order" bson:"order"`

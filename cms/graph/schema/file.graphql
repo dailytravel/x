@@ -33,22 +33,16 @@ input NewFile {
   metadata: Map
   starred: Boolean
   status: String
-  user: ID
   categories: [ID!]
 }
 
 input UpdateFile {
-  locale: String
+  locale: String!
   name: String
   description: String
-  type: String
-  size: Int
-  provider: String
-  url: String
   metadata: Map
   starred: Boolean
   status: String
-  user: ID
   categories: [ID!]
 }
 

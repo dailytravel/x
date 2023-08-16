@@ -6,10 +6,16 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
+	"github.com/dailytravel/x/cms/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
@@ -20,6 +26,46 @@ func (r *fileResolver) ID(ctx context.Context, obj *model.File) (string, error) 
 // UID is the resolver for the uid field.
 func (r *fileResolver) UID(ctx context.Context, obj *model.File) (string, error) {
 	return obj.UID.Hex(), nil
+}
+
+// Name is the resolver for the name field.
+func (r *fileResolver) Name(ctx context.Context, obj *model.File) (string, error) {
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+
+	// Try to retrieve the name for the requested locale
+	if name, ok := obj.Name[locale].(string); ok {
+		return name, nil
+	}
+
+	// If the name is not found for the requested locale,
+	// fallback to the category's default locale
+	if name, ok := obj.Name[obj.Locale].(string); ok {
+		return name, nil
+	}
+
+	// Return an error if the name is not found for any locale
+	return "", errors.New("Name not found for any locale")
+}
+
+// Description is the resolver for the description field.
+func (r *fileResolver) Description(ctx context.Context, obj *model.File) (*string, error) {
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+
+	// Try to retrieve the description for the requested locale
+	if description, ok := obj.Description[locale].(string); ok {
+		return &description, nil
+	}
+
+	// If the description is not found for the requested locale,
+	// fallback to the category's default locale
+	if description, ok := obj.Description[obj.Locale].(string); ok {
+		return &description, nil
+	}
+
+	// Return an error if the name is not found for any locale
+	return nil, errors.New("Description not found for any locale")
 }
 
 // Metadata is the resolver for the metadata field.
@@ -39,42 +85,200 @@ func (r *fileResolver) UpdatedAt(ctx context.Context, obj *model.File) (string, 
 
 // CreatedBy is the resolver for the created_by field.
 func (r *fileResolver) CreatedBy(ctx context.Context, obj *model.File) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *fileResolver) UpdatedBy(ctx context.Context, obj *model.File) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // CreateFile is the resolver for the createFile field.
 func (r *mutationResolver) CreateFile(ctx context.Context, input model.NewFile) (*model.File, error) {
-	panic(fmt.Errorf("not implemented: CreateFile - createFile"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	file := &model.File{
+		UID:         *uid,
+		Locale:      input.Locale,
+		Name:        bson.M{input.Locale: input.Name},
+		Description: bson.M{input.Locale: input.Description},
+		Type:        input.Type,
+		Size:        int64(input.Size),
+		Provider:    input.Provider,
+		URL:         input.URL,
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
+	}
+
+	// Perform the insertion into the database
+	_, err = r.db.Collection("files").InsertOne(ctx, file)
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
 }
 
 // UpdateFile is the resolver for the updateFile field.
 func (r *mutationResolver) UpdateFile(ctx context.Context, id string, input model.UpdateFile) (*model.File, error) {
-	panic(fmt.Errorf("not implemented: UpdateFile - updateFile"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch the existing file entry
+	filter := bson.M{"_id": _id}
+	existingFile := &model.File{}
+	err = r.db.Collection(existingFile.Collection()).FindOne(ctx, filter).Decode(existingFile)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update fields based on input
+	if input.Name != nil {
+		existingFile.Name[input.Locale] = *input.Name
+	}
+	if input.Description != nil {
+		existingFile.Description[input.Locale] = *input.Description
+	}
+	existingFile.UpdatedBy = uid
+
+	// Perform the update in the database
+	update := bson.M{
+		"$set": existingFile,
+	}
+	_, err = r.db.Collection(existingFile.Collection()).UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return existingFile, nil
 }
 
 // DeleteFile is the resolver for the deleteFile field.
 func (r *mutationResolver) DeleteFile(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteFile - deleteFile"))
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	result, err := r.db.Collection("files").DeleteOne(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.DeletedCount == 0 {
+		return map[string]interface{}{
+			"deleted": false,
+			"error":   "file not found",
+		}, nil
+	}
+
+	return map[string]interface{}{
+		"success": true,
+	}, nil
 }
 
 // DeleteFiles is the resolver for the deleteFiles field.
 func (r *mutationResolver) DeleteFiles(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteFiles - deleteFiles"))
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	result, err := r.db.Collection("files").DeleteMany(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.DeletedCount == 0 {
+		return map[string]interface{}{
+			"deleted": false,
+			"error":   "no files were deleted",
+		}, nil
+	}
+
+	return map[string]interface{}{
+		"success": true,
+	}, nil
 }
 
 // Files is the resolver for the files field.
 func (r *queryResolver) Files(ctx context.Context, args map[string]interface{}) (*model.Files, error) {
-	panic(fmt.Errorf("not implemented: Files - files"))
+	var items []*model.File
+	//find all items
+	cur, err := r.db.Collection("files").Find(ctx, r.model.Query(args), r.model.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.File
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("files").CountDocuments(ctx, r.model.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Files{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // File is the resolver for the file field.
 func (r *queryResolver) File(ctx context.Context, id string) (*model.File, error) {
-	panic(fmt.Errorf("not implemented: File - file"))
+	var item *model.File
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for ID: %s", id)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // File returns FileResolver implementation.

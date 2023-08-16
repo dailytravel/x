@@ -41,7 +41,6 @@ input NewTask {
   start_date: String
   due_date: String
   labels: [String]
-  categories: [ID!]
   status: String
   metadata: Map
 }
@@ -57,7 +56,6 @@ input UpdateTask {
   start_date: String
   due_date: String
   labels: [String]
-  categories: [ID!]
   status: String
   metadata: Map
 }

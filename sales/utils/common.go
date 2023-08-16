@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/typesense/typesense-go/typesense/api"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -138,6 +139,43 @@ func Options(args map[string]interface{}) *options.FindOptions {
 	}
 
 	return options
+}
+
+func Params(args map[string]interface{}) *api.SearchCollectionParams {
+	searchParameters := &api.SearchCollectionParams{
+		Q:        getStringArg(args, "q"),
+		QueryBy:  getStringArg(args, "query_by"),
+		FilterBy: getStringPointerArg(args, "filter_by"),
+		SortBy:   getStringPointerArg(args, "sort_by"),
+		Page:     getIntPointerArg(args, "page"),
+		PerPage:  getIntPointerArg(args, "per_page"),
+	}
+
+	return searchParameters
+}
+
+func getStringArg(args map[string]interface{}, key string) string {
+	if val, ok := args[key].(string); ok && val != "" {
+		return val
+	}
+	return ""
+}
+
+func getStringPointerArg(args map[string]interface{}, key string) *string {
+	if val, ok := args[key].(string); ok && val != "" {
+		return &val
+	}
+	return nil
+}
+
+func getIntPointerArg(args map[string]interface{}, key string) *int {
+	if val, ok := args[key].(json.Number); ok {
+		if intValue, err := val.Int64(); err == nil {
+			intVal := int(intValue)
+			return &intVal
+		}
+	}
+	return nil
 }
 
 func UID(claims jwt.MapClaims) (*primitive.ObjectID, error) {
