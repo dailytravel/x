@@ -8,13 +8,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Category struct {
+type Term struct {
 	Database *mongo.Database
-	Model    *model.Category
+	Model    *model.Term
 }
 
 // Create mongo collection
-func (m *Category) Migrate() error {
+func (m *Term) Migrate() error {
 	col := m.Database.Collection(m.Model.Collection())
 	indexes, err := col.Indexes().List(context.Background())
 	if err != nil {

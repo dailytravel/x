@@ -13,25 +13,25 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type Category struct {
+type Term struct {
 	Model       `bson:",inline"`
 	Parent      primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
 	Locale      string             `json:"locale" bson:"locale"`
 	Name        primitive.M        `json:"name" bson:"name"`
 	Description primitive.M        `json:"description,omitempty" bson:"description,omitempty"`
-	Taxonomy    string             `json:"taxonomy" bson:"taxonomy"`
+	Type        string             `json:"type" bson:"type"`
 	Slug        *string            `json:"slug" bson:"slug"`
 	Order       int                `json:"order" bson:"order"`
 	Count       int                `json:"count" bson:"count"`
 }
 
-func (Category) IsEntity() {}
+func (Term) IsEntity() {}
 
-func (i *Category) Collection() string {
-	return "categories"
+func (i *Term) Collection() string {
+	return "terms"
 }
 
-func (i *Category) MarshalBSON() ([]byte, error) {
+func (i *Term) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
 	if i.CreatedAt.IsZero() {
@@ -40,14 +40,14 @@ func (i *Category) MarshalBSON() ([]byte, error) {
 
 	i.UpdatedAt = now
 
-	type t Category
+	type t Term
 	return bson.Marshal((*t)(i))
 }
 
-func (i *Category) Index() []mongo.IndexModel {
+func (i *Term) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
-		{Keys: bson.D{{Key: "taxonomy", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_by", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_by", Value: 1}}, Options: options.Index()},
@@ -56,13 +56,13 @@ func (i *Category) Index() []mongo.IndexModel {
 	}
 }
 
-func (i *Category) Schema() interface{} {
+func (i *Term) Schema() interface{} {
 	schema := &api.CollectionSchema{
 		Name: i.Collection(),
 		Fields: []api.Field{
 			{Name: "slug", Type: "string"},
 			{Name: "parent", Type: "string", Optional: pointer.True()},
-			{Name: "taxonomy", Type: "string", Facet: pointer.True()},
+			{Name: "type", Type: "string", Facet: pointer.True()},
 			{Name: "locale", Type: "string", Facet: pointer.True()},
 			{Name: "name", Type: "object"},
 			{Name: "description", Type: "object"},
@@ -78,14 +78,14 @@ func (i *Category) Schema() interface{} {
 	return schema
 }
 
-func (i *Category) Document() map[string]interface{} {
+func (i *Term) Document() map[string]interface{} {
 	document := map[string]interface{}{
 		"id":          i.ID,
 		"parent":      i.Parent,
 		"locale":      i.Locale,
 		"name":        i.Name,
 		"description": i.Description,
-		"taxonomy":    i.Taxonomy,
+		"type":        i.Type,
 		"slug":        i.Slug,
 		"order":       i.Order,
 		"count":       i.Count,
@@ -96,7 +96,7 @@ func (i *Category) Document() map[string]interface{} {
 	return document
 }
 
-func (i *Category) Insert(collection typesense.CollectionInterface) error {
+func (i *Term) Insert(collection typesense.CollectionInterface) error {
 	document := i.Document()
 
 	if _, err := collection.Retrieve(); err != nil {
@@ -113,7 +113,7 @@ func (i *Category) Insert(collection typesense.CollectionInterface) error {
 	return nil
 }
 
-func (i *Category) Update(collection typesense.CollectionInterface, documentKey primitive.M, updatedFields primitive.M, removedFields primitive.A) error {
+func (i *Term) Update(collection typesense.CollectionInterface, documentKey primitive.M, updatedFields primitive.M, removedFields primitive.A) error {
 	documentID := documentKey["_id"].(primitive.ObjectID).Hex()
 
 	// Check if 'deleted_at' field is in updatedFields and its value is of type primitive.Timestamp
@@ -162,7 +162,7 @@ func (i *Category) Update(collection typesense.CollectionInterface, documentKey 
 	return nil
 }
 
-func (i *Category) Delete(collection typesense.CollectionInterface, documentKey primitive.M) error {
+func (i *Term) Delete(collection typesense.CollectionInterface, documentKey primitive.M) error {
 	id := documentKey["_id"].(primitive.ObjectID).Hex()
 
 	// Delete document from Typesense

@@ -14,6 +14,7 @@ type contextKey string
 const GinContextKey contextKey = "GinContextKey"
 const AuthContextKey contextKey = "AuthContextKey"
 const APIKeyContextKey contextKey = "APIKeyContextKey"
+const LocaleContextKey contextKey = "LocaleContextKey"
 
 func Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -31,12 +32,17 @@ func Middleware() gin.HandlerFunc {
 	}
 }
 
-func APIKey(ctx context.Context) string {
-	raw, _ := ctx.Value(APIKeyContextKey).(string)
+func Auth(ctx context.Context) jwt.MapClaims {
+	raw, _ := ctx.Value(AuthContextKey).(jwt.MapClaims)
 	return raw
 }
 
-func Auth(ctx context.Context) jwt.MapClaims {
-	raw, _ := ctx.Value(AuthContextKey).(jwt.MapClaims)
+func Locale(ctx context.Context) *string {
+	raw, _ := ctx.Value(LocaleContextKey).(*string)
+	return raw
+}
+
+func APIKey(ctx context.Context) *string {
+	raw, _ := ctx.Value(APIKeyContextKey).(*string)
 	return raw
 }

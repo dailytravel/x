@@ -6,27 +6,12 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/dailytravel/x/cms/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-// FindCategoryByID is the resolver for the findCategoryByID field.
-func (r *entityResolver) FindCategoryByID(ctx context.Context, id string) (*model.Category, error) {
-	var item *model.Category
-
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
-}
 
 // FindContentByID is the resolver for the findContentByID field.
 func (r *entityResolver) FindContentByID(ctx context.Context, id string) (*model.Content, error) {
@@ -60,6 +45,11 @@ func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.Fi
 	return item, nil
 }
 
+// FindTermByID is the resolver for the findTermByID field.
+func (r *entityResolver) FindTermByID(ctx context.Context, id string) (*model.Term, error) {
+	panic(fmt.Errorf("not implemented: FindTermByID - findTermByID"))
+}
+
 // FindUserByID is the resolver for the findUserByID field.
 func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
 	return &model.User{
@@ -71,3 +61,24 @@ func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.Us
 func (r *Resolver) Entity() EntityResolver { return &entityResolver{r} }
 
 type entityResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *entityResolver) FindCategoryByID(ctx context.Context, id string) (*model.Term, error) {
+	var item *model.Term
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}

@@ -11,20 +11,16 @@ import (
 
 	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
+	"github.com/dailytravel/x/account/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CreateRole is the resolver for the createRole field.
 func (r *mutationResolver) CreateRole(ctx context.Context, input model.NewRole) (*model.Role, error) {
-	auth := auth.Auth(ctx)
-	if auth == nil {
-		return nil, fmt.Errorf("unauthorized")
-	}
-
-	sub, err := primitive.ObjectIDFromHex(auth["sub"].(string))
+	uid, err := utils.UID(auth.Auth(ctx))
 	if err != nil {
-		return nil, fmt.Errorf("invalid id")
+		return nil, err
 	}
 
 	// Convert permission names to primitive.ObjectID values
@@ -43,8 +39,8 @@ func (r *mutationResolver) CreateRole(ctx context.Context, input model.NewRole) 
 		Description: input.Description,
 		Permissions: permissions, // Assign the converted permission IDs
 		Model: model.Model{
-			CreatedBy: sub,
-			UpdatedBy: sub,
+			CreatedBy: uid,
+			UpdatedBy: uid,
 		},
 	}
 
@@ -60,14 +56,9 @@ func (r *mutationResolver) CreateRole(ctx context.Context, input model.NewRole) 
 
 // UpdateRole is the resolver for the updateRole field.
 func (r *mutationResolver) UpdateRole(ctx context.Context, id string, input model.UpdateRole) (*model.Role, error) {
-	auth := auth.Auth(ctx)
-	if auth == nil {
-		return nil, fmt.Errorf("unauthorized")
-	}
-
-	sub, err := primitive.ObjectIDFromHex(auth["sub"].(string))
+	uid, err := utils.UID(auth.Auth(ctx))
 	if err != nil {
-		return nil, fmt.Errorf("invalid id")
+		return nil, err
 	}
 
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -77,7 +68,7 @@ func (r *mutationResolver) UpdateRole(ctx context.Context, id string, input mode
 	filter := bson.M{"_id": _id}
 	item := &model.Role{
 		Model: model.Model{
-			UpdatedBy: sub,
+			UpdatedBy: uid,
 		},
 	}
 
@@ -245,20 +236,24 @@ func (r *roleResolver) UpdatedAt(ctx context.Context, obj *model.Role) (string, 
 
 // CreatedBy is the resolver for the created_by field.
 func (r *roleResolver) CreatedBy(ctx context.Context, obj *model.Role) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.CreatedBy,
-		},
-	}, nil
+	var item *model.User
+
+	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": obj.CreatedBy}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *roleResolver) UpdatedBy(ctx context.Context, obj *model.Role) (*model.User, error) {
-	return &model.User{
-		Model: model.Model{
-			ID: obj.UpdatedBy,
-		},
-	}, nil
+	var item *model.User
+
+	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": obj.UpdatedBy}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Role returns RoleResolver implementation.

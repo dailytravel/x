@@ -10,21 +10,21 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/cms/auth"
-	"github.com/dailytravel/x/cms/graph/model"
-	"github.com/dailytravel/x/cms/utils"
+	"github.com/dailytravel/x/configuration/auth"
+	"github.com/dailytravel/x/configuration/graph/model"
+	"github.com/dailytravel/x/configuration/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
-func (r *countryResolver) ID(ctx context.Context, obj *model.Country) (string, error) {
+func (r *currencyResolver) ID(ctx context.Context, obj *model.Currency) (string, error) {
 	return obj.ID.Hex(), nil
 }
 
 // Name is the resolver for the name field.
-func (r *countryResolver) Name(ctx context.Context, obj *model.Country) (string, error) {
+func (r *currencyResolver) Name(ctx context.Context, obj *model.Currency) (string, error) {
 	locale := auth.Locale(ctx)
 	if name, ok := obj.Name[locale].(string); ok {
 		return name, nil
@@ -34,35 +34,47 @@ func (r *countryResolver) Name(ctx context.Context, obj *model.Country) (string,
 }
 
 // Metadata is the resolver for the metadata field.
-func (r *countryResolver) Metadata(ctx context.Context, obj *model.Country) (map[string]interface{}, error) {
+func (r *currencyResolver) Metadata(ctx context.Context, obj *model.Currency) (map[string]interface{}, error) {
 	return obj.Metadata, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
-func (r *countryResolver) CreatedAt(ctx context.Context, obj *model.Country) (string, error) {
+func (r *currencyResolver) CreatedAt(ctx context.Context, obj *model.Currency) (string, error) {
 	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
-func (r *countryResolver) UpdatedAt(ctx context.Context, obj *model.Country) (string, error) {
+func (r *currencyResolver) UpdatedAt(ctx context.Context, obj *model.Currency) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreatedBy is the resolver for the created_by field.
-func (r *countryResolver) CreatedBy(ctx context.Context, obj *model.Country) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+func (r *currencyResolver) CreatedBy(ctx context.Context, obj *model.Currency) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
-func (r *countryResolver) UpdatedBy(ctx context.Context, obj *model.Country) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+func (r *currencyResolver) UpdatedBy(ctx context.Context, obj *model.Currency) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
-// CreateCountry is the resolver for the createCountry field.
-func (r *mutationResolver) CreateCountry(ctx context.Context, input model.NewCountry) (*model.Country, error) {
-	var item *model.Country
+// CreateCurrency is the resolver for the createCurrency field.
+func (r *mutationResolver) CreateCurrency(ctx context.Context, input model.NewCurrency) (*model.Currency, error) {
+	var item *model.Currency
 
-	doc := &model.Country{
+	doc := &model.Currency{
 		Code: input.Code,
 		Name: map[string]interface{}{
 			input.Locale: input.Name,
@@ -77,9 +89,9 @@ func (r *mutationResolver) CreateCountry(ctx context.Context, input model.NewCou
 	return item, nil
 }
 
-// UpdateCountry is the resolver for the updateCountry field.
-func (r *mutationResolver) UpdateCountry(ctx context.Context, id string, input model.UpdateCountry) (*model.Country, error) {
-	var item *model.Country
+// UpdateCurrency is the resolver for the updateCurrency field.
+func (r *mutationResolver) UpdateCurrency(ctx context.Context, id string, input *model.UpdateCurrency) (*model.Currency, error) {
+	var item *model.Currency
 
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -99,13 +111,13 @@ func (r *mutationResolver) UpdateCountry(ctx context.Context, id string, input m
 	return item, nil
 }
 
-// DeleteCountry is the resolver for the deleteCountry field.
-func (r *mutationResolver) DeleteCountry(ctx context.Context, id string) (map[string]interface{}, error) {
+// DeleteCurrency is the resolver for the deleteCurrency field.
+func (r *mutationResolver) DeleteCurrency(ctx context.Context, id string) (map[string]interface{}, error) {
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
-	res, err := r.db.Collection("countries").DeleteOne(ctx, bson.M{"_id": _id})
+	res, err := r.db.Collection("currencies").DeleteOne(ctx, bson.M{"_id": _id})
 	if err != nil {
 		return nil, fmt.Errorf("error deleting log: %v", err)
 	}
@@ -119,8 +131,8 @@ func (r *mutationResolver) DeleteCountry(ctx context.Context, id string) (map[st
 	}, nil
 }
 
-// DeleteCountries is the resolver for the deleteCountries field.
-func (r *mutationResolver) DeleteCountries(ctx context.Context, ids []string) (map[string]interface{}, error) {
+// DeleteCurrencies is the resolver for the deleteCurrencies field.
+func (r *mutationResolver) DeleteCurrencies(ctx context.Context, ids []string) (map[string]interface{}, error) {
 	var _ids []primitive.ObjectID
 
 	for _, id := range ids {
@@ -131,7 +143,7 @@ func (r *mutationResolver) DeleteCountries(ctx context.Context, ids []string) (m
 		_ids = append(_ids, _id)
 	}
 
-	res, err := r.db.Collection("countries").DeleteMany(ctx, bson.M{"_id": bson.M{"$in": _ids}})
+	res, err := r.db.Collection("currencies").DeleteMany(ctx, bson.M{"_id": bson.M{"$in": _ids}})
 	if err != nil {
 		return nil, fmt.Errorf("error deleting log: %v", err)
 	}
@@ -145,9 +157,9 @@ func (r *mutationResolver) DeleteCountries(ctx context.Context, ids []string) (m
 	}, nil
 }
 
-// Country is the resolver for the country field.
-func (r *queryResolver) Country(ctx context.Context, code string) (*model.Country, error) {
-	var item *model.Country
+// Currency is the resolver for the currency field.
+func (r *queryResolver) Currency(ctx context.Context, code string) (*model.Currency, error) {
+	var item *model.Currency
 	col := r.db.Collection(item.Collection())
 
 	filter := bson.M{"code": code}
@@ -163,17 +175,17 @@ func (r *queryResolver) Country(ctx context.Context, code string) (*model.Countr
 	return item, nil
 }
 
-// Countries is the resolver for the countries field.
-func (r *queryResolver) Countries(ctx context.Context, args map[string]interface{}) (*model.Countries, error) {
-	var items []*model.Country
+// Currencies is the resolver for the currencies field.
+func (r *queryResolver) Currencies(ctx context.Context, args map[string]interface{}) (*model.Currencies, error) {
+	var items []*model.Currency
 	//find all items
-	cur, err := r.db.Collection("countries").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("currencies").Find(ctx, utils.Query(args), utils.Options(args))
 	if err != nil {
 		return nil, err
 	}
 
 	for cur.Next(ctx) {
-		var item *model.Country
+		var item *model.Currency
 		if err := cur.Decode(&item); err != nil {
 			return nil, err
 		}
@@ -181,18 +193,18 @@ func (r *queryResolver) Countries(ctx context.Context, args map[string]interface
 	}
 
 	//get total count
-	count, err := r.db.Collection("countries").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("currencies").CountDocuments(ctx, utils.Query(args), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Countries{
+	return &model.Currencies{
 		Count: int(count),
 		Data:  items,
 	}, nil
 }
 
-// Country returns CountryResolver implementation.
-func (r *Resolver) Country() CountryResolver { return &countryResolver{r} }
+// Currency returns CurrencyResolver implementation.
+func (r *Resolver) Currency() CurrencyResolver { return &currencyResolver{r} }
 
-type countryResolver struct{ *Resolver }
+type currencyResolver struct{ *Resolver }

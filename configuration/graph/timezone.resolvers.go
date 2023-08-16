@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/cms/graph/model"
-	"github.com/dailytravel/x/cms/utils"
+	"github.com/dailytravel/x/configuration/graph/model"
+	"github.com/dailytravel/x/configuration/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

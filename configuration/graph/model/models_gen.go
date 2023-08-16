@@ -8,9 +8,71 @@ import (
 	"strconv"
 )
 
+type Countries struct {
+	Data  []*Country `json:"data,omitempty"`
+	Count int        `json:"count"`
+}
+
+type Currencies struct {
+	Data  []*Currency `json:"data,omitempty"`
+	Count int         `json:"count"`
+}
+
+type Locales struct {
+	Count int       `json:"count"`
+	Data  []*Locale `json:"data,omitempty"`
+}
+
+type NewCountry struct {
+	Code      string                 `json:"code"`
+	Locale    string                 `json:"locale"`
+	Name      string                 `json:"name"`
+	Native    string                 `json:"native"`
+	Continent string                 `json:"continent"`
+	Currency  *string                `json:"currency,omitempty"`
+	Languages []*string              `json:"languages,omitempty"`
+	Capital   *string                `json:"capital,omitempty"`
+	Flag      *string                `json:"flag,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewCurrency struct {
+	ID        *string                `json:"id,omitempty"`
+	Locale    string                 `json:"locale"`
+	Name      string                 `json:"name"`
+	Code      string                 `json:"code"`
+	Rate      float64                `json:"rate"`
+	Symbol    string                 `json:"symbol"`
+	Precision int                    `json:"precision"`
+	Decimal   string                 `json:"decimal"`
+	Thousand  string                 `json:"thousand"`
+	Order     int                    `json:"order"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewLocale struct {
+	ID         *string                `json:"id,omitempty"`
+	Name       string                 `json:"name"`
+	Locale     string                 `json:"locale"`
+	Code       string                 `json:"code"`
+	Order      int                    `json:"order"`
+	Rtl        bool                   `json:"rtl"`
+	DateFormat string                 `json:"date_format"`
+	TimeFormat string                 `json:"time_format"`
+	WeekStart  int                    `json:"week_start"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type NewOption struct {
 	Name string `json:"name"`
 	Data string `json:"data"`
+}
+
+type NewTimezone struct {
+	ID       *string                `json:"id,omitempty"`
+	Name     string                 `json:"name"`
+	Offset   int                    `json:"offset"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewWebhook struct {
@@ -25,9 +87,60 @@ type Options struct {
 	Count int       `json:"count"`
 }
 
+type Timezones struct {
+	Count int         `json:"count"`
+	Data  []*Timezone `json:"data,omitempty"`
+}
+
+type UpdateCountry struct {
+	Locale    *string                `json:"locale,omitempty"`
+	Code      *string                `json:"code,omitempty"`
+	Name      *string                `json:"name,omitempty"`
+	Native    *string                `json:"native,omitempty"`
+	Continent *string                `json:"continent,omitempty"`
+	Currency  *string                `json:"currency,omitempty"`
+	Languages []*string              `json:"languages,omitempty"`
+	Capital   *string                `json:"capital,omitempty"`
+	Flag      *string                `json:"flag,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type UpdateCurrency struct {
+	Locale    *string                `json:"locale,omitempty"`
+	Name      *string                `json:"name,omitempty"`
+	Code      *string                `json:"code,omitempty"`
+	Rate      *float64               `json:"rate,omitempty"`
+	Symbol    *string                `json:"symbol,omitempty"`
+	Precision *int                   `json:"precision,omitempty"`
+	Decimal   *string                `json:"decimal,omitempty"`
+	Thousand  *string                `json:"thousand,omitempty"`
+	Order     *int                   `json:"order,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Status    *string                `json:"status,omitempty"`
+}
+
+type UpdateLocale struct {
+	Name       *string                `json:"name,omitempty"`
+	Locale     string                 `json:"locale"`
+	Code       *string                `json:"code,omitempty"`
+	Order      *int                   `json:"order,omitempty"`
+	Rtl        *bool                  `json:"rtl,omitempty"`
+	DateFormat *string                `json:"date_format,omitempty"`
+	TimeFormat *string                `json:"time_format,omitempty"`
+	WeekStart  *int                   `json:"week_start,omitempty"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type UpdateOption struct {
 	Name *string `json:"name,omitempty"`
 	Data *string `json:"data,omitempty"`
+}
+
+type UpdateTimezone struct {
+	Name        *string                `json:"name,omitempty"`
+	Offset      *int                   `json:"offset,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateWebhook struct {
@@ -62,6 +175,47 @@ type WebhookHeaderInput struct {
 type Webhooks struct {
 	Data  []*Webhook `json:"data,omitempty"`
 	Count int        `json:"count"`
+}
+
+type CurrencyStatus string
+
+const (
+	CurrencyStatusActive   CurrencyStatus = "ACTIVE"
+	CurrencyStatusInactive CurrencyStatus = "INACTIVE"
+)
+
+var AllCurrencyStatus = []CurrencyStatus{
+	CurrencyStatusActive,
+	CurrencyStatusInactive,
+}
+
+func (e CurrencyStatus) IsValid() bool {
+	switch e {
+	case CurrencyStatusActive, CurrencyStatusInactive:
+		return true
+	}
+	return false
+}
+
+func (e CurrencyStatus) String() string {
+	return string(e)
+}
+
+func (e *CurrencyStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = CurrencyStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid CurrencyStatus", str)
+	}
+	return nil
+}
+
+func (e CurrencyStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type WebhookEventAction string

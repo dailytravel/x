@@ -1,9 +1,9 @@
-type Category @key(fields: "id") {
+type Term @key(fields: "id") {
   id: ID!
-  parent: Category
-  children: [Category]
+  parent: Term
+  children: [Term]
   locale: String!
-  taxonomy: String!
+  type: String!
   slug: String
   name: String!
   description: String
@@ -16,42 +16,42 @@ type Category @key(fields: "id") {
   updated_by: ID
 }
 
-type Categories {
+type Terms {
   count: Int!
-  data: [Category]
+  data: [Term]
 }
 
-input NewCategory {
+input NewTerm {
   locale: String!
   name: String!
   slug: String
   description: String
   parent: ID
-  taxonomy: String!
+  type: String!
   order: Int
   metadata: Map
 }
 
-input UpdateCategory {
+input UpdateTerm {
   id: ID
   locale: String!
   name: String
   slug: String
   description: String
   parent: ID
-  taxonomy: String
+  type: String
   order: Int
   metadata: Map
 }
 
 extend type Query {
-  category(id: ID!): Category
-  categories(args: Map): Map
+  term(id: ID!): Term
+  terms(args: Map): Map
 }
 
 extend type Mutation {
-  createCategory(input: NewCategory!): Category @auth
-  updateCategory(id: ID!, input: UpdateCategory!): Category @auth
-  deleteCategory(id: ID!): Map @auth
-  deleteCategories(ids: [ID!]!): Map @auth
+  createTerm(input: NewTerm!): Term @auth
+  updateTerm(id: ID!, input: UpdateTerm!): Term @auth
+  deleteTerm(id: ID!): Map @auth
+  deleteTerms(ids: [ID!]!): Map @auth
 }

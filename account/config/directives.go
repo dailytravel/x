@@ -21,7 +21,7 @@ var (
 func Directives(c *graph.Config) {
 	c.Directives.Api = func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 		apiKey := auth.APIKey(ctx)
-		if apiKey == "" {
+		if apiKey == nil {
 			return nil, ErrAPIKeyRequired
 		}
 

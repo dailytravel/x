@@ -25,9 +25,9 @@ type Model struct {
 	UpdatedAt   primitive.Timestamp `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 	PublishedAt primitive.Timestamp `json:"published_at,omitempty" bson:"published_at,omitempty"`
 	DeletedAt   primitive.Timestamp `json:"deleted_at,omitempty" bson:"deleted_at,omitempty"`
-	CreatedBy   primitive.ObjectID  `json:"created_by,omitempty" bson:"created_by,omitempty"`
-	UpdatedBy   primitive.ObjectID  `json:"updated_by,omitempty" bson:"updated_by,omitempty"`
-	DeletedBy   primitive.ObjectID  `json:"deleted_by,omitempty" bson:"deleted_by,omitempty"`
+	CreatedBy   *primitive.ObjectID `json:"created_by,omitempty" bson:"created_by,omitempty"`
+	UpdatedBy   *primitive.ObjectID `json:"updated_by,omitempty" bson:"updated_by,omitempty"`
+	DeletedBy   *primitive.ObjectID `json:"deleted_by,omitempty" bson:"deleted_by,omitempty"`
 }
 
 func (i *Model) Query(args map[string]interface{}) interface{} {

@@ -16,17 +16,18 @@ import (
 
 type Content struct {
 	Model       `bson:",inline"`
-	UID         primitive.ObjectID `json:"uid" bson:"uid"`
-	Parent      primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
-	Slug        string             `json:"slug" bson:"slug"`
-	Locale      string             `json:"locale" bson:"locale"`
-	Type        string             `json:"type" bson:"type"`
-	Title       primitive.M        `json:"title" bson:"title"`
-	Summary     primitive.M        `json:"summary" bson:"summary"`
-	Body        primitive.M        `json:"body" bson:"body"`
-	Status      string             `json:"status" bson:"status"`
-	Commentable bool               `json:"commentable" bson:"commentable"`
-	Metadata    primitive.M        `json:"metadata" bson:"metadata"`
+	UID         primitive.ObjectID    `json:"uid" bson:"uid"`
+	Parent      *primitive.ObjectID   `json:"parent,omitempty" bson:"parent,omitempty"`
+	Slug        *string               `json:"slug" bson:"slug"`
+	Locale      string                `json:"locale" bson:"locale"`
+	Type        string                `json:"type" bson:"type"`
+	Title       primitive.M           `json:"title" bson:"title"`
+	Summary     primitive.M           `json:"summary" bson:"summary"`
+	Body        primitive.M           `json:"body" bson:"body"`
+	Terms       []*primitive.ObjectID `json:"terms,omitempty" bson:"terms,omitempty"`
+	Status      string                `json:"status" bson:"status"`
+	Commentable bool                  `json:"commentable" bson:"commentable"`
+	Metadata    primitive.M           `json:"metadata" bson:"metadata"`
 }
 
 func (Content) IsEntity() {}
@@ -50,7 +51,7 @@ func (i *Content) Collection() string {
 
 func (i *Content) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "parent", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
@@ -97,7 +98,7 @@ func (i *Content) Document() map[string]interface{} {
 		"updated_at": time.Unix(int64(i.UpdatedAt.T), 0).Format(time.RFC3339),
 	}
 
-	if i.Parent != primitive.NilObjectID {
+	if i.Parent != nil {
 		document["parent"] = i.Parent
 	}
 

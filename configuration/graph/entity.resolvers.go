@@ -6,14 +6,15 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/configuration/graph/model"
 )
 
 // FindUserByID is the resolver for the findUserByID field.
 func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: FindUserByID - findUserByID"))
+	return &model.User{
+		ID: id,
+	}, nil
 }
 
 // Entity returns EntityResolver implementation.

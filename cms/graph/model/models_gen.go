@@ -8,11 +8,6 @@ import (
 	"strconv"
 )
 
-type Categories struct {
-	Count int         `json:"count"`
-	Data  []*Category `json:"data,omitempty"`
-}
-
 type Contents struct {
 	Count int        `json:"count"`
 	Data  []*Content `json:"data,omitempty"`
@@ -36,17 +31,6 @@ type Files struct {
 type Locales struct {
 	Count int       `json:"count"`
 	Data  []*Locale `json:"data,omitempty"`
-}
-
-type NewCategory struct {
-	Locale      string                 `json:"locale"`
-	Name        string                 `json:"name"`
-	Slug        *string                `json:"slug,omitempty"`
-	Description *string                `json:"description,omitempty"`
-	Parent      *string                `json:"parent,omitempty"`
-	Taxonomy    string                 `json:"taxonomy"`
-	Order       *int                   `json:"order,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewContent struct {
@@ -119,11 +103,15 @@ type NewLocale struct {
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type NewTaxonomy struct {
-	Category      string `json:"category"`
-	Taxonomizable string `json:"Taxonomizable"`
-	Type          string `json:"type"`
-	Sticky        *bool  `json:"sticky,omitempty"`
+type NewTerm struct {
+	Locale      string                 `json:"locale"`
+	Name        string                 `json:"name"`
+	Slug        *string                `json:"slug,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Parent      *string                `json:"parent,omitempty"`
+	Type        string                 `json:"type"`
+	Order       *int                   `json:"order,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewTimezone struct {
@@ -133,21 +121,14 @@ type NewTimezone struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
+type Terms struct {
+	Count int     `json:"count"`
+	Data  []*Term `json:"data,omitempty"`
+}
+
 type Timezones struct {
 	Count int         `json:"count"`
 	Data  []*Timezone `json:"data,omitempty"`
-}
-
-type UpdateCategory struct {
-	ID          *string                `json:"id,omitempty"`
-	Locale      string                 `json:"locale"`
-	Name        *string                `json:"name,omitempty"`
-	Slug        *string                `json:"slug,omitempty"`
-	Description *string                `json:"description,omitempty"`
-	Parent      *string                `json:"parent,omitempty"`
-	Taxonomy    *string                `json:"taxonomy,omitempty"`
-	Order       *int                   `json:"order,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateContent struct {
@@ -215,8 +196,16 @@ type UpdateLocale struct {
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type UpdateTaxonomy struct {
-	Sticky *bool `json:"sticky,omitempty"`
+type UpdateTerm struct {
+	ID          *string                `json:"id,omitempty"`
+	Locale      string                 `json:"locale"`
+	Name        *string                `json:"name,omitempty"`
+	Slug        *string                `json:"slug,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Parent      *string                `json:"parent,omitempty"`
+	Type        *string                `json:"type,omitempty"`
+	Order       *int                   `json:"order,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateTimezone struct {

@@ -80,26 +80,6 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 		}()
 
 		switch typeName {
-		case "Category":
-			resolverName, err := entityResolverNameForCategory(ctx, rep)
-			if err != nil {
-				return fmt.Errorf(`finding resolver for Entity "Category": %w`, err)
-			}
-			switch resolverName {
-
-			case "findCategoryByID":
-				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findCategoryByID(): %w`, err)
-				}
-				entity, err := ec.resolvers.Entity().FindCategoryByID(ctx, id0)
-				if err != nil {
-					return fmt.Errorf(`resolving Entity "Category": %w`, err)
-				}
-
-				list[idx[i]] = entity
-				return nil
-			}
 		case "Content":
 			resolverName, err := entityResolverNameForContent(ctx, rep)
 			if err != nil {
@@ -135,6 +115,26 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				entity, err := ec.resolvers.Entity().FindFileByID(ctx, id0)
 				if err != nil {
 					return fmt.Errorf(`resolving Entity "File": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Term":
+			resolverName, err := entityResolverNameForTerm(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Term": %w`, err)
+			}
+			switch resolverName {
+
+			case "findTermByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findTermByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindTermByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Term": %w`, err)
 				}
 
 				list[idx[i]] = entity
@@ -229,23 +229,6 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 	}
 }
 
-func entityResolverNameForCategory(ctx context.Context, rep map[string]interface{}) (string, error) {
-	for {
-		var (
-			m   map[string]interface{}
-			val interface{}
-			ok  bool
-		)
-		_ = val
-		m = rep
-		if _, ok = m["id"]; !ok {
-			break
-		}
-		return "findCategoryByID", nil
-	}
-	return "", fmt.Errorf("%w for Category", ErrTypeNotFound)
-}
-
 func entityResolverNameForContent(ctx context.Context, rep map[string]interface{}) (string, error) {
 	for {
 		var (
@@ -278,6 +261,23 @@ func entityResolverNameForFile(ctx context.Context, rep map[string]interface{}) 
 		return "findFileByID", nil
 	}
 	return "", fmt.Errorf("%w for File", ErrTypeNotFound)
+}
+
+func entityResolverNameForTerm(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findTermByID", nil
+	}
+	return "", fmt.Errorf("%w for Term", ErrTypeNotFound)
 }
 
 func entityResolverNameForUser(ctx context.Context, rep map[string]interface{}) (string, error) {

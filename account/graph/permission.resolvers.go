@@ -27,7 +27,7 @@ func (r *mutationResolver) CreatePermission(ctx context.Context, input model.New
 		Name:        input.Name,
 		Description: input.Description,
 		Model: model.Model{
-			CreatedBy: *uid,
+			CreatedBy: uid,
 		},
 	}
 
@@ -56,7 +56,7 @@ func (r *mutationResolver) UpdatePermission(ctx context.Context, id string, inpu
 	filter := bson.M{"_id": _id}
 	item := &model.Permission{
 		Model: model.Model{
-			UpdatedBy: *uid,
+			UpdatedBy: uid,
 		},
 	}
 
