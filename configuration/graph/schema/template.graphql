@@ -1,0 +1,45 @@
+type Template {
+  id: ID!
+  locale: String!
+  name: String!
+  subject: String!
+  body: String!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+  created_by: ID
+  updated_by: ID
+}
+
+type Templates {
+  count: Int!
+  data: [Template]
+}
+
+input NewTemplate {
+  locale: String!
+  name: String!
+  subject: String!
+  body: String!
+  metadata: Map
+}
+
+input UpdateTemplate {
+  locale: String
+  name: String
+  subject: String
+  body: String
+  metadata: Map
+}
+
+extend type Query {
+  template(name: String!): Template
+  templates(args: Map): Templates
+}
+
+extend type Mutation {
+  createTemplate(input: NewTemplate!): Template
+  updateTemplate(id: ID!, input: UpdateTemplate!): Template
+  deleteTemplate(id: ID!): Map
+  deleteTemplates(ids: [ID]!): Map
+}

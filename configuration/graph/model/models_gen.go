@@ -68,6 +68,14 @@ type NewOption struct {
 	Data string `json:"data"`
 }
 
+type NewTemplate struct {
+	Locale   string                 `json:"locale"`
+	Name     string                 `json:"name"`
+	Subject  string                 `json:"subject"`
+	Body     string                 `json:"body"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type NewTimezone struct {
 	ID       *string                `json:"id,omitempty"`
 	Name     string                 `json:"name"`
@@ -85,6 +93,11 @@ type NewWebhook struct {
 type Options struct {
 	Data  []*Option `json:"data,omitempty"`
 	Count int       `json:"count"`
+}
+
+type Templates struct {
+	Count int         `json:"count"`
+	Data  []*Template `json:"data,omitempty"`
 }
 
 type Timezones struct {
@@ -134,6 +147,14 @@ type UpdateLocale struct {
 type UpdateOption struct {
 	Name *string `json:"name,omitempty"`
 	Data *string `json:"data,omitempty"`
+}
+
+type UpdateTemplate struct {
+	Locale   *string                `json:"locale,omitempty"`
+	Name     *string                `json:"name,omitempty"`
+	Subject  *string                `json:"subject,omitempty"`
+	Body     *string                `json:"body,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateTimezone struct {
