@@ -15,3 +15,46 @@ type Membership @key(fields: "id") {
   created_by: ID
   updated_by: ID
 }
+
+type Memberships {
+  data: [Membership]
+  count: Int!
+}
+
+input NewMembership {
+  tier: ID!
+  number: String!
+  since: String!
+  until: String!
+  billing: Map
+  payment: Map
+  metadata: Map
+  status: String!
+  created_by: ID
+  updated_by: ID
+}
+
+input UpdateMembership {
+  tier: ID
+  number: String
+  since: String
+  until: String
+  billing: Map
+  payment: Map
+  metadata: Map
+  status: String
+  created_by: ID
+  updated_by: ID
+}
+
+extend type Query {
+  membership(id: ID!): Membership
+  memberships(args: Map!): Memberships
+}
+
+extend type Mutation {
+  createMembership(input: NewMembership!): Membership
+  updateMembership(id: ID!, input: UpdateMembership!): Membership
+  deleteMembership(id: ID!): Membership
+  deleteMemberships(ids: [ID!]!): [Membership]
+}

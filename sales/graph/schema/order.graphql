@@ -1,11 +1,8 @@
 type Order {
   id: ID!
   reference: String!
-  total: Float!
-  currency: String!
   cancellable: Boolean!
   status: String!
-  cancelled_at: Int
   created_at: String!
   updated_at: String!
   uid: ID!
@@ -21,20 +18,17 @@ type Orders {
 input NewOrder {
   reference: String!
   data: [ID!]
-  total: Float!
-  currency: String!
   cancellable: Boolean!
   status: String!
+  metadata: Map
 }
 
 input UpdateOrder {
   reference: String
   data: [ID!]
-  total: Float
-  currency: String
   cancellable: Boolean
   status: String
-  cancelled_at: Int
+  metadata: Map
 }
 
 extend type Query {

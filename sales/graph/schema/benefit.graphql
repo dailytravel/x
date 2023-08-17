@@ -10,7 +10,7 @@ type Benefit {
 
 type Benefits {
   data: [Benefit]
-  count: Int
+  count: Int!
 }
 
 input NewBenefit {
@@ -26,12 +26,13 @@ input UpdateBenefit {
 }
 
 extend type Query {
-  benefits(args: Map!): [Benefit]
+  benefits(args: Map!): Benefits
   benefit(id: ID!): Benefit
 }
 
 extend type Mutation {
   createBenefit(input: NewBenefit!): Benefit
   updateBenefit(id: ID!, input: UpdateBenefit!): Benefit
-  deleteBenefit(id: ID!): Boolean
+  deleteBenefit(id: ID!): Map
+  deleteBenefits(ids: [ID!]!): Map
 }

@@ -11,16 +11,13 @@ import (
 
 type Order struct {
 	Model       `bson:",inline"`
-	User        primitive.ObjectID  `bson:"user,omitempty" json:"user,omitempty"`
-	Type        string              `json:"type,omitempty" bson:"type,omitempty"`
-	Order       string              `json:"locale,omitempty" bson:"locale,omitempty"`
-	Reference   string              `json:"reference,omitempty" bson:"reference,omitempty"`
-	Amount      float64             `json:"amount,omitempty" bson:"amount,omitempty"`
-	Currency    string              `json:"currency,omitempty" bson:"currency,omitempty"`
-	Coupon      string              `json:"coupon,omitempty" bson:"coupon,omitempty"`
-	Cancellable bool                `json:"cancellable,omitempty" bson:"cancellable,omitempty"`
-	CancelledAt primitive.Timestamp `json:"cancelled_at,omitempty" bson:"cancelled_at,omitempty"`
-	Status      string              `json:"status,omitempty" bson:"status,omitempty"`
+	UID         primitive.ObjectID `bson:"uid" json:"uid"`
+	Type        string             `json:"type" bson:"type"`
+	Order       string             `json:"locale" bson:"locale"`
+	Reference   string             `json:"reference" bson:"reference"`
+	Coupon      *string            `json:"coupon,omitempty" bson:"coupon,omitempty"`
+	Cancellable *bool              `json:"cancellable" bson:"cancellable"`
+	Status      string             `json:"status" bson:"status"`
 }
 
 func (i *Order) MarshalBSON() ([]byte, error) {

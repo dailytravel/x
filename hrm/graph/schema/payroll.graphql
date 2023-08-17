@@ -7,6 +7,41 @@ type Payroll {
   status: String!
   created_at: String!
   updated_at: String!
-  created_by: ID!
-  updated_by: ID!
+  created_by: ID
+  updated_by: ID
+  employee: Employee
+}
+
+type Payrolls {
+  data: [Payroll]
+  count: Int!
+}
+
+input NewPayroll {
+  employee: ID!
+  pay_date: String!
+  amount: Float!
+  currency: String!
+  metadata: Map
+  status: String!
+}
+
+input UpdatePayroll {
+  pay_date: String
+  amount: Float
+  currency: String
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  payroll(id: ID!): Payroll
+  payrolls(args: Map): Payrolls
+}
+
+extend type Mutation {
+  createPayroll(input: NewPayroll!): Payroll
+  updatePayroll(id: ID!, input: UpdatePayroll!): Payroll
+  deletePayroll(id: ID!): Payroll
+  deletePayrolls(ids: [ID!]!): [Payroll]
 }

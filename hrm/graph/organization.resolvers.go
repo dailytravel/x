@@ -6,34 +6,189 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"time"
 
+	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
+	"github.com/dailytravel/x/hrm/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreateOrganization is the resolver for the createOrganization field.
 func (r *mutationResolver) CreateOrganization(ctx context.Context, input model.NewOrganization) (*model.Organization, error) {
-	panic(fmt.Errorf("not implemented: CreateOrganization - createOrganization"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Organization{
+		Type:        input.Type,
+		Name:        input.Name,
+		Description: input.Description,
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
+	}
+
+	if input.Employee != nil {
+		employee, err := primitive.ObjectIDFromHex(*input.Employee)
+		if err != nil {
+			return nil, err
+		}
+		item.Employee = &employee
+	}
+
+	if input.Parent != nil {
+		parent, err := primitive.ObjectIDFromHex(*input.Parent)
+		if err != nil {
+			return nil, err
+		}
+		item.Parent = &parent
+	}
+
+	// Insert the new organization
+	if _, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateOrganization is the resolver for the updateOrganization field.
 func (r *mutationResolver) UpdateOrganization(ctx context.Context, id string, input model.UpdateOrganization) (*model.Organization, error) {
-	panic(fmt.Errorf("not implemented: UpdateOrganization - updateOrganization"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to an ObjectID
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch the existing organization
+	item := &model.Organization{}
+	filter := bson.M{"_id": objectID}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update the organization fields based on the input
+	if input.Type != nil {
+		item.Type = *input.Type
+	}
+	if input.Name != nil {
+		item.Name = *input.Name
+	}
+	if input.Description != nil {
+		item.Description = input.Description
+	}
+	if input.Employee != nil {
+		employee, err := primitive.ObjectIDFromHex(*input.Employee)
+		if err != nil {
+			return nil, err
+		}
+		item.Employee = &employee
+	}
+	if input.Parent != nil {
+		parent, err := primitive.ObjectIDFromHex(*input.Parent)
+		if err != nil {
+			return nil, err
+		}
+		item.Parent = &parent
+	}
+
+	// Set the updated fields and update the organization
+	update := bson.M{
+		"$set": bson.M{
+			"type":        item.Type,
+			"name":        item.Name,
+			"description": item.Description,
+			"employee":    item.Employee,
+			"parent":      item.Parent,
+			"updated_by":  uid,
+		},
+	}
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
+
+	var updatedOrg model.Organization
+	err = r.db.Collection("organizations").FindOneAndUpdate(ctx, filter, update, opts).Decode(&updatedOrg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &updatedOrg, nil
 }
 
 // DeleteOrganization is the resolver for the deleteOrganization field.
 func (r *mutationResolver) DeleteOrganization(ctx context.Context, id string) (*model.Organization, error) {
-	panic(fmt.Errorf("not implemented: DeleteOrganization - deleteOrganization"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to an ObjectID
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch the organization that needs to be deleted
+	orgToDelete := &model.Organization{}
+	filter := bson.M{"_id": objectID}
+	err = r.db.Collection(orgToDelete.Collection()).FindOne(ctx, filter).Decode(orgToDelete)
+	if err != nil {
+		return nil, err
+	}
+
+	// Archive the organization by updating its status and marking it as deleted
+	archiveFields := bson.M{
+		"status":     "archived",
+		"archived":   true,
+		"updated_by": uid,
+		"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+	}
+
+	update := bson.M{"$set": archiveFields}
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
+
+	var archivedOrg model.Organization
+	err = r.db.Collection("organizations").FindOneAndUpdate(ctx, filter, update, opts).Decode(&archivedOrg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &archivedOrg, nil
 }
 
 // ID is the resolver for the id field.
 func (r *organizationResolver) ID(ctx context.Context, obj *model.Organization) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Parent is the resolver for the parent field.
 func (r *organizationResolver) Parent(ctx context.Context, obj *model.Organization) (*model.Organization, error) {
-	panic(fmt.Errorf("not implemented: Parent - parent"))
+	var item *model.Organization
+
+	filter := bson.M{"parent": obj.Parent}
+	options := options.FindOne().SetProjection(bson.M{"_id": 1, "name": 1, "description": 1})
+
+	err := r.db.Collection(item.Collection()).FindOne(ctx, filter, options).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -43,50 +198,102 @@ func (r *organizationResolver) Metadata(ctx context.Context, obj *model.Organiza
 
 // CreatedAt is the resolver for the created_at field.
 func (r *organizationResolver) CreatedAt(ctx context.Context, obj *model.Organization) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *organizationResolver) UpdatedAt(ctx context.Context, obj *model.Organization) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// UID is the resolver for the uid field.
-func (r *organizationResolver) UID(ctx context.Context, obj *model.Organization) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+// Employee is the resolver for the employee field.
+func (r *organizationResolver) Employee(ctx context.Context, obj *model.Organization) (*model.Employee, error) {
+	var item *model.Employee
+
+	filter := bson.M{"_id": obj.Employee}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // CreatedBy is the resolver for the created_by field.
 func (r *organizationResolver) CreatedBy(ctx context.Context, obj *model.Organization) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *organizationResolver) UpdatedBy(ctx context.Context, obj *model.Organization) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // Organizations is the resolver for the organizations field.
-func (r *queryResolver) Organizations(ctx context.Context, arg map[string]interface{}) (*model.Organizations, error) {
-	panic(fmt.Errorf("not implemented: Organizations - organizations"))
+func (r *queryResolver) Organizations(ctx context.Context, args map[string]interface{}) (*model.Organizations, error) {
+	var items []*model.Organization
+	//find all items
+	cur, err := r.db.Collection("organizations").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Organization
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("organizations").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Organizations{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Organization is the resolver for the organization field.
 func (r *queryResolver) Organization(ctx context.Context, id string) (*model.Organization, error) {
-	panic(fmt.Errorf("not implemented: Organization - organization"))
+	var item *model.Organization
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": _id}
+
+	if err := r.db.Collection("organizations").FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Organization returns OrganizationResolver implementation.
 func (r *Resolver) Organization() OrganizationResolver { return &organizationResolver{r} }
 
 type organizationResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *organizationResolver) Manager(ctx context.Context, obj *model.Organization) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Manager - manager"))
-}

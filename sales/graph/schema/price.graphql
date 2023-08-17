@@ -2,7 +2,7 @@ type Price {
   id: ID!
   product: Product!
   start_date: String
-  end_date: Int
+  end_date: String
   regular: Float!
   sale: Float
   metadata: Map
@@ -12,12 +12,12 @@ type Price {
 
 type Prices {
   data: [Price]
-  count: Int
+  count: Int!
 }
 
 input NewPrice {
   start_date: String
-  end_date: Int
+  end_date: String
   regular: Float!
   sale: Float
   metadata: Map
@@ -25,20 +25,15 @@ input NewPrice {
 
 input UpdatePrice {
   start_date: String
-  end_date: Int
+  end_date: String
   regular: Float
   sale: Float
   metadata: Map
 }
 
-input DateRange {
-  start_date: String
-  end_date: Int
-}
-
 extend type Query {
   price(id: ID!): Price
-  prices(product: ID!, date: DateRange): Prices
+  prices(product: ID!, start_date: String!, end_date: String!): Prices
 }
 
 extend type Mutation {

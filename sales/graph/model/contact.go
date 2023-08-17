@@ -16,35 +16,32 @@ import (
 
 type Contact struct {
 	Model        `bson:",inline"`
-	UID          primitive.ObjectID  `bson:"uid" json:"uid"`
-	Company      *primitive.ObjectID `bson:"company,omitempty" json:"company,omitempty"`
-	Type         string              `bson:"type" json:"type"`
-	FirstName    string              `json:"first_name,omitempty" bson:"first_name,omitempty"`
-	LastName     string              `json:"last_name,omitempty" bson:"last_name,omitempty"`
-	Birthday     primitive.DateTime  `json:"birthday,omitempty" bson:"birthday,omitempty"`
-	Gender       Gender              `json:"gender,omitempty" bson:"gender,omitempty"`
-	JobTitle     string              `json:"job_title,omitempty" bson:"job_title,omitempty"`
-	Email        Email               `json:"email,omitempty" bson:"email,omitempty"`
-	Phone        Phone               `json:"phone,omitempty" bson:"phone,omitempty"`
-	Picture      string              `json:"picture,omitempty" bson:"picture,omitempty"`
-	Street       string              `json:"street,omitempty" bson:"street,omitempty"`
-	City         string              `json:"city,omitempty" bson:"city,omitempty"`
-	Zip          string              `json:"zip,omitempty" bson:"zip,omitempty"`
-	State        string              `json:"state,omitempty" bson:"state,omitempty"`
-	Country      string              `json:"country,omitempty" bson:"country,omitempty"`
-	Website      string              `json:"website,omitempty" bson:"website,omitempty"`
-	Photos       []*string           `json:"photos,omitempty" bson:"photos,omitempty"`
-	Source       string              `json:"source,omitempty" bson:"source,omitempty"`
-	Revenue      float64             `json:"revenue,omitempty" bson:"revenue,omitempty"`
-	Timezone     string              `json:"timezone,omitempty" bson:"timezone,omitempty"`
-	Language     string              `json:"language,omitempty" bson:"language,omitempty"`
-	Subscribed   bool                `json:"subscribed,omitempty" bson:"subscribed,omitempty"`
-	Notes        string              `json:"notes,omitempty" bson:"notes,omitempty"`
-	Stage        string              `json:"stage,omitempty" bson:"stage,omitempty"`
-	Labels       []string            `json:"labels,omitempty" bson:"labels,omitempty"`
-	Status       string              `json:"status" bson:"status"`
-	Reviewable   bool                `json:"reviewable,omitempty" bson:"reviewable,omitempty"`
-	LastActivity primitive.Timestamp `json:"last_activity,omitempty" bson:"last_activity,omitempty"`
+	UID          primitive.ObjectID   `bson:"uid" json:"uid"`
+	Company      *primitive.ObjectID  `bson:"company,omitempty" json:"company,omitempty"`
+	Type         string               `bson:"type" json:"type"`
+	FirstName    *string              `json:"first_name,omitempty" bson:"first_name,omitempty"`
+	LastName     *string              `json:"last_name,omitempty" bson:"last_name,omitempty"`
+	Birthday     primitive.DateTime   `json:"birthday,omitempty" bson:"birthday,omitempty"`
+	Gender       Gender               `json:"gender,omitempty" bson:"gender,omitempty"`
+	JobTitle     *string              `json:"job_title,omitempty" bson:"job_title,omitempty"`
+	Email        string               `json:"email,omitempty" bson:"email,omitempty"`
+	Phone        *string              `json:"phone,omitempty" bson:"phone,omitempty"`
+	Picture      *string              `json:"picture,omitempty" bson:"picture,omitempty"`
+	Street       *string              `json:"street,omitempty" bson:"street,omitempty"`
+	City         *string              `json:"city,omitempty" bson:"city,omitempty"`
+	Zip          *string              `json:"zip,omitempty" bson:"zip,omitempty"`
+	State        *string              `json:"state,omitempty" bson:"state,omitempty"`
+	Country      *string              `json:"country,omitempty" bson:"country,omitempty"`
+	Website      *string              `json:"website,omitempty" bson:"website,omitempty"`
+	Source       string               `json:"source,omitempty" bson:"source,omitempty"`
+	Timezone     *string              `json:"timezone,omitempty" bson:"timezone,omitempty"`
+	Language     *string              `json:"language,omitempty" bson:"language,omitempty"`
+	Rating       *int                 `json:"rating,omitempty" bson:"rating,omitempty"`
+	Subscribed   bool                 `json:"subscribed,omitempty" bson:"subscribed,omitempty"`
+	Notes        *string              `json:"notes,omitempty" bson:"notes,omitempty"`
+	Status       string               `json:"status" bson:"status"`
+	LastActivity *primitive.Timestamp `json:"last_activity,omitempty" bson:"last_activity,omitempty"`
+	Labels       []string             `json:"labels,omitempty" bson:"labels,omitempty"`
 }
 
 func (Contact) IsEntity() {}
@@ -94,23 +91,21 @@ func (i *Contact) Schema() interface{} {
 			{Name: "last_name", Type: "string", Optional: pointer.True()},
 			{Name: "job_title", Type: "string", Optional: pointer.True()},
 			{Name: "gender", Type: "string", Optional: pointer.True()},
-			{Name: "photos", Type: "string[]", Optional: pointer.True()},
 			{Name: "country", Type: "string", Optional: pointer.True(), Facet: pointer.True()},
 			{Name: "timezone", Type: "string", Optional: pointer.True()},
 			{Name: "language", Type: "string", Optional: pointer.True()},
 			{Name: "source", Type: "string", Optional: pointer.True()},
-			{Name: "revenue", Type: "float"},
 			{Name: "notes", Type: "string", Optional: pointer.True()},
 			{Name: "status", Type: "string", Facet: pointer.True()},
 			{Name: "created_by", Type: "string", Optional: pointer.True()},
 			{Name: "updated_by", Type: "string", Optional: pointer.True()},
+			{Name: "rating", Type: "int32"},
 			{Name: "created_at", Type: "int32"},
 			{Name: "updated_at", Type: "int32"},
 			{Name: "last_activity", Type: "int32"},
 			{Name: "birthday", Type: "int32", Facet: pointer.True()},
-			{Name: "email", Type: "object", Optional: pointer.True()},
-			{Name: "phone", Type: "object", Optional: pointer.True()},
-			{Name: "metadata", Type: "object", Optional: pointer.True()},
+			{Name: "email", Type: "string"},
+			{Name: "phone", Type: "string", Optional: pointer.True()},
 			{Name: "followers", Type: "string[]", Optional: pointer.True()},
 			{Name: "labels", Type: "string[]", Optional: pointer.True()},
 		},
@@ -141,11 +136,9 @@ func (i *Contact) Document() map[string]interface{} {
 		"timezone":      i.Timezone,
 		"language":      i.Language,
 		"status":        i.Status,
-		"photos":        i.Photos,
 		"email":         i.Email,
 		"phone":         i.Phone,
 		"metadata":      i.Metadata,
-		"revenue":       i.Revenue,
 		"created_at":    i.CreatedAt.T,
 		"updated_at":    i.UpdatedAt.T,
 		"last_activity": i.LastActivity.T,

@@ -1,6 +1,6 @@
 type Program {
   id: ID!
-  type: ProgramType!
+  type: String!
   locale: String!
   name: String!
   description: String!

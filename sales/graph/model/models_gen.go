@@ -10,7 +10,7 @@ import (
 
 type Benefits struct {
 	Data  []*Benefit `json:"data,omitempty"`
-	Count *int       `json:"count,omitempty"`
+	Count int        `json:"count"`
 }
 
 type Companies struct {
@@ -33,11 +33,6 @@ type Coupons struct {
 	Count int       `json:"count"`
 }
 
-type DateRange struct {
-	StartDate *string `json:"start_date,omitempty"`
-	EndDate   *int    `json:"end_date,omitempty"`
-}
-
 type Email struct {
 	Personal *string `json:"personal,omitempty"`
 	Work     *string `json:"work,omitempty"`
@@ -52,7 +47,12 @@ type EmailInput struct {
 
 type Inventories struct {
 	Data  []*Inventory `json:"data,omitempty"`
-	Count *int         `json:"count,omitempty"`
+	Count int          `json:"count"`
+}
+
+type Memberships struct {
+	Data  []*Membership `json:"data,omitempty"`
+	Count int           `json:"count"`
 }
 
 type NewBenefit struct {
@@ -62,11 +62,10 @@ type NewBenefit struct {
 }
 
 type NewCompany struct {
-	User        *string                `json:"user,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
 	Name        string                 `json:"name"`
 	Description *string                `json:"description,omitempty"`
 	Type        string                 `json:"type"`
-	Parent      *string                `json:"parent,omitempty"`
 	Industry    *string                `json:"industry,omitempty"`
 	Employees   *int                   `json:"employees,omitempty"`
 	Revenue     *float64               `json:"revenue,omitempty"`
@@ -82,38 +81,36 @@ type NewCompany struct {
 }
 
 type NewContact struct {
-	Company    *string                `json:"company,omitempty"`
-	User       *string                `json:"user,omitempty"`
-	Type       *string                `json:"type,omitempty"`
-	FirstName  *string                `json:"first_name,omitempty"`
-	LastName   *string                `json:"last_name,omitempty"`
-	Picture    *string                `json:"picture,omitempty"`
-	Email      *EmailInput            `json:"email,omitempty"`
-	Phone      *PhoneInput            `json:"phone,omitempty"`
-	Street     *string                `json:"street,omitempty"`
-	City       *string                `json:"city,omitempty"`
-	State      *string                `json:"state,omitempty"`
-	Zip        *string                `json:"zip,omitempty"`
-	Country    *string                `json:"country,omitempty"`
-	Website    *string                `json:"website,omitempty"`
-	Birthday   *string                `json:"birthday,omitempty"`
-	JobTitle   *string                `json:"job_title,omitempty"`
-	Gender     *Gender                `json:"gender,omitempty"`
-	Timezone   *string                `json:"timezone,omitempty"`
-	Language   *string                `json:"language,omitempty"`
-	Source     *string                `json:"source,omitempty"`
-	Revenue    *float64               `json:"revenue,omitempty"`
-	Rating     *int                   `json:"rating,omitempty"`
-	Notes      *string                `json:"notes,omitempty"`
-	Stage      *string                `json:"stage,omitempty"`
-	Status     *string                `json:"status,omitempty"`
-	Labels     []*string              `json:"labels,omitempty"`
-	Metadata   map[string]interface{} `json:"metadata,omitempty"`
-	Reviewable *bool                  `json:"reviewable,omitempty"`
+	Company   *string                `json:"company,omitempty"`
+	UID       *string                `json:"uid,omitempty"`
+	Type      *string                `json:"type,omitempty"`
+	FirstName *string                `json:"first_name,omitempty"`
+	LastName  *string                `json:"last_name,omitempty"`
+	Picture   *string                `json:"picture,omitempty"`
+	Email     string                 `json:"email"`
+	Phone     *string                `json:"phone,omitempty"`
+	Street    *string                `json:"street,omitempty"`
+	City      *string                `json:"city,omitempty"`
+	State     *string                `json:"state,omitempty"`
+	Zip       *string                `json:"zip,omitempty"`
+	Country   *string                `json:"country,omitempty"`
+	Website   *string                `json:"website,omitempty"`
+	Birthday  *string                `json:"birthday,omitempty"`
+	JobTitle  *string                `json:"job_title,omitempty"`
+	Gender    *Gender                `json:"gender,omitempty"`
+	Timezone  *string                `json:"timezone,omitempty"`
+	Language  *string                `json:"language,omitempty"`
+	Source    string                 `json:"source"`
+	Rating    *int                   `json:"rating,omitempty"`
+	Notes     *string                `json:"notes,omitempty"`
+	Stage     *string                `json:"stage,omitempty"`
+	Status    *string                `json:"status,omitempty"`
+	Labels    []*string              `json:"labels,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewContract struct {
-	User        string                 `json:"user"`
+	UID         string                 `json:"uid"`
 	Contact     string                 `json:"contact"`
 	Reference   string                 `json:"reference"`
 	Description string                 `json:"description"`
@@ -124,41 +121,57 @@ type NewContract struct {
 	AutoRenew   bool                   `json:"auto_renew"`
 	Categories  []string               `json:"categories,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      string                 `json:"status"`
 }
 
 type NewCoupon struct {
 	Locale      string                 `json:"locale"`
 	Code        string                 `json:"code"`
 	Description string                 `json:"description"`
-	Type        DiscountType           `json:"type"`
+	Type        string                 `json:"type"`
 	Amount      float64                `json:"amount"`
 	MaxDiscount *float64               `json:"max_discount,omitempty"`
 	Currency    string                 `json:"currency"`
 	StartDate   string                 `json:"start_date"`
-	EndDate     int                    `json:"end_date"`
+	EndDate     string                 `json:"end_date"`
 	Products    []string               `json:"products,omitempty"`
 	MaxUses     *int                   `json:"max_uses,omitempty"`
 	MinPurchase *float64               `json:"min_purchase,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      *string                `json:"status,omitempty"`
 }
 
 type NewInventory struct {
-	Date     int  `json:"date"`
-	Quantity *int `json:"quantity,omitempty"`
+	Product  string `json:"product"`
+	Date     string `json:"date"`
+	Quantity int    `json:"quantity"`
+}
+
+type NewMembership struct {
+	Tier      string                 `json:"tier"`
+	Number    string                 `json:"number"`
+	Since     string                 `json:"since"`
+	Until     string                 `json:"until"`
+	Billing   map[string]interface{} `json:"billing,omitempty"`
+	Payment   map[string]interface{} `json:"payment,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Status    string                 `json:"status"`
+	CreatedBy *string                `json:"created_by,omitempty"`
+	UpdatedBy *string                `json:"updated_by,omitempty"`
 }
 
 type NewOrder struct {
-	Reference   string   `json:"reference"`
-	Data        []string `json:"data,omitempty"`
-	Total       float64  `json:"total"`
-	Currency    string   `json:"currency"`
-	Cancellable bool     `json:"cancellable"`
-	Status      string   `json:"status"`
+	Reference   string                 `json:"reference"`
+	Data        []string               `json:"data,omitempty"`
+	Cancellable bool                   `json:"cancellable"`
+	Status      string                 `json:"status"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewPoint struct {
 	Points    int                    `json:"points"`
 	Type      string                 `json:"type"`
+	Target    map[string]interface{} `json:"target"`
 	ExpiresAt *string                `json:"expires_at,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	Status    string                 `json:"status"`
@@ -166,7 +179,7 @@ type NewPoint struct {
 
 type NewPrice struct {
 	StartDate *string                `json:"start_date,omitempty"`
-	EndDate   *int                   `json:"end_date,omitempty"`
+	EndDate   *string                `json:"end_date,omitempty"`
 	Regular   float64                `json:"regular"`
 	Sale      *float64               `json:"sale,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
@@ -193,7 +206,7 @@ type NewProgram struct {
 }
 
 type NewQuote struct {
-	User        string                 `json:"user"`
+	UID         string                 `json:"uid"`
 	Contact     *string                `json:"contact,omitempty"`
 	Locale      string                 `json:"locale"`
 	Reference   string                 `json:"reference"`
@@ -233,7 +246,7 @@ type NewTier struct {
 }
 
 type NewTransaction struct {
-	User        string                 `json:"user"`
+	UID         string                 `json:"uid"`
 	Type        string                 `json:"type"`
 	Status      string                 `json:"status"`
 	Amount      float64                `json:"amount"`
@@ -267,17 +280,6 @@ type PhoneInput struct {
 	Other  *string `json:"other,omitempty"`
 }
 
-type Pipeline struct {
-	ID          string                 `json:"id"`
-	Type        string                 `json:"type"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-	Parent      *Pipeline              `json:"parent,omitempty"`
-}
-
 type Points struct {
 	Count int      `json:"count"`
 	Data  []*Point `json:"data,omitempty"`
@@ -285,7 +287,7 @@ type Points struct {
 
 type Prices struct {
 	Data  []*Price `json:"data,omitempty"`
-	Count *int     `json:"count,omitempty"`
+	Count int      `json:"count"`
 }
 
 type Products struct {
@@ -313,20 +315,6 @@ type Tiers struct {
 	Count int     `json:"count"`
 }
 
-type Transaction struct {
-	ID          string                 `json:"id"`
-	User        *User                  `json:"user"`
-	Type        string                 `json:"type"`
-	Status      string                 `json:"status"`
-	Amount      float64                `json:"amount"`
-	Currency    string                 `json:"currency"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Date        string                 `json:"date"`
-	Description string                 `json:"description"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
-}
-
 type Transactions struct {
 	Data  []*Transaction `json:"data,omitempty"`
 	Count int            `json:"count"`
@@ -339,11 +327,10 @@ type UpdateBenefit struct {
 }
 
 type UpdateCompany struct {
-	User        *string                `json:"user,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Type        *string                `json:"type,omitempty"`
-	Parent      *string                `json:"parent,omitempty"`
 	Industry    *string                `json:"industry,omitempty"`
 	Employees   *int                   `json:"employees,omitempty"`
 	Revenue     *float64               `json:"revenue,omitempty"`
@@ -359,39 +346,37 @@ type UpdateCompany struct {
 }
 
 type UpdateContact struct {
-	Company    *string                `json:"company,omitempty"`
-	User       *string                `json:"user,omitempty"`
-	Reference  *string                `json:"reference,omitempty"`
-	Type       *string                `json:"type,omitempty"`
-	FirstName  *string                `json:"first_name,omitempty"`
-	LastName   *string                `json:"last_name,omitempty"`
-	Picture    *string                `json:"picture,omitempty"`
-	Email      *EmailInput            `json:"email,omitempty"`
-	Phone      *PhoneInput            `json:"phone,omitempty"`
-	Street     *string                `json:"street,omitempty"`
-	City       *string                `json:"city,omitempty"`
-	State      *string                `json:"state,omitempty"`
-	Zip        *string                `json:"zip,omitempty"`
-	Country    *string                `json:"country,omitempty"`
-	Website    *string                `json:"website,omitempty"`
-	Birthday   *string                `json:"birthday,omitempty"`
-	JobTitle   *string                `json:"job_title,omitempty"`
-	Gender     *Gender                `json:"gender,omitempty"`
-	Timezone   *string                `json:"timezone,omitempty"`
-	Language   *string                `json:"language,omitempty"`
-	Source     *string                `json:"source,omitempty"`
-	Revenue    *float64               `json:"revenue,omitempty"`
-	Rating     *int                   `json:"rating,omitempty"`
-	Notes      *string                `json:"notes,omitempty"`
-	Stage      *string                `json:"stage,omitempty"`
-	Status     *string                `json:"status,omitempty"`
-	Labels     []*string              `json:"labels,omitempty"`
-	Metadata   map[string]interface{} `json:"metadata,omitempty"`
-	Reviewable *bool                  `json:"reviewable,omitempty"`
+	Company   *string                `json:"company,omitempty"`
+	UID       *string                `json:"uid,omitempty"`
+	Reference *string                `json:"reference,omitempty"`
+	Type      *string                `json:"type,omitempty"`
+	FirstName *string                `json:"first_name,omitempty"`
+	LastName  *string                `json:"last_name,omitempty"`
+	Picture   *string                `json:"picture,omitempty"`
+	Email     *string                `json:"email,omitempty"`
+	Phone     *string                `json:"phone,omitempty"`
+	Street    *string                `json:"street,omitempty"`
+	City      *string                `json:"city,omitempty"`
+	State     *string                `json:"state,omitempty"`
+	Zip       *string                `json:"zip,omitempty"`
+	Country   *string                `json:"country,omitempty"`
+	Website   *string                `json:"website,omitempty"`
+	Birthday  *string                `json:"birthday,omitempty"`
+	JobTitle  *string                `json:"job_title,omitempty"`
+	Gender    *Gender                `json:"gender,omitempty"`
+	Timezone  *string                `json:"timezone,omitempty"`
+	Language  *string                `json:"language,omitempty"`
+	Source    *string                `json:"source,omitempty"`
+	Rating    *int                   `json:"rating,omitempty"`
+	Notes     *string                `json:"notes,omitempty"`
+	Stage     *string                `json:"stage,omitempty"`
+	Status    *string                `json:"status,omitempty"`
+	Labels    []*string              `json:"labels,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateContract struct {
-	User        *string                `json:"user,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
 	Contact     *string                `json:"contact,omitempty"`
 	Reference   *string                `json:"reference,omitempty"`
 	Description *string                `json:"description,omitempty"`
@@ -402,50 +387,64 @@ type UpdateContract struct {
 	AutoRenew   *bool                  `json:"auto_renew,omitempty"`
 	Categories  []string               `json:"categories,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      *string                `json:"status,omitempty"`
 }
 
 type UpdateCoupon struct {
 	Locale      string                 `json:"locale"`
 	Code        *string                `json:"code,omitempty"`
 	Description *string                `json:"description,omitempty"`
-	Type        *DiscountType          `json:"type,omitempty"`
+	Type        *string                `json:"type,omitempty"`
 	Amount      *float64               `json:"amount,omitempty"`
 	MaxDiscount *float64               `json:"max_discount,omitempty"`
 	Currency    *string                `json:"currency,omitempty"`
 	StartDate   *string                `json:"start_date,omitempty"`
-	EndDate     *int                   `json:"end_date,omitempty"`
+	EndDate     *string                `json:"end_date,omitempty"`
 	Products    []string               `json:"products,omitempty"`
 	MaxUses     *int                   `json:"max_uses,omitempty"`
 	MinPurchase *float64               `json:"min_purchase,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      *string                `json:"status,omitempty"`
 }
 
 type UpdateInventory struct {
-	Date     *int `json:"date,omitempty"`
-	Quantity *int `json:"quantity,omitempty"`
+	Date     *string `json:"date,omitempty"`
+	Quantity *int    `json:"quantity,omitempty"`
+}
+
+type UpdateMembership struct {
+	Tier      *string                `json:"tier,omitempty"`
+	Number    *string                `json:"number,omitempty"`
+	Since     *string                `json:"since,omitempty"`
+	Until     *string                `json:"until,omitempty"`
+	Billing   map[string]interface{} `json:"billing,omitempty"`
+	Payment   map[string]interface{} `json:"payment,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Status    *string                `json:"status,omitempty"`
+	CreatedBy *string                `json:"created_by,omitempty"`
+	UpdatedBy *string                `json:"updated_by,omitempty"`
 }
 
 type UpdateOrder struct {
-	Reference   *string  `json:"reference,omitempty"`
-	Data        []string `json:"data,omitempty"`
-	Total       *float64 `json:"total,omitempty"`
-	Currency    *string  `json:"currency,omitempty"`
-	Cancellable *bool    `json:"cancellable,omitempty"`
-	Status      *string  `json:"status,omitempty"`
-	CancelledAt *int     `json:"cancelled_at,omitempty"`
+	Reference   *string                `json:"reference,omitempty"`
+	Data        []string               `json:"data,omitempty"`
+	Cancellable *bool                  `json:"cancellable,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdatePoint struct {
 	Points    *int                   `json:"points,omitempty"`
 	Type      *string                `json:"type,omitempty"`
 	ExpiresAt *string                `json:"expires_at,omitempty"`
+	Target    map[string]interface{} `json:"target,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	Status    *string                `json:"status,omitempty"`
 }
 
 type UpdatePrice struct {
 	StartDate *string                `json:"start_date,omitempty"`
-	EndDate   *int                   `json:"end_date,omitempty"`
+	EndDate   *string                `json:"end_date,omitempty"`
 	Regular   *float64               `json:"regular,omitempty"`
 	Sale      *float64               `json:"sale,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
@@ -471,7 +470,7 @@ type UpdateProgram struct {
 }
 
 type UpdateQuote struct {
-	User        *string                `json:"user,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
 	Contact     *string                `json:"contact,omitempty"`
 	Locale      *string                `json:"locale,omitempty"`
 	Reference   *string                `json:"reference,omitempty"`
@@ -512,7 +511,7 @@ type UpdateTier struct {
 }
 
 type UpdateTransaction struct {
-	User        *string                `json:"user,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
 	Type        *string                `json:"type,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 	Amount      *float64               `json:"amount,omitempty"`
@@ -525,18 +524,6 @@ type UpdateTransaction struct {
 type UpdateWishlist struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	Status   *string                `json:"status,omitempty"`
-}
-
-type Wishlist struct {
-	ID        string                 `json:"id"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    string                 `json:"status"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	Product   string                 `json:"product"`
-	UID       string                 `json:"uid"`
-	CreatedBy *string                `json:"created_by,omitempty"`
-	UpdatedBy *string                `json:"updated_by,omitempty"`
 }
 
 type Wishlists struct {

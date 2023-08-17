@@ -6,37 +6,241 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
+	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // CreateWishlist is the resolver for the createWishlist field.
 func (r *mutationResolver) CreateWishlist(ctx context.Context, input model.NewWishlist) (*model.Wishlist, error) {
-	panic(fmt.Errorf("not implemented: CreateWishlist - createWishlist"))
-}
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
 
-// UpdateWishlist is the resolver for the updateWishlist field.
-func (r *mutationResolver) UpdateWishlist(ctx context.Context, input model.UpdateWishlist) (*model.Wishlist, error) {
-	panic(fmt.Errorf("not implemented: UpdateWishlist - updateWishlist"))
+	product, err := primitive.ObjectIDFromHex(input.Product)
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Wishlist{
+		UID:     *uid,
+		Product: product,
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+			Metadata:  input.Metadata,
+		},
+	}
+
+	// Set the fields from the input
+	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteWishlist is the resolver for the deleteWishlist field.
 func (r *mutationResolver) DeleteWishlist(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteWishlist - deleteWishlist"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the filter to match the given ID
+	filter := bson.M{"_id": _id}
+
+	// Define the update to mark the record as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("wishlists").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.ModifiedCount == 0 {
+		return nil, fmt.Errorf("wishlist not found")
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // DeleteWishlists is the resolver for the deleteWishlists field.
 func (r *mutationResolver) DeleteWishlists(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteWishlists - deleteWishlists"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match the given IDs
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	// Define the update to mark records as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("wishlists").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // Wishlist is the resolver for the wishlist field.
 func (r *queryResolver) Wishlist(ctx context.Context, id string) (*model.Wishlist, error) {
-	panic(fmt.Errorf("not implemented: Wishlist - wishlist"))
+	var item *model.Wishlist
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Wishlists is the resolver for the wishlists field.
 func (r *queryResolver) Wishlists(ctx context.Context, args map[string]interface{}) (*model.Wishlists, error) {
-	panic(fmt.Errorf("not implemented: Wishlists - wishlists"))
+	var items []*model.Wishlist
+	//find all items
+	cur, err := r.db.Collection("wishlists").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Wishlist
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("wishlists").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Wishlists{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
+
+// ID is the resolver for the id field.
+func (r *wishlistResolver) ID(ctx context.Context, obj *model.Wishlist) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *wishlistResolver) Metadata(ctx context.Context, obj *model.Wishlist) (map[string]interface{}, error) {
+	return obj.Metadata, nil
+}
+
+// CreatedAt is the resolver for the created_at field.
+func (r *wishlistResolver) CreatedAt(ctx context.Context, obj *model.Wishlist) (string, error) {
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+}
+
+// UpdatedAt is the resolver for the updated_at field.
+func (r *wishlistResolver) UpdatedAt(ctx context.Context, obj *model.Wishlist) (string, error) {
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+}
+
+// Product is the resolver for the product field.
+func (r *wishlistResolver) Product(ctx context.Context, obj *model.Wishlist) (*model.Product, error) {
+	var item *model.Product
+
+	filter := bson.M{"_id": obj.Product}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
+}
+
+// UID is the resolver for the uid field.
+func (r *wishlistResolver) UID(ctx context.Context, obj *model.Wishlist) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// CreatedBy is the resolver for the created_by field.
+func (r *wishlistResolver) CreatedBy(ctx context.Context, obj *model.Wishlist) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *wishlistResolver) UpdatedBy(ctx context.Context, obj *model.Wishlist) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
+}
+
+// Wishlist returns WishlistResolver implementation.
+func (r *Resolver) Wishlist() WishlistResolver { return &wishlistResolver{r} }
+
+type wishlistResolver struct{ *Resolver }

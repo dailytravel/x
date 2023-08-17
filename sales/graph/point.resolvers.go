@@ -6,39 +6,207 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
+	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // CreatePoint is the resolver for the createPoint field.
 func (r *mutationResolver) CreatePoint(ctx context.Context, input model.NewPoint) (*model.Point, error) {
-	panic(fmt.Errorf("not implemented: CreatePoint - createPoint"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Point{
+		UID: *uid,
+		Target: model.Target{
+			ID:   input.Target["id"].(primitive.ObjectID),
+			Type: input.Target["type"].(model.PointType),
+		},
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+			Metadata:  input.Metadata,
+		},
+	}
+
+	// Set the fields from the input
+	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdatePoint is the resolver for the updatePoint field.
-func (r *mutationResolver) UpdatePoint(ctx context.Context, input model.UpdatePoint) (*model.Point, error) {
-	panic(fmt.Errorf("not implemented: UpdatePoint - updatePoint"))
+func (r *mutationResolver) UpdatePoint(ctx context.Context, id string, input model.UpdatePoint) (*model.Point, error) {
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create an update document with the fields to be updated
+	item := &model.Point{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	if input.Type != nil {
+		item.Type = *input.Type
+	}
+
+	if input.Points != nil {
+		item.Points = *input.Points
+	}
+
+	if input.ExpiresAt != nil {
+		expiresAt := primitive.Timestamp{T: uint32(time.Now().Unix())}
+		item.ExpiresAt = expiresAt
+	}
+
+	if input.Metadata != nil {
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
+	}
+
+	// Update the updated_by and updated_at fields
+	item.UpdatedBy = uid
+
+	// Perform the update in the database
+	res, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if the coupon was actually updated
+	if res.ModifiedCount == 0 {
+		return nil, fmt.Errorf("no coupon was updated")
+	}
+
+	return item, nil
 }
 
 // DeletePoint is the resolver for the deletePoint field.
 func (r *mutationResolver) DeletePoint(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeletePoint - deletePoint"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to an ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the filter to match the given ID
+	filter := bson.M{"_id": _id}
+
+	// Define the update to mark the record as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("points").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.ModifiedCount == 0 {
+		return nil, fmt.Errorf("point not found")
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // DeletePoints is the resolver for the deletePoints field.
 func (r *mutationResolver) DeletePoints(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeletePoints - deletePoints"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match the given IDs
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	// Define the update to mark records as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("points").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // ID is the resolver for the id field.
 func (r *pointResolver) ID(ctx context.Context, obj *model.Point) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Target is the resolver for the target field.
 func (r *pointResolver) Target(ctx context.Context, obj *model.Point) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Target - target"))
+	var item map[string]interface{}
+
+	filter := bson.M{"_id": obj.Target.ID}
+	if err := r.db.Collection(obj.Target.Type.String()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
+}
+
+// Type is the resolver for the type field.
+func (r *pointResolver) Type(ctx context.Context, obj *model.Point) (model.PointType, error) {
+	panic(fmt.Errorf("not implemented: Type - type"))
 }
 
 // Metadata is the resolver for the metadata field.
@@ -46,14 +214,19 @@ func (r *pointResolver) Metadata(ctx context.Context, obj *model.Point) (map[str
 	return obj.Metadata, nil
 }
 
+// ExpiresAt is the resolver for the expires_at field.
+func (r *pointResolver) ExpiresAt(ctx context.Context, obj *model.Point) (string, error) {
+	panic(fmt.Errorf("not implemented: ExpiresAt - expires_at"))
+}
+
 // CreatedAt is the resolver for the created_at field.
 func (r *pointResolver) CreatedAt(ctx context.Context, obj *model.Point) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *pointResolver) UpdatedAt(ctx context.Context, obj *model.Point) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
@@ -63,35 +236,76 @@ func (r *pointResolver) UID(ctx context.Context, obj *model.Point) (string, erro
 
 // CreatedBy is the resolver for the created_by field.
 func (r *pointResolver) CreatedBy(ctx context.Context, obj *model.Point) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *pointResolver) UpdatedBy(ctx context.Context, obj *model.Point) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // Points is the resolver for the points field.
 func (r *queryResolver) Points(ctx context.Context, args map[string]interface{}) (*model.Points, error) {
-	panic(fmt.Errorf("not implemented: Points - points"))
+	var items []*model.Point
+	//find all items
+	cur, err := r.db.Collection("points").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Point
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("points").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Points{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Point is the resolver for the point field.
 func (r *queryResolver) Point(ctx context.Context, id string) (*model.Point, error) {
-	panic(fmt.Errorf("not implemented: Point - point"))
+	var item *model.Point
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Point returns PointResolver implementation.
 func (r *Resolver) Point() PointResolver { return &pointResolver{r} }
 
 type pointResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *pointResolver) User(ctx context.Context, obj *model.Point) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}

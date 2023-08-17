@@ -11,7 +11,7 @@ import (
 
 type Contract struct {
 	Model       `bson:",inline"`
-	User        primitive.ObjectID `json:"user" bson:"user"`
+	UID         primitive.ObjectID `json:"uid" bson:"uid"`
 	Contact     primitive.ObjectID `json:"contact" bson:"contact"`
 	Reference   string             `json:"reference" bson:"reference"`
 	Description string             `json:"description" bson:"description"`

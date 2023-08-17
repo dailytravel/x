@@ -31,7 +31,7 @@ enum ContractStatus {
 }
 
 input NewContract {
-  user: ID!
+  uid: ID!
   contact: ID!
   reference: String!
   description: String!
@@ -42,10 +42,11 @@ input NewContract {
   auto_renew: Boolean!
   categories: [ID!]
   metadata: Map
+  status: String! #"draft" | "active" | "completed" | "canceled";
 }
 
 input UpdateContract {
-  user: ID
+  uid: ID
   contact: ID
   reference: String
   description: String
@@ -56,6 +57,7 @@ input UpdateContract {
   auto_renew: Boolean
   categories: [ID!]
   metadata: Map
+  status: String #"draft" | "active" | "completed" | "canceled";
 }
 
 extend type Query {

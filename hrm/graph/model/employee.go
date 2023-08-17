@@ -11,9 +11,10 @@ import (
 
 type Employee struct {
 	Model        `bson:",inline"`
-	User         primitive.ObjectID `json:"user" bson:"user"`
+	UID          primitive.ObjectID `json:"uid" bson:"uid"`
 	Organization primitive.ObjectID `json:"organization" bson:"organization"`
 	Position     primitive.ObjectID `json:"position" bson:"position"`
+	Reference    string             `json:"reference" bson:"reference"`
 	FirstName    string             `json:"first_name" bson:"first_name"`
 	LastName     string             `json:"last_name" bson:"last_name"`
 	Email        string             `json:"email" bson:"email"`
@@ -43,7 +44,7 @@ func (i *Employee) Collection() string {
 
 func (i *Employee) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "organization", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "position", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},

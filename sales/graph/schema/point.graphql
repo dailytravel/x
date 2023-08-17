@@ -27,6 +27,7 @@ type Points {
 input NewPoint {
   points: Int!
   type: String! # "earn", "redeem", "adjustment"
+  target: Map! #program, reward
   expires_at: String
   metadata: Map
   status: String! # "pending", "completed", "failed"
@@ -36,6 +37,7 @@ input UpdatePoint {
   points: Int
   type: String # "earn", "redeem", "adjustment"
   expires_at: String
+  target: Map #program, reward
   metadata: Map
   status: String # "pending", "completed", "failed"
 }
@@ -47,7 +49,7 @@ extend type Query {
 
 extend type Mutation {
   createPoint(input: NewPoint!): Point @auth
-  updatePoint(input: UpdatePoint!): Point @auth
+  updatePoint(id: ID!, input: UpdatePoint!): Point @auth
   deletePoint(id: ID!): Map @auth
   deletePoints(ids: [ID!]!): Map @auth
 }

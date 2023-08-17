@@ -52,7 +52,7 @@ extend type Query {
 
 extend type Mutation {
   createProduct(input: NewProduct!): Product @auth
-  updateProduct(input: UpdateProduct!): Product @auth
+  updateProduct(id: ID!, input: UpdateProduct!): Product @auth
   deleteProduct(id: ID!): Map @auth
   deleteProducts(ids: [ID!]!): Map @auth
 }

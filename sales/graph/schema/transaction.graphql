@@ -1,6 +1,5 @@
 type Transaction {
   id: ID!
-  user: User!
   type: String! #e.g., "purchase," "refund," "payment," etc.
   status: String! #e.g., "completed," "pending," "failed," etc.
   amount: Float!
@@ -10,6 +9,9 @@ type Transaction {
   description: String!
   created_at: String!
   updated_at: String!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 enum TransactionMethod {
@@ -32,7 +34,7 @@ type Transactions {
 }
 
 input NewTransaction {
-  user: ID!
+  uid: ID!
   type: String!
   status: String!
   amount: Float!
@@ -43,7 +45,7 @@ input NewTransaction {
 }
 
 input UpdateTransaction {
-  user: ID
+  uid: ID
   type: String
   status: String
   amount: Float

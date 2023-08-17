@@ -4,7 +4,7 @@ type Wishlist {
   status: String!
   created_at: String!
   updated_at: String!
-  product: ID!
+  product: Product!
   uid: ID!
   created_by: ID
   updated_by: ID
@@ -38,7 +38,6 @@ extend type Query {
 
 extend type Mutation {
   createWishlist(input: NewWishlist!): Wishlist @auth
-  updateWishlist(input: UpdateWishlist!): Wishlist @auth
   deleteWishlist(id: ID!): Map @auth
   deleteWishlists(ids: [ID!]!): Map @auth
 }

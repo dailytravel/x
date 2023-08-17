@@ -85,7 +85,6 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 }
 
 // UpdateTask is the resolver for the updateTask field.
-// UpdateTask is the resolver for the updateTask field.
 func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input model.UpdateTask) (*model.Task, error) {
 	uid, err := utils.UID(auth.Auth(ctx))
 	if err != nil {
@@ -382,7 +381,7 @@ func (r *taskResolver) DueDate(ctx context.Context, obj *model.Task) (*string, e
 		return nil, nil
 	}
 
-	dueDate := time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339)
+	dueDate := time.Unix(int64(obj.DueDate.T), 0).Format(time.RFC3339)
 	return &dueDate, nil
 }
 

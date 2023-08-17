@@ -124,6 +124,9 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 
 	// Create a new payload containing the access token and user information
 	payload, err := auth.Payload(auth.Auth(ctx), k, *client, 3600)
+	if err != nil {
+		return nil, err
+	}
 
 	return payload, nil
 }

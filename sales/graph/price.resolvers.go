@@ -6,9 +6,16 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
+	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // CreatePrice is the resolver for the createPrice field.
@@ -23,12 +30,82 @@ func (r *mutationResolver) UpdatePrice(ctx context.Context, id string, input mod
 
 // DeletePrice is the resolver for the deletePrice field.
 func (r *mutationResolver) DeletePrice(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeletePrice - deletePrice"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to an ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the filter to match the given ID
+	filter := bson.M{"_id": _id}
+
+	// Define the update to mark the record as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("prices").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.ModifiedCount == 0 {
+		return nil, fmt.Errorf("price not found")
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // DeletePrices is the resolver for the deletePrices field.
 func (r *mutationResolver) DeletePrices(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeletePrices - deletePrices"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match the given IDs
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	// Define the update to mark records as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("prices").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // ID is the resolver for the id field.
@@ -38,12 +115,37 @@ func (r *priceResolver) ID(ctx context.Context, obj *model.Price) (string, error
 
 // Product is the resolver for the product field.
 func (r *priceResolver) Product(ctx context.Context, obj *model.Price) (*model.Product, error) {
-	panic(fmt.Errorf("not implemented: Product - product"))
+	var item *model.Product
+
+	filter := bson.M{"_id": obj.Product}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // StartDate is the resolver for the start_date field.
 func (r *priceResolver) StartDate(ctx context.Context, obj *model.Price) (*string, error) {
-	panic(fmt.Errorf("not implemented: StartDate - start_date"))
+	if obj.StartDate == nil {
+		return nil, nil
+	}
+
+	startDate := time.Unix(int64(obj.StartDate.T), 0).Format(time.RFC3339)
+	return &startDate, nil
+}
+
+// EndDate is the resolver for the end_date field.
+func (r *priceResolver) EndDate(ctx context.Context, obj *model.Price) (*string, error) {
+	if obj.EndDate == nil {
+		return nil, nil
+	}
+
+	endDate := time.Unix(int64(obj.EndDate.T), 0).Format(time.RFC3339)
+	return &endDate, nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -53,22 +155,93 @@ func (r *priceResolver) Metadata(ctx context.Context, obj *model.Price) (map[str
 
 // CreatedBy is the resolver for the created_by field.
 func (r *priceResolver) CreatedBy(ctx context.Context, obj *model.Price) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *priceResolver) UpdatedBy(ctx context.Context, obj *model.Price) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+	return &updatedBy, nil
 }
 
 // Price is the resolver for the price field.
 func (r *queryResolver) Price(ctx context.Context, id string) (*model.Price, error) {
-	panic(fmt.Errorf("not implemented: Price - price"))
+	var item *model.Price
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Prices is the resolver for the prices field.
-func (r *queryResolver) Prices(ctx context.Context, product string, date *model.DateRange) (*model.Prices, error) {
-	panic(fmt.Errorf("not implemented: Prices - prices"))
+func (r *queryResolver) Prices(ctx context.Context, product string, startDate string, endDate string) (*model.Prices, error) {
+	var items []*model.Price
+
+	_id, err := primitive.ObjectIDFromHex(product)
+	if err != nil {
+		return nil, err
+	}
+
+	start, err := time.Parse(time.RFC3339, endDate)
+	if err != nil {
+		return nil, err
+	}
+
+	end, err := time.Parse(time.RFC3339, endDate)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{
+		"product":    _id,
+		"start_date": primitive.NewDateTimeFromTime(start),
+		"end_date":   primitive.NewDateTimeFromTime(end),
+	}
+
+	//find all items
+	cur, err := r.db.Collection("prices").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Price
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("prices").CountDocuments(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Prices{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Price returns PriceResolver implementation.

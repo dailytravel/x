@@ -1,6 +1,5 @@
 type Leave {
   id: ID!
-  owner: User!
   type: String!
   start_date: String!
   end_date: String
@@ -9,8 +8,9 @@ type Leave {
   metadata: Map
   created_at: String!
   updated_at: String!
-  created_by: ID!
-  updated_by: ID!
+  employee: Employee
+  created_by: ID
+  updated_by: ID
 }
 
 type Leaves {
@@ -42,7 +42,7 @@ enum LeaveType {
 }
 
 input NewLeave {
-  owner: ID!
+  employee: ID!
   type: String!
   start_date: String!
   end_date: String
@@ -69,4 +69,5 @@ extend type Mutation {
   createLeave(input: NewLeave!): Leave
   updateLeave(id: ID!, input: UpdateLeave!): Leave
   deleteLeave(id: ID!): Map
+  deleteLeaves(ids: [ID!]!): Map
 }

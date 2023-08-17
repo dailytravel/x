@@ -32,17 +32,17 @@ func Middleware() gin.HandlerFunc {
 	}
 }
 
-func APIKey(ctx context.Context) string {
-	raw, _ := ctx.Value(APIKeyContextKey).(string)
-	return raw
-}
-
 func Auth(ctx context.Context) jwt.MapClaims {
 	raw, _ := ctx.Value(AuthContextKey).(jwt.MapClaims)
 	return raw
 }
 
-func Locale(ctx context.Context) string {
-	raw, _ := ctx.Value(LocaleContextKey).(string)
+func Locale(ctx context.Context) *string {
+	raw, _ := ctx.Value(LocaleContextKey).(*string)
+	return raw
+}
+
+func APIKey(ctx context.Context) *string {
+	raw, _ := ctx.Value(APIKeyContextKey).(*string)
 	return raw
 }

@@ -8,28 +8,28 @@ type Organization @key(fields: "id") {
   metadata: Map
   created_at: String!
   updated_at: String!
-  uid: ID!
+  employee: Employee
   created_by: ID
   updated_by: ID
 }
 
 type Organizations {
   data: [Organization]
-  count: Int
+  count: Int!
 }
 
 input NewOrganization {
-  manager: ID
+  employee: ID
   parent: ID
   name: String!
   description: String
-  type: String
+  type: String!
   status: String
   metadata: Map
 }
 
 input UpdateOrganization {
-  manager: ID
+  employee: ID
   parent: ID
   name: String
   description: String
@@ -39,7 +39,7 @@ input UpdateOrganization {
 }
 
 extend type Query {
-  organizations(arg: Map): Organizations
+  organizations(args: Map): Organizations
   organization(id: ID!): Organization
 }
 

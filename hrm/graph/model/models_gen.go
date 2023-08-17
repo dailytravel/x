@@ -13,76 +13,21 @@ type Attendances struct {
 	Count int           `json:"count"`
 }
 
-type Certification struct {
-	Name             string `json:"name"`
-	IssuingAuthority string `json:"issuingAuthority"`
-	Date             string `json:"date"`
-}
-
-type CertificationInput struct {
-	Name             string `json:"name"`
-	IssuingAuthority string `json:"issuingAuthority"`
-	Date             string `json:"date"`
-}
-
 type CreateResume struct {
-	ApplicantID    string                `json:"applicantId"`
-	Title          string                `json:"title"`
-	Summary        *string               `json:"summary,omitempty"`
-	Experience     []*ExperienceInput    `json:"experience,omitempty"`
-	Education      []*EducationInput     `json:"education,omitempty"`
-	Skills         []*string             `json:"skills,omitempty"`
-	Certifications []*CertificationInput `json:"certifications,omitempty"`
-	Languages      []*LanguageInput      `json:"languages,omitempty"`
-	Projects       []*ProjectInput       `json:"projects,omitempty"`
-	References     []*ReferenceInput     `json:"references,omitempty"`
-}
-
-type Education struct {
-	Degree      string  `json:"degree"`
-	University  string  `json:"university"`
-	StartDate   string  `json:"startDate"`
-	EndDate     *string `json:"endDate,omitempty"`
-	Description *string `json:"description,omitempty"`
-}
-
-type EducationInput struct {
-	Degree      string  `json:"degree"`
-	University  string  `json:"university"`
-	StartDate   string  `json:"startDate"`
-	EndDate     *string `json:"endDate,omitempty"`
-	Description *string `json:"description,omitempty"`
+	Title          string `json:"title"`
+	Summary        string `json:"summary"`
+	Experience     string `json:"experience"`
+	Education      string `json:"education"`
+	Skills         string `json:"skills"`
+	Certifications string `json:"certifications"`
+	Languages      string `json:"languages"`
+	Projects       string `json:"projects"`
+	References     string `json:"references"`
 }
 
 type Employees struct {
 	Data  []*Employee `json:"data,omitempty"`
 	Count int         `json:"count"`
-}
-
-type Experience struct {
-	Title       string  `json:"title"`
-	Company     string  `json:"company"`
-	StartDate   string  `json:"startDate"`
-	EndDate     *string `json:"endDate,omitempty"`
-	Description *string `json:"description,omitempty"`
-}
-
-type ExperienceInput struct {
-	Title       string  `json:"title"`
-	Company     string  `json:"company"`
-	StartDate   string  `json:"startDate"`
-	EndDate     *string `json:"endDate,omitempty"`
-	Description *string `json:"description,omitempty"`
-}
-
-type Language struct {
-	Name        string       `json:"name"`
-	Proficiency *Proficiency `json:"proficiency,omitempty"`
-}
-
-type LanguageInput struct {
-	Name        string      `json:"name"`
-	Proficiency Proficiency `json:"proficiency"`
 }
 
 type Leaves struct {
@@ -116,7 +61,7 @@ type NewEmployee struct {
 }
 
 type NewLeave struct {
-	Owner     string                 `json:"owner"`
+	Employee  string                 `json:"employee"`
 	Type      string                 `json:"type"`
 	StartDate string                 `json:"start_date"`
 	EndDate   *string                `json:"end_date,omitempty"`
@@ -126,13 +71,22 @@ type NewLeave struct {
 }
 
 type NewOrganization struct {
-	Manager     *string                `json:"manager,omitempty"`
+	Employee    *string                `json:"employee,omitempty"`
 	Parent      *string                `json:"parent,omitempty"`
 	Name        string                 `json:"name"`
 	Description *string                `json:"description,omitempty"`
-	Type        *string                `json:"type,omitempty"`
+	Type        string                 `json:"type"`
 	Status      *string                `json:"status,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewPayroll struct {
+	Employee string                 `json:"employee"`
+	PayDate  string                 `json:"pay_date"`
+	Amount   float64                `json:"amount"`
+	Currency string                 `json:"currency"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   string                 `json:"status"`
 }
 
 type NewPosition struct {
@@ -155,50 +109,27 @@ type NewSalary struct {
 
 type Organizations struct {
 	Data  []*Organization `json:"data,omitempty"`
-	Count *int            `json:"count,omitempty"`
+	Count int             `json:"count"`
+}
+
+type Payrolls struct {
+	Data  []*Payroll `json:"data,omitempty"`
+	Count int        `json:"count"`
 }
 
 type Positions struct {
-	Map   []*Position `json:"map,omitempty"`
-	Count *int        `json:"count,omitempty"`
-}
-
-type Project struct {
-	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	StartDate   string  `json:"startDate"`
-	EndDate     *string `json:"endDate,omitempty"`
-}
-
-type ProjectInput struct {
-	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	StartDate   string  `json:"startDate"`
-	EndDate     *string `json:"endDate,omitempty"`
-}
-
-type Reference struct {
-	Name         string  `json:"name"`
-	Relationship string  `json:"relationship"`
-	Email        string  `json:"email"`
-	Phone        *string `json:"phone,omitempty"`
-}
-
-type ReferenceInput struct {
-	Name         string  `json:"name"`
-	Relationship string  `json:"relationship"`
-	Email        string  `json:"email"`
-	Phone        *string `json:"phone,omitempty"`
+	Data  []*Position `json:"data,omitempty"`
+	Count int         `json:"count"`
 }
 
 type Resumes struct {
 	Data  []*Resume `json:"data,omitempty"`
-	Count *int      `json:"count,omitempty"`
+	Count int       `json:"count"`
 }
 
 type Salaries struct {
 	Data  []*Salary `json:"data,omitempty"`
-	Count *int      `json:"count,omitempty"`
+	Count int       `json:"count"`
 }
 
 type UpdateAttendance struct {
@@ -236,13 +167,21 @@ type UpdateLeave struct {
 }
 
 type UpdateOrganization struct {
-	Manager     *string                `json:"manager,omitempty"`
+	Employee    *string                `json:"employee,omitempty"`
 	Parent      *string                `json:"parent,omitempty"`
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Type        *string                `json:"type,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type UpdatePayroll struct {
+	PayDate  *string                `json:"pay_date,omitempty"`
+	Amount   *float64               `json:"amount,omitempty"`
+	Currency *string                `json:"currency,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
 }
 
 type UpdatePosition struct {
@@ -256,15 +195,15 @@ type UpdatePosition struct {
 }
 
 type UpdateResume struct {
-	Title          *string               `json:"title,omitempty"`
-	Summary        *string               `json:"summary,omitempty"`
-	Experience     []*ExperienceInput    `json:"experience,omitempty"`
-	Education      []*EducationInput     `json:"education,omitempty"`
-	Skills         []*string             `json:"skills,omitempty"`
-	Certifications []*CertificationInput `json:"certifications,omitempty"`
-	Languages      []*LanguageInput      `json:"languages,omitempty"`
-	Projects       []*ProjectInput       `json:"projects,omitempty"`
-	References     []*ReferenceInput     `json:"references,omitempty"`
+	Title          *string `json:"title,omitempty"`
+	Summary        *string `json:"summary,omitempty"`
+	Experience     *string `json:"experience,omitempty"`
+	Education      *string `json:"education,omitempty"`
+	Skills         *string `json:"skills,omitempty"`
+	Certifications *string `json:"certifications,omitempty"`
+	Languages      *string `json:"languages,omitempty"`
+	Projects       *string `json:"projects,omitempty"`
+	References     *string `json:"references,omitempty"`
 }
 
 type UpdateSalary struct {
@@ -425,50 +364,5 @@ func (e *LeaveType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e LeaveType) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type Proficiency string
-
-const (
-	ProficiencyBasic        Proficiency = "BASIC"
-	ProficiencyIntermediate Proficiency = "INTERMEDIATE"
-	ProficiencyAdvanced     Proficiency = "ADVANCED"
-	ProficiencyNative       Proficiency = "NATIVE"
-)
-
-var AllProficiency = []Proficiency{
-	ProficiencyBasic,
-	ProficiencyIntermediate,
-	ProficiencyAdvanced,
-	ProficiencyNative,
-}
-
-func (e Proficiency) IsValid() bool {
-	switch e {
-	case ProficiencyBasic, ProficiencyIntermediate, ProficiencyAdvanced, ProficiencyNative:
-		return true
-	}
-	return false
-}
-
-func (e Proficiency) String() string {
-	return string(e)
-}
-
-func (e *Proficiency) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = Proficiency(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid Proficiency", str)
-	}
-	return nil
-}
-
-func (e Proficiency) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

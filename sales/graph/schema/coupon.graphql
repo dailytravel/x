@@ -8,7 +8,7 @@ type Coupon {
   max_discount: Float
   currency: String!
   start_date: String!
-  end_date: Int!
+  end_date: String!
   max_uses: Int
   min_purchase: Float
   uses: Int
@@ -34,32 +34,34 @@ input NewCoupon {
   locale: String!
   code: String!
   description: String!
-  type: DiscountType!
+  type: String!
   amount: Float!
   max_discount: Float
   currency: String!
   start_date: String!
-  end_date: Int!
+  end_date: String!
   products: [ID!]
   max_uses: Int
   min_purchase: Float
   metadata: Map
+  status: String
 }
 
 input UpdateCoupon {
   locale: String!
   code: String
   description: String
-  type: DiscountType
+  type: String
   amount: Float
   max_discount: Float
   currency: String
   start_date: String
-  end_date: Int
+  end_date: String
   products: [ID!]
   max_uses: Int
   min_purchase: Float
   metadata: Map
+  status: String
 }
 
 extend type Query {

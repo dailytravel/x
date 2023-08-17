@@ -6,10 +6,16 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
@@ -17,14 +23,19 @@ func (r *couponResolver) ID(ctx context.Context, obj *model.Coupon) (string, err
 	return obj.ID.Hex(), nil
 }
 
+// Description is the resolver for the description field.
+func (r *couponResolver) Description(ctx context.Context, obj *model.Coupon) (string, error) {
+	panic(fmt.Errorf("not implemented: Description - description"))
+}
+
 // StartDate is the resolver for the start_date field.
 func (r *couponResolver) StartDate(ctx context.Context, obj *model.Coupon) (string, error) {
-	panic(fmt.Errorf("not implemented: StartDate - start_date"))
+	return obj.StartDate.Time().Format(time.RFC3339), nil
 }
 
 // EndDate is the resolver for the end_date field.
-func (r *couponResolver) EndDate(ctx context.Context, obj *model.Coupon) (int, error) {
-	panic(fmt.Errorf("not implemented: EndDate - end_date"))
+func (r *couponResolver) EndDate(ctx context.Context, obj *model.Coupon) (string, error) {
+	return obj.EndDate.Time().Format(time.RFC3339), nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -49,42 +60,269 @@ func (r *couponResolver) UID(ctx context.Context, obj *model.Coupon) (string, er
 
 // CreatedBy is the resolver for the created_by field.
 func (r *couponResolver) CreatedBy(ctx context.Context, obj *model.Coupon) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *couponResolver) UpdatedBy(ctx context.Context, obj *model.Coupon) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // CreateCoupon is the resolver for the createCoupon field.
 func (r *mutationResolver) CreateCoupon(ctx context.Context, input model.NewCoupon) (*model.Coupon, error) {
-	panic(fmt.Errorf("not implemented: CreateCoupon - createCoupon"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Coupon{
+		UID:    uid,
+		Code:   utils.String(8),
+		Locale: input.Locale,
+		Description: bson.M{
+			input.Locale: input.Description,
+		},
+		Type:        input.Type,
+		Amount:      input.Amount,
+		Currency:    input.Currency,
+		MinPurchase: input.MinPurchase,
+		MaxDiscount: input.MaxDiscount,
+		MaxUses:     input.MaxUses,
+		Status:      *input.Status,
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+			Metadata:  input.Metadata,
+		},
+	}
+
+	utils.Date(&input.StartDate, &item.StartDate)
+	utils.Date(&input.EndDate, &item.EndDate)
+
+	// Set the fields from the input
+	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateCoupon is the resolver for the updateCoupon field.
 func (r *mutationResolver) UpdateCoupon(ctx context.Context, id string, input model.UpdateCoupon) (*model.Coupon, error) {
-	panic(fmt.Errorf("not implemented: UpdateCoupon - updateCoupon"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create an update document with the fields to be updated
+	item := &model.Coupon{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	if input.Description != nil {
+		item.Description[input.Locale] = *input.Description
+	}
+
+	if input.Type != nil {
+		item.Type = *input.Type
+	}
+
+	if input.Amount != nil {
+		item.Amount = *input.Amount
+	}
+
+	if input.Currency != nil {
+		item.Currency = *input.Currency
+	}
+
+	if input.MinPurchase != nil {
+		item.MinPurchase = input.MinPurchase
+	}
+
+	if input.MaxDiscount != nil {
+		item.MaxDiscount = input.MaxDiscount
+	}
+
+	if input.MaxUses != nil {
+		item.MaxUses = input.MaxUses
+	}
+
+	if input.Status != nil {
+		item.Status = *input.Status
+	}
+
+	if input.Metadata != nil {
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
+	}
+
+	// Update the updated_by and updated_at fields
+	item.UpdatedBy = uid
+
+	// Perform the update in the database
+	res, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if the coupon was actually updated
+	if res.ModifiedCount == 0 {
+		return nil, fmt.Errorf("no coupon was updated")
+	}
+
+	return item, nil
 }
 
 // DeleteCoupon is the resolver for the deleteCoupon field.
 func (r *mutationResolver) DeleteCoupon(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteCoupon - deleteCoupon"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to an ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the filter to match the given ID
+	filter := bson.M{"_id": _id}
+
+	// Define the update to mark the record as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("coupons").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.ModifiedCount == 0 {
+		return nil, fmt.Errorf("coupon not found")
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // DeleteCoupons is the resolver for the deleteCoupons field.
 func (r *mutationResolver) DeleteCoupons(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteCoupons - deleteCoupons"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match the given IDs
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	// Define the update to mark records as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("coupons").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // Coupon is the resolver for the coupon field.
 func (r *queryResolver) Coupon(ctx context.Context, id string) (*model.Coupon, error) {
-	panic(fmt.Errorf("not implemented: Coupon - coupon"))
+	var item *model.Coupon
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Coupons is the resolver for the coupons field.
 func (r *queryResolver) Coupons(ctx context.Context, args map[string]interface{}) (*model.Coupons, error) {
-	panic(fmt.Errorf("not implemented: Coupons - coupons"))
+	var items []*model.Coupon
+	//find all items
+	cur, err := r.db.Collection("coupons").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Coupon
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("coupons").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Coupons{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Coupon returns CouponResolver implementation.

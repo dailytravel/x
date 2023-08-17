@@ -3,8 +3,6 @@ type Company @key(fields: "id") {
   name: String!
   description: String
   type: String! # "team", "company", or "department"
-  parent: Company
-  children: [Company]
   industry: String
   employees: Int
   revenue: Float
@@ -17,7 +15,6 @@ type Company @key(fields: "id") {
   website: String
   metadata: Map
   status: String!
-  last_activity: Int!
   created_at: String!
   updated_at: String!
   uid: ID!
@@ -31,11 +28,10 @@ type Companies {
 }
 
 input NewCompany {
-  user: ID
+  uid: ID
   name: String!
   description: String
   type: String! # "team", "company", or "department"
-  parent: ID
   industry: String
   employees: Int
   revenue: Float
@@ -51,11 +47,10 @@ input NewCompany {
 }
 
 input UpdateCompany {
-  user: ID
+  uid: ID
   name: String
   description: String
   type: String # "team", "company", or "department"
-  parent: ID
   industry: String
   employees: Int
   revenue: Float
@@ -79,4 +74,5 @@ extend type Mutation {
   createCompany(input: NewCompany!): Company @auth
   updateCompany(id: ID!, input: UpdateCompany!): Company @auth
   deleteCompany(id: ID!): Map @auth
+  deleteCompanies(ids: [ID]!): Map @auth
 }

@@ -11,15 +11,15 @@ import (
 
 type Point struct {
 	Model     `bson:",inline"`
-	User      primitive.ObjectID `json:"user" bson:"user"`
-	Pointable Pointable          `json:"pointable" bson:"pointable"`
-	Points    int                `json:"points" bson:"points"`
-	Type      PointType          `json:"type" bson:"type"`
-	Metadata  primitive.M        `json:"metadata,omitempty" bson:"metadata,omitempty"`
-	ExpiresAt string             `json:"expires_at" bson:"expires_at"`
+	UID       primitive.ObjectID  `json:"uid" bson:"uid"`
+	Target    Target              `json:"target" bson:"target"`
+	Points    int                 `json:"points" bson:"points"`
+	Type      string              `json:"type" bson:"type"`
+	Metadata  primitive.M         `json:"metadata,omitempty" bson:"metadata,omitempty"`
+	ExpiresAt primitive.Timestamp `json:"expires_at" bson:"expires_at"`
 }
 
-type Pointable struct {
+type Target struct {
 	ID   primitive.ObjectID `json:"id" bson:"id"`
 	Type PointType          `json:"type" bson:"type"`
 }
@@ -43,8 +43,8 @@ func (i *Point) Collection() string {
 
 func (i *Point) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "pointable._id", Value: 1}, {Key: "pointable.type", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "target._id", Value: 1}, {Key: "target.type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},

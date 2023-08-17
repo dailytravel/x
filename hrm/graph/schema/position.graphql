@@ -8,13 +8,13 @@ type Position {
   status: String!
   created_at: String!
   updated_at: String!
-  created_by: ID!
-  updated_by: ID!
+  created_by: ID
+  updated_by: ID
 }
 
 type Positions {
-  map: [Position]
-  count: Int
+  data: [Position]
+  count: Int!
 }
 
 input NewPosition {
@@ -38,7 +38,7 @@ input UpdatePosition {
 
 extend type Query {
   position(id: ID!): Position
-  positions: Positions
+  positions(args: Map): Positions
 }
 
 extend type Mutation {

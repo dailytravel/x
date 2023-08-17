@@ -1,141 +1,140 @@
 type Resume {
   id: ID!
   title: String!
-  summary: String
-  experience: [Experience]
-  education: [Education]
-  skills: [String]
-  certifications: [Certification]
-  languages: [Language]
-  projects: [Project]
-  references: [Reference]
+  summary: String!
+  experience: String!
+  education: String!
+  skills: String!
+  certifications: String!
+  languages: String!
+  projects: String!
+  references: String!
   metadata: Map
   status: String!
   created_at: String!
   updated_at: String!
   uid: ID!
-  created_by: ID!
-  updated_by: ID!
-}
-
-type Experience {
-  title: String!
-  company: String!
-  startDate: String!
-  endDate: String
-  description: String
-}
-
-type Education {
-  degree: String!
-  university: String!
-  startDate: String!
-  endDate: String
-  description: String
-}
-
-type Certification {
-  name: String!
-  issuingAuthority: String!
-  date: String!
-}
-
-type Language {
-  name: String!
-  proficiency: Proficiency
-}
-
-enum Proficiency {
-  BASIC
-  INTERMEDIATE
-  ADVANCED
-  NATIVE
-}
-
-type Project {
-  name: String!
-  description: String
-  startDate: String!
-  endDate: String
-}
-
-type Reference {
-  name: String!
-  relationship: String!
-  email: String!
-  phone: String
+  created_by: ID
+  updated_by: ID
 }
 
 type Resumes {
   data: [Resume]
-  count: Int
+  count: Int!
 }
 
+# type Experience {
+#   title: String!
+#   company: String!
+#   startDate: String!
+#   endDate: String
+#   description: String
+# }
+
+# type Education {
+#   degree: String!
+#   university: String!
+#   startDate: String!
+#   endDate: String
+#   description: String
+# }
+
+# type Certification {
+#   name: String!
+#   issuingAuthority: String!
+#   date: String!
+# }
+
+# type Language {
+#   name: String!
+#   proficiency: Proficiency
+# }
+
+# enum Proficiency {
+#   BASIC
+#   INTERMEDIATE
+#   ADVANCED
+#   NATIVE
+# }
+
+# type Project {
+#   name: String!
+#   description: String
+#   startDate: String!
+#   endDate: String
+# }
+
+# type Reference {
+#   name: String!
+#   relationship: String!
+#   email: String!
+#   phone: String
+# }
+
 input CreateResume {
-  applicantId: ID!
   title: String!
-  summary: String
-  experience: [ExperienceInput]
-  education: [EducationInput]
-  skills: [String]
-  certifications: [CertificationInput]
-  languages: [LanguageInput]
-  projects: [ProjectInput]
-  references: [ReferenceInput]
+  summary: String!
+  experience: String!
+  education: String!
+  skills: String!
+  certifications: String!
+  languages: String!
+  projects: String!
+  references: String!
 }
 
 input UpdateResume {
   title: String
   summary: String
-  experience: [ExperienceInput]
-  education: [EducationInput]
-  skills: [String]
-  certifications: [CertificationInput]
-  languages: [LanguageInput]
-  projects: [ProjectInput]
-  references: [ReferenceInput]
+  experience: String
+  education: String
+  skills: String
+  certifications: String
+  languages: String
+  projects: String
+  references: String
 }
 
-input ExperienceInput {
-  title: String!
-  company: String!
-  startDate: String!
-  endDate: String
-  description: String
-}
+# input ExperienceInput {
+#   title: String!
+#   company: String!
+#   startDate: String!
+#   endDate: String
+#   description: String
+# }
 
-input EducationInput {
-  degree: String!
-  university: String!
-  startDate: String!
-  endDate: String
-  description: String
-}
+# input EducationInput {
+#   degree: String!
+#   university: String!
+#   startDate: String!
+#   endDate: String
+#   description: String
+# }
 
-input CertificationInput {
-  name: String!
-  issuingAuthority: String!
-  date: String!
-}
+# input CertificationInput {
+#   name: String!
+#   issuingAuthority: String!
+#   date: String!
+# }
 
-input LanguageInput {
-  name: String!
-  proficiency: Proficiency!
-}
+# input LanguageInput {
+#   name: String!
+#   proficiency: Proficiency!
+# }
 
-input ProjectInput {
-  name: String!
-  description: String
-  startDate: String!
-  endDate: String
-}
+# input ProjectInput {
+#   name: String!
+#   description: String
+#   startDate: String!
+#   endDate: String
+# }
 
-input ReferenceInput {
-  name: String!
-  relationship: String!
-  email: String!
-  phone: String
-}
+# input ReferenceInput {
+#   name: String!
+#   relationship: String!
+#   email: String!
+#   phone: String
+# }
 
 extend type Query {
   resume(id: ID!): Resume

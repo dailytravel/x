@@ -8,14 +8,14 @@ type Salary {
   status: String!
   created_at: String!
   updated_at: String!
-  employee: ID!
-  created_by: ID!
-  updated_by: ID!
+  employee: Employee!
+  created_by: ID
+  updated_by: ID
 }
 
 type Salaries {
   data: [Salary]
-  count: Int
+  count: Int!
 }
 
 input NewSalary {
@@ -44,4 +44,5 @@ extend type Mutation {
   createSalary(input: NewSalary!): Salary
   updateSalary(id: ID!, input: UpdateSalary!): Salary
   deleteSalary(id: ID!): Map
+  deleteSalaries(ids: [ID!]!): Map
 }

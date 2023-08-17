@@ -6,40 +6,194 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // CreateQuote is the resolver for the createQuote field.
 func (r *mutationResolver) CreateQuote(ctx context.Context, input *model.NewQuote) (*model.Quote, error) {
-	panic(fmt.Errorf("not implemented: CreateQuote - createQuote"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Quote{
+		Locale: input.Locale,
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+			Metadata:  input.Metadata,
+		},
+	}
+
+	// Set the fields from the input
+	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateQuote is the resolver for the updateQuote field.
 func (r *mutationResolver) UpdateQuote(ctx context.Context, id string, input model.UpdateQuote) (*model.Quote, error) {
-	panic(fmt.Errorf("not implemented: UpdateQuote - updateQuote"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Quote{
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+			Metadata:  input.Metadata,
+		},
+	}
+
+	// Set the fields from the input
+	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteQuote is the resolver for the deleteQuote field.
 func (r *mutationResolver) DeleteQuote(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteQuote - deleteQuote"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the filter to match the given ID
+	filter := bson.M{"_id": _id}
+
+	// Define the update to mark the record as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("quotes").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.ModifiedCount == 0 {
+		return nil, fmt.Errorf("quote not found")
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // DeleteQuotes is the resolver for the deleteQuotes field.
 func (r *mutationResolver) DeleteQuotes(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteQuotes - deleteQuotes"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match the given IDs
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	// Define the update to mark records as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("quotes").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // Quotes is the resolver for the quotes field.
 func (r *queryResolver) Quotes(ctx context.Context, args map[string]interface{}) (*model.Quotes, error) {
-	panic(fmt.Errorf("not implemented: Quotes - quotes"))
+	var items []*model.Quote
+	//find all items
+	cur, err := r.db.Collection("quotes").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Quote
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("quotes").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Quotes{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Quote is the resolver for the quote field.
 func (r *queryResolver) Quote(ctx context.Context, id string) (*model.Quote, error) {
-	panic(fmt.Errorf("not implemented: Quote - quote"))
+	var item *model.Quote
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // ID is the resolver for the id field.
@@ -64,7 +218,7 @@ func (r *quoteResolver) Metadata(ctx context.Context, obj *model.Quote) (map[str
 
 // Billing is the resolver for the billing field.
 func (r *quoteResolver) Billing(ctx context.Context, obj *model.Quote) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Billing - billing"))
+	return obj.Billing, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -84,28 +238,27 @@ func (r *quoteResolver) UID(ctx context.Context, obj *model.Quote) (string, erro
 
 // CreatedBy is the resolver for the created_by field.
 func (r *quoteResolver) CreatedBy(ctx context.Context, obj *model.Quote) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *quoteResolver) UpdatedBy(ctx context.Context, obj *model.Quote) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // Quote returns QuoteResolver implementation.
 func (r *Resolver) Quote() QuoteResolver { return &quoteResolver{r} }
 
 type quoteResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *quoteResolver) User(ctx context.Context, obj *model.Quote) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}
-func (r *quoteResolver) Owner(ctx context.Context, obj *model.Quote) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
-}

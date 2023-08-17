@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/insight/graph/model"
 )
@@ -33,12 +34,13 @@ func (r *activityResolver) Target(ctx context.Context, obj *model.Activity) (str
 
 // CreatedAt is the resolver for the created_at field.
 func (r *activityResolver) CreatedAt(ctx context.Context, obj *model.Activity) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Activity is the resolver for the activity field.
 func (r *queryResolver) Activity(ctx context.Context, id string) (*model.Activity, error) {
-	panic(fmt.Errorf("not implemented: Activity - activity"))
+	panic(fmt.Errorf("not implemented: Activities - activities"))
+
 }
 
 // Activities is the resolver for the activities field.

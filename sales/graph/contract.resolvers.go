@@ -6,29 +6,46 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
+	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
 func (r *contractResolver) ID(ctx context.Context, obj *model.Contract) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Contact is the resolver for the contact field.
 func (r *contractResolver) Contact(ctx context.Context, obj *model.Contract) (*model.Contact, error) {
-	panic(fmt.Errorf("not implemented: Contact - contact"))
+	var item *model.Contact
+
+	filter := bson.M{"_id": obj.Contact}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // StartDate is the resolver for the start_date field.
 func (r *contractResolver) StartDate(ctx context.Context, obj *model.Contract) (string, error) {
-	panic(fmt.Errorf("not implemented: StartDate - start_date"))
+	return obj.StartDate.Time().Format(time.RFC3339), nil
 }
 
 // EndDate is the resolver for the end_date field.
 func (r *contractResolver) EndDate(ctx context.Context, obj *model.Contract) (string, error) {
-	panic(fmt.Errorf("not implemented: EndDate - end_date"))
+	return obj.EndDate.Time().Format(time.RFC3339), nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -38,12 +55,12 @@ func (r *contractResolver) Metadata(ctx context.Context, obj *model.Contract) (m
 
 // CreatedAt is the resolver for the created_at field.
 func (r *contractResolver) CreatedAt(ctx context.Context, obj *model.Contract) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *contractResolver) UpdatedAt(ctx context.Context, obj *model.Contract) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
@@ -53,42 +70,247 @@ func (r *contractResolver) UID(ctx context.Context, obj *model.Contract) (string
 
 // CreatedBy is the resolver for the created_by field.
 func (r *contractResolver) CreatedBy(ctx context.Context, obj *model.Contract) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *contractResolver) UpdatedBy(ctx context.Context, obj *model.Contract) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // CreateContract is the resolver for the createContract field.
 func (r *mutationResolver) CreateContract(ctx context.Context, input model.NewContract) (*model.Contract, error) {
-	panic(fmt.Errorf("not implemented: CreateContract - createContract"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Contract{
+		UID:         *uid,
+		Reference:   input.Reference,
+		Amount:      input.Amount,
+		Currency:    input.Currency,
+		Description: input.Description,
+		AutoRenew:   input.AutoRenew,
+		Status:      input.Status,
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
+	}
+
+	contact, err := primitive.ObjectIDFromHex(input.Contact)
+	if err != nil {
+		return nil, err
+	}
+
+	item.Contact = contact
+	utils.Date(&input.StartDate, &item.StartDate)
+	utils.Date(&input.EndDate, &item.EndDate)
+
+	// Set the fields from the input
+	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateContract is the resolver for the updateContract field.
 func (r *mutationResolver) UpdateContract(ctx context.Context, id string, input model.UpdateContract) (*model.Contract, error) {
-	panic(fmt.Errorf("not implemented: UpdateContract - updateContract"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	contractID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve the existing contract from the database
+	item := &model.Contract{}
+	filter := bson.M{"_id": contractID}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Perform the actual updates
+	if input.Reference != nil {
+		item.Reference = *input.Reference
+	}
+	if input.Amount != nil {
+		item.Amount = *input.Amount
+	}
+	if input.Currency != nil {
+		item.Currency = *input.Currency
+	}
+	if input.Description != nil {
+		item.Description = *input.Description
+	}
+	if input.AutoRenew != nil {
+		item.AutoRenew = *input.AutoRenew
+	}
+	if input.Status != nil {
+		item.Status = *input.Status
+	}
+
+	// Update the updated_by and updated_at fields
+	item.UpdatedBy = uid
+	item.UpdatedAt = primitive.Timestamp{T: uint32(time.Now().Unix())}
+
+	// Perform the update in the database
+	updateResult, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if the contract was actually updated
+	if updateResult.ModifiedCount == 0 {
+		return nil, fmt.Errorf("no contract was updated")
+	}
+
+	return item, nil
 }
 
 // DeleteContract is the resolver for the deleteContract field.
 func (r *mutationResolver) DeleteContract(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteContract - deleteContract"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to an ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the filter to match the given ID
+	filter := bson.M{"_id": _id}
+
+	// Define the update to mark the record as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	_, err = r.db.Collection("contracts").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success"}, nil
 }
 
 // DeleteContracts is the resolver for the deleteContracts field.
 func (r *mutationResolver) DeleteContracts(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteContracts - deleteContracts"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match the given IDs
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	// Define the update to mark records as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("contracts").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // Contract is the resolver for the contract field.
 func (r *queryResolver) Contract(ctx context.Context, id string) (*model.Contract, error) {
-	panic(fmt.Errorf("not implemented: Contract - contract"))
+	var item *model.Contract
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Contracts is the resolver for the contracts field.
 func (r *queryResolver) Contracts(ctx context.Context, args map[string]interface{}) (*model.Contracts, error) {
-	panic(fmt.Errorf("not implemented: Contracts - contracts"))
+	var items []*model.Contract
+	//find all items
+	cur, err := r.db.Collection("contracts").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Contract
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("contracts").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Contracts{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Contract returns ContractResolver implementation.

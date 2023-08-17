@@ -9,14 +9,14 @@ import (
 
 type Membership struct {
 	Model   `bson:",inline"`
-	User    primitive.ObjectID `json:"user,omitempty" bson:"user,omitempty"`
-	Tier    primitive.ObjectID `json:"tier,omitempty" bson:"tier,omitempty"`
-	Number  string             `json:"number,omitempty" bson:"number,omitempty"`
-	Since   primitive.DateTime `json:"since,omitempty" bson:"since,omitempty"`
-	Until   primitive.DateTime `json:"until,omitempty" bson:"until,omitempty"`
+	UID     primitive.ObjectID `json:"user" bson:"user"`
+	Tier    primitive.ObjectID `json:"tier" bson:"tier"`
+	Number  string             `json:"number" bson:"number"`
+	Since   string             `json:"since" bson:"since"`
+	Until   string             `json:"until" bson:"until"`
 	Billing primitive.M        `json:"billing,omitempty" bson:"billing,omitempty"`
 	Payment primitive.M        `json:"payment,omitempty" bson:"payment,omitempty"`
-	Status  string             `json:"status,omitempty" bson:"status,omitempty"`
+	Status  string             `json:"status" bson:"status"`
 }
 
 func (Membership) IsEntity() {}

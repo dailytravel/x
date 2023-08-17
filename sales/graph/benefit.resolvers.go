@@ -6,19 +6,40 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
+	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // ID is the resolver for the id field.
 func (r *benefitResolver) ID(ctx context.Context, obj *model.Benefit) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Description is the resolver for the description field.
 func (r *benefitResolver) Description(ctx context.Context, obj *model.Benefit) (string, error) {
-	panic(fmt.Errorf("not implemented: Description - description"))
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+
+	// Try to retrieve the description for the requested locale
+	if description, ok := obj.Description[*locale].(string); ok {
+		return description, nil
+	}
+
+	// If the description is not found for the requested locale,
+	// fallback to the taxonomy's default locale
+	if description, ok := obj.Description[obj.Locale].(string); ok {
+		return description, nil
+	}
+
+	// Return an error if the name is not found for any locale
+	return "", errors.New("Description not found for any locale")
 }
 
 // Metadata is the resolver for the metadata field.
@@ -28,37 +49,222 @@ func (r *benefitResolver) Metadata(ctx context.Context, obj *model.Benefit) (map
 
 // CreatedAt is the resolver for the created_at field.
 func (r *benefitResolver) CreatedAt(ctx context.Context, obj *model.Benefit) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *benefitResolver) UpdatedAt(ctx context.Context, obj *model.Benefit) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateBenefit is the resolver for the createBenefit field.
 func (r *mutationResolver) CreateBenefit(ctx context.Context, input model.NewBenefit) (*model.Benefit, error) {
-	panic(fmt.Errorf("not implemented: CreateBenefit - createBenefit"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new benefit object
+	item := &model.Benefit{
+		Locale: input.Locale,
+		Description: bson.M{
+			input.Locale: input.Description,
+		},
+		Model: model.Model{
+			Metadata:  input.Metadata,
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
+	}
+
+	// Set the fields from the input
+	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateBenefit is the resolver for the updateBenefit field.
 func (r *mutationResolver) UpdateBenefit(ctx context.Context, id string, input model.UpdateBenefit) (*model.Benefit, error) {
-	panic(fmt.Errorf("not implemented: UpdateBenefit - updateBenefit"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the benefit by ID
+	item := &model.Benefit{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update the benefit fields based on the input
+	if input.Description != nil {
+		item.Description[*input.Locale] = *input.Description
+	}
+
+	if input.Metadata != nil {
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
+	}
+
+	item.UpdatedBy = uid
+
+	// Update the benefit in the database
+	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteBenefit is the resolver for the deleteBenefit field.
-func (r *mutationResolver) DeleteBenefit(ctx context.Context, id string) (*bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteBenefit - deleteBenefit"))
+func (r *mutationResolver) DeleteBenefit(ctx context.Context, id string) (map[string]interface{}, error) {
+	// Get the authenticated user's ID
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the benefit by ID
+	benefit := &model.Benefit{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(benefit.Collection()).FindOne(ctx, filter).Decode(benefit)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if the user has permission to delete the benefit
+	if benefit.CreatedBy != uid {
+		return nil, fmt.Errorf("you don't have permission to delete this benefit")
+	}
+
+	// Define the update to mark the benefit as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("benefits").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.ModifiedCount == 0 {
+		return nil, fmt.Errorf("benefit not found")
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
+}
+
+// DeleteBenefits is the resolver for the deleteBenefits field.
+func (r *mutationResolver) DeleteBenefits(ctx context.Context, ids []string) (map[string]interface{}, error) {
+	// Get the authenticated user's ID
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match the given IDs and the owner's ID
+	filter := bson.M{
+		"_id":       bson.M{"$in": objectIDs},
+		"createdBy": uid,
+	}
+
+	// Define the update to mark records as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("benefits").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // Benefits is the resolver for the benefits field.
-func (r *queryResolver) Benefits(ctx context.Context, args map[string]interface{}) ([]*model.Benefit, error) {
-	panic(fmt.Errorf("not implemented: Benefits - benefits"))
+func (r *queryResolver) Benefits(ctx context.Context, args map[string]interface{}) (*model.Benefits, error) {
+	var items []*model.Benefit
+	//find all items
+	cur, err := r.db.Collection("benefits").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Benefit
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("benefits").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Benefits{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Benefit is the resolver for the benefit field.
 func (r *queryResolver) Benefit(ctx context.Context, id string) (*model.Benefit, error) {
-	panic(fmt.Errorf("not implemented: Benefit - benefit"))
+	var item *model.Benefit
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection("benefits").FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Benefit returns BenefitResolver implementation.

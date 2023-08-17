@@ -1,7 +1,7 @@
 type Inventory {
   id: ID!
   product: Product!
-  date: Int!
+  date: String!
   quantity: Int
   created_by: ID
   updated_by: ID
@@ -9,21 +9,22 @@ type Inventory {
 
 type Inventories {
   data: [Inventory]
-  count: Int
+  count: Int!
 }
 
 input NewInventory {
-  date: Int!
-  quantity: Int
+  product: ID!
+  date: String!
+  quantity: Int!
 }
 
 input UpdateInventory {
-  date: Int
+  date: String
   quantity: Int
 }
 
 extend type Query {
-  inventories(product: ID, date: Int!): Inventories
+  inventories(product: ID!): Inventories
   inventory(id: ID!): Inventory
 }
 

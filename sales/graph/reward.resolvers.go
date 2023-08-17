@@ -6,40 +6,220 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // CreateReward is the resolver for the createReward field.
 func (r *mutationResolver) CreateReward(ctx context.Context, input model.NewReward) (*model.Reward, error) {
-	panic(fmt.Errorf("not implemented: CreateReward - createReward"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Reward{
+		Locale:      input.Locale,
+		Name:        bson.M{input.Locale: input.Name},
+		Description: bson.M{input.Locale: input.Description},
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+			Metadata:  input.Metadata,
+		},
+	}
+
+	// Set the fields from the input
+	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateReward is the resolver for the updateReward field.
 func (r *mutationResolver) UpdateReward(ctx context.Context, id string, input model.UpdateReward) (*model.Reward, error) {
-	panic(fmt.Errorf("not implemented: UpdateReward - updateReward"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create an update document with the fields to be updated
+	item := &model.Reward{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	if input.Name != nil {
+		item.Name[item.Locale] = *input.Name
+	}
+
+	if input.Description != nil {
+		item.Description[item.Locale] = *input.Description
+	}
+
+	if input.Metadata != nil {
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
+	}
+
+	// Update the updated_by and updated_at fields
+	item.UpdatedBy = uid
+
+	// Perform the update in the database
+	res, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if the coupon was actually updated
+	if res.ModifiedCount == 0 {
+		return nil, fmt.Errorf("no coupon was updated")
+	}
+
+	return item, nil
 }
 
 // DeleteReward is the resolver for the deleteReward field.
 func (r *mutationResolver) DeleteReward(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteReward - deleteReward"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to an ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the filter to match the given ID
+	filter := bson.M{"_id": _id}
+
+	// Define the update to mark the record as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("rewards").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // DeleteRewards is the resolver for the deleteRewards field.
 func (r *mutationResolver) DeleteRewards(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteRewards - deleteRewards"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match the given IDs
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	// Define the update to mark records as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("rewards").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // Rewards is the resolver for the rewards field.
 func (r *queryResolver) Rewards(ctx context.Context, args map[string]interface{}) (*model.Rewards, error) {
-	panic(fmt.Errorf("not implemented: Rewards - rewards"))
+	var items []*model.Reward
+	//find all items
+	cur, err := r.db.Collection("rewards").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Reward
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("rewards").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Rewards{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Reward is the resolver for the reward field.
 func (r *queryResolver) Reward(ctx context.Context, id string) (*model.Reward, error) {
-	panic(fmt.Errorf("not implemented: Reward - reward"))
+	var item *model.Reward
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // ID is the resolver for the id field.
@@ -49,17 +229,57 @@ func (r *rewardResolver) ID(ctx context.Context, obj *model.Reward) (string, err
 
 // Tier is the resolver for the tier field.
 func (r *rewardResolver) Tier(ctx context.Context, obj *model.Reward) (*model.Tier, error) {
-	panic(fmt.Errorf("not implemented: Tier - tier"))
+	var item *model.Tier
+
+	filter := bson.M{"_id": obj.Tier}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("tier not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Name is the resolver for the name field.
 func (r *rewardResolver) Name(ctx context.Context, obj *model.Reward) (string, error) {
-	panic(fmt.Errorf("not implemented: Name - name"))
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+
+	// Try to retrieve the name for the requested locale
+	if name, ok := obj.Name[*locale].(string); ok {
+		return name, nil
+	}
+
+	// If the name is not found for the requested locale,
+	// fallback to the taxonomy's default locale
+	if name, ok := obj.Name[obj.Locale].(string); ok {
+		return name, nil
+	}
+
+	// Return an error if the name is not found for any locale
+	return "", errors.New("name not found for any locale")
 }
 
 // Description is the resolver for the description field.
 func (r *rewardResolver) Description(ctx context.Context, obj *model.Reward) (string, error) {
-	panic(fmt.Errorf("not implemented: Description - description"))
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+
+	// Try to retrieve the description for the requested locale
+	if description, ok := obj.Description[*locale].(string); ok {
+		return description, nil
+	}
+
+	// If the description is not found for the requested locale,
+	// fallback to the taxonomy's default locale
+	if description, ok := obj.Description[obj.Locale].(string); ok {
+		return description, nil
+	}
+
+	// Return an error if the name is not found for any locale
+	return "", errors.New("Description not found for any locale")
 }
 
 // Metadata is the resolver for the metadata field.
@@ -84,12 +304,24 @@ func (r *rewardResolver) UpdatedAt(ctx context.Context, obj *model.Reward) (stri
 
 // CreatedBy is the resolver for the created_by field.
 func (r *rewardResolver) CreatedBy(ctx context.Context, obj *model.Reward) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *rewardResolver) UpdatedBy(ctx context.Context, obj *model.Reward) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // Reward returns RewardResolver implementation.

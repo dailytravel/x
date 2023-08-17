@@ -6,10 +6,16 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
@@ -19,17 +25,27 @@ func (r *contactResolver) ID(ctx context.Context, obj *model.Contact) (string, e
 
 // Birthday is the resolver for the birthday field.
 func (r *contactResolver) Birthday(ctx context.Context, obj *model.Contact) (*string, error) {
-	panic(fmt.Errorf("not implemented: Birthday - birthday"))
+	if obj.Birthday.Time().IsZero() {
+		return nil, nil
+	}
+
+	birthday := obj.Birthday.Time().String()
+	return &birthday, nil
 }
 
 // Company is the resolver for the company field.
 func (r *contactResolver) Company(ctx context.Context, obj *model.Contact) (*model.Company, error) {
-	panic(fmt.Errorf("not implemented: Company - company"))
-}
+	var item *model.Company
 
-// Rating is the resolver for the rating field.
-func (r *contactResolver) Rating(ctx context.Context, obj *model.Contact) (*int, error) {
-	panic(fmt.Errorf("not implemented: Rating - rating"))
+	filter := bson.M{"_id": obj.Company}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -38,8 +54,13 @@ func (r *contactResolver) Metadata(ctx context.Context, obj *model.Contact) (map
 }
 
 // LastActivity is the resolver for the last_activity field.
-func (r *contactResolver) LastActivity(ctx context.Context, obj *model.Contact) (*int, error) {
-	panic(fmt.Errorf("not implemented: LastActivity - last_activity"))
+func (r *contactResolver) LastActivity(ctx context.Context, obj *model.Contact) (*string, error) {
+	if obj.LastActivity.IsZero() {
+		return nil, nil
+	}
+
+	lastActivity := time.Unix(int64(obj.LastActivity.T), 0).Format(time.RFC3339)
+	return &lastActivity, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -59,74 +80,307 @@ func (r *contactResolver) UID(ctx context.Context, obj *model.Contact) (string, 
 
 // CreatedBy is the resolver for the created_by field.
 func (r *contactResolver) CreatedBy(ctx context.Context, obj *model.Contact) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *contactResolver) UpdatedBy(ctx context.Context, obj *model.Contact) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // CreateContact is the resolver for the createContact field.
 func (r *mutationResolver) CreateContact(ctx context.Context, input model.NewContact) (*model.Contact, error) {
-	panic(fmt.Errorf("not implemented: CreateContact - createContact"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Contact{
+		FirstName: input.FirstName,
+		LastName:  input.LastName,
+		Email:     input.Email,
+		Phone:     input.Phone,
+		City:      input.City,
+		Zip:       input.Zip,
+		State:     input.State,
+		Source:    input.Source,
+		Language:  input.Language,
+		JobTitle:  input.JobTitle,
+		Gender:    *input.Gender,
+		Rating:    input.Rating,
+		Country:   input.Country,
+		Timezone:  input.Timezone,
+		Website:   input.Website,
+		Status:    *input.Status,
+		Notes:     input.Notes,
+		Picture:   input.Picture,
+		Model: model.Model{
+			Metadata:  input.Metadata,
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
+	}
+
+	// Set the fields from the input
+	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateContact is the resolver for the updateContact field.
 func (r *mutationResolver) UpdateContact(ctx context.Context, id string, input model.UpdateContact) (*model.Contact, error) {
-	panic(fmt.Errorf("not implemented: UpdateContact - updateContact"))
+	// Get the authenticated user ID
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve the existing contact from the database
+	item := &model.Contact{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	if input.FirstName != nil {
+		item.FirstName = input.FirstName
+	}
+
+	if input.LastName != nil {
+		item.LastName = input.LastName
+	}
+
+	if input.Email != nil {
+		item.Email = *input.Email
+	}
+
+	if input.Phone != nil {
+		item.Phone = input.Phone
+	}
+
+	if input.City != nil {
+		item.City = input.City
+	}
+
+	if item.Country != nil {
+		item.Country = input.Country
+	}
+
+	if input.Zip != nil {
+		item.Zip = input.Zip
+	}
+
+	if input.State != nil {
+		item.State = input.State
+	}
+
+	if input.Source != nil {
+		item.Source = *input.Source
+	}
+
+	if input.Language != nil {
+		item.Language = input.Language
+	}
+
+	if input.JobTitle != nil {
+		item.JobTitle = input.JobTitle
+	}
+
+	if input.Website != nil {
+		item.Website = input.Website
+	}
+
+	if input.Timezone != nil {
+		item.Timezone = input.Timezone
+	}
+
+	if input.Rating != nil {
+		item.Rating = input.Rating
+	}
+
+	if input.Source != nil {
+		item.Source = *input.Source
+	}
+
+	if input.Picture != nil {
+		item.Picture = input.Picture
+	}
+
+	if item.Notes != nil {
+		item.Notes = input.Notes
+	}
+
+	if input.Labels != nil {
+		for _, label := range input.Labels {
+			item.Labels = append(item.Labels, *label)
+		}
+	}
+
+	if input.Metadata != nil {
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
+	}
+
+	item.UpdatedBy = uid
+	utils.Date(input.Birthday, &item.Birthday)
+
+	// Perform the update operation in the database
+	updated := &model.Contact{}
+	res := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, bson.M{"$set": item})
+	if res.Err() != nil {
+		return nil, res.Err()
+	}
+
+	// Decode the updated contact
+	err = res.Decode(updated)
+	if err != nil {
+		return nil, err
+	}
+
+	return updated, nil
 }
 
 // DeleteContact is the resolver for the deleteContact field.
 func (r *mutationResolver) DeleteContact(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteContact - deleteContact"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to an ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the contact by ID
+	contact := &model.Contact{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(contact.Collection()).FindOne(ctx, filter).Decode(contact)
+	if err != nil {
+		return nil, err
+	}
+
+	// Mark the contact as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Update the contact in the database
+	result, err := r.db.Collection("contacts").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // DeleteContacts is the resolver for the deleteContacts field.
 func (r *mutationResolver) DeleteContacts(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteContacts - deleteContacts"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match the given IDs
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	// Define the update to mark records as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("contacts").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // Contacts is the resolver for the contacts field.
 func (r *queryResolver) Contacts(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Contacts - contacts"))
+	res, err := r.ts.Collection("contacts").Documents().Search(utils.Params(args))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert struct to map
+	results, err := utils.StructToMap(res)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 // Contact is the resolver for the contact field.
 func (r *queryResolver) Contact(ctx context.Context, id string) (*model.Contact, error) {
-	panic(fmt.Errorf("not implemented: Contact - contact"))
-}
+	var item *model.Contact
 
-// ContactCreated is the resolver for the contactCreated field.
-func (r *subscriptionResolver) ContactCreated(ctx context.Context) (<-chan *model.Contact, error) {
-	panic(fmt.Errorf("not implemented: ContactCreated - contactCreated"))
-}
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
 
-// ContactUpdated is the resolver for the contactUpdated field.
-func (r *subscriptionResolver) ContactUpdated(ctx context.Context) (<-chan *model.Contact, error) {
-	panic(fmt.Errorf("not implemented: ContactUpdated - contactUpdated"))
-}
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
 
-// ContactDeleted is the resolver for the contactDeleted field.
-func (r *subscriptionResolver) ContactDeleted(ctx context.Context) (<-chan *model.Contact, error) {
-	panic(fmt.Errorf("not implemented: ContactDeleted - contactDeleted"))
+	return item, nil
 }
 
 // Contact returns ContactResolver implementation.
 func (r *Resolver) Contact() ContactResolver { return &contactResolver{r} }
 
-// Subscription returns SubscriptionResolver implementation.
-func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r} }
-
 type contactResolver struct{ *Resolver }
-type subscriptionResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *contactResolver) Type(ctx context.Context, obj *model.Contact) (string, error) {
-	panic(fmt.Errorf("not implemented: Type - type"))
-}

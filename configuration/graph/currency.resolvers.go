@@ -25,12 +25,22 @@ func (r *currencyResolver) ID(ctx context.Context, obj *model.Currency) (string,
 
 // Name is the resolver for the name field.
 func (r *currencyResolver) Name(ctx context.Context, obj *model.Currency) (string, error) {
+	// Get the locale from the context
 	locale := auth.Locale(ctx)
-	if name, ok := obj.Name[locale].(string); ok {
+
+	// Try to retrieve the name for the requested locale
+	if name, ok := obj.Name[*locale].(string); ok {
 		return name, nil
 	}
 
-	return obj.Name[obj.Locale].(string), nil
+	// If the name is not found for the requested locale,
+	// fallback to the taxonomy's default locale
+	if name, ok := obj.Name[obj.Locale].(string); ok {
+		return name, nil
+	}
+
+	// Return an error if the name is not found for any locale
+	return "", errors.New("Name not found for any locale")
 }
 
 // Metadata is the resolver for the metadata field.

@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/cms/auth"
@@ -27,31 +26,43 @@ func (r *contentResolver) ID(ctx context.Context, obj *model.Content) (string, e
 // Title is the resolver for the title field.
 func (r *contentResolver) Title(ctx context.Context, obj *model.Content) (string, error) {
 	locale := auth.Locale(ctx)
-	if title, ok := obj.Title[locale].(string); ok {
+	if title, ok := obj.Title[*locale].(string); ok {
 		return title, nil
 	}
 
-	return obj.Title[obj.Locale].(string), nil
+	if title, ok := obj.Title[obj.Locale].(string); ok {
+		return title, nil
+	}
+
+	return "", errors.New("Title not found for any locale")
 }
 
 // Summary is the resolver for the summary field.
 func (r *contentResolver) Summary(ctx context.Context, obj *model.Content) (string, error) {
 	locale := auth.Locale(ctx)
-	if summary, ok := obj.Summary[locale].(string); ok {
+	if summary, ok := obj.Summary[*locale].(string); ok {
 		return summary, nil
 	}
 
-	return obj.Summary[obj.Locale].(string), nil
+	if summary, ok := obj.Summary[obj.Locale].(string); ok {
+		return summary, nil
+	}
+
+	return "", errors.New("Summary not found for any locale")
 }
 
 // Body is the resolver for the body field.
 func (r *contentResolver) Body(ctx context.Context, obj *model.Content) (string, error) {
 	locale := auth.Locale(ctx)
-	if body, ok := obj.Body[locale].(string); ok {
+	if body, ok := obj.Body[*locale].(string); ok {
 		return body, nil
 	}
 
-	return obj.Body[obj.Locale].(string), nil
+	if body, ok := obj.Body[obj.Locale].(string); ok {
+		return body, nil
+	}
+
+	return "", errors.New("Body not found for any locale")
 }
 
 // Metadata is the resolver for the metadata field.
@@ -98,7 +109,21 @@ func (r *contentResolver) UpdatedBy(ctx context.Context, obj *model.Content) (*s
 
 // Terms is the resolver for the terms field.
 func (r *contentResolver) Terms(ctx context.Context, obj *model.Content) ([]*model.Term, error) {
-	panic(fmt.Errorf("not implemented: Terms - terms"))
+	var items []*model.Term
+
+	filter := bson.M{"_id": bson.M{"$in": obj.Terms}}
+	options := options.Find().SetProjection(bson.M{"_id": 1, "name": 1, "slug": 1, "content": 1})
+
+	cursor, err := r.db.Collection("terms").Find(ctx, filter, options)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
 
 // Parent is the resolver for the parent field.

@@ -17,6 +17,11 @@ import (
 
 type ContextKey string
 
+const (
+	cardNumberPrefix = "MCRD"
+	cardNumberLength = 12
+)
+
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
@@ -33,6 +38,17 @@ func Bytes(n int) ([]byte, error) {
 //Number ...
 func Number(n int) string {
 	var letters = []rune("0123456789")
+
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
+//String ...
+func String(n int) string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 	b := make([]rune, n)
 	for i := range b {
@@ -189,4 +205,27 @@ func UID(claims jwt.MapClaims) (*primitive.ObjectID, error) {
 	}
 
 	return &uid, nil
+}
+
+func Date(dateStr *string, targetDate *primitive.DateTime) {
+	if dateStr != nil {
+		dateTime, err := time.Parse(time.RFC3339, *dateStr)
+		if err == nil {
+			date := primitive.NewDateTimeFromTime(dateTime)
+			*targetDate = date
+		}
+	}
+}
+
+// GenerateMembershipCardNumber generates a unique membership card number.
+func GenerateMembershipCardNumber() string {
+	rand.Seed(time.Now().UnixNano())
+
+	// Generate a random numeric portion of the card number
+	randomNumber := rand.Intn(90000000) + 10000000
+
+	// Combine the prefix and the random number to create the card number
+	cardNumber := fmt.Sprintf("%s%d", cardNumberPrefix, randomNumber)
+
+	return cardNumber
 }

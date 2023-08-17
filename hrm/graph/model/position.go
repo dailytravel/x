@@ -15,7 +15,6 @@ type Position struct {
 	Locale       string             `json:"locale" bson:"locale"`
 	Title        primitive.M        `json:"title" bson:"title"`
 	Description  primitive.M        `json:"description,omitempty" bson:"description,omitempty"`
-	Location     string             `json:"location" bson:"location"`
 	Salary       string             `json:"salary" bson:"salary"`
 	Status       string             `json:"status" bson:"status"`
 }

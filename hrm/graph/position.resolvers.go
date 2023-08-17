@@ -6,44 +6,216 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"time"
 
+	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
+	"github.com/dailytravel/x/hrm/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // CreatePosition is the resolver for the createPosition field.
 func (r *mutationResolver) CreatePosition(ctx context.Context, input model.NewPosition) (*model.Position, error) {
-	panic(fmt.Errorf("not implemented: CreatePosition - createPosition"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Position{
+		Locale:      input.Locale,
+		Title:       bson.M{input.Locale: input.Title},
+		Description: bson.M{input.Locale: input.Description},
+		Salary:      input.Salary,
+		Status:      input.Status,
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
+	}
+
+	// Insert the new organization
+	if _, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdatePosition is the resolver for the updatePosition field.
 func (r *mutationResolver) UpdatePosition(ctx context.Context, id string, input model.UpdatePosition) (*model.Position, error) {
-	panic(fmt.Errorf("not implemented: UpdatePosition - updatePosition"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the item by ID
+	item := &model.Position{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update the position's fields
+	if input.Title != nil {
+		item.Title[input.Locale] = *input.Title
+	}
+
+	if input.Description != nil {
+		item.Description[input.Locale] = *input.Description
+	}
+
+	if input.Salary != nil {
+		item.Salary = *input.Salary
+	}
+
+	if input.Status != nil {
+		item.Status = *input.Status
+	}
+
+	item.UpdatedBy = uid
+
+	// Update the position in the database
+	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeletePosition is the resolver for the deletePosition field.
 func (r *mutationResolver) DeletePosition(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeletePosition - deletePosition"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the position by ID
+	position := &model.Position{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(position.Collection()).FindOne(ctx, filter).Decode(position)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the update to mark the position as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	_, err = r.db.Collection(position.Collection()).UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success"}, nil
 }
 
 // DeletePositions is the resolver for the deletePositions field.
 func (r *mutationResolver) DeletePositions(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeletePositions - deletePositions"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match the given IDs
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	// Define the update to mark positions as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update operation in the database
+	result, err := r.db.Collection("positions").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // ID is the resolver for the id field.
 func (r *positionResolver) ID(ctx context.Context, obj *model.Position) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Title is the resolver for the title field.
 func (r *positionResolver) Title(ctx context.Context, obj *model.Position) (string, error) {
-	panic(fmt.Errorf("not implemented: Title - title"))
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+
+	// Try to retrieve the title for the requested locale
+	if title, ok := obj.Title[*locale].(string); ok {
+		return title, nil
+	}
+
+	// If the title is not found for the requested locale,
+	// fallback to the taxonomy's default locale
+	if title, ok := obj.Title[obj.Locale].(string); ok {
+		return title, nil
+	}
+
+	// Return an error if the name is not found for any locale
+	return "", errors.New("title not found")
 }
 
 // Description is the resolver for the description field.
 func (r *positionResolver) Description(ctx context.Context, obj *model.Position) (string, error) {
-	panic(fmt.Errorf("not implemented: Description - description"))
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+
+	// Try to retrieve the description for the requested locale
+	if description, ok := obj.Description[*locale].(string); ok {
+		return description, nil
+	}
+
+	// If the description is not found for the requested locale,
+	// fallback to the taxonomy's default locale
+	if description, ok := obj.Description[obj.Locale].(string); ok {
+		return description, nil
+	}
+
+	// Return an error if the name is not found for any locale
+	return "", errors.New("description not found")
 }
 
 // Metadata is the resolver for the metadata field.
@@ -53,32 +225,83 @@ func (r *positionResolver) Metadata(ctx context.Context, obj *model.Position) (m
 
 // CreatedAt is the resolver for the created_at field.
 func (r *positionResolver) CreatedAt(ctx context.Context, obj *model.Position) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *positionResolver) UpdatedAt(ctx context.Context, obj *model.Position) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // CreatedBy is the resolver for the created_by field.
-func (r *positionResolver) CreatedBy(ctx context.Context, obj *model.Position) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+func (r *positionResolver) CreatedBy(ctx context.Context, obj *model.Position) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
-func (r *positionResolver) UpdatedBy(ctx context.Context, obj *model.Position) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+func (r *positionResolver) UpdatedBy(ctx context.Context, obj *model.Position) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // Position is the resolver for the position field.
 func (r *queryResolver) Position(ctx context.Context, id string) (*model.Position, error) {
-	panic(fmt.Errorf("not implemented: Position - position"))
+	var item *model.Position
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": _id}
+
+	if err := r.db.Collection("positions").FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Positions is the resolver for the positions field.
-func (r *queryResolver) Positions(ctx context.Context) (*model.Positions, error) {
-	panic(fmt.Errorf("not implemented: Positions - positions"))
+func (r *queryResolver) Positions(ctx context.Context, args map[string]interface{}) (*model.Positions, error) {
+	var items []*model.Position
+	//find all items
+	cur, err := r.db.Collection("positions").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Position
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("positions").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Positions{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Position returns PositionResolver implementation.

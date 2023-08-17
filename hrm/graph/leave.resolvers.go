@@ -6,10 +6,17 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
+	"github.com/dailytravel/x/hrm/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ID is the resolver for the id field.
@@ -17,19 +24,20 @@ func (r *leaveResolver) ID(ctx context.Context, obj *model.Leave) (string, error
 	return obj.ID.Hex(), nil
 }
 
-// Owner is the resolver for the owner field.
-func (r *leaveResolver) Owner(ctx context.Context, obj *model.Leave) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Owner - owner"))
-}
-
 // StartDate is the resolver for the start_date field.
 func (r *leaveResolver) StartDate(ctx context.Context, obj *model.Leave) (string, error) {
-	panic(fmt.Errorf("not implemented: StartDate - start_date"))
+	return obj.StartDate.Time().String(), nil
 }
 
 // EndDate is the resolver for the end_date field.
 func (r *leaveResolver) EndDate(ctx context.Context, obj *model.Leave) (*string, error) {
-	panic(fmt.Errorf("not implemented: EndDate - end_date"))
+	if obj.EndDate.Time().IsZero() {
+		return nil, nil
+	}
+
+	endDate := obj.EndDate.Time().String()
+
+	return &endDate, nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -47,39 +55,257 @@ func (r *leaveResolver) UpdatedAt(ctx context.Context, obj *model.Leave) (string
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// Employee is the resolver for the employee field.
+func (r *leaveResolver) Employee(ctx context.Context, obj *model.Leave) (*model.Employee, error) {
+	var item *model.Employee
+
+	filter := bson.M{"_id": obj.Employee}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("employee not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
+}
+
 // CreatedBy is the resolver for the created_by field.
-func (r *leaveResolver) CreatedBy(ctx context.Context, obj *model.Leave) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+func (r *leaveResolver) CreatedBy(ctx context.Context, obj *model.Leave) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
-func (r *leaveResolver) UpdatedBy(ctx context.Context, obj *model.Leave) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+func (r *leaveResolver) UpdatedBy(ctx context.Context, obj *model.Leave) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // CreateLeave is the resolver for the createLeave field.
 func (r *mutationResolver) CreateLeave(ctx context.Context, input model.NewLeave) (*model.Leave, error) {
-	panic(fmt.Errorf("not implemented: CreateLeave - createLeave"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Leave{
+		Type:   input.Type,
+		Reason: input.Reason,
+		Status: input.Status,
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
+	}
+
+	//convert string to primitive.DateTime
+	startDate, err := time.Parse(time.RFC3339, input.StartDate)
+	if err != nil {
+		return nil, err
+	}
+
+	item.StartDate = primitive.NewDateTimeFromTime(startDate)
+
+	//convert string to primitive.DateTime
+	if input.EndDate != nil {
+		endDate, err := time.Parse(time.RFC3339, *input.EndDate)
+		if err != nil {
+			return nil, err
+		}
+		item.EndDate = primitive.NewDateTimeFromTime(endDate)
+	}
+
+	// Set the fields from the input
+	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateLeave is the resolver for the updateLeave field.
 func (r *mutationResolver) UpdateLeave(ctx context.Context, id string, input model.UpdateLeave) (*model.Leave, error) {
-	panic(fmt.Errorf("not implemented: UpdateLeave - updateLeave"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the leave by ID
+	item := &model.Leave{}
+	filter := bson.M{"_id": _id}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update the leave fields based on input
+	if input.Type != nil {
+		item.Type = *input.Type
+	}
+
+	if input.Reason != nil {
+		item.Reason = *input.Reason
+	}
+
+	if input.Status != nil {
+		item.Status = *input.Status
+	}
+
+	item.UpdatedBy = uid
+
+	// Update the leave in the database
+	_, err = r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item})
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteLeave is the resolver for the deleteLeave field.
 func (r *mutationResolver) DeleteLeave(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteLeave - deleteLeave"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the filter to match the leave by ID
+	filter := bson.M{"_id": _id}
+
+	// Set the fields to mark the leave as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update and retrieve the modified count
+	opts := options.Update().SetUpsert(false)
+	result, err := r.db.Collection("leaves").UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"success":      true,
+		"deletedCount": result.ModifiedCount,
+	}, nil
+}
+
+// DeleteLeaves is the resolver for the deleteLeaves field.
+func (r *mutationResolver) DeleteLeaves(ctx context.Context, ids []string) (map[string]interface{}, error) {
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the string IDs to ObjectIDs
+	var objectIDs []primitive.ObjectID
+	for _, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		objectIDs = append(objectIDs, _id)
+	}
+
+	// Define the filter to match leaves by IDs
+	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
+
+	// Set the fields to mark the leaves as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted_by": uid,
+			"status":     "deleted",
+			"updated_by": uid,
+			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	}
+
+	// Perform the update and retrieve the modified count
+	opts := options.Update().SetUpsert(false)
+	result, err := r.db.Collection("leaves").UpdateMany(ctx, filter, update, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"success":      true,
+		"deletedCount": result.ModifiedCount,
+	}, nil
 }
 
 // Leaves is the resolver for the leaves field.
 func (r *queryResolver) Leaves(ctx context.Context, args map[string]interface{}) (*model.Leaves, error) {
-	panic(fmt.Errorf("not implemented: Leaves - leaves"))
+	var items []*model.Leave
+	//find all items
+	cur, err := r.db.Collection("leaves").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Leave
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("leaves").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Leaves{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Leave is the resolver for the leave field.
 func (r *queryResolver) Leave(ctx context.Context, id string) (*model.Leave, error) {
-	panic(fmt.Errorf("not implemented: Leave - leave"))
+	var item *model.Leave
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Leave returns LeaveResolver implementation.

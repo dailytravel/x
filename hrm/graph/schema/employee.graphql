@@ -6,10 +6,10 @@ type Employee {
   email: String!
   phone: String!
   address: String!
-  birthday: String
+  birthday: String!
   status: String
   metadata: Map
-  hire_date: String
+  hire_date: String!
   created_at: String!
   updated_at: String!
   user: User
@@ -65,5 +65,6 @@ extend type Query {
 extend type Mutation {
   createEmployee(input: NewEmployee!): Employee
   updateEmployee(id: ID!, input: UpdateEmployee!): Employee
-  deleteEmployee(id: ID!): Boolean
+  deleteEmployee(id: ID!): Map
+  deleteEmployees(ids: [ID!]!): Map
 }

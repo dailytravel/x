@@ -34,7 +34,7 @@ func (r *fileResolver) Name(ctx context.Context, obj *model.File) (string, error
 	locale := auth.Locale(ctx)
 
 	// Try to retrieve the name for the requested locale
-	if name, ok := obj.Name[locale].(string); ok {
+	if name, ok := obj.Name[*locale].(string); ok {
 		return name, nil
 	}
 
@@ -54,7 +54,7 @@ func (r *fileResolver) Description(ctx context.Context, obj *model.File) (*strin
 	locale := auth.Locale(ctx)
 
 	// Try to retrieve the description for the requested locale
-	if description, ok := obj.Description[locale].(string); ok {
+	if description, ok := obj.Description[*locale].(string); ok {
 		return &description, nil
 	}
 
