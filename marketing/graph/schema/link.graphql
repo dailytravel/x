@@ -8,7 +8,6 @@ type Link {
   status: String
   created_at: String!
   updated_at: String!
-  categories: [Category]
   uid: ID!
   created_by: ID
   updated_by: ID
@@ -25,7 +24,7 @@ input NewLink {
   domain: String!
   reference: String!
   destination: String!
-  categories: [ID!]
+  terms: [ID!]
   metadata: Map
 }
 
@@ -34,7 +33,7 @@ input UpdateLink {
   title: String
   domain: String
   reference: String
-  categories: [ID!]
+  terms: [ID!]
   metadata: Map
 }
 

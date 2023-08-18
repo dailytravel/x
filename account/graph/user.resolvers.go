@@ -207,20 +207,21 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 	filter := bson.M{"_id": _id}
 
 	item := &model.User{
+		Name:     *input.Name,
+		Email:    *input.Email,
+		Timezone: input.Timezone,
+		Locale:   input.Locale,
+		Picture:  input.Picture,
+		Phone:    input.Phone,
+		Status:   *input.Status,
 		Model: model.Model{
 			UpdatedBy: uid,
 		},
 	}
 
-	// item.SetLocale(input.Locale)
-	// item.SetName(input.Name)
-	// item.SetName(input.Name)
-	// item.SetEmail(input.Email)
-	// item.SetTimezone(input.Timezone)
-	// item.SetPhone(input.Phone)
-	// item.SetMetadata(input.Metadata)
-	// item.SetStatus(input.Status)
-	// item.SetRoles(input.Roles)
+	for _, role := range input.Roles {
+		item.Roles = append(item.Roles, *role)
+	}
 
 	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, bson.M{"$set": item}).Decode(item); err != nil {
 		return nil, err
@@ -236,21 +237,23 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, input model.Update
 		return nil, err
 	}
 
-	var item *model.User
+	item := &model.User{
+		Name:     *input.Name,
+		Email:    *input.Email,
+		Timezone: input.Timezone,
+		Locale:   input.Locale,
+		Picture:  input.Picture,
+		Phone:    input.Phone,
+		Status:   *input.Status,
+	}
 
-	// item.SetLocale(input.Locale)
-	// item.SetName(input.Name)
-	// item.SetName(input.Name)
-	// item.SetEmail(input.Email)
-	// item.SetTimezone(input.Timezone)
-	// item.SetPhone(input.Phone)
-	// item.SetMetadata(input.Metadata)
-	// item.SetStatus(input.Status)
+	for _, role := range input.Roles {
+		item.Roles = append(item.Roles, *role)
+	}
 
 	filter := bson.M{"_id": uid}
-	update := bson.M{"$set": bson.M{"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())}, "deleted_by": uid}}
 
-	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, update).Decode(&item); err != nil {
+	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item); err != nil {
 		return nil, err
 	}
 

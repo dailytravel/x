@@ -27,7 +27,7 @@ import (
 
 func init() {
 	os.Setenv("GIN_MODE", "release")
-	os.Setenv("PORT", "4010")
+	os.Setenv("PORT", "4011")
 	os.Setenv("DB_HOST", "localhost")
 	os.Setenv("DB_NAME", "sales")
 	os.Setenv("MONGODB_URI", "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1")

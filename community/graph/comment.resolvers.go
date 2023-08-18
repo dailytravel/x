@@ -32,7 +32,7 @@ func (r *commentResolver) UID(ctx context.Context, obj *model.Comment) (string, 
 // Body is the resolver for the body field.
 func (r *commentResolver) Body(ctx context.Context, obj *model.Comment) (string, error) {
 	locale := auth.Locale(ctx)
-	if body, ok := obj.Body[locale].(string); ok {
+	if body, ok := obj.Body[*locale].(string); ok {
 		return body, nil
 	}
 

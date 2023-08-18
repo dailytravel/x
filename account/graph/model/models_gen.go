@@ -202,9 +202,13 @@ type UpdateRole struct {
 type UpdateUser struct {
 	Name     *string   `json:"name,omitempty"`
 	Email    *string   `json:"email,omitempty"`
-	Password *string   `json:"password,omitempty"`
+	Phone    *string   `json:"phone,omitempty"`
 	Roles    []*string `json:"roles,omitempty"`
 	Mfa      *MFAInput `json:"mfa,omitempty"`
+	Timezone *string   `json:"timezone,omitempty"`
+	Locale   *string   `json:"locale,omitempty"`
+	Picture  *string   `json:"picture,omitempty"`
+	Status   *string   `json:"status,omitempty"`
 }
 
 type Users struct {

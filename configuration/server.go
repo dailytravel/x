@@ -22,11 +22,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const defaultPort = "4004"
-
 func init() {
 	os.Setenv("GIN_MODE", "release")
-	os.Setenv("PORT", "4004")
+	os.Setenv("DEFAULT_LOCALE", "en")
+	os.Setenv("PORT", "4005")
 	os.Setenv("DB_HOST", "localhost")
 	os.Setenv("DB_NAME", "configuration")
 	os.Setenv("MONGODB_URI", "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1")

@@ -13,13 +13,16 @@ import (
 
 type User struct {
 	Model    `bson:",inline"`
-	Name     string      `json:"name" bson:"name"`
-	Email    string      `json:"email" bson:"email"`
-	Password string      `json:"password" bson:"password"`
-	Roles    []string    `json:"roles,omitempty" bson:"roles,omitempty"`
-	Mfa      *Mfa        `json:"mfa,omitempty" bson:"mfa,omitempty"`
-	Metadata primitive.M `json:"metadata,omitempty" bson:"metadata,omitempty"`
-	Status   string      `json:"status" bson:"status"`
+	Name     string   `json:"name" bson:"name"`
+	Email    string   `json:"email" bson:"email"`
+	Phone    *string  `json:"phone,omitempty" bson:"phone,omitempty"`
+	Password string   `json:"password" bson:"password"`
+	Roles    []string `json:"roles,omitempty" bson:"roles,omitempty"`
+	Mfa      *Mfa     `json:"mfa,omitempty" bson:"mfa,omitempty"`
+	Locale   *string  `json:"locale,omitempty" bson:"locale,omitempty"`
+	Timezone *string  `json:"timezone,omitempty" bson:"timezone,omitempty"`
+	Picture  *string  `json:"picture,omitempty" bson:"picture,omitempty"`
+	Status   string   `json:"status" bson:"status"`
 }
 
 func (User) IsEntity() {}

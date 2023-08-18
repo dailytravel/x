@@ -5,6 +5,7 @@ echo "The server is initializing..."
 
 function cleanup {
   kill "$ACCOUNT_PID"
+  kill "$BASE_PID"
   kill "$CMS_PID"
   kill "$COMMUNITY_PID"
   kill "$CONFIG_PID"
@@ -13,14 +14,12 @@ function cleanup {
   kill "$INSIGHT_PID"
   kill "$MARKETING_PID"
   kill "$PAYMENT_PID" 
-  kill "$REPORTING_PID"
   kill "$SALES_PID"
-  kill "$SEARCH_PID"
-  kill "$WORKSPACE_PID"
 }
 
 # Build each Go service
 (cd account && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd base && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd cms && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd community && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd configuration && GOOS=linux GOARCH=amd64 go build -v -o app .)
@@ -30,10 +29,10 @@ function cleanup {
 (cd marketing && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd payment && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd sales && GOOS=linux GOARCH=amd64 go build -v -o app .)
-(cd workspace && GOOS=linux GOARCH=amd64 go build -v -o app .)
 
 # Start each Go service
 ./account/app & ACCOUNT_PID=$!
+./base/app & BASE_PID=$!
 ./cms/app & CMS_PID=$!
 ./configuration/app & CONFIG_PID=$!
 ./community/app & COMMUNITY_PID=$!
@@ -43,7 +42,6 @@ function cleanup {
 ./marketing/app & MARKETING_PID=$!
 ./payment/app & PAYMENT_PID=$!
 ./sales/app & SALES_PID=$!
-./workspace/app & WORKSPACE_PID=$!
 
 trap cleanup EXIT
 
@@ -51,7 +49,7 @@ trap cleanup EXIT
 timeout=30
 interval=1
 elapsed=0
-all_pids=($ACCOUNT_PID $CMS_PID $CONFIG_PID $COMMUNITY_PID $FINANCE_PID $HRM_PID $MARKETING_PID $PAYMENT_PID $REPORTING_PID $SALES_PID $SEARCH_PID $WORKSPACE_PID)
+all_pids=($ACCOUNT_PID $BASE_PID $CMS_PID $COMMUNITY_PID $CONFIG_PID $FINANCE_PID $HRM_PID $INSIGHT_PID $MARKETING_PID $PAYMENT_PID $SALES_PID)
 
 # Loop until all servers are running or timeout occurs
 while true; do

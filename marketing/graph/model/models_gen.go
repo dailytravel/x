@@ -18,23 +18,11 @@ type Campaigns struct {
 	Data  []*Campaign `json:"data,omitempty"`
 }
 
-type Category struct {
-	ID string `json:"id"`
-}
-
-func (Category) IsEntity() {}
-
 type Comment struct {
 	ID string `json:"id"`
 }
 
 func (Comment) IsEntity() {}
-
-type CreateSegmentInput struct {
-	Name        string       `json:"name"`
-	Description *string      `json:"description,omitempty"`
-	Rules       []*RuleInput `json:"rules"`
-}
 
 type Follow struct {
 	ID string `json:"id"`
@@ -52,7 +40,6 @@ type Link struct {
 	Status      *string                `json:"status,omitempty"`
 	CreatedAt   string                 `json:"created_at"`
 	UpdatedAt   string                 `json:"updated_at"`
-	Categories  []*Category            `json:"categories,omitempty"`
 	UID         string                 `json:"uid"`
 	CreatedBy   *string                `json:"created_by,omitempty"`
 	UpdatedBy   *string                `json:"updated_by,omitempty"`
@@ -84,7 +71,7 @@ type NewLink struct {
 	Domain      string                 `json:"domain"`
 	Reference   string                 `json:"reference"`
 	Destination string                 `json:"destination"`
-	Categories  []string               `json:"categories,omitempty"`
+	Terms       []string               `json:"terms,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
@@ -156,18 +143,12 @@ type UpdateCampaign struct {
 }
 
 type UpdateLink struct {
-	User       *string                `json:"user,omitempty"`
-	Title      *string                `json:"title,omitempty"`
-	Domain     *string                `json:"domain,omitempty"`
-	Reference  *string                `json:"reference,omitempty"`
-	Categories []string               `json:"categories,omitempty"`
-	Metadata   map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateSegmentInput struct {
-	Name        *string      `json:"name,omitempty"`
-	Description *string      `json:"description,omitempty"`
-	Rules       []*RuleInput `json:"rules,omitempty"`
+	User      *string                `json:"user,omitempty"`
+	Title     *string                `json:"title,omitempty"`
+	Domain    *string                `json:"domain,omitempty"`
+	Reference *string                `json:"reference,omitempty"`
+	Terms     []string               `json:"terms,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type CampaignStatus string

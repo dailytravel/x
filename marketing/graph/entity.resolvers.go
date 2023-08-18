@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/marketing/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -31,7 +30,9 @@ func (r *entityResolver) FindCampaignByID(ctx context.Context, id string) (*mode
 
 // FindUserByID is the resolver for the findUserByID field.
 func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: FindUserByID - findUserByID"))
+	return &model.User{
+		ID: id,
+	}, nil
 }
 
 // Entity returns EntityResolver implementation.

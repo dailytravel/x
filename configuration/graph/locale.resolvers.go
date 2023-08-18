@@ -27,15 +27,12 @@ func (r *localeResolver) ID(ctx context.Context, obj *model.Locale) (string, err
 func (r *localeResolver) Name(ctx context.Context, obj *model.Locale) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the name for the requested locale
 	if name, ok := obj.Name[*locale].(string); ok {
-		return name, nil
-	}
-
-	// If the name is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if name, ok := obj.Name[obj.Locale].(string); ok {
 		return name, nil
 	}
 

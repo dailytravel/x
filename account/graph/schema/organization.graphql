@@ -1,8 +1,6 @@
-extend type Organization @key(fields: "uid created_by updated_by") {
-  uid: ID! @external
+extend type Organization @key(fields: "created_by updated_by") {
   created_by: ID! @external
   updated_by: ID! @external
-  user: User
   created: User
   updated: User
 }
