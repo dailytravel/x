@@ -147,33 +147,6 @@ func (r *userResolver) Contacts(ctx context.Context, obj *model.User) ([]*model.
 	return items, nil
 }
 
-// Contracts is the resolver for the contracts field.
-func (r *userResolver) Contracts(ctx context.Context, obj *model.User) ([]*model.Contract, error) {
-	var items []*model.Contract
-
-	uid, err := primitive.ObjectIDFromHex(obj.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	filter := bson.M{"uid": uid}
-	//find all items
-	cur, err := r.db.Collection("contracts").Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	for cur.Next(ctx) {
-		var item *model.Contract
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
-
-	return items, nil
-}
-
 // Quotes is the resolver for the quotes field.
 func (r *userResolver) Quotes(ctx context.Context, obj *model.User) ([]*model.Quote, error) {
 	var items []*model.Quote

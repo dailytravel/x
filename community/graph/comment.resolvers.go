@@ -25,8 +25,13 @@ func (r *commentResolver) ID(ctx context.Context, obj *model.Comment) (string, e
 }
 
 // UID is the resolver for the uid field.
-func (r *commentResolver) UID(ctx context.Context, obj *model.Comment) (string, error) {
-	return obj.UID.Hex(), nil
+func (r *commentResolver) UID(ctx context.Context, obj *model.Comment) (*string, error) {
+	if obj.UID == nil {
+		return nil, nil
+	}
+
+	uid := obj.UID.Hex()
+	return &uid, nil
 }
 
 // Body is the resolver for the body field.
@@ -159,7 +164,9 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 	}
 
 	item := &model.Comment{
-		UID:    *uid,
+		UID:    uid,
+		Name:   input.Name,
+		Email:  input.Email,
 		Locale: input.Locale,
 		Commentable: model.Commentable{
 			ID:   _id,
@@ -177,7 +184,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 			return nil, err
 		}
 
-		item.Parent = parent
+		item.Parent = &parent
 	}
 
 	if input.Body != nil {
@@ -214,8 +221,26 @@ func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input m
 		return nil, err
 	}
 
+	if input.Name != nil {
+		item.Name = input.Name
+	}
+
+	if input.Email != nil {
+		item.Email = input.Email
+	}
+
 	if input.Body != nil {
 		item.Body[input.Locale] = input.Body
+	}
+
+	if input.Metadata != nil {
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
+	}
+
+	if input.Status != nil {
+		item.Status = *input.Status
 	}
 
 	item.UpdatedBy = uid

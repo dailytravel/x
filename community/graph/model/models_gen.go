@@ -60,6 +60,9 @@ type NewComment struct {
 	Parent      *string                `json:"parent,omitempty"`
 	Commentable map[string]interface{} `json:"commentable"`
 	Locale      string                 `json:"locale"`
+	UID         *string                `json:"uid,omitempty"`
+	Name        *string                `json:"name,omitempty"`
+	Email       *string                `json:"email,omitempty"`
 	Body        *string                `json:"body,omitempty"`
 	Rating      *int                   `json:"rating,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
@@ -95,6 +98,12 @@ type NewReaction struct {
 	Action    string                 `json:"action"`
 }
 
+type NewRecipient struct {
+	Recipient string `json:"recipient"`
+	Message   string `json:"message"`
+	ReadAt    *int   `json:"read_at,omitempty"`
+}
+
 type Notifications struct {
 	Data  []*Notification `json:"data,omitempty"`
 	Count int             `json:"count"`
@@ -112,12 +121,6 @@ type Reactions struct {
 	Count int         `json:"count"`
 }
 
-type RecipientInput struct {
-	Recipient string `json:"recipient"`
-	Message   string `json:"message"`
-	ReadAt    *int   `json:"read_at,omitempty"`
-}
-
 type Recipients struct {
 	Count int          `json:"count"`
 	Data  []*Recipient `json:"data,omitempty"`
@@ -133,6 +136,9 @@ func (Task) IsEntity() {}
 type UpdateComment struct {
 	Parent      *string                `json:"parent,omitempty"`
 	Locale      string                 `json:"locale"`
+	UID         *string                `json:"uid,omitempty"`
+	Name        *string                `json:"name,omitempty"`
+	Email       *string                `json:"email,omitempty"`
 	Body        *string                `json:"body,omitempty"`
 	Rating      *int                   `json:"rating,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
@@ -163,6 +169,11 @@ type UpdateMessage struct {
 
 type UpdateReaction struct {
 	Action string `json:"action"`
+}
+
+type UpdateRecipient struct {
+	ID     string `json:"id"`
+	ReadAt *int   `json:"read_at,omitempty"`
 }
 
 type ConversationStatus string

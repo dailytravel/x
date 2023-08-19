@@ -246,15 +246,12 @@ func (r *rewardResolver) Tier(ctx context.Context, obj *model.Reward) (*model.Ti
 func (r *rewardResolver) Name(ctx context.Context, obj *model.Reward) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the name for the requested locale
 	if name, ok := obj.Name[*locale].(string); ok {
-		return name, nil
-	}
-
-	// If the name is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if name, ok := obj.Name[obj.Locale].(string); ok {
 		return name, nil
 	}
 
@@ -266,15 +263,12 @@ func (r *rewardResolver) Name(ctx context.Context, obj *model.Reward) (string, e
 func (r *rewardResolver) Description(ctx context.Context, obj *model.Reward) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the description for the requested locale
 	if description, ok := obj.Description[*locale].(string); ok {
-		return description, nil
-	}
-
-	// If the description is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if description, ok := obj.Description[obj.Locale].(string); ok {
 		return description, nil
 	}
 
@@ -289,7 +283,13 @@ func (r *rewardResolver) Metadata(ctx context.Context, obj *model.Reward) (map[s
 
 // ExpiresAt is the resolver for the expires_at field.
 func (r *rewardResolver) ExpiresAt(ctx context.Context, obj *model.Reward) (*string, error) {
-	panic(fmt.Errorf("not implemented: ExpiresAt - expires_at"))
+	if obj.ExpiresAt.IsZero() {
+		return nil, nil
+	}
+
+	expiresAt := time.Unix(int64(obj.ExpiresAt.T), 0).Format(time.RFC3339)
+
+	return &expiresAt, nil
 }
 
 // CreatedAt is the resolver for the created_at field.

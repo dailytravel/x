@@ -222,15 +222,12 @@ func (r *termResolver) Children(ctx context.Context, obj *model.Term) ([]*model.
 func (r *termResolver) Name(ctx context.Context, obj *model.Term) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the name for the requested locale
 	if name, ok := obj.Name[*locale].(string); ok {
-		return name, nil
-	}
-
-	// If the name is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if name, ok := obj.Name[obj.Locale].(string); ok {
 		return name, nil
 	}
 
@@ -242,15 +239,12 @@ func (r *termResolver) Name(ctx context.Context, obj *model.Term) (string, error
 func (r *termResolver) Description(ctx context.Context, obj *model.Term) (*string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the description for the requested locale
 	if description, ok := obj.Description[*locale].(string); ok {
-		return &description, nil
-	}
-
-	// If the description is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if description, ok := obj.Description[obj.Locale].(string); ok {
 		return &description, nil
 	}
 

@@ -26,15 +26,12 @@ func (r *benefitResolver) ID(ctx context.Context, obj *model.Benefit) (string, e
 func (r *benefitResolver) Description(ctx context.Context, obj *model.Benefit) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the description for the requested locale
 	if description, ok := obj.Description[*locale].(string); ok {
-		return description, nil
-	}
-
-	// If the description is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if description, ok := obj.Description[obj.Locale].(string); ok {
 		return description, nil
 	}
 

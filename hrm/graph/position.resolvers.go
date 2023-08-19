@@ -182,15 +182,12 @@ func (r *positionResolver) ID(ctx context.Context, obj *model.Position) (string,
 func (r *positionResolver) Title(ctx context.Context, obj *model.Position) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the title for the requested locale
 	if title, ok := obj.Title[*locale].(string); ok {
-		return title, nil
-	}
-
-	// If the title is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if title, ok := obj.Title[obj.Locale].(string); ok {
 		return title, nil
 	}
 
@@ -202,15 +199,12 @@ func (r *positionResolver) Title(ctx context.Context, obj *model.Position) (stri
 func (r *positionResolver) Description(ctx context.Context, obj *model.Position) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the description for the requested locale
 	if description, ok := obj.Description[*locale].(string); ok {
-		return description, nil
-	}
-
-	// If the description is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if description, ok := obj.Description[obj.Locale].(string); ok {
 		return description, nil
 	}
 

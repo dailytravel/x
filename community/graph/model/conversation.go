@@ -11,7 +11,7 @@ import (
 
 type Conversation struct {
 	Model       `bson:",inline"`
-	User        primitive.ObjectID  `json:"owner" bson:"owner"`
+	UID         primitive.ObjectID  `json:"uid" bson:"uid"`
 	Type        string              `json:"type" bson:"type"`
 	Name        *string             `json:"name,omitempty" bson:"name,omitempty"`
 	Description *string             `json:"description,omitempty" bson:"description,omitempty"`

@@ -6,25 +6,114 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/dailytravel/x/community/auth"
 	"github.com/dailytravel/x/community/graph/model"
+	"github.com/dailytravel/x/community/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // UpdateNotification is the resolver for the updateNotification field.
-func (r *mutationResolver) UpdateNotification(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: UpdateNotification - updateNotification"))
+func (r *mutationResolver) UpdateNotification(ctx context.Context, id string) (*model.Notification, error) {
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	item := &model.Notification{
+		ReadAt: primitive.Timestamp{T: uint32(time.Now().Unix())},
+		Model: model.Model{
+			UpdatedBy: uid,
+		},
+	}
+
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update the contact
+	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item}, nil); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteNotification is the resolver for the deleteNotification field.
 func (r *mutationResolver) DeleteNotification(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteNotification - deleteNotification"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	notificationID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the filter to match the notification by ID and the user who is deleting it
+	filter := bson.M{
+		"_id": notificationID,
+		"uid": uid,
+	}
+
+	// Perform the delete operation
+	result, err := r.db.Collection("notifications").DeleteOne(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.DeletedCount == 0 {
+		return map[string]interface{}{"status": "error", "message": "Notification not found or not owned by the user"}, nil
+	}
+
+	return map[string]interface{}{"status": "success", "message": "Notification deleted successfully"}, nil
 }
 
 // DeleteNotifications is the resolver for the deleteNotifications field.
 func (r *mutationResolver) DeleteNotifications(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteNotifications - deleteNotifications"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var notificationIDs []primitive.ObjectID
+	for _, id := range ids {
+		notificationID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		notificationIDs = append(notificationIDs, notificationID)
+	}
+
+	// Define the filter to match the notifications by IDs and the user who is deleting them
+	filter := bson.M{
+		"_id": bson.M{"$in": notificationIDs},
+		"uid": uid,
+	}
+
+	// Perform the delete operation
+	result, err := r.db.Collection("notifications").DeleteMany(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.DeletedCount}, nil
 }
 
 // ID is the resolver for the id field.
@@ -38,8 +127,13 @@ func (r *notificationResolver) UID(ctx context.Context, obj *model.Notification)
 }
 
 // ReadAt is the resolver for the read_at field.
-func (r *notificationResolver) ReadAt(ctx context.Context, obj *model.Notification) (*int, error) {
-	panic(fmt.Errorf("not implemented: ReadAt - read_at"))
+func (r *notificationResolver) ReadAt(ctx context.Context, obj *model.Notification) (*string, error) {
+	if obj.ReadAt.IsZero() {
+		return nil, nil
+	}
+
+	readAt := time.Unix(int64(obj.ReadAt.T), 0).Format(time.RFC3339)
+	return &readAt, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -54,7 +148,17 @@ func (r *notificationResolver) UpdatedAt(ctx context.Context, obj *model.Notific
 
 // Notifiable is the resolver for the notifiable field.
 func (r *notificationResolver) Notifiable(ctx context.Context, obj *model.Notification) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Notifiable - notifiable"))
+	var item map[string]interface{}
+
+	err := r.db.Collection(obj.Notifiable.Type).FindOne(ctx, bson.M{"_id": obj.Notifiable.ID}).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -64,25 +168,57 @@ func (r *notificationResolver) Metadata(ctx context.Context, obj *model.Notifica
 
 // Notifications is the resolver for the notifications field.
 func (r *queryResolver) Notifications(ctx context.Context, args map[string]interface{}) (*model.Notifications, error) {
-	panic(fmt.Errorf("not implemented: Notifications - notifications"))
+	var items []*model.Notification
+	//find all items
+	cur, err := r.db.Collection("notifications").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Notification
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("notifications").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Notifications{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Notification is the resolver for the notification field.
 func (r *queryResolver) Notification(ctx context.Context, id string) (*model.Notification, error) {
-	panic(fmt.Errorf("not implemented: Notification - notification"))
+	var item *model.Notification
+	col := r.db.Collection(item.Collection())
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	err = col.FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Notification returns NotificationResolver implementation.
 func (r *Resolver) Notification() NotificationResolver { return &notificationResolver{r} }
 
 type notificationResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *notificationResolver) User(ctx context.Context, obj *model.Notification) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
-}

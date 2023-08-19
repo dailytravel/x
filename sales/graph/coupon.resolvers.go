@@ -25,7 +25,19 @@ func (r *couponResolver) ID(ctx context.Context, obj *model.Coupon) (string, err
 
 // Description is the resolver for the description field.
 func (r *couponResolver) Description(ctx context.Context, obj *model.Coupon) (string, error) {
-	panic(fmt.Errorf("not implemented: Description - description"))
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
+
+	// Try to retrieve the description for the requested locale
+	if description, ok := obj.Description[*locale].(string); ok {
+		return description, nil
+	}
+
+	// Return an error if the name is not found for any locale
+	return "", errors.New("Description not found for any locale")
 }
 
 // StartDate is the resolver for the start_date field.

@@ -190,15 +190,12 @@ func (r *productResolver) ID(ctx context.Context, obj *model.Product) (string, e
 func (r *productResolver) Name(ctx context.Context, obj *model.Product) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the name for the requested locale
 	if name, ok := obj.Name[*locale].(string); ok {
-		return name, nil
-	}
-
-	// If the name is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if name, ok := obj.Name[obj.Locale].(string); ok {
 		return name, nil
 	}
 
@@ -210,15 +207,12 @@ func (r *productResolver) Name(ctx context.Context, obj *model.Product) (string,
 func (r *productResolver) Description(ctx context.Context, obj *model.Product) (*string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the description for the requested locale
 	if description, ok := obj.Description[*locale].(string); ok {
-		return &description, nil
-	}
-
-	// If the description is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if description, ok := obj.Description[obj.Locale].(string); ok {
 		return &description, nil
 	}
 
@@ -228,12 +222,48 @@ func (r *productResolver) Description(ctx context.Context, obj *model.Product) (
 
 // Prices is the resolver for the prices field.
 func (r *productResolver) Prices(ctx context.Context, obj *model.Product) ([]*model.Price, error) {
-	panic(fmt.Errorf("not implemented: Prices - prices"))
+	var items []*model.Price
+
+	filter := bson.M{"product": obj.ID}
+
+	//find all items
+	cur, err := r.db.Collection("prices").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Price
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Inventory is the resolver for the inventory field.
 func (r *productResolver) Inventory(ctx context.Context, obj *model.Product) ([]*model.Inventory, error) {
-	panic(fmt.Errorf("not implemented: Inventory - inventory"))
+	var items []*model.Inventory
+
+	filter := bson.M{"product": obj.ID}
+
+	//find all items
+	cur, err := r.db.Collection("inventories").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Inventory
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Metadata is the resolver for the metadata field.

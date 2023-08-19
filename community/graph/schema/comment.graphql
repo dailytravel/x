@@ -1,7 +1,9 @@
 type Comment @key(fields: "id") {
   id: ID!
-  uid: ID!
+  uid: ID
   locale: String!
+  name: String
+  email: String
   body: String!
   rating: Int
   status: String!
@@ -25,6 +27,9 @@ input NewComment {
   parent: ID
   commentable: Map!
   locale: String!
+  uid: ID
+  name: String
+  email: String
   body: String
   rating: Int
   metadata: Map
@@ -35,6 +40,9 @@ input NewComment {
 input UpdateComment {
   parent: ID
   locale: String!
+  uid: ID
+  name: String
+  email: String
   body: String
   rating: Int
   metadata: Map

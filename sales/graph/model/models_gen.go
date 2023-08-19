@@ -23,11 +23,6 @@ type Contacts struct {
 	Data  []*Contact `json:"data,omitempty"`
 }
 
-type Contracts struct {
-	Data  []*Contract `json:"data,omitempty"`
-	Count int         `json:"count"`
-}
-
 type Coupons struct {
 	Data  []*Coupon `json:"data,omitempty"`
 	Count int       `json:"count"`
@@ -107,21 +102,6 @@ type NewContact struct {
 	Status    *string                `json:"status,omitempty"`
 	Labels    []*string              `json:"labels,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type NewContract struct {
-	UID         string                 `json:"uid"`
-	Contact     string                 `json:"contact"`
-	Reference   string                 `json:"reference"`
-	Description string                 `json:"description"`
-	Amount      float64                `json:"amount"`
-	Currency    string                 `json:"currency"`
-	StartDate   string                 `json:"start_date"`
-	EndDate     string                 `json:"end_date"`
-	AutoRenew   bool                   `json:"auto_renew"`
-	Categories  []string               `json:"categories,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      string                 `json:"status"`
 }
 
 type NewCoupon struct {
@@ -375,21 +355,6 @@ type UpdateContact struct {
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type UpdateContract struct {
-	UID         *string                `json:"uid,omitempty"`
-	Contact     *string                `json:"contact,omitempty"`
-	Reference   *string                `json:"reference,omitempty"`
-	Description *string                `json:"description,omitempty"`
-	Amount      *float64               `json:"amount,omitempty"`
-	Currency    *string                `json:"currency,omitempty"`
-	StartDate   *string                `json:"start_date,omitempty"`
-	EndDate     *string                `json:"end_date,omitempty"`
-	AutoRenew   *bool                  `json:"auto_renew,omitempty"`
-	Categories  []string               `json:"categories,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      *string                `json:"status,omitempty"`
-}
-
 type UpdateCoupon struct {
 	Locale      string                 `json:"locale"`
 	Code        *string                `json:"code,omitempty"`
@@ -618,53 +583,6 @@ func (e *ContactStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ContactStatus) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type ContractStatus string
-
-const (
-	ContractStatusDraft      ContractStatus = "DRAFT"
-	ContractStatusPending    ContractStatus = "PENDING"
-	ContractStatusActive     ContractStatus = "ACTIVE"
-	ContractStatusExpired    ContractStatus = "EXPIRED"
-	ContractStatusTerminated ContractStatus = "TERMINATED"
-)
-
-var AllContractStatus = []ContractStatus{
-	ContractStatusDraft,
-	ContractStatusPending,
-	ContractStatusActive,
-	ContractStatusExpired,
-	ContractStatusTerminated,
-}
-
-func (e ContractStatus) IsValid() bool {
-	switch e {
-	case ContractStatusDraft, ContractStatusPending, ContractStatusActive, ContractStatusExpired, ContractStatusTerminated:
-		return true
-	}
-	return false
-}
-
-func (e ContractStatus) String() string {
-	return string(e)
-}
-
-func (e *ContractStatus) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = ContractStatus(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid ContractStatus", str)
-	}
-	return nil
-}
-
-func (e ContractStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

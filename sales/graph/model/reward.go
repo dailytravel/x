@@ -11,13 +11,13 @@ import (
 
 type Reward struct {
 	Model       `bson:",inline"`
-	Tier        primitive.ObjectID `bson:"tier" json:"tier"`
-	Locale      string             `bson:"locale" json:"locale"`
-	Name        primitive.M        `json:"name" bson:"name"`
-	Description primitive.M        `json:"description,omitempty" bson:"description,omitempty"`
-	Cost        int64              `json:"cost" bson:"cost"`
-	ExpiresAt   int64              `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
-	Status      string             `json:"status" bson:"status"`
+	Tier        primitive.ObjectID  `bson:"tier" json:"tier"`
+	Locale      string              `bson:"locale" json:"locale"`
+	Name        primitive.M         `json:"name" bson:"name"`
+	Description primitive.M         `json:"description,omitempty" bson:"description,omitempty"`
+	Cost        int64               `json:"cost" bson:"cost"`
+	ExpiresAt   primitive.Timestamp `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
+	Status      string              `json:"status" bson:"status"`
 }
 
 func (i *Reward) MarshalBSON() ([]byte, error) {

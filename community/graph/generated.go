@@ -66,9 +66,11 @@ type ComplexityRoot struct {
 		Commentable func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
 		CreatedBy   func(childComplexity int) int
+		Email       func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Locale      func(childComplexity int) int
 		Metadata    func(childComplexity int) int
+		Name        func(childComplexity int) int
 		Parent      func(childComplexity int) int
 		Rating      func(childComplexity int) int
 		Reactions   func(childComplexity int) int
@@ -180,7 +182,7 @@ type ComplexityRoot struct {
 		CreateFollow        func(childComplexity int, input model.NewFollow) int
 		CreateMessage       func(childComplexity int, input model.NewMessage) int
 		CreateReaction      func(childComplexity int, input model.NewReaction) int
-		CreateRecipient     func(childComplexity int, input model.RecipientInput) int
+		CreateRecipient     func(childComplexity int, input model.NewRecipient) int
 		DeleteComment       func(childComplexity int, id string) int
 		DeleteComments      func(childComplexity int, ids []string) int
 		DeleteConversation  func(childComplexity int, id string) int
@@ -197,9 +199,9 @@ type ComplexityRoot struct {
 		UpdateConversation  func(childComplexity int, id string, input model.UpdateConversation) int
 		UpdateFollow        func(childComplexity int, id string, input model.UpdateFollow) int
 		UpdateMessage       func(childComplexity int, id string, input model.UpdateMessage) int
-		UpdateNotification  func(childComplexity int, args map[string]interface{}) int
+		UpdateNotification  func(childComplexity int, id string) int
 		UpdateReaction      func(childComplexity int, id string, input model.UpdateReaction) int
-		UpdateRecipient     func(childComplexity int, args map[string]interface{}) int
+		UpdateRecipient     func(childComplexity int, id string, input model.UpdateRecipient) int
 	}
 
 	Notification struct {
@@ -264,8 +266,8 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		Message   func(childComplexity int) int
 		ReadAt    func(childComplexity int) int
+		UID       func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
-		User      func(childComplexity int) int
 	}
 
 	Recipients struct {
@@ -294,7 +296,7 @@ type ComplexityRoot struct {
 
 type CommentResolver interface {
 	ID(ctx context.Context, obj *model.Comment) (string, error)
-	UID(ctx context.Context, obj *model.Comment) (string, error)
+	UID(ctx context.Context, obj *model.Comment) (*string, error)
 
 	Body(ctx context.Context, obj *model.Comment) (string, error)
 
@@ -369,13 +371,13 @@ type MutationResolver interface {
 	UpdateMessage(ctx context.Context, id string, input model.UpdateMessage) (*model.Message, error)
 	DeleteMessage(ctx context.Context, id string) (map[string]interface{}, error)
 	DeleteMessages(ctx context.Context, ids []string) (map[string]interface{}, error)
-	UpdateNotification(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
+	UpdateNotification(ctx context.Context, id string) (*model.Notification, error)
 	DeleteNotification(ctx context.Context, id string) (map[string]interface{}, error)
 	DeleteNotifications(ctx context.Context, ids []string) (map[string]interface{}, error)
 	CreateReaction(ctx context.Context, input model.NewReaction) (*model.Reaction, error)
 	UpdateReaction(ctx context.Context, id string, input model.UpdateReaction) (*model.Reaction, error)
-	CreateRecipient(ctx context.Context, input model.RecipientInput) (*model.Recipient, error)
-	UpdateRecipient(ctx context.Context, args map[string]interface{}) (*model.Recipient, error)
+	CreateRecipient(ctx context.Context, input model.NewRecipient) (*model.Recipient, error)
+	UpdateRecipient(ctx context.Context, id string, input model.UpdateRecipient) (*model.Recipient, error)
 	DeleteRecipient(ctx context.Context, id string) (map[string]interface{}, error)
 	DeleteRecipients(ctx context.Context, ids []string) (map[string]interface{}, error)
 }
@@ -383,7 +385,7 @@ type NotificationResolver interface {
 	ID(ctx context.Context, obj *model.Notification) (string, error)
 	UID(ctx context.Context, obj *model.Notification) (string, error)
 
-	ReadAt(ctx context.Context, obj *model.Notification) (*int, error)
+	ReadAt(ctx context.Context, obj *model.Notification) (*string, error)
 	CreatedAt(ctx context.Context, obj *model.Notification) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.Notification) (string, error)
 	Notifiable(ctx context.Context, obj *model.Notification) (map[string]interface{}, error)
@@ -393,7 +395,7 @@ type QueryResolver interface {
 	Comments(ctx context.Context, args map[string]interface{}) (*model.Comments, error)
 	Comment(ctx context.Context, id string) (*model.Comment, error)
 	Conversation(ctx context.Context, id string) (*model.Conversation, error)
-	Conversations(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
+	Conversations(ctx context.Context, args map[string]interface{}) (*model.Conversations, error)
 	Follows(ctx context.Context, ids []string) ([]*model.Follow, error)
 	Follow(ctx context.Context, id string) (*model.Follow, error)
 	Message(ctx context.Context, id string) (*model.Message, error)
@@ -417,9 +419,9 @@ type ReactionResolver interface {
 }
 type RecipientResolver interface {
 	ID(ctx context.Context, obj *model.Recipient) (string, error)
-	User(ctx context.Context, obj *model.Recipient) (*model.User, error)
+	UID(ctx context.Context, obj *model.Recipient) (string, error)
 	Message(ctx context.Context, obj *model.Recipient) (*model.Message, error)
-	ReadAt(ctx context.Context, obj *model.Recipient) (*int, error)
+	ReadAt(ctx context.Context, obj *model.Recipient) (*string, error)
 	CreatedAt(ctx context.Context, obj *model.Recipient) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.Recipient) (string, error)
 }
@@ -481,6 +483,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.CreatedBy(childComplexity), true
 
+	case "Comment.email":
+		if e.complexity.Comment.Email == nil {
+			break
+		}
+
+		return e.complexity.Comment.Email(childComplexity), true
+
 	case "Comment.id":
 		if e.complexity.Comment.ID == nil {
 			break
@@ -501,6 +510,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Comment.Metadata(childComplexity), true
+
+	case "Comment.name":
+		if e.complexity.Comment.Name == nil {
+			break
+		}
+
+		return e.complexity.Comment.Name(childComplexity), true
 
 	case "Comment.parent":
 		if e.complexity.Comment.Parent == nil {
@@ -1091,7 +1107,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateRecipient(childComplexity, args["input"].(model.RecipientInput)), true
+		return e.complexity.Mutation.CreateRecipient(childComplexity, args["input"].(model.NewRecipient)), true
 
 	case "Mutation.deleteComment":
 		if e.complexity.Mutation.DeleteComment == nil {
@@ -1295,7 +1311,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateNotification(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Mutation.UpdateNotification(childComplexity, args["id"].(string)), true
 
 	case "Mutation.updateReaction":
 		if e.complexity.Mutation.UpdateReaction == nil {
@@ -1319,7 +1335,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateRecipient(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Mutation.UpdateRecipient(childComplexity, args["id"].(string), args["input"].(model.UpdateRecipient)), true
 
 	case "Notification.created_at":
 		if e.complexity.Notification.CreatedAt == nil {
@@ -1697,19 +1713,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Recipient.ReadAt(childComplexity), true
 
+	case "Recipient.uid":
+		if e.complexity.Recipient.UID == nil {
+			break
+		}
+
+		return e.complexity.Recipient.UID(childComplexity), true
+
 	case "Recipient.updated_at":
 		if e.complexity.Recipient.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Recipient.UpdatedAt(childComplexity), true
-
-	case "Recipient.user":
-		if e.complexity.Recipient.User == nil {
-			break
-		}
-
-		return e.complexity.Recipient.User(childComplexity), true
 
 	case "Recipients.count":
 		if e.complexity.Recipients.Count == nil {
@@ -1801,12 +1817,13 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNewFollow,
 		ec.unmarshalInputNewMessage,
 		ec.unmarshalInputNewReaction,
-		ec.unmarshalInputRecipientInput,
+		ec.unmarshalInputNewRecipient,
 		ec.unmarshalInputUpdateComment,
 		ec.unmarshalInputUpdateConversation,
 		ec.unmarshalInputUpdateFollow,
 		ec.unmarshalInputUpdateMessage,
 		ec.unmarshalInputUpdateReaction,
+		ec.unmarshalInputUpdateRecipient,
 	)
 	first := true
 
@@ -2274,10 +2291,10 @@ func (ec *executionContext) field_Mutation_createReaction_args(ctx context.Conte
 func (ec *executionContext) field_Mutation_createRecipient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.RecipientInput
+	var arg0 model.NewRecipient
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNRecipientInput2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐRecipientInput(ctx, tmp)
+		arg0, err = ec.unmarshalNNewRecipient2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐNewRecipient(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2565,15 +2582,15 @@ func (ec *executionContext) field_Mutation_updateMessage_args(ctx context.Contex
 func (ec *executionContext) field_Mutation_updateNotification_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
-		arg0, err = ec.unmarshalNMap2map(ctx, tmp)
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -2604,15 +2621,24 @@ func (ec *executionContext) field_Mutation_updateReaction_args(ctx context.Conte
 func (ec *executionContext) field_Mutation_updateRecipient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
-		arg0, err = ec.unmarshalNMap2map(ctx, tmp)
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["id"] = arg0
+	var arg1 model.UpdateRecipient
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateRecipient2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐUpdateRecipient(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -2959,14 +2985,11 @@ func (ec *executionContext) _Comment_uid(ctx context.Context, field graphql.Coll
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Comment_uid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3014,6 +3037,88 @@ func (ec *executionContext) _Comment_locale(ctx context.Context, field graphql.C
 }
 
 func (ec *executionContext) fieldContext_Comment_locale(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Comment_name(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Comment_email(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_email(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Comment",
 		Field:      field,
@@ -3326,6 +3431,10 @@ func (ec *executionContext) fieldContext_Comment_parent(ctx context.Context, fie
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -3399,6 +3508,10 @@ func (ec *executionContext) fieldContext_Comment_children(ctx context.Context, f
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -3701,6 +3814,10 @@ func (ec *executionContext) fieldContext_Comments_data(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -3818,6 +3935,10 @@ func (ec *executionContext) fieldContext_Contact_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -3935,6 +4056,10 @@ func (ec *executionContext) fieldContext_Content_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -4699,6 +4824,10 @@ func (ec *executionContext) fieldContext_Conversation_comments(ctx context.Conte
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -4894,6 +5023,10 @@ func (ec *executionContext) fieldContext_Entity_findCommentByID(ctx context.Cont
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -5607,6 +5740,10 @@ func (ec *executionContext) fieldContext_Expense_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -5724,6 +5861,10 @@ func (ec *executionContext) fieldContext_File_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -6673,8 +6814,8 @@ func (ec *executionContext) fieldContext_Message_recipients(ctx context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Recipient_id(ctx, field)
-			case "user":
-				return ec.fieldContext_Recipient_user(ctx, field)
+			case "uid":
+				return ec.fieldContext_Recipient_uid(ctx, field)
 			case "message":
 				return ec.fieldContext_Recipient_message(ctx, field)
 			case "read_at":
@@ -6855,6 +6996,10 @@ func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Cont
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -6959,6 +7104,10 @@ func (ec *executionContext) fieldContext_Mutation_updateComment(ctx context.Cont
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -8186,7 +8335,7 @@ func (ec *executionContext) _Mutation_updateNotification(ctx context.Context, fi
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().UpdateNotification(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Mutation().UpdateNotification(rctx, fc.Args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -8202,10 +8351,10 @@ func (ec *executionContext) _Mutation_updateNotification(ctx context.Context, fi
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(map[string]interface{}); ok {
+		if data, ok := tmp.(*model.Notification); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be map[string]interface{}`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/dailytravel/x/community/graph/model.Notification`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8214,9 +8363,9 @@ func (ec *executionContext) _Mutation_updateNotification(ctx context.Context, fi
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(*model.Notification)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalONotification2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐNotification(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateNotification(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8226,7 +8375,27 @@ func (ec *executionContext) fieldContext_Mutation_updateNotification(ctx context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Notification_id(ctx, field)
+			case "uid":
+				return ec.fieldContext_Notification_uid(ctx, field)
+			case "type":
+				return ec.fieldContext_Notification_type(ctx, field)
+			case "locale":
+				return ec.fieldContext_Notification_locale(ctx, field)
+			case "read_at":
+				return ec.fieldContext_Notification_read_at(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Notification_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Notification_updated_at(ctx, field)
+			case "notifiable":
+				return ec.fieldContext_Notification_notifiable(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Notification_metadata(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Notification", field.Name)
 		},
 	}
 	defer func() {
@@ -8582,7 +8751,7 @@ func (ec *executionContext) _Mutation_createRecipient(ctx context.Context, field
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().CreateRecipient(rctx, fc.Args["input"].(model.RecipientInput))
+			return ec.resolvers.Mutation().CreateRecipient(rctx, fc.Args["input"].(model.NewRecipient))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -8625,8 +8794,8 @@ func (ec *executionContext) fieldContext_Mutation_createRecipient(ctx context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Recipient_id(ctx, field)
-			case "user":
-				return ec.fieldContext_Recipient_user(ctx, field)
+			case "uid":
+				return ec.fieldContext_Recipient_uid(ctx, field)
 			case "message":
 				return ec.fieldContext_Recipient_message(ctx, field)
 			case "read_at":
@@ -8668,7 +8837,7 @@ func (ec *executionContext) _Mutation_updateRecipient(ctx context.Context, field
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().UpdateRecipient(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Mutation().UpdateRecipient(rctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateRecipient))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -8711,8 +8880,8 @@ func (ec *executionContext) fieldContext_Mutation_updateRecipient(ctx context.Co
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Recipient_id(ctx, field)
-			case "user":
-				return ec.fieldContext_Recipient_user(ctx, field)
+			case "uid":
+				return ec.fieldContext_Recipient_uid(ctx, field)
 			case "message":
 				return ec.fieldContext_Recipient_message(ctx, field)
 			case "read_at":
@@ -9082,9 +9251,9 @@ func (ec *executionContext) _Notification_read_at(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Notification_read_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9094,7 +9263,7 @@ func (ec *executionContext) fieldContext_Notification_read_at(ctx context.Contex
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9478,6 +9647,10 @@ func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -9657,10 +9830,10 @@ func (ec *executionContext) _Query_conversations(ctx context.Context, field grap
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(map[string]interface{}); ok {
+		if data, ok := tmp.(*model.Conversations); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be map[string]interface{}`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/dailytravel/x/community/graph/model.Conversations`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9669,9 +9842,9 @@ func (ec *executionContext) _Query_conversations(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(*model.Conversations)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOConversations2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐConversations(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_conversations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9681,7 +9854,13 @@ func (ec *executionContext) fieldContext_Query_conversations(ctx context.Context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			switch field.Name {
+			case "data":
+				return ec.fieldContext_Conversations_data(ctx, field)
+			case "count":
+				return ec.fieldContext_Conversations_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Conversations", field.Name)
 		},
 	}
 	defer func() {
@@ -10367,8 +10546,8 @@ func (ec *executionContext) fieldContext_Query_recipient(ctx context.Context, fi
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Recipient_id(ctx, field)
-			case "user":
-				return ec.fieldContext_Recipient_user(ctx, field)
+			case "uid":
+				return ec.fieldContext_Recipient_uid(ctx, field)
 			case "message":
 				return ec.fieldContext_Recipient_message(ctx, field)
 			case "read_at":
@@ -10791,6 +10970,10 @@ func (ec *executionContext) fieldContext_Quote_comments(ctx context.Context, fie
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -11315,8 +11498,8 @@ func (ec *executionContext) fieldContext_Recipient_id(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Recipient_user(ctx context.Context, field graphql.CollectedField, obj *model.Recipient) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Recipient_user(ctx, field)
+func (ec *executionContext) _Recipient_uid(ctx context.Context, field graphql.CollectedField, obj *model.Recipient) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Recipient_uid(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11329,7 +11512,7 @@ func (ec *executionContext) _Recipient_user(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Recipient().User(rctx, obj)
+		return ec.resolvers.Recipient().UID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11341,33 +11524,19 @@ func (ec *executionContext) _Recipient_user(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Recipient_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Recipient_uid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Recipient",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "notifications":
-				return ec.fieldContext_User_notifications(ctx, field)
-			case "conversations":
-				return ec.fieldContext_User_conversations(ctx, field)
-			case "comments":
-				return ec.fieldContext_User_comments(ctx, field)
-			case "reactions":
-				return ec.fieldContext_User_reactions(ctx, field)
-			case "following":
-				return ec.fieldContext_User_following(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -11458,9 +11627,9 @@ func (ec *executionContext) _Recipient_read_at(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Recipient_read_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11470,7 +11639,7 @@ func (ec *executionContext) fieldContext_Recipient_read_at(ctx context.Context, 
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -11646,8 +11815,8 @@ func (ec *executionContext) fieldContext_Recipients_data(ctx context.Context, fi
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Recipient_id(ctx, field)
-			case "user":
-				return ec.fieldContext_Recipient_user(ctx, field)
+			case "uid":
+				return ec.fieldContext_Recipient_uid(ctx, field)
 			case "message":
 				return ec.fieldContext_Recipient_message(ctx, field)
 			case "read_at":
@@ -11749,6 +11918,10 @@ func (ec *executionContext) fieldContext_Task_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -12002,6 +12175,10 @@ func (ec *executionContext) fieldContext_User_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
@@ -13976,7 +14153,7 @@ func (ec *executionContext) unmarshalInputNewComment(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "commentable", "locale", "body", "rating", "metadata", "status", "attachments"}
+	fieldsInOrder := [...]string{"parent", "commentable", "locale", "uid", "name", "email", "body", "rating", "metadata", "status", "attachments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14010,6 +14187,33 @@ func (ec *executionContext) unmarshalInputNewComment(ctx context.Context, obj in
 				return it, err
 			}
 			it.Locale = data
+		case "uid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uid"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UID = data
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
 		case "body":
 			var err error
 
@@ -14285,8 +14489,8 @@ func (ec *executionContext) unmarshalInputNewReaction(ctx context.Context, obj i
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputRecipientInput(ctx context.Context, obj interface{}) (model.RecipientInput, error) {
-	var it model.RecipientInput
+func (ec *executionContext) unmarshalInputNewRecipient(ctx context.Context, obj interface{}) (model.NewRecipient, error) {
+	var it model.NewRecipient
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -14339,7 +14543,7 @@ func (ec *executionContext) unmarshalInputUpdateComment(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "locale", "body", "rating", "metadata", "status", "attachments"}
+	fieldsInOrder := [...]string{"parent", "locale", "uid", "name", "email", "body", "rating", "metadata", "status", "attachments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14364,6 +14568,33 @@ func (ec *executionContext) unmarshalInputUpdateComment(ctx context.Context, obj
 				return it, err
 			}
 			it.Locale = data
+		case "uid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uid"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UID = data
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
 		case "body":
 			var err error
 
@@ -14612,6 +14843,44 @@ func (ec *executionContext) unmarshalInputUpdateReaction(ctx context.Context, ob
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateRecipient(ctx context.Context, obj interface{}) (model.UpdateRecipient, error) {
+	var it model.UpdateRecipient
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "read_at"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "read_at":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("read_at"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReadAt = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -14756,9 +15025,6 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 					}
 				}()
 				res = ec._Comment_uid(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
 				return res
 			}
 
@@ -14787,6 +15053,10 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "name":
+			out.Values[i] = ec._Comment_name(ctx, field, obj)
+		case "email":
+			out.Values[i] = ec._Comment_email(ctx, field, obj)
 		case "body":
 			field := field
 
@@ -17942,7 +18212,7 @@ func (ec *executionContext) _Recipient(ctx context.Context, sel ast.SelectionSet
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "user":
+		case "uid":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -17951,7 +18221,7 @@ func (ec *executionContext) _Recipient(ctx context.Context, sel ast.SelectionSet
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Recipient_user(ctx, field, obj)
+				res = ec._Recipient_uid(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -19040,6 +19310,11 @@ func (ec *executionContext) unmarshalNNewReaction2githubᚗcomᚋdailytravelᚋx
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNNewRecipient2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐNewRecipient(ctx context.Context, v interface{}) (model.NewRecipient, error) {
+	res, err := ec.unmarshalInputNewRecipient(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNNotification2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐNotification(ctx context.Context, sel ast.SelectionSet, v model.Notification) graphql.Marshaler {
 	return ec._Notification(ctx, sel, &v)
 }
@@ -19136,11 +19411,6 @@ func (ec *executionContext) marshalNRecipient2ᚖgithubᚗcomᚋdailytravelᚋx�
 	return ec._Recipient(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNRecipientInput2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐRecipientInput(ctx context.Context, v interface{}) (model.RecipientInput, error) {
-	res, err := ec.unmarshalInputRecipientInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -19213,6 +19483,11 @@ func (ec *executionContext) unmarshalNUpdateMessage2githubᚗcomᚋdailytravel�
 
 func (ec *executionContext) unmarshalNUpdateReaction2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐUpdateReaction(ctx context.Context, v interface{}) (model.UpdateReaction, error) {
 	res, err := ec.unmarshalInputUpdateReaction(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateRecipient2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐUpdateRecipient(ctx context.Context, v interface{}) (model.UpdateRecipient, error) {
+	res, err := ec.unmarshalInputUpdateRecipient(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -19705,6 +19980,13 @@ func (ec *executionContext) marshalOConversation2ᚖgithubᚗcomᚋdailytravel�
 		return graphql.Null
 	}
 	return ec._Conversation(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOConversations2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐConversations(ctx context.Context, sel ast.SelectionSet, v *model.Conversations) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Conversations(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOFollow2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐFollow(ctx context.Context, sel ast.SelectionSet, v []*model.Follow) graphql.Marshaler {

@@ -11,13 +11,15 @@ import (
 
 type Comment struct {
 	Model       `bson:",inline"`
-	UID         primitive.ObjectID `bson:"uid" json:"uid"`
-	Parent      primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
-	Commentable Commentable        `json:"commentable" bson:"commentable"`
-	Locale      string             `json:"locale,omitempty" bson:"locale,omitempty"`
-	Body        primitive.M        `json:"body,omitempty" bson:"body,omitempty"`
-	Rating      int                `json:"rating,omitempty" bson:"rating,omitempty"`
-	Status      string             `json:"status" bson:"status"`
+	UID         *primitive.ObjectID `bson:"uid" json:"uid"`
+	Parent      *primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
+	Commentable Commentable         `json:"commentable" bson:"commentable"`
+	Name        *string             `json:"name,omitempty" bson:"name,omitempty"`
+	Email       *string             `json:"email,omitempty" bson:"email,omitempty"`
+	Locale      string              `json:"locale,omitempty" bson:"locale,omitempty"`
+	Body        primitive.M         `json:"body,omitempty" bson:"body,omitempty"`
+	Rating      int                 `json:"rating,omitempty" bson:"rating,omitempty"`
+	Status      string              `json:"status" bson:"status"`
 }
 
 func (Comment) IsEntity() {}

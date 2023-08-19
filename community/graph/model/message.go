@@ -1,8 +1,11 @@
 package model
 
 import (
+	"context"
 	"time"
 
+	"github.com/dailytravel/x/community/db"
+	"github.com/typesense/typesense-go/typesense"
 	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,7 +18,7 @@ type Message struct {
 	Model        `bson:",inline"`
 	Parent       primitive.ObjectID  `json:"parent,omitempty" bson:"parent,omitempty"`
 	Conversation primitive.ObjectID  `json:"conversation" bson:"conversation"`
-	User         primitive.ObjectID  `json:"user" bson:"user"`
+	UID          primitive.ObjectID  `json:"uid" bson:"uid"`
 	Locale       string              `json:"locale" bson:"locale"`
 	Type         string              `json:"type" bson:"type"`
 	Subject      *string             `json:"subject,omitempty" bson:"subject,omitempty"`
@@ -43,7 +46,7 @@ func (i *Message) Collection() string {
 
 func (i *Message) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "parent", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "conversation", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
@@ -57,7 +60,7 @@ func (i *Message) Schema() interface{} {
 	return &api.CollectionSchema{
 		Name: i.Collection(),
 		Fields: []api.Field{
-			{Name: "user", Type: "string"},
+			{Name: "uid", Type: "string"},
 			{Name: "parent", Type: "string"},
 			{Name: "conversation", Type: "string"},
 			{Name: "locale", Type: "string", Facet: pointer.True()},
@@ -78,7 +81,7 @@ func (i *Message) Document() map[string]interface{} {
 	document := map[string]interface{}{
 		"id":           i.ID,
 		"parent":       i.Parent,
-		"owner":        i.User,
+		"uid":          i.UID,
 		"conversation": i.Conversation,
 		"locale":       i.Locale,
 		"type":         i.Type,
@@ -93,62 +96,63 @@ func (i *Message) Document() map[string]interface{} {
 	return document
 }
 
-// func (i *Message) Insert(collection typesense.CollectionInterface) error {
-// 	document := i.Document()
+func (i *Message) Insert(collection typesense.CollectionInterface) error {
+	document := i.Document()
 
-// 	// Retrieve Typesense collection schema and create it if it doesn't exist
-// 	if err := i.Retrieve(collection, i.Schema().(*api.CollectionSchema)); err != nil {
-// 		return err
-// 	}
+	if _, err := collection.Retrieve(); err != nil {
+		// Create collection
+		if _, err := db.Client.Collections().Create(i.Schema().(*api.CollectionSchema)); err != nil {
+			return err
+		}
+	}
+	if _, err := collection.Documents().Create(document); err != nil {
+		return err
+	}
 
-// 	if _, err := collection.Documents().Create(document); err != nil {
-// 		return err
-// 	}
+	return nil
+}
 
-// 	return nil
-// }
+func (i *Message) Update(collection typesense.CollectionInterface, documentKey primitive.M, updatedFields primitive.M, removedFields primitive.A) error {
+	documentID := documentKey["_id"].(primitive.ObjectID).Hex()
 
-// func (i *Message) Update(collection typesense.CollectionInterface, documentKey primitive.M, updatedFields primitive.M, removedFields primitive.A) error {
-// 	documentID := documentKey["_id"].(primitive.ObjectID).Hex()
+	// Create a map to hold the updated fields
+	updatePayload := make(map[string]interface{})
 
-// 	// Create a map to hold the updated fields
-// 	updatePayload := make(map[string]interface{})
+	for field, value := range updatedFields {
+		switch field {
+		case "created_at", "updated_at", "schedule_at":
+			timestamp := value.(primitive.Timestamp)
+			updatePayload[field] = timestamp.T
+		default:
+			updatePayload[field] = value
+		}
+	}
 
-// 	for field, value := range updatedFields {
-// 		switch field {
-// 		case "created_at", "updated_at", "schedule_at":
-// 			timestamp := value.(primitive.Timestamp)
-// 			updatePayload[field] = timestamp.T
-// 		default:
-// 			updatePayload[field] = value
-// 		}
-// 	}
+	for _, field := range removedFields {
+		updatePayload[field.(string)] = nil
+	}
 
-// 	for _, field := range removedFields {
-// 		updatePayload[field.(string)] = nil
-// 	}
+	if _, err := collection.Document(documentID).Update(updatePayload); err != nil {
+		var item *Message
+		if err := db.Database.Collection(i.Collection()).FindOne(context.Background(), documentKey).Decode(&item); err != nil {
+			return err
+		}
 
-// 	if _, err := collection.Document(documentID).Update(updatePayload); err != nil {
-// 		var item *Message
-// 		if err := database.Database.Collection(i.Collection()).FindOne(context.Background(), documentKey).Decode(&item); err != nil {
-// 			return err
-// 		}
+		if err := i.Insert(collection); err != nil {
+			return err
+		}
+	}
 
-// 		if err := i.Insert(collection); err != nil {
-// 			return err
-// 		}
-// 	}
+	return nil
+}
 
-// 	return nil
-// }
+func (i *Message) Delete(collection typesense.CollectionInterface, documentKey primitive.M) error {
+	id := documentKey["_id"].(primitive.ObjectID).Hex()
 
-// func (i *Message) Delete(collection typesense.CollectionInterface, documentKey primitive.M) error {
-// 	id := documentKey["_id"].(primitive.ObjectID).Hex()
+	// Delete document from Typesense
+	if _, err := collection.Document(id).Delete(); err != nil {
+		return err
+	}
 
-// 	// Delete document from Typesense
-// 	if _, err := collection.Document(id).Delete(); err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
+	return nil
+}

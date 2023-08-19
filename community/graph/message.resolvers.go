@@ -6,10 +6,15 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
+	"github.com/dailytravel/x/community/auth"
 	"github.com/dailytravel/x/community/graph/model"
+	"github.com/dailytravel/x/community/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
@@ -19,7 +24,18 @@ func (r *messageResolver) ID(ctx context.Context, obj *model.Message) (string, e
 
 // Conversation is the resolver for the conversation field.
 func (r *messageResolver) Conversation(ctx context.Context, obj *model.Message) (*model.Conversation, error) {
-	panic(fmt.Errorf("not implemented: Conversation - conversation"))
+	var item *model.Conversation
+
+	filter := bson.M{"_id": obj.Conversation}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -34,37 +50,186 @@ func (r *messageResolver) UpdatedAt(ctx context.Context, obj *model.Message) (st
 
 // Recipients is the resolver for the recipients field.
 func (r *messageResolver) Recipients(ctx context.Context, obj *model.Message) ([]*model.Recipient, error) {
-	panic(fmt.Errorf("not implemented: Recipients - recipients"))
+	var items []*model.Recipient
+
+	filter := bson.M{"message": obj.ID}
+
+	cur, err := r.db.Collection("recipients").Find(ctx, filter, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Recipient
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // CreateMessage is the resolver for the createMessage field.
 func (r *mutationResolver) CreateMessage(ctx context.Context, input model.NewMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: CreateMessage - createMessage"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Message{
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
+	}
+
+	// Insert the new organization
+	if _, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // UpdateMessage is the resolver for the updateMessage field.
 func (r *mutationResolver) UpdateMessage(ctx context.Context, id string, input model.UpdateMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: UpdateMessage - updateMessage"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	item := &model.Message{}
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
+	if err != nil {
+		return nil, err
+	}
+
+	item.UpdatedBy = uid
+
+	// Update the contact
+	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item}, nil); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteMessage is the resolver for the deleteMessage field.
 func (r *mutationResolver) DeleteMessage(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteMessage - deleteMessage"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the ID string to ObjectID
+	messageID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the filter to find the message by ID and the user who sent the message
+	filter := bson.M{
+		"_id":    messageID,
+		"sender": uid,
+	}
+
+	// Define the update to mark the message as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted": true,
+		},
+	}
+
+	// Perform the update operation
+	_, err = r.db.Collection("messages").UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success"}, nil
 }
 
 // DeleteMessages is the resolver for the deleteMessages field.
 func (r *mutationResolver) DeleteMessages(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteMessages - deleteMessages"))
+	uid, err := utils.UID(auth.Auth(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the list of ID strings to ObjectIDs
+	var messageIDs []primitive.ObjectID
+	for _, id := range ids {
+		messageID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		messageIDs = append(messageIDs, messageID)
+	}
+
+	// Define the filter to match the given IDs and the user who sent the messages
+	filter := bson.M{
+		"_id":    bson.M{"$in": messageIDs},
+		"sender": uid,
+	}
+
+	// Define the update to mark messages as deleted
+	update := bson.M{
+		"$set": bson.M{
+			"deleted": true,
+		},
+	}
+
+	// Perform the update operation
+	result, err := r.db.Collection("messages").UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
 // Message is the resolver for the message field.
 func (r *queryResolver) Message(ctx context.Context, id string) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: Message - message"))
+	var item *model.Message
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": _id}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Messages is the resolver for the messages field.
 func (r *queryResolver) Messages(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Messages - messages"))
+	res, err := r.ts.Collection("messages").Documents().Search(utils.Params(args))
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert struct to map
+	results, err := utils.StructToMap(res)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 // Message returns MessageResolver implementation.

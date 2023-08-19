@@ -1,8 +1,8 @@
 type Recipient {
   id: ID!
-  user: User!
+  uid: ID!
   message: Message!
-  read_at: Int
+  read_at: String
   created_at: String!
   updated_at: String!
 }
@@ -12,9 +12,14 @@ type Recipients {
   data: [Recipient]
 }
 
-input RecipientInput {
+input NewRecipient {
   recipient: ID!
   message: ID!
+  read_at: Int
+}
+
+input UpdateRecipient {
+  id: ID!
   read_at: Int
 }
 
@@ -24,8 +29,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  createRecipient(input: RecipientInput!): Recipient @auth
-  updateRecipient(args: Map!): Recipient @auth
+  createRecipient(input: NewRecipient!): Recipient @auth
+  updateRecipient(id: ID!, input: UpdateRecipient!): Recipient @auth
   deleteRecipient(id: ID!): Map @auth
   deleteRecipients(ids: [ID!]!): Map @auth
 }

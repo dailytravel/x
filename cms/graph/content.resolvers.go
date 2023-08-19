@@ -40,11 +40,11 @@ func (r *contentResolver) Title(ctx context.Context, obj *model.Content) (string
 // Summary is the resolver for the summary field.
 func (r *contentResolver) Summary(ctx context.Context, obj *model.Content) (string, error) {
 	locale := auth.Locale(ctx)
-	if summary, ok := obj.Summary[*locale].(string); ok {
-		return summary, nil
+	if locale == nil {
+		locale = &obj.Locale
 	}
 
-	if summary, ok := obj.Summary[obj.Locale].(string); ok {
+	if summary, ok := obj.Summary[*locale].(string); ok {
 		return summary, nil
 	}
 
@@ -54,11 +54,11 @@ func (r *contentResolver) Summary(ctx context.Context, obj *model.Content) (stri
 // Body is the resolver for the body field.
 func (r *contentResolver) Body(ctx context.Context, obj *model.Content) (string, error) {
 	locale := auth.Locale(ctx)
-	if body, ok := obj.Body[*locale].(string); ok {
-		return body, nil
+	if locale == nil {
+		locale = &obj.Locale
 	}
 
-	if body, ok := obj.Body[obj.Locale].(string); ok {
+	if body, ok := obj.Body[*locale].(string); ok {
 		return body, nil
 	}
 
