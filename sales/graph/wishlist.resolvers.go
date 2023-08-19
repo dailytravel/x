@@ -25,14 +25,14 @@ func (r *mutationResolver) CreateWishlist(ctx context.Context, input model.NewWi
 		return nil, err
 	}
 
-	product, err := primitive.ObjectIDFromHex(input.Product)
+	content, err := primitive.ObjectIDFromHex(input.Content)
 	if err != nil {
 		return nil, err
 	}
 
 	item := &model.Wishlist{
 		UID:     *uid,
-		Product: product,
+		Content: content,
 		Model: model.Model{
 			CreatedBy: uid,
 			UpdatedBy: uid,
@@ -198,19 +198,9 @@ func (r *wishlistResolver) UpdatedAt(ctx context.Context, obj *model.Wishlist) (
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// Product is the resolver for the product field.
-func (r *wishlistResolver) Product(ctx context.Context, obj *model.Wishlist) (*model.Product, error) {
-	var item *model.Product
-
-	filter := bson.M{"_id": obj.Product}
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("document not found")
-		}
-		return nil, err
-	}
-
-	return item, nil
+// Content is the resolver for the content field.
+func (r *wishlistResolver) Content(ctx context.Context, obj *model.Wishlist) (string, error) {
+	return obj.Content.Hex(), nil
 }
 
 // UID is the resolver for the uid field.

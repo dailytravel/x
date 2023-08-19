@@ -5,6 +5,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Membership struct {
@@ -36,4 +38,16 @@ func (i *Membership) MarshalBSON() ([]byte, error) {
 
 func (i *Membership) Collection() string {
 	return "memberships"
+}
+
+func (i *Membership) Index() []mongo.IndexModel {
+	return []mongo.IndexModel{
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "tier", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "number", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "deleted_at", Value: 1}}, Options: options.Index()},
+	}
 }

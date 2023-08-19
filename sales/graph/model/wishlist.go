@@ -12,7 +12,7 @@ import (
 type Wishlist struct {
 	Model   `bson:",inline"`
 	UID     primitive.ObjectID `json:"uid" bson:"uid"`
-	Product primitive.ObjectID `json:"product" bson:"product"`
+	Content primitive.ObjectID `json:"content" bson:"content"`
 	Status  string             `json:"status" bson:"status"`
 }
 

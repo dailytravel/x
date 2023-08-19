@@ -116,10 +116,8 @@ type Order struct {
 func (Order) IsEntity() {}
 
 type Organization struct {
-	UID       string `json:"uid"`
 	CreatedBy string `json:"created_by"`
 	UpdatedBy string `json:"updated_by"`
-	User      *User  `json:"user,omitempty"`
 	Created   *User  `json:"created,omitempty"`
 	Updated   *User  `json:"updated,omitempty"`
 }

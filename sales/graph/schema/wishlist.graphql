@@ -4,7 +4,7 @@ type Wishlist {
   status: String!
   created_at: String!
   updated_at: String!
-  product: Product!
+  content: ID!
   uid: ID!
   created_by: ID
   updated_by: ID
@@ -22,7 +22,7 @@ type Wishlists {
 }
 
 input NewWishlist {
-  product: ID!
+  content: ID!
   metadata: Map
 }
 

@@ -65,15 +65,6 @@ func (r *entityResolver) FindContentByUIDAndCreatedByAndUpdatedBy(ctx context.Co
 	}, nil
 }
 
-// FindContractByUIDAndCreatedByAndUpdatedBy is the resolver for the findContractByUIDAndCreatedByAndUpdatedBy field.
-func (r *entityResolver) FindContractByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Contract, error) {
-	return &model.Contract{
-		UID:       uid,
-		CreatedBy: createdBy,
-		UpdatedBy: updatedBy,
-	}, nil
-}
-
 // FindCouponByUIDAndCreatedByAndUpdatedBy is the resolver for the findCouponByUIDAndCreatedByAndUpdatedBy field.
 func (r *entityResolver) FindCouponByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Coupon, error) {
 	return &model.Coupon{
@@ -164,10 +155,9 @@ func (r *entityResolver) FindOrderByUIDAndCreatedByAndUpdatedBy(ctx context.Cont
 	}, nil
 }
 
-// FindOrganizationByUIDAndCreatedByAndUpdatedBy is the resolver for the findOrganizationByUIDAndCreatedByAndUpdatedBy field.
-func (r *entityResolver) FindOrganizationByUIDAndCreatedByAndUpdatedBy(ctx context.Context, uid string, createdBy string, updatedBy string) (*model.Organization, error) {
+// FindOrganizationByCreatedByAndUpdatedBy is the resolver for the findOrganizationByCreatedByAndUpdatedBy field.
+func (r *entityResolver) FindOrganizationByCreatedByAndUpdatedBy(ctx context.Context, createdBy string, updatedBy string) (*model.Organization, error) {
 	return &model.Organization{
-		UID:       uid,
 		CreatedBy: createdBy,
 		UpdatedBy: updatedBy,
 	}, nil

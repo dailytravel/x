@@ -1,0 +1,69 @@
+type Variant {
+  id: ID!
+  locale: String!
+  sku: String!
+  name: String!
+  description: String!
+  price: Float!
+  discount: Float!
+  quantity: Int!
+  currency: String!
+  metadata: Map
+  start_date: String!
+  end_date: String!
+  status: String!
+  created_at: String!
+  updated_at: String!
+  created_by: ID
+  updated_by: ID
+  package: ID!
+}
+
+type Variants {
+  count: Int!
+  data: [Variant]
+}
+
+input NewVariant {
+  locale: String!
+  sku: String!
+  name: String!
+  description: String!
+  price: Float!
+  currency: String!
+  discount: Float!
+  quantity: Int!
+  metadata: Map
+  start_date: String!
+  end_date: String!
+  status: String!
+  package: ID!
+}
+
+input UpdateVariant {
+  locale: String
+  sku: String
+  name: String
+  description: String
+  price: Float
+  currency: String
+  discount: Float
+  quantity: Int
+  metadata: Map
+  start_date: String
+  end_date: String
+  status: String
+  package: ID
+}
+
+extend type Query {
+  variant(id: ID!): Variant
+  variants(args: Map): Variants
+}
+
+extend type Mutation {
+  createVariant(input: NewVariant!): Variant
+  updateVariant(id: ID!, input: UpdateVariant!): Variant
+  deleteVariant(id: ID!): Map
+  deleteVariants(ids: [ID!]!): Map
+}

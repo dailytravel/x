@@ -40,11 +40,6 @@ type EmailInput struct {
 	Other    *string `json:"other,omitempty"`
 }
 
-type Inventories struct {
-	Data  []*Inventory `json:"data,omitempty"`
-	Count int          `json:"count"`
-}
-
 type Memberships struct {
 	Data  []*Membership `json:"data,omitempty"`
 	Count int           `json:"count"`
@@ -121,12 +116,6 @@ type NewCoupon struct {
 	Status      *string                `json:"status,omitempty"`
 }
 
-type NewInventory struct {
-	Product  string `json:"product"`
-	Date     string `json:"date"`
-	Quantity int    `json:"quantity"`
-}
-
 type NewMembership struct {
 	Tier      string                 `json:"tier"`
 	Number    string                 `json:"number"`
@@ -157,26 +146,7 @@ type NewPoint struct {
 	Status    string                 `json:"status"`
 }
 
-type NewPrice struct {
-	StartDate *string                `json:"start_date,omitempty"`
-	EndDate   *string                `json:"end_date,omitempty"`
-	Regular   float64                `json:"regular"`
-	Sale      *float64               `json:"sale,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type NewProduct struct {
-	Sku         string                 `json:"sku"`
-	Locale      string                 `json:"locale"`
-	Type        string                 `json:"type"`
-	Name        string                 `json:"name"`
-	Description *string                `json:"description,omitempty"`
-	Quantity    int                    `json:"quantity"`
-	Currency    string                 `json:"currency"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type NewProgram struct {
+type NewPromotion struct {
 	Type        string                 `json:"type"`
 	Locale      string                 `json:"locale"`
 	Name        string                 `json:"name"`
@@ -236,8 +206,24 @@ type NewTransaction struct {
 	Description string                 `json:"description"`
 }
 
+type NewVariant struct {
+	Locale      string                 `json:"locale"`
+	Sku         string                 `json:"sku"`
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Price       float64                `json:"price"`
+	Currency    string                 `json:"currency"`
+	Discount    float64                `json:"discount"`
+	Quantity    int                    `json:"quantity"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	StartDate   string                 `json:"start_date"`
+	EndDate     string                 `json:"end_date"`
+	Status      string                 `json:"status"`
+	Package     string                 `json:"package"`
+}
+
 type NewWishlist struct {
-	Product  string                 `json:"product"`
+	Content  string                 `json:"content"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
@@ -265,19 +251,9 @@ type Points struct {
 	Data  []*Point `json:"data,omitempty"`
 }
 
-type Prices struct {
-	Data  []*Price `json:"data,omitempty"`
-	Count int      `json:"count"`
-}
-
-type Products struct {
-	Data  []*Product `json:"data,omitempty"`
-	Count int        `json:"count"`
-}
-
-type Programs struct {
-	Data  []*Program `json:"data,omitempty"`
-	Count int        `json:"count"`
+type Promotions struct {
+	Data  []*Promotion `json:"data,omitempty"`
+	Count int          `json:"count"`
 }
 
 type Quotes struct {
@@ -372,11 +348,6 @@ type UpdateCoupon struct {
 	Status      *string                `json:"status,omitempty"`
 }
 
-type UpdateInventory struct {
-	Date     *string `json:"date,omitempty"`
-	Quantity *int    `json:"quantity,omitempty"`
-}
-
 type UpdateMembership struct {
 	Tier      *string                `json:"tier,omitempty"`
 	Number    *string                `json:"number,omitempty"`
@@ -407,26 +378,7 @@ type UpdatePoint struct {
 	Status    *string                `json:"status,omitempty"`
 }
 
-type UpdatePrice struct {
-	StartDate *string                `json:"start_date,omitempty"`
-	EndDate   *string                `json:"end_date,omitempty"`
-	Regular   *float64               `json:"regular,omitempty"`
-	Sale      *float64               `json:"sale,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateProduct struct {
-	Sku         *string                `json:"sku,omitempty"`
-	Locale      *string                `json:"locale,omitempty"`
-	Type        *string                `json:"type,omitempty"`
-	Name        *string                `json:"name,omitempty"`
-	Description *string                `json:"description,omitempty"`
-	Quantity    *int                   `json:"quantity,omitempty"`
-	Currency    *string                `json:"currency,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateProgram struct {
+type UpdatePromotion struct {
 	Locale      *string                `json:"locale,omitempty"`
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
@@ -486,9 +438,30 @@ type UpdateTransaction struct {
 	Description *string                `json:"description,omitempty"`
 }
 
+type UpdateVariant struct {
+	Locale      *string                `json:"locale,omitempty"`
+	Sku         *string                `json:"sku,omitempty"`
+	Name        *string                `json:"name,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Price       *float64               `json:"price,omitempty"`
+	Currency    *string                `json:"currency,omitempty"`
+	Discount    *float64               `json:"discount,omitempty"`
+	Quantity    *int                   `json:"quantity,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	StartDate   *string                `json:"start_date,omitempty"`
+	EndDate     *string                `json:"end_date,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Package     *string                `json:"package,omitempty"`
+}
+
 type UpdateWishlist struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	Status   *string                `json:"status,omitempty"`
+}
+
+type Variants struct {
+	Count int        `json:"count"`
+	Data  []*Variant `json:"data,omitempty"`
 }
 
 type Wishlists struct {
@@ -803,52 +776,52 @@ func (e PointType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type ProgramType string
+type PromotionType string
 
 const (
-	ProgramTypePurchase     ProgramType = "PURCHASE"
-	ProgramTypeReferral     ProgramType = "REFERRAL"
-	ProgramTypeSignup       ProgramType = "SIGNUP"
-	ProgramTypeReview       ProgramType = "REVIEW"
-	ProgramTypeBirthday     ProgramType = "BIRTHDAY"
-	ProgramTypeSubscription ProgramType = "SUBSCRIPTION"
+	PromotionTypePurchase     PromotionType = "PURCHASE"
+	PromotionTypeReferral     PromotionType = "REFERRAL"
+	PromotionTypeSignup       PromotionType = "SIGNUP"
+	PromotionTypeReview       PromotionType = "REVIEW"
+	PromotionTypeBirthday     PromotionType = "BIRTHDAY"
+	PromotionTypeSubscription PromotionType = "SUBSCRIPTION"
 )
 
-var AllProgramType = []ProgramType{
-	ProgramTypePurchase,
-	ProgramTypeReferral,
-	ProgramTypeSignup,
-	ProgramTypeReview,
-	ProgramTypeBirthday,
-	ProgramTypeSubscription,
+var AllPromotionType = []PromotionType{
+	PromotionTypePurchase,
+	PromotionTypeReferral,
+	PromotionTypeSignup,
+	PromotionTypeReview,
+	PromotionTypeBirthday,
+	PromotionTypeSubscription,
 }
 
-func (e ProgramType) IsValid() bool {
+func (e PromotionType) IsValid() bool {
 	switch e {
-	case ProgramTypePurchase, ProgramTypeReferral, ProgramTypeSignup, ProgramTypeReview, ProgramTypeBirthday, ProgramTypeSubscription:
+	case PromotionTypePurchase, PromotionTypeReferral, PromotionTypeSignup, PromotionTypeReview, PromotionTypeBirthday, PromotionTypeSubscription:
 		return true
 	}
 	return false
 }
 
-func (e ProgramType) String() string {
+func (e PromotionType) String() string {
 	return string(e)
 }
 
-func (e *ProgramType) UnmarshalGQL(v interface{}) error {
+func (e *PromotionType) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
 	}
 
-	*e = ProgramType(str)
+	*e = PromotionType(str)
 	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid ProgramType", str)
+		return fmt.Errorf("%s is not a valid PromotionType", str)
 	}
 	return nil
 }
 
-func (e ProgramType) MarshalGQL(w io.Writer) {
+func (e PromotionType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

@@ -248,34 +248,6 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				list[idx[i]] = entity
 				return nil
 			}
-		case "Contract":
-			resolverName, err := entityResolverNameForContract(ctx, rep)
-			if err != nil {
-				return fmt.Errorf(`finding resolver for Entity "Contract": %w`, err)
-			}
-			switch resolverName {
-
-			case "findContractByUIDAndCreatedByAndUpdatedBy":
-				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findContractByUIDAndCreatedByAndUpdatedBy(): %w`, err)
-				}
-				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 1 for findContractByUIDAndCreatedByAndUpdatedBy(): %w`, err)
-				}
-				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 2 for findContractByUIDAndCreatedByAndUpdatedBy(): %w`, err)
-				}
-				entity, err := ec.resolvers.Entity().FindContractByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
-				if err != nil {
-					return fmt.Errorf(`resolving Entity "Contract": %w`, err)
-				}
-
-				list[idx[i]] = entity
-				return nil
-			}
 		case "Coupon":
 			resolverName, err := entityResolverNameForCoupon(ctx, rep)
 			if err != nil {
@@ -563,20 +535,16 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 			}
 			switch resolverName {
 
-			case "findOrganizationByUIDAndCreatedByAndUpdatedBy":
-				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+			case "findOrganizationByCreatedByAndUpdatedBy":
+				id0, err := ec.unmarshalNID2string(ctx, rep["created_by"])
 				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findOrganizationByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+					return fmt.Errorf(`unmarshalling param 0 for findOrganizationByCreatedByAndUpdatedBy(): %w`, err)
 				}
-				id1, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+				id1, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
 				if err != nil {
-					return fmt.Errorf(`unmarshalling param 1 for findOrganizationByUIDAndCreatedByAndUpdatedBy(): %w`, err)
+					return fmt.Errorf(`unmarshalling param 1 for findOrganizationByCreatedByAndUpdatedBy(): %w`, err)
 				}
-				id2, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 2 for findOrganizationByUIDAndCreatedByAndUpdatedBy(): %w`, err)
-				}
-				entity, err := ec.resolvers.Entity().FindOrganizationByUIDAndCreatedByAndUpdatedBy(ctx, id0, id1, id2)
+				entity, err := ec.resolvers.Entity().FindOrganizationByCreatedByAndUpdatedBy(ctx, id0, id1)
 				if err != nil {
 					return fmt.Errorf(`resolving Entity "Organization": %w`, err)
 				}
@@ -991,31 +959,6 @@ func entityResolverNameForContent(ctx context.Context, rep map[string]interface{
 	return "", fmt.Errorf("%w for Content", ErrTypeNotFound)
 }
 
-func entityResolverNameForContract(ctx context.Context, rep map[string]interface{}) (string, error) {
-	for {
-		var (
-			m   map[string]interface{}
-			val interface{}
-			ok  bool
-		)
-		_ = val
-		m = rep
-		if _, ok = m["uid"]; !ok {
-			break
-		}
-		m = rep
-		if _, ok = m["created_by"]; !ok {
-			break
-		}
-		m = rep
-		if _, ok = m["updated_by"]; !ok {
-			break
-		}
-		return "findContractByUIDAndCreatedByAndUpdatedBy", nil
-	}
-	return "", fmt.Errorf("%w for Contract", ErrTypeNotFound)
-}
-
 func entityResolverNameForCoupon(ctx context.Context, rep map[string]interface{}) (string, error) {
 	for {
 		var (
@@ -1275,10 +1218,6 @@ func entityResolverNameForOrganization(ctx context.Context, rep map[string]inter
 		)
 		_ = val
 		m = rep
-		if _, ok = m["uid"]; !ok {
-			break
-		}
-		m = rep
 		if _, ok = m["created_by"]; !ok {
 			break
 		}
@@ -1286,7 +1225,7 @@ func entityResolverNameForOrganization(ctx context.Context, rep map[string]inter
 		if _, ok = m["updated_by"]; !ok {
 			break
 		}
-		return "findOrganizationByUIDAndCreatedByAndUpdatedBy", nil
+		return "findOrganizationByCreatedByAndUpdatedBy", nil
 	}
 	return "", fmt.Errorf("%w for Organization", ErrTypeNotFound)
 }

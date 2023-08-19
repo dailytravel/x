@@ -69,7 +69,11 @@ async function startApolloServer() {
   // Use the Apollo server middleware along with authentication and CORS
   app.use(
     cors({
-      origin: ["http://localhost:4000", "https://api.trip.express"],
+      origin: [
+        "http://localhost:3000",
+        "http://localhost:4000",
+        "https://api.trip.express",
+      ],
     }),
     json(),
     authenticate,

@@ -211,6 +211,16 @@ func (r *quoteResolver) ValidUntil(ctx context.Context, obj *model.Quote) (int, 
 	panic(fmt.Errorf("not implemented: ValidUntil - valid_until"))
 }
 
+// Amount is the resolver for the amount field.
+func (r *quoteResolver) Amount(ctx context.Context, obj *model.Quote) (float64, error) {
+	panic(fmt.Errorf("not implemented: Amount - amount"))
+}
+
+// Currency is the resolver for the currency field.
+func (r *quoteResolver) Currency(ctx context.Context, obj *model.Quote) (string, error) {
+	panic(fmt.Errorf("not implemented: Currency - currency"))
+}
+
 // Metadata is the resolver for the metadata field.
 func (r *quoteResolver) Metadata(ctx context.Context, obj *model.Quote) (map[string]interface{}, error) {
 	return obj.Metadata, nil

@@ -5,26 +5,26 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Quote struct {
 	Model
-	User        primitive.ObjectID  `json:"user,omitempty" bson:"user,omitempty"`
-	Contact     primitive.ObjectID  `json:"contacts,omitempty" bson:"contacts,omitempty"`
-	Reference   string              `json:"reference,omitempty" bson:"reference,omitempty"`
-	Purchase    string              `json:"purchase,omitempty" bson:"purchase,omitempty"`
-	Locale      string              `json:"locale,omitempty" bson:"locale,omitempty"`
-	Name        string              `json:"name,omitempty" bson:"name,omitempty"`
-	Description string              `json:"description,omitempty" bson:"description,omitempty"`
-	Template    string              `json:"template,omitempty" bson:"template,omitempty"`
-	ValidUntil  primitive.Timestamp `json:"valid_until,omitempty" bson:"valid_until,omitempty"`
-	Amount      float64             `json:"amount,omitempty" bson:"amount,omitempty"`
-	Currency    string              `json:"currency,omitempty" bson:"currency,omitempty"`
-	Terms       string              `json:"terms,omitempty" bson:"terms,omitempty"`
-	Payment     string              `json:"payment,omitempty" bson:"payment,omitempty"`
+	UID         primitive.ObjectID  `json:"uid" bson:"uid"`
+	Contact     primitive.ObjectID  `json:"contacts" bson:"contacts"`
+	Reference   string              `json:"reference" bson:"reference"`
+	Purchase    *string             `json:"purchase,omitempty" bson:"purchase,omitempty"`
+	Locale      string              `json:"locale" bson:"locale"`
+	Name        string              `json:"name" bson:"name"`
+	Description *string             `json:"description,omitempty" bson:"description,omitempty"`
+	Template    string              `json:"template" bson:"template"`
+	ValidUntil  primitive.Timestamp `json:"valid_until" bson:"valid_until"`
+	Terms       string              `json:"terms" bson:"terms"`
+	Payment     string              `json:"payment" bson:"payment"`
 	Notes       string              `json:"notes,omitempty" bson:"notes,omitempty"`
 	Billing     primitive.M         `json:"billing,omitempty" bson:"billing,omitempty"`
-	Status      string              `json:"status,omitempty" bson:"status,omitempty"`
+	Status      string              `json:"status" bson:"status"`
 }
 
 func (i *Quote) MarshalBSON() ([]byte, error) {
@@ -42,4 +42,18 @@ func (i *Quote) MarshalBSON() ([]byte, error) {
 
 func (i *Quote) Collection() string {
 	return "quotes"
+}
+
+func (i *Quote) Index() []mongo.IndexModel {
+	return []mongo.IndexModel{
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "contact", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "locale", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "reference", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "purchase", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "deleted_at", Value: 1}}, Options: options.Index()},
+	}
 }

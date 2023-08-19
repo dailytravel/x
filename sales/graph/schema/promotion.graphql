@@ -1,0 +1,56 @@
+type Promotion {
+  id: ID!
+  type: String!
+  locale: String!
+  name: String!
+  description: String!
+  points: Int!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+  created_by: ID
+  updated_by: ID
+}
+
+enum PromotionType {
+  PURCHASE
+  REFERRAL
+  SIGNUP
+  REVIEW
+  BIRTHDAY
+  SUBSCRIPTION
+}
+
+type Promotions {
+  data: [Promotion]
+  count: Int!
+}
+
+input NewPromotion {
+  type: String!
+  locale: String!
+  name: String!
+  description: String!
+  points: Int!
+  metadata: Map
+}
+
+input UpdatePromotion {
+  locale: String
+  name: String
+  description: String
+  points: Int
+  metadata: Map
+}
+
+extend type Query {
+  promotion(id: ID!): Promotion @auth
+  promotions(args: Map): Promotions @auth
+}
+
+extend type Mutation {
+  createPromotion(input: NewPromotion!): Promotion @auth
+  updatePromotion(id: ID!, input: UpdatePromotion!): Promotion @auth
+  deletePromotion(id: ID!): Promotion @auth
+  deletePromotions(ids: [ID!]!): Boolean @auth
+}
