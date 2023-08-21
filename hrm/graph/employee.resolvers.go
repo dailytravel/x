@@ -68,17 +68,6 @@ func (r *employeeResolver) Organization(ctx context.Context, obj *model.Employee
 	return item, nil
 }
 
-// Position is the resolver for the position field.
-func (r *employeeResolver) Position(ctx context.Context, obj *model.Employee) (*model.Position, error) {
-	var item *model.Position
-
-	if err := r.db.Collection("positions").FindOne(ctx, bson.M{"_id": obj.UID}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
-}
-
 // UID is the resolver for the uid field.
 func (r *employeeResolver) UID(ctx context.Context, obj *model.Employee) (string, error) {
 	return obj.UID.Hex(), nil

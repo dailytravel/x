@@ -30,6 +30,11 @@ type Employees struct {
 	Count int         `json:"count"`
 }
 
+type Jobs struct {
+	Data  []*Job `json:"data,omitempty"`
+	Count *int   `json:"count,omitempty"`
+}
+
 type Leaves struct {
 	Data  []*Leave `json:"data,omitempty"`
 	Count int      `json:"count"`
@@ -48,6 +53,7 @@ type NewEmployee struct {
 	Reference      string                 `json:"reference"`
 	FirstName      string                 `json:"first_name"`
 	LastName       string                 `json:"last_name"`
+	Position       string                 `json:"position"`
 	Email          string                 `json:"email"`
 	Phone          string                 `json:"phone"`
 	Address        string                 `json:"address"`
@@ -57,7 +63,21 @@ type NewEmployee struct {
 	HireDate       *string                `json:"hire_date,omitempty"`
 	UserID         *string                `json:"user_id,omitempty"`
 	OrganizationID string                 `json:"organization_id"`
-	PositionID     *string                `json:"position_id,omitempty"`
+}
+
+type NewJob struct {
+	Locale       string                 `json:"locale"`
+	Title        string                 `json:"title"`
+	Description  string                 `json:"description"`
+	Requirements string                 `json:"requirements"`
+	Skills       *string                `json:"skills,omitempty"`
+	Benefits     *string                `json:"benefits,omitempty"`
+	Location     string                 `json:"location"`
+	Type         string                 `json:"type"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       string                 `json:"status"`
+	CreatedBy    *string                `json:"created_by,omitempty"`
+	UpdatedBy    *string                `json:"updated_by,omitempty"`
 }
 
 type NewLeave struct {
@@ -89,15 +109,6 @@ type NewPayroll struct {
 	Status   string                 `json:"status"`
 }
 
-type NewPosition struct {
-	Locale      string                 `json:"locale"`
-	Title       string                 `json:"title"`
-	Description string                 `json:"description"`
-	Salary      string                 `json:"salary"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      string                 `json:"status"`
-}
-
 type NewSalary struct {
 	Employee  string                 `json:"employee"`
 	Amount    float64                `json:"amount"`
@@ -115,11 +126,6 @@ type Organizations struct {
 type Payrolls struct {
 	Data  []*Payroll `json:"data,omitempty"`
 	Count int        `json:"count"`
-}
-
-type Positions struct {
-	Data  []*Position `json:"data,omitempty"`
-	Count int         `json:"count"`
 }
 
 type Resumes struct {
@@ -145,6 +151,7 @@ type UpdateEmployee struct {
 	Reference      *string                `json:"reference,omitempty"`
 	FirstName      *string                `json:"first_name,omitempty"`
 	LastName       *string                `json:"last_name,omitempty"`
+	Position       *string                `json:"position,omitempty"`
 	Email          *string                `json:"email,omitempty"`
 	Phone          *string                `json:"phone,omitempty"`
 	Address        *string                `json:"address,omitempty"`
@@ -154,7 +161,21 @@ type UpdateEmployee struct {
 	HireDate       *string                `json:"hire_date,omitempty"`
 	UserID         *string                `json:"user_id,omitempty"`
 	OrganizationID *string                `json:"organization_id,omitempty"`
-	PositionID     *string                `json:"position_id,omitempty"`
+}
+
+type UpdateJob struct {
+	Locale       *string                `json:"locale,omitempty"`
+	Title        *string                `json:"title,omitempty"`
+	Description  *string                `json:"description,omitempty"`
+	Requirements *string                `json:"requirements,omitempty"`
+	Skills       *string                `json:"skills,omitempty"`
+	Benefits     *string                `json:"benefits,omitempty"`
+	Location     *string                `json:"location,omitempty"`
+	Type         *string                `json:"type,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Status       *string                `json:"status,omitempty"`
+	CreatedBy    *string                `json:"created_by,omitempty"`
+	UpdatedBy    *string                `json:"updated_by,omitempty"`
 }
 
 type UpdateLeave struct {
@@ -182,16 +203,6 @@ type UpdatePayroll struct {
 	Currency *string                `json:"currency,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	Status   *string                `json:"status,omitempty"`
-}
-
-type UpdatePosition struct {
-	Locale      string                 `json:"locale"`
-	Title       *string                `json:"title,omitempty"`
-	Description *string                `json:"description,omitempty"`
-	Location    *string                `json:"location,omitempty"`
-	Salary      *string                `json:"salary,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      *string                `json:"status,omitempty"`
 }
 
 type UpdateResume struct {
@@ -256,6 +267,94 @@ func (e *AttendanceStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e AttendanceStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type JobStatus string
+
+const (
+	JobStatusOpen   JobStatus = "OPEN"
+	JobStatusClosed JobStatus = "CLOSED"
+)
+
+var AllJobStatus = []JobStatus{
+	JobStatusOpen,
+	JobStatusClosed,
+}
+
+func (e JobStatus) IsValid() bool {
+	switch e {
+	case JobStatusOpen, JobStatusClosed:
+		return true
+	}
+	return false
+}
+
+func (e JobStatus) String() string {
+	return string(e)
+}
+
+func (e *JobStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = JobStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid JobStatus", str)
+	}
+	return nil
+}
+
+func (e JobStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type JobType string
+
+const (
+	JobTypeFullTime   JobType = "FULL_TIME"
+	JobTypePartTime   JobType = "PART_TIME"
+	JobTypeContract   JobType = "CONTRACT"
+	JobTypeFreelance  JobType = "FREELANCE"
+	JobTypeInternship JobType = "INTERNSHIP"
+)
+
+var AllJobType = []JobType{
+	JobTypeFullTime,
+	JobTypePartTime,
+	JobTypeContract,
+	JobTypeFreelance,
+	JobTypeInternship,
+}
+
+func (e JobType) IsValid() bool {
+	switch e {
+	case JobTypeFullTime, JobTypePartTime, JobTypeContract, JobTypeFreelance, JobTypeInternship:
+		return true
+	}
+	return false
+}
+
+func (e JobType) String() string {
+	return string(e)
+}
+
+func (e *JobType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = JobType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid JobType", str)
+	}
+	return nil
+}
+
+func (e JobType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

@@ -48,7 +48,7 @@ type ResolverRoot interface {
 
 type DirectiveRoot struct {
 	Api              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Auth             func(ctx context.Context, obj interface{}, next graphql.Resolver, requires []*string) (res interface{}, err error)
+	Auth             func(ctx context.Context, obj interface{}, next graphql.Resolver, roles []*string) (res interface{}, err error)
 	ComposeDirective func(ctx context.Context, obj interface{}, next graphql.Resolver, name string) (res interface{}, err error)
 	HasScope         func(ctx context.Context, obj interface{}, next graphql.Resolver, scope []string) (res interface{}, err error)
 	InterfaceObject  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -1303,14 +1303,14 @@ func (ec *executionContext) dir_auth_args(ctx context.Context, rawArgs map[strin
 	var err error
 	args := map[string]interface{}{}
 	var arg0 []*string
-	if tmp, ok := rawArgs["requires"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("requires"))
+	if tmp, ok := rawArgs["roles"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
 		arg0, err = ec.unmarshalOString2ᚕᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["requires"] = arg0
+	args["roles"] = arg0
 	return args, nil
 }
 
@@ -3779,14 +3779,14 @@ func (ec *executionContext) _Mutation_createAudience(ctx context.Context, field 
 			return ec.resolvers.Mutation().CreateAudience(rctx, fc.Args["input"].(model.NewAudience))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3873,14 +3873,14 @@ func (ec *executionContext) _Mutation_updateAudience(ctx context.Context, field 
 			return ec.resolvers.Mutation().UpdateAudience(rctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateAudience))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -3967,14 +3967,14 @@ func (ec *executionContext) _Mutation_deleteAudience(ctx context.Context, field 
 			return ec.resolvers.Mutation().DeleteAudience(rctx, fc.Args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -4043,14 +4043,14 @@ func (ec *executionContext) _Mutation_deleteAudiences(ctx context.Context, field
 			return ec.resolvers.Mutation().DeleteAudiences(rctx, fc.Args["ids"].([]string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -4795,14 +4795,14 @@ func (ec *executionContext) _Mutation_createSegment(ctx context.Context, field g
 			return ec.resolvers.Mutation().CreateSegment(rctx, fc.Args["input"].(model.SegmentInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -4889,14 +4889,14 @@ func (ec *executionContext) _Mutation_updateSegment(ctx context.Context, field g
 			return ec.resolvers.Mutation().UpdateSegment(rctx, fc.Args["id"].(string), fc.Args["input"].(model.SegmentInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -4983,14 +4983,14 @@ func (ec *executionContext) _Mutation_deleteSegment(ctx context.Context, field g
 			return ec.resolvers.Mutation().DeleteSegment(rctx, fc.Args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -5059,14 +5059,14 @@ func (ec *executionContext) _Mutation_deleteSegments(ctx context.Context, field 
 			return ec.resolvers.Mutation().DeleteSegments(rctx, fc.Args["ids"].([]string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -5135,14 +5135,14 @@ func (ec *executionContext) _Query_audience(ctx context.Context, field graphql.C
 			return ec.resolvers.Query().Audience(rctx, fc.Args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -5229,14 +5229,14 @@ func (ec *executionContext) _Query_audiences(ctx context.Context, field graphql.
 			return ec.resolvers.Query().Audiences(rctx, fc.Args["args"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -5691,14 +5691,14 @@ func (ec *executionContext) _Query_segment(ctx context.Context, field graphql.Co
 			return ec.resolvers.Query().Segment(rctx, fc.Args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)
@@ -5785,14 +5785,14 @@ func (ec *executionContext) _Query_segments(ctx context.Context, field graphql.C
 			return ec.resolvers.Query().Segments(rctx, fc.Args["args"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
-			requires, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
+			roles, err := ec.unmarshalOString2ᚕᚖstring(ctx, []interface{}{"ADMIN"})
 			if err != nil {
 				return nil, err
 			}
 			if ec.directives.Auth == nil {
 				return nil, errors.New("directive auth is not implemented")
 			}
-			return ec.directives.Auth(ctx, nil, directive0, requires)
+			return ec.directives.Auth(ctx, nil, directive0, roles)
 		}
 
 		tmp, err := directive1(rctx)

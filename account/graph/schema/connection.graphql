@@ -1,0 +1,46 @@
+type Connection {
+  id: ID!
+  name: String!
+  description: String!
+  type: String!
+  status: String!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+  client: Client
+}
+
+type Connections {
+  data: [Connection]
+  count: Int!
+}
+
+input NewConnection {
+  client: ID!
+  name: String!
+  description: String
+  type: String!
+  status: String!
+  metadata: Map
+}
+
+input UpdateConnection {
+  name: String
+  description: String
+  status: String
+  metadata: Map
+}
+
+extend type Query {
+  connections(args: Map): Connections
+  connection(id: ID!): Connection
+}
+
+extend type Mutation {
+  createConnection(input: NewConnection!): Connection
+  updateConnection(id: ID!, input: UpdateConnection!): Connection
+  deleteConnection(id: ID!): Map
+  deleteConnections(ids: [ID!]!): Map
+}

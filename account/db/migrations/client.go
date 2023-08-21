@@ -56,13 +56,12 @@ func (m *Client) Migrate() error {
 			hash, _ := utils.Base64(32, false)
 			//create default client
 			client := &model.Client{
-				Name:        "Default",
-				Secret:      hash,
-				Redirect:    "http://localhost:8080",
-				Permissions: []string{"*"},
-				Domains:     []string{"*"},
-				Provider:    "local",
-				Revoked:     false,
+				Name:     "Default",
+				Secret:   hash,
+				Redirect: "http://localhost:8080",
+				Domain:   "api.trip.express",
+				Provider: "local",
+				Revoked:  false,
 			}
 
 			if _, err := col.InsertOne(context.Background(), client); err != nil {

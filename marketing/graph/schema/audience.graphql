@@ -29,14 +29,14 @@ input UpdateAudience {
 }
 
 extend type Query {
-  audience(id: ID!): Audience @auth(requires: [ADMIN])
-  audiences(args: Map): [Audience] @auth(requires: [ADMIN])
+  audience(id: ID!): Audience @auth(roles: [ADMIN])
+  audiences(args: Map): [Audience] @auth(roles: [ADMIN])
 }
 
 extend type Mutation {
-  createAudience(input: NewAudience!): Audience @auth(requires: [ADMIN])
+  createAudience(input: NewAudience!): Audience @auth(roles: [ADMIN])
   updateAudience(id: ID!, input: UpdateAudience!): Audience
-    @auth(requires: [ADMIN])
-  deleteAudience(id: ID!): Map @auth(requires: [ADMIN])
-  deleteAudiences(ids: [ID!]!): Map @auth(requires: [ADMIN])
+    @auth(roles: [ADMIN])
+  deleteAudience(id: ID!): Map @auth(roles: [ADMIN])
+  deleteAudiences(ids: [ID!]!): Map @auth(roles: [ADMIN])
 }

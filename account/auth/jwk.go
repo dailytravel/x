@@ -50,7 +50,7 @@ func getJWKS(items []*model.Key) (map[string]interface{}, error) {
 			pubKey := privKey.Public()
 
 			jwksKey := JWKSKey{
-				Kid: item.Kid,
+				Kid: item.ID.Hex(),
 				Kty: "RSA",
 				Use: "sig",   // Use "sig" for signatures, "enc" for encryption
 				Alg: "RS256", // The algorithm used with this key (e.g., RS256, RS384, RS512)
@@ -99,7 +99,7 @@ func CreateJWKSFile(col *mongo.Collection) error {
 	// Create the desired file path relative to the current working directory
 	filePath := filepath.Join(currentDir, "gateway", ".well-known", "jwks.json")
 
-	file, err := json.MarshalIndent(jwks["keys"], "", " ")
+	file, err := json.MarshalIndent(jwks, "", " ")
 	if err != nil {
 		return err
 	}

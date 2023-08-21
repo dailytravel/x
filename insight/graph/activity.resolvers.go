@@ -40,7 +40,6 @@ func (r *activityResolver) CreatedAt(ctx context.Context, obj *model.Activity) (
 // Activity is the resolver for the activity field.
 func (r *queryResolver) Activity(ctx context.Context, id string) (*model.Activity, error) {
 	panic(fmt.Errorf("not implemented: Activities - activities"))
-
 }
 
 // Activities is the resolver for the activities field.

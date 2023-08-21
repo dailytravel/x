@@ -4,6 +4,7 @@ type Permission {
   description: String
   created_at: String!
   updated_at: String!
+  api: Api
 }
 
 type Permissions {
@@ -22,14 +23,14 @@ input UpdatePermission {
 }
 
 extend type Query {
-  permissions(args: Map): Permissions @auth(requires: [ADMIN])
-  permission(id: ID!): Permission! @auth(requires: [ADMIN])
+  permissions(args: Map): Permissions @auth(roles: [ADMIN])
+  permission(id: ID!): Permission! @auth(roles: [ADMIN])
 }
 
 extend type Mutation {
-  createPermission(input: NewPermission!): Permission! @auth(requires: [ADMIN])
+  createPermission(input: NewPermission!): Permission! @auth(roles: [ADMIN])
   updatePermission(id: ID!, input: UpdatePermission!): Permission!
-    @auth(requires: [ADMIN])
-  deletePermission(id: ID!): Map @auth(requires: [ADMIN])
-  deletePermissions(ids: [ID!]!): Map @auth(requires: [ADMIN])
+    @auth(roles: [ADMIN])
+  deletePermission(id: ID!): Map @auth(roles: [ADMIN])
+  deletePermissions(ids: [ID!]!): Map @auth(roles: [ADMIN])
 }

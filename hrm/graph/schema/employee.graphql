@@ -14,7 +14,7 @@ type Employee {
   updated_at: String!
   user: User
   organization: Organization!
-  position: Position
+  position: String!
   uid: ID!
   created_by: ID
   updated_by: ID
@@ -29,6 +29,7 @@ input NewEmployee {
   reference: String!
   first_name: String!
   last_name: String!
+  position: String!
   email: String!
   phone: String!
   address: String!
@@ -38,13 +39,13 @@ input NewEmployee {
   hire_date: String
   user_id: ID
   organization_id: ID!
-  position_id: ID
 }
 
 input UpdateEmployee {
   reference: String
   first_name: String
   last_name: String
+  position: String
   email: String
   phone: String
   address: String
@@ -54,7 +55,6 @@ input UpdateEmployee {
   hire_date: String
   user_id: ID
   organization_id: ID
-  position_id: ID
 }
 
 extend type Query {

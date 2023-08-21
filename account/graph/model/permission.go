@@ -13,8 +13,9 @@ import (
 
 type Permission struct {
 	Model       `bson:",inline"`
-	Name        string  `json:"name" bson:"name"`
-	Description *string `json:"description,omitempty" bson:"description,omitempty"`
+	Api         primitive.ObjectID `json:"api" bson:"api"`
+	Name        string             `json:"name" bson:"name"`
+	Description *string            `json:"description,omitempty" bson:"description,omitempty"`
 }
 
 // remove spacing characters
@@ -41,7 +42,7 @@ func (i *Permission) Collection() string {
 
 func (i *Permission) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "name", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "api", Value: 1}, {Key: "name", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},

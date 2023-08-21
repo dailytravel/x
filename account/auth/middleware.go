@@ -18,12 +18,11 @@ const LocaleContextKey contextKey = "LocaleContextKey"
 
 func Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		auth := c.Request.Header.Get("auth")
-		apiKey := c.Request.Header.Get("x-api-key")
 
 		ctx := context.WithValue(c.Request.Context(), GinContextKey, c)
-		ctx = context.WithValue(ctx, AuthContextKey, auth)
-		ctx = context.WithValue(ctx, APIKeyContextKey, apiKey)
+		ctx = context.WithValue(ctx, LocaleContextKey, c.GetHeader("x-locale"))
+		ctx = context.WithValue(ctx, APIKeyContextKey, c.GetHeader("x-api-key"))
+		ctx = context.WithValue(ctx, AuthContextKey, c.GetHeader("authorization"))
 
 		// Add the gin.Context to the request context using the custom context key
 		c.Request = c.Request.WithContext(ctx)
@@ -38,11 +37,11 @@ func Auth(ctx context.Context) jwt.MapClaims {
 }
 
 func Locale(ctx context.Context) *string {
-	raw, _ := ctx.Value(LocaleContextKey).(*string)
-	return raw
+	raw, _ := ctx.Value(LocaleContextKey).(string)
+	return &raw
 }
 
 func APIKey(ctx context.Context) *string {
-	raw, _ := ctx.Value(APIKeyContextKey).(*string)
-	return raw
+	raw, _ := ctx.Value(APIKeyContextKey).(string) // Change this line
+	return &raw
 }

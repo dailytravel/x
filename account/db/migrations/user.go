@@ -6,6 +6,7 @@ import (
 	"github.com/dailytravel/x/account/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -75,6 +76,11 @@ func (m *User) Migrate() error {
 		}
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("abc@123"), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
 	for _, email := range emails {
 		// Check if the user exists
 		filter := bson.M{"email": email["email"].(string)}
@@ -92,7 +98,7 @@ func (m *User) Migrate() error {
 					roles[i] = r
 				}
 				item.Roles = roles
-				item.Password = "abc@123"
+				item.Password = string(hashedPassword)
 
 				if _, err := col.InsertOne(context.Background(), item); err != nil {
 					return err

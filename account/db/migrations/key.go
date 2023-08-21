@@ -11,14 +11,13 @@ import (
 
 	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Key struct {
-	Database    *mongo.Database
-	Model *model.Key
+	Database *mongo.Database
+	Model    *model.Key
 }
 
 // Create mongo collection
@@ -62,7 +61,6 @@ func (m *Key) Migrate() error {
 		if err == mongo.ErrNoDocuments {
 			// create current and next certificate
 			for _, status := range []string{"current", "next"} {
-				kid := uuid.NewString()
 
 				privateKey, err := auth.GenerateRSAKeyPair(2048)
 				if err != nil {
@@ -97,7 +95,6 @@ func (m *Key) Migrate() error {
 				cert := &model.Key{
 					Name:        status,
 					Provider:    "local",
-					Kid:         kid,
 					Certificate: string(privateKeyPEM),
 					Fingerprint: fingerprintHex,
 					Thumbprint:  thumbprintSHA256Hex,

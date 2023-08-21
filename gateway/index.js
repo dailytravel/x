@@ -25,8 +25,8 @@ const authenticate = expressjwt({
     jwksRequestsPerMinute: 5,
     jwksUri: "http://localhost:4000/.well-known/jwks.json", // Replace with your Auth0 domain
   }),
-  audience: "api.trip.express",
-  issuer: "https://api.trip.express/",
+  audience: "https://api.trip.express/graphql",
+  issuer: "https://api.trip.express",
   algorithms: ["RS256"],
   credentialsRequired: false,
 });

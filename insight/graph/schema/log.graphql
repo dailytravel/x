@@ -41,13 +41,13 @@ input UpdateLog {
 }
 
 extend type Query {
-  log(id: ID!): Log @auth(requires: [ADMIN])
+  log(id: ID!): Log @auth(roles: [ADMIN])
   logs(args: Map): Logs
 }
 
 extend type Mutation {
   createLog(input: NewLog!): Log
   updateLog(id: ID!, input: UpdateLog!): Log
-  deleteLog(id: ID!): Map @auth(requires: [ADMIN])
-  deleteLogs(ids: [ID]!): Map @auth(requires: [ADMIN])
+  deleteLog(id: ID!): Map @auth(roles: [ADMIN])
+  deleteLogs(ids: [ID]!): Map @auth(roles: [ADMIN])
 }

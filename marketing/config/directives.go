@@ -21,7 +21,7 @@ func Directives(c *graph.Config) {
 		return next(ctx)
 	}
 
-	c.Directives.Auth = func(ctx context.Context, obj interface{}, next graphql.Resolver, requires []*string) (interface{}, error) {
+	c.Directives.Auth = func(ctx context.Context, obj interface{}, next graphql.Resolver, roles []*string) (interface{}, error) {
 		return nil, ErrMissingRole
 	}
 

@@ -1,0 +1,45 @@
+type Integration {
+  id: ID!
+  name: String!
+  description: String
+  type: String!
+  status: String!
+  metadata: Map
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}
+
+type Integrations {
+  data: [Integration]
+  count: Int!
+}
+
+input NewIntegration {
+  name: String!
+  description: String
+  type: String!
+  status: String!
+  metadata: Map
+}
+
+input UpdateIntegration {
+  name: String
+  description: String
+  type: String
+  status: String
+  metadata: Map
+}
+
+extend type Query {
+  integrations(args: Map): Integrations
+  integration(id: ID!): Integration
+}
+
+extend type Mutation {
+  createIntegration(input: NewIntegration!): Integration
+  updateIntegration(id: ID!, input: UpdateIntegration!): Integration
+  deleteIntegration(id: ID!): Map
+  deleteIntegrations(ids: [ID!]!): Map
+}

@@ -28,6 +28,9 @@ func init() {
 	os.Setenv("DB_HOST", "localhost")
 	os.Setenv("DB_NAME", "account")
 	os.Setenv("MONGODB_URI", "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1")
+	os.Setenv("ISSUER", "https://api.trip.express")
+	os.Setenv("AUDIENCE", "https://api.trip.express/graphql")
+	os.Setenv("JWKS_URI", "https://api.trip.express/.well-known/jwks.json")
 }
 
 // Defining the playgroundHandler handler

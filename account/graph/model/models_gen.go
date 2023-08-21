@@ -8,9 +8,19 @@ import (
 	"strconv"
 )
 
+type Apis struct {
+	Data  []*Api `json:"data,omitempty"`
+	Count int    `json:"count"`
+}
+
 type Clients struct {
 	Data  []*Client `json:"data,omitempty"`
 	Count int       `json:"count"`
+}
+
+type Connections struct {
+	Data  []*Connection `json:"data,omitempty"`
+	Count int           `json:"count"`
 }
 
 type Identity struct {
@@ -25,6 +35,11 @@ type Identity struct {
 	Status      string                 `json:"status"`
 	CreatedAt   string                 `json:"created_at"`
 	UpdatedAt   string                 `json:"updated_at"`
+}
+
+type Integrations struct {
+	Data  []*Integration `json:"data,omitempty"`
+	Count int            `json:"count"`
 }
 
 type Invitations struct {
@@ -63,13 +78,38 @@ type Membership struct {
 
 func (Membership) IsEntity() {}
 
+type NewAPI struct {
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Identifier  string                 `json:"identifier"`
+	Algorithm   Algorithm              `json:"algorithm"`
+	Expiration  int                    `json:"expiration"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type NewClient struct {
 	Type        string                 `json:"type"`
 	Name        string                 `json:"name"`
 	Description *string                `json:"description,omitempty"`
-	Domains     []*string              `json:"domains,omitempty"`
+	Domain      *string                `json:"domain,omitempty"`
 	Redirect    string                 `json:"redirect"`
-	Permissions []*string              `json:"permissions,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewConnection struct {
+	Client      string                 `json:"client"`
+	Name        string                 `json:"name"`
+	Description *string                `json:"description,omitempty"`
+	Type        string                 `json:"type"`
+	Status      string                 `json:"status"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewIntegration struct {
+	Name        string                 `json:"name"`
+	Description *string                `json:"description,omitempty"`
+	Type        string                 `json:"type"`
+	Status      string                 `json:"status"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
@@ -171,14 +211,37 @@ type Roles struct {
 	Count int     `json:"count"`
 }
 
+type UpdateAPI struct {
+	Name        *string                `json:"name,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Identifier  *string                `json:"identifier,omitempty"`
+	Algorithm   *Algorithm             `json:"algorithm,omitempty"`
+	Expiration  *int                   `json:"expiration,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type UpdateClient struct {
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
-	Domains     []*string              `json:"domains,omitempty"`
+	Domain      *string                `json:"domain,omitempty"`
 	Redirect    *string                `json:"redirect,omitempty"`
-	Permissions []string               `json:"permissions,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	ExpiresAt   *string                `json:"expires_at,omitempty"`
+}
+
+type UpdateConnection struct {
+	Name        *string                `json:"name,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type UpdateIntegration struct {
+	Name        *string                `json:"name,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Type        *string                `json:"type,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateInvitation struct {
@@ -228,6 +291,67 @@ type Wishlist struct {
 }
 
 func (Wishlist) IsEntity() {}
+
+type Algorithm string
+
+const (
+	AlgorithmHs256 Algorithm = "HS256"
+	AlgorithmHs384 Algorithm = "HS384"
+	AlgorithmHs512 Algorithm = "HS512"
+	AlgorithmRs256 Algorithm = "RS256"
+	AlgorithmRs384 Algorithm = "RS384"
+	AlgorithmRs512 Algorithm = "RS512"
+	AlgorithmEs256 Algorithm = "ES256"
+	AlgorithmEs384 Algorithm = "ES384"
+	AlgorithmEs512 Algorithm = "ES512"
+	AlgorithmPs256 Algorithm = "PS256"
+	AlgorithmPs384 Algorithm = "PS384"
+	AlgorithmPs512 Algorithm = "PS512"
+)
+
+var AllAlgorithm = []Algorithm{
+	AlgorithmHs256,
+	AlgorithmHs384,
+	AlgorithmHs512,
+	AlgorithmRs256,
+	AlgorithmRs384,
+	AlgorithmRs512,
+	AlgorithmEs256,
+	AlgorithmEs384,
+	AlgorithmEs512,
+	AlgorithmPs256,
+	AlgorithmPs384,
+	AlgorithmPs512,
+}
+
+func (e Algorithm) IsValid() bool {
+	switch e {
+	case AlgorithmHs256, AlgorithmHs384, AlgorithmHs512, AlgorithmRs256, AlgorithmRs384, AlgorithmRs512, AlgorithmEs256, AlgorithmEs384, AlgorithmEs512, AlgorithmPs256, AlgorithmPs384, AlgorithmPs512:
+		return true
+	}
+	return false
+}
+
+func (e Algorithm) String() string {
+	return string(e)
+}
+
+func (e *Algorithm) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Algorithm(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Algorithm", str)
+	}
+	return nil
+}
+
+func (e Algorithm) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
 
 type InvitationStatus string
 

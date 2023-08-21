@@ -11,12 +11,12 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/utils"
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,6 +26,11 @@ import (
 // ID is the resolver for the id field.
 func (r *keyResolver) ID(ctx context.Context, obj *model.Key) (string, error) {
 	return obj.ID.Hex(), nil
+}
+
+// Kid is the resolver for the kid field.
+func (r *keyResolver) Kid(ctx context.Context, obj *model.Key) (string, error) {
+	panic(fmt.Errorf("not implemented: Kid - kid"))
 }
 
 // ExpiresAt is the resolver for the expires_at field.
@@ -52,7 +57,7 @@ func (r *keyResolver) User(ctx context.Context, obj *model.Key) (*model.User, er
 	var item *model.User
 	col := r.db.Collection(item.Collection())
 
-	filter := bson.M{"_id": obj.User}
+	filter := bson.M{"_id": obj.UID}
 	options := options.FindOne().SetProjection(bson.M{"_id": 1, "name": 1, "email": 1, "photos": 1})
 
 	err := col.FindOne(ctx, filter, options).Decode(&item)
@@ -85,7 +90,6 @@ func (r *mutationResolver) RevokeKey(ctx context.Context) (*model.Key, error) {
 	}
 
 	// Generate a new key for the "next" status
-	kid := uuid.NewString()
 	privateKey, err := auth.GenerateRSAKeyPair(2048)
 	if err != nil {
 		return nil, err
@@ -116,7 +120,6 @@ func (r *mutationResolver) RevokeKey(ctx context.Context) (*model.Key, error) {
 	cert := &model.Key{
 		Name:        "next",
 		Provider:    "local",
-		Kid:         kid,
 		Certificate: string(privateKeyPEM),
 		Fingerprint: fingerprintHex,
 		Thumbprint:  thumbprintSHA256Hex,
@@ -168,7 +171,6 @@ func (r *mutationResolver) RotateKey(ctx context.Context) (*model.Key, error) {
 	}
 
 	// Generate a new key for the "next" status
-	kid := uuid.NewString()
 	privateKey, err := auth.GenerateRSAKeyPair(2048)
 	if err != nil {
 		return nil, err
@@ -199,7 +201,6 @@ func (r *mutationResolver) RotateKey(ctx context.Context) (*model.Key, error) {
 	cert := &model.Key{
 		Name:        "next",
 		Provider:    "local",
-		Kid:         kid,
 		Certificate: string(privateKeyPEM),
 		Fingerprint: fingerprintHex,
 		Thumbprint:  thumbprintSHA256Hex,

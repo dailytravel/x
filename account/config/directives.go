@@ -28,17 +28,17 @@ func Directives(c *graph.Config) {
 		return next(ctx)
 	}
 
-	c.Directives.Auth = func(ctx context.Context, obj interface{}, next graphql.Resolver, requires []*string) (interface{}, error) {
+	c.Directives.Auth = func(ctx context.Context, obj interface{}, next graphql.Resolver, roles []*string) (interface{}, error) {
 		claims := auth.Auth(ctx)
 		if claims == nil {
 			return nil, ErrNotAuthenticated
 		}
 
-		if len(requires) == 0 {
+		if len(roles) == 0 {
 			return next(ctx)
 		}
 
-		for _, require := range requires {
+		for _, require := range roles {
 			for _, role := range strings.Split(claims["roles"].(string), " ") {
 				if role == *require {
 					return next(ctx)

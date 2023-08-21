@@ -47,8 +47,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  createLocale(input: NewLocale!): Locale @auth(requires: [ADMIN])
-  updateLocale(id: ID!, input: UpdateLocale!): Locale @auth(requires: [ADMIN])
-  deleteLocale(id: ID!): Map @auth(requires: [ADMIN])
-  deleteLocales(ids: [ID!]!): Map @auth(requires: [ADMIN])
+  createLocale(input: NewLocale!): Locale @auth(roles: [ADMIN])
+  updateLocale(id: ID!, input: UpdateLocale!): Locale @auth(roles: [ADMIN])
+  deleteLocale(id: ID!): Map @auth(roles: [ADMIN])
+  deleteLocales(ids: [ID!]!): Map @auth(roles: [ADMIN])
 }

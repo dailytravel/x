@@ -16,11 +16,10 @@ type Client struct {
 	Name        string              `json:"name" bson:"name"`
 	Description string              `json:"description,omitempty" bson:"description,omitempty"`
 	Secret      string              `json:"secret" bson:"secret"`
-	Domains     []string            `json:"domains,omitempty" bson:"domains,omitempty"`
+	Domain      string              `json:"domain" bson:"domain"`
 	Redirect    string              `json:"redirect,omitempty" bson:"redirect,omitempty"`
 	Revoked     bool                `json:"revoked,omitempty" bson:"revoked,omitempty"`
 	Provider    string              `json:"provider,omitempty" bson:"provider,omitempty"`
-	Permissions []string            `json:"permissions,omitempty" bson:"permissions,omitempty"`
 	LastUsed    primitive.Timestamp `json:"last_used,omitempty" bson:"last_used,omitempty"`
 	ExpiresAt   primitive.Timestamp `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
 	Status      string              `json:"status" bson:"status"`
@@ -45,6 +44,7 @@ func (i *Client) Collection() string {
 
 func (i *Client) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
+		{Keys: bson.D{{Key: "domain", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},

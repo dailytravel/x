@@ -11,11 +11,10 @@ import (
 
 type Key struct {
 	Model       `bson:",inline"`
-	User        *primitive.ObjectID  `json:"user,omitempty" bson:"user,omitempty"`
+	UID         *primitive.ObjectID  `json:"uid,omitempty" bson:"uid,omitempty"`
 	Name        string               `json:"name" bson:"name"`
 	Type        string               `json:"type" bson:"type"`
 	Provider    string               `json:"provider" bson:"provider"`
-	Kid         string               `json:"kid" bson:"kid"`
 	Certificate string               `json:"certificate" bson:"certificate"`
 	Fingerprint string               `json:"fingerprint" bson:"fingerprint"`
 	Thumbprint  string               `json:"thumbprint" bson:"thumbprint"`
@@ -42,8 +41,8 @@ func (i *Key) Collection() string {
 
 func (i *Key) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "provider", Value: 1}, {Key: "kid", Value: 1}}, Options: options.Index().SetUnique(true)},
-		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "provider", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},

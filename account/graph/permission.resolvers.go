@@ -137,6 +137,11 @@ func (r *permissionResolver) UpdatedAt(ctx context.Context, obj *model.Permissio
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// API is the resolver for the api field.
+func (r *permissionResolver) API(ctx context.Context, obj *model.Permission) (*model.Api, error) {
+	panic(fmt.Errorf("not implemented: API - api"))
+}
+
 // Permissions is the resolver for the permissions field.
 func (r *queryResolver) Permissions(ctx context.Context, args map[string]interface{}) (*model.Permissions, error) {
 	var items []*model.Permission

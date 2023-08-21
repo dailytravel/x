@@ -85,8 +85,8 @@ input VerifyEmailInput {
 }
 
 extend type Query {
-  users(args: Map): Map @auth(requires: [ADMIN])
-  user(id: ID!): User @auth(requires: [ADMIN])
+  users(args: Map): Map @auth(roles: [ADMIN])
+  user(id: ID!): User @auth(roles: [ADMIN])
   me: User @auth
 }
 
@@ -95,10 +95,10 @@ extend type Mutation {
   register(input: RegisterInput!): Payload
   login(input: LoginInput!): Payload
   socialLogin(provider: SocialProvider!, access_token: String!): Payload
-  updateUser(id: ID!, input: UpdateUser!): User @auth(requires: [ADMIN])
+  updateUser(id: ID!, input: UpdateUser!): User @auth(roles: [ADMIN])
   updateAccount(input: UpdateUser!): User @auth
-  deleteUser(id: ID!): Map @auth(requires: [ADMIN])
-  deleteUsers(ids: [ID!]!): Map @auth(requires: [ADMIN])
+  deleteUser(id: ID!): Map @auth(roles: [ADMIN])
+  deleteUsers(ids: [ID!]!): Map @auth(roles: [ADMIN])
   deleteAccount: Map @auth
   restoreUser(id: ID!): Map @auth
   forgotPassword(email: String!): Map

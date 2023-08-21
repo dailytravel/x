@@ -37,7 +37,7 @@ func CreateToken(claims map[string]interface{}, kid string, key interface{}) (st
 	return "", errors.New("invalid private key")
 }
 
-func Payload(claims jwt.MapClaims, k *model.Key, clientID string, expiresIn int) (*model.Payload, error) {
+func Token(claims jwt.MapClaims, k *model.Key) (*string, error) {
 	privBlock, _ := pem.Decode([]byte(k.Certificate))
 	if privBlock == nil {
 		return nil, fmt.Errorf("error decoding private key PEM block")
@@ -48,20 +48,10 @@ func Payload(claims jwt.MapClaims, k *model.Key, clientID string, expiresIn int)
 	}
 
 	//generate token
-	access_token, err := CreateToken(claims, k.Kid, privKey)
+	token, err := CreateToken(claims, k.ID.Hex(), privKey)
 	if err != nil {
 		return nil, fmt.Errorf("token not found")
 	}
 
-	refresh_token, err := CreateToken(claims, k.Kid, privKey)
-	if err != nil {
-		return nil, fmt.Errorf("token not found")
-	}
-
-	return &model.Payload{
-		AccessToken:  access_token,
-		RefreshToken: refresh_token,
-		TokenType:    "Bearer",
-		ExpiresIn:    expiresIn,
-	}, nil
+	return &token, nil
 }

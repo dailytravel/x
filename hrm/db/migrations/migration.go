@@ -9,6 +9,8 @@ type Migrator interface {
 func AutoMigrate() error {
 	migrators := []Migrator{
 		&Attendance{Database: db.Database},
+		&Employee{Database: db.Database},
+		&Job{Database: db.Database},
 		&Leave{Database: db.Database},
 		&Organization{Database: db.Database},
 		&Payroll{Database: db.Database},

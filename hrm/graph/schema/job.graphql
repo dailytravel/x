@@ -1,0 +1,77 @@
+type Job {
+  id: ID!
+  locale: String!
+  title: String!
+  description: String!
+  requirements: String!
+  skills: String
+  benefits: String
+  location: String!
+  type: String!
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+  created_by: ID
+  updated_by: ID
+}
+
+type Jobs {
+  data: [Job]
+  count: Int
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  FREELANCE
+  INTERNSHIP
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
+}
+
+input NewJob {
+  locale: String!
+  title: String!
+  description: String!
+  requirements: String!
+  skills: String
+  benefits: String
+  location: String!
+  type: String!
+  metadata: Map
+  status: String!
+  created_by: ID
+  updated_by: ID
+}
+
+input UpdateJob {
+  locale: String
+  title: String
+  description: String
+  requirements: String
+  skills: String
+  benefits: String
+  location: String
+  type: String
+  metadata: Map
+  status: String
+  created_by: ID
+  updated_by: ID
+}
+
+extend type Query {
+  job(id: ID!): Job
+  jobs(args: Map): Map
+}
+
+extend type Mutation {
+  createJob(input: NewJob!): Job @auth(roles: ["admin"])
+  updateJob(id: ID!, input: UpdateJob!): Job @auth(roles: ["admin"])
+  deleteJob(id: ID!): Map @auth(roles: ["admin"])
+  deleteJobs(ids: [ID!]!): Map @auth(roles: ["admin"])
+}

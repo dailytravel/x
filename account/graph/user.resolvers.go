@@ -14,6 +14,7 @@ import (
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/utils"
 	"github.com/go-redis/redis"
+	jwt "github.com/golang-jwt/jwt/v4"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -72,15 +73,29 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 
 // Register is the resolver for the register field.
 func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.Payload, error) {
-	// Check if the user is already authenticated
-	authenticatedUser := auth.Auth(ctx)
-	if authenticatedUser != nil {
-		return nil, fmt.Errorf("user is already authenticated")
-	}
+	var k *model.Key
+	var a *model.Api
+	var c *model.Client
 
 	client := auth.APIKey(ctx)
 	if client == nil {
 		return nil, fmt.Errorf("client not found")
+	}
+
+	//check client
+	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"secret": client}, nil).Decode(&c); err != nil {
+		return nil, fmt.Errorf("client not found")
+	}
+
+	//check api
+	if err := r.db.Collection("apis").FindOne(ctx, bson.M{"identifier": "https://api.trip.express/graphql"}, nil).Decode(&a); err != nil {
+		return nil, fmt.Errorf("api not found")
+	}
+
+	// Check if the user is already authenticated
+	authenticatedUser := auth.Auth(ctx)
+	if authenticatedUser != nil {
+		return nil, fmt.Errorf("user is already authenticated")
 	}
 
 	// Check if the email already exists
@@ -117,28 +132,64 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 
 	newUser.ID = res.InsertedID.(primitive.ObjectID)
 
-	var k *model.Key
 	if err := r.db.Collection(k.Collection()).FindOne(ctx, bson.M{"status": "current"}, nil).Decode(&k); err != nil {
 		return nil, fmt.Errorf("key not found")
 	}
 
-	// Create a new payload containing the access token and user information
-	payload, err := auth.Payload(auth.Auth(ctx), k, *client, 3600)
+	access_token, err := auth.Token(jwt.MapClaims{
+		"sub": newUser.ID.Hex(),
+		"aud": a.Identifier,
+		"iss": "https://" + c.Domain,
+		"azp": c.ID.Hex(),
+		"iat": time.Now().Unix(),
+		"exp": time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
+	}, k)
+
 	if err != nil {
 		return nil, err
 	}
 
-	return payload, nil
+	refresh_token, err := auth.Token(jwt.MapClaims{
+		"sub": newUser.ID.Hex(),
+		"aud": a.Identifier,
+		"iss": "https://" + c.Domain,
+		"azp": c.ID.Hex(),
+		"iat": time.Now().Unix(),
+		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+	}, k)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Payload{
+		AccessToken:  *access_token,
+		RefreshToken: *refresh_token,
+		TokenType:    "Bearer",
+		ExpiresIn:    3600,
+	}, nil
 }
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.Payload, error) {
 	var u *model.User
 	var k *model.Key
+	var a *model.Api
+	var c *model.Client
 
 	client := auth.APIKey(ctx)
 	if client == nil {
 		return nil, fmt.Errorf("client not found")
+	}
+
+	//check client
+	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"secret": client}, nil).Decode(&c); err != nil {
+		return nil, fmt.Errorf("client not found")
+	}
+
+	//check api
+	if err := r.db.Collection("apis").FindOne(ctx, bson.M{"identifier": "https://api.trip.express/graphql"}, nil).Decode(&a); err != nil {
+		return nil, fmt.Errorf("api not found")
 	}
 
 	//find user by email
@@ -156,22 +207,56 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 		return nil, fmt.Errorf("key not found")
 	}
 
-	payload, err := auth.Payload(auth.Auth(ctx), k, *client, 3600)
+	access_token, err := auth.Token(jwt.MapClaims{
+		"sub": u.ID.Hex(),
+		"aud": a.Identifier,
+		"iss": "https://" + c.Domain,
+		"azp": c.ID.Hex(),
+		"iat": time.Now().Unix(),
+		"exp": time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
+	}, k)
 
-	return payload, err
+	if err != nil {
+		return nil, err
+	}
+
+	refresh_token, err := auth.Token(jwt.MapClaims{
+		"sub": u.ID.Hex(),
+		"aud": a.Identifier,
+		"iss": "https://" + c.Domain,
+		"azp": c.ID.Hex(),
+		"iat": time.Now().Unix(),
+		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+	}, k)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Payload{
+		AccessToken:  *access_token,
+		RefreshToken: *refresh_token,
+		TokenType:    "Bearer",
+		ExpiresIn:    3600,
+	}, nil
 }
 
 // SocialLogin is the resolver for the socialLogin field.
 func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.SocialProvider, accessToken string) (*model.Payload, error) {
 	var u *model.User
 	var k *model.Key
+	var a *model.Api
+	var c *model.Client
 
-	//check client
 	client := auth.APIKey(ctx)
 	if client == nil {
 		return nil, fmt.Errorf("client not found")
 	}
 
+	//check client
+	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"secret": client}, nil).Decode(&c); err != nil {
+		return nil, fmt.Errorf("client not found")
+	}
 	// verify token from provider by google oauth
 	email, err := auth.GoogleLogin(ctx, accessToken)
 	if err != nil {
@@ -188,9 +273,38 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.Socia
 		return nil, fmt.Errorf("key not found")
 	}
 
-	payload, err := auth.Payload(auth.Auth(ctx), k, *client, 3600)
+	access_token, err := auth.Token(jwt.MapClaims{
+		"sub": u.ID.Hex(),
+		"aud": a.Identifier,
+		"iss": "https://" + c.Domain,
+		"azp": c.ID.Hex(),
+		"iat": time.Now().Unix(),
+		"exp": time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
+	}, k)
 
-	return payload, err
+	if err != nil {
+		return nil, err
+	}
+
+	refresh_token, err := auth.Token(jwt.MapClaims{
+		"sub": u.ID.Hex(),
+		"aud": a.Identifier,
+		"iss": "https://" + c.Domain,
+		"azp": c.ID.Hex(),
+		"iat": time.Now().Unix(),
+		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+	}, k)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Payload{
+		AccessToken:  *access_token,
+		RefreshToken: *refresh_token,
+		TokenType:    "Bearer",
+		ExpiresIn:    3600,
+	}, nil
 }
 
 // UpdateUser is the resolver for the updateUser field.

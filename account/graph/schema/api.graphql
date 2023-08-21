@@ -1,0 +1,64 @@
+type Api {
+  id: ID!
+  name: String!
+  description: String!
+  identifier: String!
+  algorithm: String!
+  expiration: Int!
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+  created_by: User
+  updated_by: User
+}
+
+type Apis {
+  data: [Api]
+  count: Int!
+}
+
+enum Algorithm {
+  HS256
+  HS384
+  HS512
+  RS256
+  RS384
+  RS512
+  ES256
+  ES384
+  ES512
+  PS256
+  PS384
+  PS512
+}
+
+input NewApi {
+  name: String!
+  description: String!
+  identifier: String!
+  algorithm: Algorithm!
+  expiration: Int!
+  metadata: Map
+}
+
+input UpdateApi {
+  name: String
+  description: String
+  identifier: String
+  algorithm: Algorithm
+  expiration: Int
+  metadata: Map
+}
+
+extend type Query {
+  api(id: ID!): Api
+  apis(args: Map): Apis
+}
+
+extend type Mutation {
+  createApi(input: NewApi!): Api
+  updateApi(id: ID!, input: UpdateApi!): Api
+  deleteApi(id: ID!): Map
+  deleteApis(ids: [ID!]!): Map
+}

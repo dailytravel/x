@@ -13,7 +13,7 @@ type Employee struct {
 	Model        `bson:",inline"`
 	UID          primitive.ObjectID `json:"uid" bson:"uid"`
 	Organization primitive.ObjectID `json:"organization" bson:"organization"`
-	Position     primitive.ObjectID `json:"position" bson:"position"`
+	Position     string             `json:"position" bson:"position"`
 	Reference    string             `json:"reference" bson:"reference"`
 	FirstName    string             `json:"first_name" bson:"first_name"`
 	LastName     string             `json:"last_name" bson:"last_name"`

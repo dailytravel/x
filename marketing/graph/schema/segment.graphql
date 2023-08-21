@@ -44,13 +44,13 @@ input RuleInput {
 }
 
 extend type Query {
-  segment(id: ID!): Segment @auth(requires: [ADMIN])
-  segments(args: Map): Segments @auth(requires: [ADMIN])
+  segment(id: ID!): Segment @auth(roles: [ADMIN])
+  segments(args: Map): Segments @auth(roles: [ADMIN])
 }
 
 extend type Mutation {
-  createSegment(input: SegmentInput!): Segment @auth(requires: [ADMIN])
-  updateSegment(id: ID!, input: SegmentInput!): Segment @auth(requires: [ADMIN])
-  deleteSegment(id: ID!): Map @auth(requires: [ADMIN])
-  deleteSegments(ids: [ID!]!): Map @auth(requires: [ADMIN])
+  createSegment(input: SegmentInput!): Segment @auth(roles: [ADMIN])
+  updateSegment(id: ID!, input: SegmentInput!): Segment @auth(roles: [ADMIN])
+  deleteSegment(id: ID!): Map @auth(roles: [ADMIN])
+  deleteSegments(ids: [ID!]!): Map @auth(roles: [ADMIN])
 }

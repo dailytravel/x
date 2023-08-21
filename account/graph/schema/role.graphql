@@ -27,13 +27,13 @@ input UpdateRole {
 }
 
 extend type Query {
-  role(id: ID!): Role @auth(requires: [ADMIN])
-  roles(args: Map): Roles @auth(requires: [ADMIN])
+  role(id: ID!): Role @auth(roles: [ADMIN])
+  roles(args: Map): Roles @auth(roles: [ADMIN])
 }
 
 extend type Mutation {
-  createRole(input: NewRole!): Role @auth(requires: [ADMIN])
-  updateRole(id: ID!, input: UpdateRole!): Role @auth(requires: [ADMIN])
-  deleteRole(id: ID!): Map @auth(requires: [ADMIN])
-  deleteRoles(ids: [ID!]!): Map @auth(requires: [ADMIN])
+  createRole(input: NewRole!): Role @auth(roles: [ADMIN])
+  updateRole(id: ID!, input: UpdateRole!): Role @auth(roles: [ADMIN])
+  deleteRole(id: ID!): Map @auth(roles: [ADMIN])
+  deleteRoles(ids: [ID!]!): Map @auth(roles: [ADMIN])
 }
