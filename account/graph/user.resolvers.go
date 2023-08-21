@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/dailytravel/x/account/auth"
@@ -25,7 +26,7 @@ import (
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	// Check if the user is authenticated
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -93,10 +94,10 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 	}
 
 	// Check if the user is already authenticated
-	authenticatedUser := auth.Auth(ctx)
-	if authenticatedUser != nil {
-		return nil, fmt.Errorf("user is already authenticated")
-	}
+	// authenticatedUser := auth.Auth(ctx)
+	// if authenticatedUser != nil {
+	// 	return nil, fmt.Errorf("user is already authenticated")
+	// }
 
 	// Check if the email already exists
 	existingUser := &model.User{}
@@ -139,7 +140,7 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 	access_token, err := auth.Token(jwt.MapClaims{
 		"sub": newUser.ID.Hex(),
 		"aud": a.Identifier,
-		"iss": "https://" + c.Domain,
+		"iss": strings.Join([]string{"https://", c.Domain}, ""),
 		"azp": c.ID.Hex(),
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
@@ -152,7 +153,7 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 	refresh_token, err := auth.Token(jwt.MapClaims{
 		"sub": newUser.ID.Hex(),
 		"aud": a.Identifier,
-		"iss": "https://" + c.Domain,
+		"iss": strings.Join([]string{"https://", c.Domain}, ""),
 		"azp": c.ID.Hex(),
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
@@ -210,7 +211,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	access_token, err := auth.Token(jwt.MapClaims{
 		"sub": u.ID.Hex(),
 		"aud": a.Identifier,
-		"iss": "https://" + c.Domain,
+		"iss": strings.Join([]string{"https://", c.Domain}, ""),
 		"azp": c.ID.Hex(),
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
@@ -223,7 +224,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	refresh_token, err := auth.Token(jwt.MapClaims{
 		"sub": u.ID.Hex(),
 		"aud": a.Identifier,
-		"iss": "https://" + c.Domain,
+		"iss": strings.Join([]string{"https://", c.Domain}, ""),
 		"azp": c.ID.Hex(),
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
@@ -276,7 +277,7 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.Socia
 	access_token, err := auth.Token(jwt.MapClaims{
 		"sub": u.ID.Hex(),
 		"aud": a.Identifier,
-		"iss": "https://" + c.Domain,
+		"iss": strings.Join([]string{"https://", c.Domain}, ""),
 		"azp": c.ID.Hex(),
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
@@ -289,7 +290,7 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.Socia
 	refresh_token, err := auth.Token(jwt.MapClaims{
 		"sub": u.ID.Hex(),
 		"aud": a.Identifier,
-		"iss": "https://" + c.Domain,
+		"iss": strings.Join([]string{"https://", c.Domain}, ""),
 		"azp": c.ID.Hex(),
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
@@ -309,7 +310,7 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.Socia
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUser) (*model.User, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -346,7 +347,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 
 // UpdateAccount is the resolver for the updateAccount field.
 func (r *mutationResolver) UpdateAccount(ctx context.Context, input model.UpdateUser) (*model.User, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -377,7 +378,7 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, input model.Update
 // DeleteUser is the resolver for the deleteUser field.
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (map[string]interface{}, error) {
 	var item *model.User
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -396,7 +397,7 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (map[strin
 
 // DeleteUsers is the resolver for the deleteUsers field.
 func (r *mutationResolver) DeleteUsers(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -429,7 +430,7 @@ func (r *mutationResolver) DeleteUsers(ctx context.Context, ids []string) (map[s
 
 // DeleteAccount is the resolver for the deleteAccount field.
 func (r *mutationResolver) DeleteAccount(ctx context.Context) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -452,7 +453,7 @@ func (r *mutationResolver) DeleteAccount(ctx context.Context) (map[string]interf
 
 // RestoreUser is the resolver for the restoreUser field.
 func (r *mutationResolver) RestoreUser(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -557,7 +558,7 @@ func (r *mutationResolver) ResetPassword(ctx context.Context, token string, pass
 func (r *mutationResolver) UpdatePassword(ctx context.Context, input model.PasswordInput) (*model.User, error) {
 	var item *model.User
 
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -676,9 +677,9 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("unauthorized")
+		return nil, err
 	}
 
 	var item *model.User
@@ -703,6 +704,11 @@ func (r *userResolver) CreatedAt(ctx context.Context, obj *model.User) (string, 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *userResolver) UpdatedAt(ctx context.Context, obj *model.User) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *userResolver) Metadata(ctx context.Context, obj *model.User) (map[string]interface{}, error) {
+	return obj.Metadata, nil
 }
 
 // User returns UserResolver implementation.

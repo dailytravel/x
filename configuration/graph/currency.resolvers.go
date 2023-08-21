@@ -36,8 +36,7 @@ func (r *currencyResolver) Name(ctx context.Context, obj *model.Currency) (strin
 		return name, nil
 	}
 
-	// Return an error if the name is not found for any locale
-	return "", errors.New("Name not found for any locale")
+	return obj.Name[obj.Locale].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.

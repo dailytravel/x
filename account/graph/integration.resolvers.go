@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -60,7 +59,7 @@ func (r *integrationResolver) UpdatedBy(ctx context.Context, obj *model.Integrat
 
 // CreateIntegration is the resolver for the createIntegration field.
 func (r *mutationResolver) CreateIntegration(ctx context.Context, input model.NewIntegration) (*model.Integration, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +81,7 @@ func (r *mutationResolver) CreateIntegration(ctx context.Context, input model.Ne
 
 // UpdateIntegration is the resolver for the updateIntegration field.
 func (r *mutationResolver) UpdateIntegration(ctx context.Context, id string, input model.UpdateIntegration) (*model.Integration, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

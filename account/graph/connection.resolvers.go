@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -71,7 +70,7 @@ func (r *connectionResolver) Client(ctx context.Context, obj *model.Connection) 
 
 // CreateConnection is the resolver for the createConnection field.
 func (r *mutationResolver) CreateConnection(ctx context.Context, input model.NewConnection) (*model.Connection, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +92,7 @@ func (r *mutationResolver) CreateConnection(ctx context.Context, input model.New
 
 // UpdateConnection is the resolver for the updateConnection field.
 func (r *mutationResolver) UpdateConnection(ctx context.Context, id string, input model.UpdateConnection) (*model.Connection, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,7 +17,7 @@ import (
 
 // CreateRole is the resolver for the createRole field.
 func (r *mutationResolver) CreateRole(ctx context.Context, input model.NewRole) (*model.Role, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +55,7 @@ func (r *mutationResolver) CreateRole(ctx context.Context, input model.NewRole) 
 
 // UpdateRole is the resolver for the updateRole field.
 func (r *mutationResolver) UpdateRole(ctx context.Context, id string, input model.UpdateRole) (*model.Role, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -4,11 +4,10 @@ rm -rf account base cms community configuration finance hrm insight marketing pa
 ./init.sh account base cms community configuration finance hrm insight marketing payment sales
 
 {
-  "iss": "https://your-api-endpoint/",
-  "sub": "user_id",
-  "aud": "https://dailytravel-app.auth0.com/api/v2/",
-  "iat": 1692459747,
-  "exp": 1693323747,
-  "azp": "client_id",
-  "scope": "read:client_grants create:client_grants"
- }
+  aud: 'https://api.trip.express/graphql',
+  azp: '64cc84de610349db6ca68102',
+  exp: 1692698524,
+  iat: 1692612124,
+  iss: 'https://api.trip.express',
+  sub: '64e07121ebebfd9aa840ae8c'
+}

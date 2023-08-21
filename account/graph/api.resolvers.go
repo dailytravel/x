@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -60,7 +59,7 @@ func (r *apiResolver) UpdatedBy(ctx context.Context, obj *model.Api) (*model.Use
 
 // CreateAPI is the resolver for the createApi field.
 func (r *mutationResolver) CreateAPI(ctx context.Context, input model.NewAPI) (*model.Api, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +81,7 @@ func (r *mutationResolver) CreateAPI(ctx context.Context, input model.NewAPI) (*
 
 // UpdateAPI is the resolver for the updateApi field.
 func (r *mutationResolver) UpdateAPI(ctx context.Context, id string, input model.UpdateAPI) (*model.Api, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

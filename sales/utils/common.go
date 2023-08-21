@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -8,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/typesense/typesense-go/typesense/api"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -194,9 +194,10 @@ func getIntPointerArg(args map[string]interface{}, key string) *int {
 	return nil
 }
 
-func UID(claims jwt.MapClaims) (*primitive.ObjectID, error) {
+func UID(ctx context.Context) (*primitive.ObjectID, error) {
+	claims := auth.Auth(ctx)
 	if claims == nil {
-		return nil, fmt.Errorf("unauthorized")
+		return nil, fmt.Errorf("not authenticated")
 	}
 
 	uid, err := primitive.ObjectIDFromHex(claims["sub"].(string))

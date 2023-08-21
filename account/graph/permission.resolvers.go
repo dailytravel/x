@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,7 +17,7 @@ import (
 
 // CreatePermission is the resolver for the createPermission field.
 func (r *mutationResolver) CreatePermission(ctx context.Context, input model.NewPermission) (*model.Permission, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +42,7 @@ func (r *mutationResolver) CreatePermission(ctx context.Context, input model.New
 
 // UpdatePermission is the resolver for the updatePermission field.
 func (r *mutationResolver) UpdatePermission(ctx context.Context, id string, input model.UpdatePermission) (*model.Permission, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

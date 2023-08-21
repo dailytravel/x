@@ -33,7 +33,10 @@ const authenticate = expressjwt({
 
 class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   willSendRequest({ request, context }) {
-    request.http.headers.set("auth", context.auth);
+    request.http.headers.set(
+      "auth",
+      context.auth ? JSON.stringify(context.auth) : null
+    );
     request.http.headers.set("x-api-key", context.apiKey);
   }
 }
@@ -81,7 +84,7 @@ async function startApolloServer() {
       context: async ({ req }) => {
         return {
           apiKey: req.headers["x-api-key"],
-          auth: req.headers["auth"],
+          auth: req.auth,
         };
       },
     })

@@ -555,6 +555,7 @@ type ComplexityRoot struct {
 		Email     func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Locale    func(childComplexity int) int
+		Metadata  func(childComplexity int) int
 		Mfa       func(childComplexity int) int
 		Name      func(childComplexity int) int
 		Phone     func(childComplexity int) int
@@ -847,6 +848,7 @@ type UserResolver interface {
 
 	CreatedAt(ctx context.Context, obj *model.User) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.User) (string, error)
+	Metadata(ctx context.Context, obj *model.User) (map[string]interface{}, error)
 }
 
 type executableSchema struct {
@@ -3664,6 +3666,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Locale(childComplexity), true
 
+	case "User.metadata":
+		if e.complexity.User.Metadata == nil {
+			break
+		}
+
+		return e.complexity.User.Metadata(childComplexity), true
+
 	case "User.mfa":
 		if e.complexity.User.Mfa == nil {
 			break
@@ -6398,6 +6407,8 @@ func (ec *executionContext) fieldContext_Api_created_by(ctx context.Context, fie
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -6465,6 +6476,8 @@ func (ec *executionContext) fieldContext_Api_updated_by(ctx context.Context, fie
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -6775,6 +6788,8 @@ func (ec *executionContext) fieldContext_Board_user(ctx context.Context, field g
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -6842,6 +6857,8 @@ func (ec *executionContext) fieldContext_Board_created(ctx context.Context, fiel
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -6909,6 +6926,8 @@ func (ec *executionContext) fieldContext_Board_updated(ctx context.Context, fiel
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -7108,6 +7127,8 @@ func (ec *executionContext) fieldContext_Campaign_user(ctx context.Context, fiel
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -7175,6 +7196,8 @@ func (ec *executionContext) fieldContext_Campaign_created(ctx context.Context, f
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -7242,6 +7265,8 @@ func (ec *executionContext) fieldContext_Campaign_updated(ctx context.Context, f
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -7397,6 +7422,8 @@ func (ec *executionContext) fieldContext_Client_user(ctx context.Context, field 
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -8226,6 +8253,8 @@ func (ec *executionContext) fieldContext_Comment_user(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -8293,6 +8322,8 @@ func (ec *executionContext) fieldContext_Comment_created(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -8360,6 +8391,8 @@ func (ec *executionContext) fieldContext_Comment_updated(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -8559,6 +8592,8 @@ func (ec *executionContext) fieldContext_Company_user(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -8626,6 +8661,8 @@ func (ec *executionContext) fieldContext_Company_created(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -8693,6 +8730,8 @@ func (ec *executionContext) fieldContext_Company_updated(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -9109,6 +9148,8 @@ func (ec *executionContext) fieldContext_Connection_created_by(ctx context.Conte
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -9176,6 +9217,8 @@ func (ec *executionContext) fieldContext_Connection_updated_by(ctx context.Conte
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -9557,6 +9600,8 @@ func (ec *executionContext) fieldContext_Contact_user(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -9624,6 +9669,8 @@ func (ec *executionContext) fieldContext_Contact_created(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -9691,6 +9738,8 @@ func (ec *executionContext) fieldContext_Contact_updated(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -9890,6 +9939,8 @@ func (ec *executionContext) fieldContext_Content_user(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -9957,6 +10008,8 @@ func (ec *executionContext) fieldContext_Content_created(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -10024,6 +10077,8 @@ func (ec *executionContext) fieldContext_Content_updated(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -10223,6 +10278,8 @@ func (ec *executionContext) fieldContext_Coupon_user(ctx context.Context, field 
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -10290,6 +10347,8 @@ func (ec *executionContext) fieldContext_Coupon_created(ctx context.Context, fie
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -10357,6 +10416,8 @@ func (ec *executionContext) fieldContext_Coupon_updated(ctx context.Context, fie
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -11941,6 +12002,8 @@ func (ec *executionContext) fieldContext_Entity_findUserByID(ctx context.Context
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -12220,6 +12283,8 @@ func (ec *executionContext) fieldContext_Expense_user(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -12287,6 +12352,8 @@ func (ec *executionContext) fieldContext_Expense_created(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -12354,6 +12421,8 @@ func (ec *executionContext) fieldContext_Expense_updated(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -12553,6 +12622,8 @@ func (ec *executionContext) fieldContext_File_user(ctx context.Context, field gr
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -12620,6 +12691,8 @@ func (ec *executionContext) fieldContext_File_created(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -12687,6 +12760,8 @@ func (ec *executionContext) fieldContext_File_updated(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -12886,6 +12961,8 @@ func (ec *executionContext) fieldContext_Follow_user(ctx context.Context, field 
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -12953,6 +13030,8 @@ func (ec *executionContext) fieldContext_Follow_created(ctx context.Context, fie
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -13020,6 +13099,8 @@ func (ec *executionContext) fieldContext_Follow_updated(ctx context.Context, fie
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -13219,6 +13300,8 @@ func (ec *executionContext) fieldContext_Goal_user(ctx context.Context, field gr
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -13286,6 +13369,8 @@ func (ec *executionContext) fieldContext_Goal_created(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -13353,6 +13438,8 @@ func (ec *executionContext) fieldContext_Goal_updated(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -13467,6 +13554,8 @@ func (ec *executionContext) fieldContext_Identity_user(ctx context.Context, fiel
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -14273,6 +14362,8 @@ func (ec *executionContext) fieldContext_Integration_created_by(ctx context.Cont
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -14340,6 +14431,8 @@ func (ec *executionContext) fieldContext_Integration_updated_by(ctx context.Cont
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -14561,6 +14654,8 @@ func (ec *executionContext) fieldContext_Invitation_sender(ctx context.Context, 
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -15124,6 +15219,8 @@ func (ec *executionContext) fieldContext_Invoice_user(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -15191,6 +15288,8 @@ func (ec *executionContext) fieldContext_Invoice_created(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -15258,6 +15357,8 @@ func (ec *executionContext) fieldContext_Invoice_updated(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -15850,6 +15951,8 @@ func (ec *executionContext) fieldContext_Key_user(ctx context.Context, field gra
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -16162,6 +16265,8 @@ func (ec *executionContext) fieldContext_Link_user(ctx context.Context, field gr
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -16229,6 +16334,8 @@ func (ec *executionContext) fieldContext_Link_created(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -16296,6 +16403,8 @@ func (ec *executionContext) fieldContext_Link_updated(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -16495,6 +16604,8 @@ func (ec *executionContext) fieldContext_List_user(ctx context.Context, field gr
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -16562,6 +16673,8 @@ func (ec *executionContext) fieldContext_List_created(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -16629,6 +16742,8 @@ func (ec *executionContext) fieldContext_List_updated(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -16916,6 +17031,8 @@ func (ec *executionContext) fieldContext_Membership_user(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -16983,6 +17100,8 @@ func (ec *executionContext) fieldContext_Membership_created(ctx context.Context,
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -17050,6 +17169,8 @@ func (ec *executionContext) fieldContext_Membership_updated(ctx context.Context,
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -19441,6 +19562,8 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -19729,6 +19852,8 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -19827,6 +19952,8 @@ func (ec *executionContext) fieldContext_Mutation_updateAccount(ctx context.Cont
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -20314,6 +20441,8 @@ func (ec *executionContext) fieldContext_Mutation_updatePassword(ctx context.Con
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -20576,6 +20705,8 @@ func (ec *executionContext) fieldContext_Order_user(ctx context.Context, field g
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -20643,6 +20774,8 @@ func (ec *executionContext) fieldContext_Order_created(ctx context.Context, fiel
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -20710,6 +20843,8 @@ func (ec *executionContext) fieldContext_Order_updated(ctx context.Context, fiel
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -20865,6 +21000,8 @@ func (ec *executionContext) fieldContext_Organization_created(ctx context.Contex
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -20932,6 +21069,8 @@ func (ec *executionContext) fieldContext_Organization_updated(ctx context.Contex
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -21307,6 +21446,8 @@ func (ec *executionContext) fieldContext_Payment_user(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -21374,6 +21515,8 @@ func (ec *executionContext) fieldContext_Payment_created(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -21441,6 +21584,8 @@ func (ec *executionContext) fieldContext_Payment_updated(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -22067,6 +22212,8 @@ func (ec *executionContext) fieldContext_Portfolio_user(ctx context.Context, fie
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -22134,6 +22281,8 @@ func (ec *executionContext) fieldContext_Portfolio_created(ctx context.Context, 
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -22201,6 +22350,8 @@ func (ec *executionContext) fieldContext_Portfolio_updated(ctx context.Context, 
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -23645,6 +23796,8 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -23743,6 +23896,8 @@ func (ec *executionContext) fieldContext_Query_me(ctx context.Context, field gra
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -24174,6 +24329,8 @@ func (ec *executionContext) fieldContext_Quote_user(ctx context.Context, field g
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -24241,6 +24398,8 @@ func (ec *executionContext) fieldContext_Quote_created(ctx context.Context, fiel
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -24308,6 +24467,8 @@ func (ec *executionContext) fieldContext_Quote_updated(ctx context.Context, fiel
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -24507,6 +24668,8 @@ func (ec *executionContext) fieldContext_Reaction_user(ctx context.Context, fiel
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -24574,6 +24737,8 @@ func (ec *executionContext) fieldContext_Reaction_created(ctx context.Context, f
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -24641,6 +24806,8 @@ func (ec *executionContext) fieldContext_Reaction_updated(ctx context.Context, f
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -24980,6 +25147,8 @@ func (ec *executionContext) fieldContext_Role_created_by(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -25047,6 +25216,8 @@ func (ec *executionContext) fieldContext_Role_updated_by(ctx context.Context, fi
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -25349,6 +25520,8 @@ func (ec *executionContext) fieldContext_Task_user(ctx context.Context, field gr
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -25416,6 +25589,8 @@ func (ec *executionContext) fieldContext_Task_created(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -25483,6 +25658,8 @@ func (ec *executionContext) fieldContext_Task_updated(ctx context.Context, field
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -25964,6 +26141,47 @@ func (ec *executionContext) fieldContext_User_updated_at(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _User_metadata(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_metadata(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().Metadata(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(map[string]interface{})
+	fc.Result = res
+	return ec.marshalOMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _User_status(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_status(ctx, field)
 	if err != nil {
@@ -26107,6 +26325,8 @@ func (ec *executionContext) fieldContext_Users_data(ctx context.Context, field g
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -26306,6 +26526,8 @@ func (ec *executionContext) fieldContext_Wishlist_user(ctx context.Context, fiel
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -26373,6 +26595,8 @@ func (ec *executionContext) fieldContext_Wishlist_created(ctx context.Context, f
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -26440,6 +26664,8 @@ func (ec *executionContext) fieldContext_Wishlist_updated(ctx context.Context, f
 				return ec.fieldContext_User_created_at(ctx, field)
 			case "updated_at":
 				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_User_status(ctx, field)
 			}
@@ -36582,6 +36808,39 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "metadata":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_metadata(ctx, field, obj)
 				return res
 			}
 

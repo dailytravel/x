@@ -10,6 +10,7 @@ type User @key(fields: "id") {
   picture: String
   created_at: String!
   updated_at: String!
+  metadata: Map
   status: String
 }
 

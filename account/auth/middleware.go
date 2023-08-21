@@ -2,6 +2,8 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -22,7 +24,17 @@ func Middleware() gin.HandlerFunc {
 		ctx := context.WithValue(c.Request.Context(), GinContextKey, c)
 		ctx = context.WithValue(ctx, LocaleContextKey, c.GetHeader("x-locale"))
 		ctx = context.WithValue(ctx, APIKeyContextKey, c.GetHeader("x-api-key"))
-		ctx = context.WithValue(ctx, AuthContextKey, c.GetHeader("authorization"))
+		// Decode the "auth" header into a map
+		authHeader := c.GetHeader("auth")
+
+		var authMap jwt.MapClaims
+		if authHeader != "" {
+			if err := json.Unmarshal([]byte(authHeader), &authMap); err != nil {
+				fmt.Println("Error decoding auth header:", err)
+			}
+		}
+
+		ctx = context.WithValue(ctx, AuthContextKey, authMap)
 
 		// Add the gin.Context to the request context using the custom context key
 		c.Request = c.Request.WithContext(ctx)

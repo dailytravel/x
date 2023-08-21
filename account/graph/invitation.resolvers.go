@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -43,7 +42,7 @@ func (r *invitationResolver) UpdatedAt(ctx context.Context, obj *model.Invitatio
 
 // CreateInvitation is the resolver for the createInvitation field.
 func (r *mutationResolver) CreateInvitation(ctx context.Context, input model.NewInvitation) (*model.Invitation, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +107,7 @@ func (r *mutationResolver) UpdateInvitation(ctx context.Context, id string, inpu
 func (r *mutationResolver) DeleteInvitation(ctx context.Context, id string) (map[string]interface{}, error) {
 	var item *model.Invitation
 
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
