@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dailytravel/x/configuration/auth"
 	"github.com/typesense/typesense-go/typesense/api"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

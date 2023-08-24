@@ -68,12 +68,8 @@ type MFAInput struct {
 }
 
 type Membership struct {
-	UID       string `json:"uid"`
-	CreatedBy string `json:"created_by"`
-	UpdatedBy string `json:"updated_by"`
-	User      *User  `json:"user,omitempty"`
-	Created   *User  `json:"created,omitempty"`
-	Updated   *User  `json:"updated,omitempty"`
+	UID  string `json:"uid"`
+	User *User  `json:"user,omitempty"`
 }
 
 func (Membership) IsEntity() {}
@@ -122,7 +118,6 @@ type NewInvitation struct {
 
 type NewKey struct {
 	Name string `json:"name"`
-	Kid  string `json:"kid"`
 }
 
 type NewPermission struct {
@@ -136,6 +131,11 @@ type NewRole struct {
 	Permissions []*string `json:"permissions,omitempty"`
 }
 
+type NewToken struct {
+	Name      string    `json:"name"`
+	Abilities []*string `json:"abilities,omitempty"`
+}
+
 type NewUser struct {
 	Name     string    `json:"name"`
 	Email    string    `json:"email"`
@@ -145,12 +145,8 @@ type NewUser struct {
 }
 
 type Order struct {
-	UID       string `json:"uid"`
-	CreatedBy string `json:"created_by"`
-	UpdatedBy string `json:"updated_by"`
-	User      *User  `json:"user,omitempty"`
-	Created   *User  `json:"created,omitempty"`
-	Updated   *User  `json:"updated,omitempty"`
+	UID  string `json:"uid"`
+	User *User  `json:"user,omitempty"`
 }
 
 func (Order) IsEntity() {}
@@ -189,12 +185,8 @@ type Point struct {
 func (Point) IsEntity() {}
 
 type Quote struct {
-	UID       string `json:"uid"`
-	CreatedBy string `json:"created_by"`
-	UpdatedBy string `json:"updated_by"`
-	User      *User  `json:"user,omitempty"`
-	Created   *User  `json:"created,omitempty"`
-	Updated   *User  `json:"updated,omitempty"`
+	UID  string `json:"uid"`
+	User *User  `json:"user,omitempty"`
 }
 
 func (Quote) IsEntity() {}
@@ -209,6 +201,11 @@ type RegisterInput struct {
 type Roles struct {
 	Data  []*Role `json:"data,omitempty"`
 	Count int     `json:"count"`
+}
+
+type Tokens struct {
+	Data  []*Token `json:"data,omitempty"`
+	Count int      `json:"count"`
 }
 
 type UpdateAPI struct {
@@ -260,6 +257,11 @@ type UpdateRole struct {
 	Permissions []*string `json:"permissions,omitempty"`
 }
 
+type UpdateToken struct {
+	Name      *string   `json:"name,omitempty"`
+	Abilities []*string `json:"abilities,omitempty"`
+}
+
 type UpdateUser struct {
 	Name     *string   `json:"name,omitempty"`
 	Email    *string   `json:"email,omitempty"`
@@ -282,12 +284,8 @@ type VerifyEmailInput struct {
 }
 
 type Wishlist struct {
-	UID       string `json:"uid"`
-	CreatedBy string `json:"created_by"`
-	UpdatedBy string `json:"updated_by"`
-	User      *User  `json:"user,omitempty"`
-	Created   *User  `json:"created,omitempty"`
-	Updated   *User  `json:"updated,omitempty"`
+	UID  string `json:"uid"`
+	User *User  `json:"user,omitempty"`
 }
 
 func (Wishlist) IsEntity() {}

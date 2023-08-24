@@ -16,6 +16,8 @@ import (
 	"github.com/dailytravel/x/account/utils"
 	"github.com/go-redis/redis"
 	jwt "github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -208,13 +210,33 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 		return nil, fmt.Errorf("key not found")
 	}
 
+	// token, err := utils.Base64(32, false)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	//create token
+	t := &model.Token{
+		UID:       u.ID,
+		Name:      "auth",
+		Token:     uuid.NewString(),
+		Abilities: []*string{pointer.String("*")},
+		ExpiresAt: &primitive.Timestamp{T: uint32(time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix())},
+	}
+
+	//insert token
+	if _, err := r.db.Collection(t.Collection()).InsertOne(ctx, t); err != nil {
+		return nil, err
+	}
+
 	access_token, err := auth.Token(jwt.MapClaims{
+		"jti": t.Token,
 		"sub": u.ID.Hex(),
 		"aud": a.Identifier,
 		"iss": strings.Join([]string{"https://", c.Domain}, ""),
 		"azp": c.ID.Hex(),
 		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
+		"exp": t.ExpiresAt.T,
 	}, k)
 
 	if err != nil {
@@ -222,6 +244,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	}
 
 	refresh_token, err := auth.Token(jwt.MapClaims{
+		"jti": t.Token,
 		"sub": u.ID.Hex(),
 		"aud": a.Identifier,
 		"iss": strings.Join([]string{"https://", c.Domain}, ""),
@@ -352,23 +375,48 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, input model.Update
 		return nil, err
 	}
 
-	item := &model.User{
-		Name:     *input.Name,
-		Email:    *input.Email,
-		Timezone: input.Timezone,
-		Locale:   input.Locale,
-		Picture:  input.Picture,
-		Phone:    input.Phone,
-		Status:   *input.Status,
+	//find user by id
+	var item *model.User
+	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": uid}, nil).Decode(&item); err != nil {
+		return nil, fmt.Errorf("user not found")
 	}
 
-	for _, role := range input.Roles {
-		item.Roles = append(item.Roles, *role)
+	//update user
+	if input.Name != nil {
+		item.Name = *input.Name
 	}
 
-	filter := bson.M{"_id": uid}
+	if input.Email != nil {
+		item.Email = *input.Email
+	}
 
-	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item); err != nil {
+	if input.Timezone != nil {
+		item.Timezone = input.Timezone
+	}
+
+	if input.Locale != nil {
+		item.Locale = input.Locale
+	}
+
+	if input.Picture != nil {
+		item.Picture = input.Picture
+	}
+
+	if input.Phone != nil {
+		item.Phone = input.Phone
+	}
+
+	if input.Status != nil {
+		item.Status = *input.Status
+	}
+
+	if input.Roles != nil {
+		for _, role := range input.Roles {
+			item.Roles = append(item.Roles, *role)
+		}
+	}
+
+	if _, err := r.db.Collection("users").UpdateOne(ctx, bson.M{"_id": uid}, bson.M{"$set": item}); err != nil {
 		return nil, err
 	}
 

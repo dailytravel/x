@@ -11,7 +11,6 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/account/auth"
@@ -26,11 +25,6 @@ import (
 // ID is the resolver for the id field.
 func (r *keyResolver) ID(ctx context.Context, obj *model.Key) (string, error) {
 	return obj.ID.Hex(), nil
-}
-
-// Kid is the resolver for the kid field.
-func (r *keyResolver) Kid(ctx context.Context, obj *model.Key) (string, error) {
-	panic(fmt.Errorf("not implemented: Kid - kid"))
 }
 
 // ExpiresAt is the resolver for the expires_at field.

@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ import (
 
 // CreateWishlist is the resolver for the createWishlist field.
 func (r *mutationResolver) CreateWishlist(ctx context.Context, input model.NewWishlist) (*model.Wishlist, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +50,7 @@ func (r *mutationResolver) CreateWishlist(ctx context.Context, input model.NewWi
 
 // DeleteWishlist is the resolver for the deleteWishlist field.
 func (r *mutationResolver) DeleteWishlist(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +90,7 @@ func (r *mutationResolver) DeleteWishlist(ctx context.Context, id string) (map[s
 
 // DeleteWishlists is the resolver for the deleteWishlists field.
 func (r *mutationResolver) DeleteWishlists(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

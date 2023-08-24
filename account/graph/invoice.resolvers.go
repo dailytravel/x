@@ -34,44 +34,6 @@ func (r *invoiceResolver) User(ctx context.Context, obj *model.Invoice) (*model.
 	return item, nil
 }
 
-// Created is the resolver for the created field.
-func (r *invoiceResolver) Created(ctx context.Context, obj *model.Invoice) (*model.User, error) {
-	var item *model.User
-
-	_id, err := primitive.ObjectIDFromHex(obj.CreatedBy)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": _id})
-		}
-		return nil, err
-	}
-
-	return item, nil
-}
-
-// Updated is the resolver for the updated field.
-func (r *invoiceResolver) Updated(ctx context.Context, obj *model.Invoice) (*model.User, error) {
-	var item *model.User
-
-	_id, err := primitive.ObjectIDFromHex(obj.UpdatedBy)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": _id})
-		}
-		return nil, err
-	}
-
-	return item, nil
-}
-
 // Invoice returns InvoiceResolver implementation.
 func (r *Resolver) Invoice() InvoiceResolver { return &invoiceResolver{r} }
 

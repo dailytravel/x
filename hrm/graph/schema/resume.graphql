@@ -2,13 +2,12 @@ type Resume {
   id: ID!
   title: String!
   summary: String!
-  experience: String!
-  education: String!
-  skills: String!
-  certifications: String!
-  languages: String!
-  projects: String!
-  references: String!
+  experience: [Experience!]!
+  education: [Education!]!
+  skills: [Skill!]!
+  certifications: [Certification!]!
+  languages: [Language!]!
+  references: [Reference!]!
   metadata: Map
   status: String!
   created_at: String!
@@ -18,123 +17,119 @@ type Resume {
   updated_by: ID
 }
 
+type Experience {
+  title: String!
+  company: String!
+  start_date: String!
+  end_date: String
+  description: String
+}
+
+type Education {
+  degree: String!
+  university: String!
+  start_date: String!
+  end_date: String
+  description: String
+}
+
+type Skill {
+  name: String!
+  proficiency: Proficiency!
+  description: String
+}
+
+type Certification {
+  name: String!
+  authority: String!
+  date: String!
+}
+
+type Language {
+  name: String!
+  proficiency: Proficiency!
+}
+
+enum Proficiency {
+  BASIC
+  INTERMEDIATE
+  ADVANCED
+  NATIVE
+}
+
+type Reference {
+  name: String!
+  relationship: String!
+  email: String!
+  phone: String
+}
+
 type Resumes {
-  data: [Resume]
+  data: [Resume!]!
   count: Int!
 }
 
-# type Experience {
-#   title: String!
-#   company: String!
-#   startDate: String!
-#   endDate: String
-#   description: String
-# }
-
-# type Education {
-#   degree: String!
-#   university: String!
-#   startDate: String!
-#   endDate: String
-#   description: String
-# }
-
-# type Certification {
-#   name: String!
-#   issuingAuthority: String!
-#   date: String!
-# }
-
-# type Language {
-#   name: String!
-#   proficiency: Proficiency
-# }
-
-# enum Proficiency {
-#   BASIC
-#   INTERMEDIATE
-#   ADVANCED
-#   NATIVE
-# }
-
-# type Project {
-#   name: String!
-#   description: String
-#   startDate: String!
-#   endDate: String
-# }
-
-# type Reference {
-#   name: String!
-#   relationship: String!
-#   email: String!
-#   phone: String
-# }
-
-input CreateResume {
+input NewResume {
   title: String!
   summary: String!
-  experience: String!
-  education: String!
-  skills: String!
-  certifications: String!
-  languages: String!
-  projects: String!
-  references: String!
+  experience: [ExperienceInput!]!
+  education: [EducationInput!]!
+  skills: [SkillInput!]!
+  certifications: [CertificationInput!]!
+  languages: [LanguageInput!]!
+  references: [ReferenceInput!]!
 }
 
 input UpdateResume {
   title: String
   summary: String
-  experience: String
-  education: String
-  skills: String
-  certifications: String
-  languages: String
-  projects: String
-  references: String
+  experience: [ExperienceInput]
+  education: [EducationInput]
+  skills: [SkillInput]
+  certifications: [CertificationInput]
+  languages: [LanguageInput]
+  references: [ReferenceInput]
 }
 
-# input ExperienceInput {
-#   title: String!
-#   company: String!
-#   startDate: String!
-#   endDate: String
-#   description: String
-# }
+input ExperienceInput {
+  title: String!
+  company: String!
+  start_date: String!
+  end_date: String
+  description: String
+}
 
-# input EducationInput {
-#   degree: String!
-#   university: String!
-#   startDate: String!
-#   endDate: String
-#   description: String
-# }
+input EducationInput {
+  degree: String!
+  university: String!
+  start_date: String!
+  end_date: String
+  description: String
+}
 
-# input CertificationInput {
-#   name: String!
-#   issuingAuthority: String!
-#   date: String!
-# }
+input CertificationInput {
+  name: String!
+  authority: String!
+  date: String!
+}
 
-# input LanguageInput {
-#   name: String!
-#   proficiency: Proficiency!
-# }
+input LanguageInput {
+  name: String!
+  proficiency: Proficiency!
+}
 
-# input ProjectInput {
-#   name: String!
-#   description: String
-#   startDate: String!
-#   endDate: String
-# }
+input ReferenceInput {
+  name: String!
+  relationship: String!
+  email: String!
+  phone: String
+}
 
-# input ReferenceInput {
-#   name: String!
-#   relationship: String!
-#   email: String!
-#   phone: String
-# }
+input SkillInput {
+  name: String!
+  proficiency: Proficiency!
+  description: String
+}
 
 extend type Query {
   resume(id: ID!): Resume
@@ -142,7 +137,7 @@ extend type Query {
 }
 
 extend type Mutation {
-  createResume(input: CreateResume!): Resume
+  createResume(input: NewResume!): Resume
   updateResume(id: ID!, input: UpdateResume!): Resume
   deleteResume(id: ID!): Map
   deleteResumes(ids: [ID!]!): Map

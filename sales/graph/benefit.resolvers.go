@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -36,7 +35,7 @@ func (r *benefitResolver) Description(ctx context.Context, obj *model.Benefit) (
 	}
 
 	// Return an error if the name is not found for any locale
-	return "", errors.New("Description not found for any locale")
+	return obj.Description[obj.Locale].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -56,7 +55,7 @@ func (r *benefitResolver) UpdatedAt(ctx context.Context, obj *model.Benefit) (st
 
 // CreateBenefit is the resolver for the createBenefit field.
 func (r *mutationResolver) CreateBenefit(ctx context.Context, input model.NewBenefit) (*model.Benefit, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +84,7 @@ func (r *mutationResolver) CreateBenefit(ctx context.Context, input model.NewBen
 
 // UpdateBenefit is the resolver for the updateBenefit field.
 func (r *mutationResolver) UpdateBenefit(ctx context.Context, id string, input model.UpdateBenefit) (*model.Benefit, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +127,7 @@ func (r *mutationResolver) UpdateBenefit(ctx context.Context, id string, input m
 // DeleteBenefit is the resolver for the deleteBenefit field.
 func (r *mutationResolver) DeleteBenefit(ctx context.Context, id string) (map[string]interface{}, error) {
 	// Get the authenticated user's ID
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +178,7 @@ func (r *mutationResolver) DeleteBenefit(ctx context.Context, id string) (map[st
 // DeleteBenefits is the resolver for the deleteBenefits field.
 func (r *mutationResolver) DeleteBenefits(ctx context.Context, ids []string) (map[string]interface{}, error) {
 	// Get the authenticated user's ID
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

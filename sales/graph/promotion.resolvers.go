@@ -20,7 +20,7 @@ import (
 
 // CreatePromotion is the resolver for the createPromotion field.
 func (r *mutationResolver) CreatePromotion(ctx context.Context, input model.NewPromotion) (*model.Promotion, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (r *mutationResolver) CreatePromotion(ctx context.Context, input model.NewP
 
 // UpdatePromotion is the resolver for the updatePromotion field.
 func (r *mutationResolver) UpdatePromotion(ctx context.Context, id string, input model.UpdatePromotion) (*model.Promotion, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (r *mutationResolver) UpdatePromotion(ctx context.Context, id string, input
 
 // DeletePromotion is the resolver for the deletePromotion field.
 func (r *mutationResolver) DeletePromotion(ctx context.Context, id string) (*model.Promotion, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func (r *mutationResolver) DeletePromotion(ctx context.Context, id string) (*mod
 
 // DeletePromotions is the resolver for the deletePromotions field.
 func (r *mutationResolver) DeletePromotions(ctx context.Context, ids []string) (*bool, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -195,27 +195,24 @@ func (r *promotionResolver) Name(ctx context.Context, obj *model.Promotion) (str
 	}
 
 	// Return an error if the name is not found for any locale
-	return "", errors.New("Name not found for any locale")
+	return obj.Name[obj.Locale].(string), nil
 }
 
 // Description is the resolver for the description field.
 func (r *promotionResolver) Description(ctx context.Context, obj *model.Promotion) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
 
 	// Try to retrieve the description for the requested locale
 	if description, ok := obj.Description[*locale].(string); ok {
 		return description, nil
 	}
 
-	// If the description is not found for the requested locale,
-	// fallback to the taxonomy's default locale
-	if description, ok := obj.Description[obj.Locale].(string); ok {
-		return description, nil
-	}
-
 	// Return an error if the description is not found for any locale
-	return "", errors.New("Description not found for any locale")
+	return obj.Description[obj.Locale].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.

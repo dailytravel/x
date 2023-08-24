@@ -21,6 +21,8 @@ type Employee struct {
 	Phone        string             `json:"phone" bson:"phone"`
 	Address      string             `json:"address" bson:"address"`
 	Birthday     primitive.DateTime `json:"birthday" bson:"birthday"`
+	Gender       string             `json:"gender" bson:"gender"`
+	Picture      string             `json:"picture" bson:"picture"`
 	HireDate     primitive.DateTime `json:"hire_date" bson:"hire_date"`
 	Status       string             `json:"status" bson:"status"`
 }

@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -67,7 +66,7 @@ func (r *companyResolver) UpdatedBy(ctx context.Context, obj *model.Company) (*s
 
 // CreateCompany is the resolver for the createCompany field.
 func (r *mutationResolver) CreateCompany(ctx context.Context, input model.NewCompany) (*model.Company, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +105,7 @@ func (r *mutationResolver) CreateCompany(ctx context.Context, input model.NewCom
 // UpdateCompany is the resolver for the updateCompany field.
 func (r *mutationResolver) UpdateCompany(ctx context.Context, id string, input model.UpdateCompany) (*model.Company, error) {
 	// Get the authenticated user ID
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

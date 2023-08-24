@@ -6,9 +6,9 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -17,23 +17,23 @@ import (
 )
 
 // CreateResume is the resolver for the createResume field.
-func (r *mutationResolver) CreateResume(ctx context.Context, input model.CreateResume) (*model.Resume, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+func (r *mutationResolver) CreateResume(ctx context.Context, input model.NewResume) (*model.Resume, error) {
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	item := &model.Resume{
-		UID:            *uid,
-		Title:          input.Title,
-		Summary:        input.Summary,
-		Experience:     input.Experience,
-		Education:      input.Education,
-		Skills:         input.Skills,
-		Certifications: input.Certifications,
-		Languages:      input.Languages,
-		Projects:       input.Projects,
-		References:     input.References,
+		UID:     *uid,
+		Title:   input.Title,
+		Summary: input.Summary,
+		// Experience:     input.Experience,
+		// Education:      input.Education,
+		// Skills:         input.Skills,
+		// Certifications: input.Certifications,
+		// Languages:      input.Languages,
+		// Projects:       input.Projects,
+		// References:     input.References,
 		Model: model.Model{
 			CreatedBy: uid,
 			UpdatedBy: uid,
@@ -50,7 +50,7 @@ func (r *mutationResolver) CreateResume(ctx context.Context, input model.CreateR
 
 // UpdateResume is the resolver for the updateResume field.
 func (r *mutationResolver) UpdateResume(ctx context.Context, id string, input model.UpdateResume) (*model.Resume, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -74,38 +74,6 @@ func (r *mutationResolver) UpdateResume(ctx context.Context, id string, input mo
 		item.Title = *input.Title
 	}
 
-	if input.Summary != nil {
-		item.Summary = *input.Summary
-	}
-
-	if input.Experience != nil {
-		item.Experience = *input.Experience
-	}
-
-	if input.Education != nil {
-		item.Education = *input.Education
-	}
-
-	if input.Skills != nil {
-		item.Skills = *input.Skills
-	}
-
-	if input.Certifications != nil {
-		item.Certifications = *input.Certifications
-	}
-
-	if input.Languages != nil {
-		item.Languages = *input.Languages
-	}
-
-	if input.Projects != nil {
-		item.Projects = *input.Projects
-	}
-
-	if input.References != nil {
-		item.References = *input.References
-	}
-
 	// Update the "updated_by" field
 	item.UpdatedBy = uid
 
@@ -120,7 +88,7 @@ func (r *mutationResolver) UpdateResume(ctx context.Context, id string, input mo
 
 // DeleteResume is the resolver for the deleteResume field.
 func (r *mutationResolver) DeleteResume(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +132,7 @@ func (r *mutationResolver) DeleteResume(ctx context.Context, id string) (map[str
 
 // DeleteResumes is the resolver for the deleteResumes field.
 func (r *mutationResolver) DeleteResumes(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -297,3 +265,28 @@ func (r *resumeResolver) UpdatedBy(ctx context.Context, obj *model.Resume) (*str
 func (r *Resolver) Resume() ResumeResolver { return &resumeResolver{r} }
 
 type resumeResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *resumeResolver) Experience(ctx context.Context, obj *model.Resume) ([]*model.Experience, error) {
+	panic(fmt.Errorf("not implemented: Experience - experience"))
+}
+func (r *resumeResolver) Education(ctx context.Context, obj *model.Resume) ([]*model.Education, error) {
+	panic(fmt.Errorf("not implemented: Education - education"))
+}
+func (r *resumeResolver) Skills(ctx context.Context, obj *model.Resume) ([]*model.Skill, error) {
+	panic(fmt.Errorf("not implemented: Skills - skills"))
+}
+func (r *resumeResolver) Certifications(ctx context.Context, obj *model.Resume) ([]*model.Certification, error) {
+	panic(fmt.Errorf("not implemented: Certifications - certifications"))
+}
+func (r *resumeResolver) Languages(ctx context.Context, obj *model.Resume) ([]*model.Language, error) {
+	panic(fmt.Errorf("not implemented: Languages - languages"))
+}
+func (r *resumeResolver) References(ctx context.Context, obj *model.Resume) ([]*model.Reference, error) {
+	panic(fmt.Errorf("not implemented: References - references"))
+}

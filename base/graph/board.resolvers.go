@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/base/auth"
 	"github.com/dailytravel/x/base/graph/model"
 	"github.com/dailytravel/x/base/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -109,7 +108,7 @@ func (r *boardResolver) UpdatedBy(ctx context.Context, obj *model.Board) (*strin
 
 // CreateBoard is the resolver for the createBoard field.
 func (r *mutationResolver) CreateBoard(ctx context.Context, input model.NewBoard) (*model.Board, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +140,7 @@ func (r *mutationResolver) CreateBoard(ctx context.Context, input model.NewBoard
 
 // UpdateBoard is the resolver for the updateBoard field.
 func (r *mutationResolver) UpdateBoard(ctx context.Context, id string, input model.UpdateBoard) (*model.Board, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

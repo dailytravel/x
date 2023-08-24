@@ -11,7 +11,7 @@ import (
 
 type Reaction struct {
 	Model     `bson:",inline"`
-	User      primitive.ObjectID `json:"user" bson:"user"`
+	UID       primitive.ObjectID `json:"uid" bson:"uid"`
 	Action    string             `json:"action" bson:"action"`
 	Reactable Reactable          `json:"reactable" bson:"reactable"`
 }
@@ -42,7 +42,7 @@ func (i *Reaction) Collection() string {
 
 func (i *Reaction) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "user", Value: 1}, {Key: "reactable._id", Value: 1}, {Key: "reactable.type", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "uid", Value: 1}, {Key: "reactable._id", Value: 1}, {Key: "reactable.type", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
 	}

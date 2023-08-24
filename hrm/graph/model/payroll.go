@@ -11,7 +11,7 @@ import (
 
 type Payroll struct {
 	Model    `bson:",inline"`
-	Employee primitive.ObjectID `bson:"employee" json:"employee"`
+	UID      primitive.ObjectID `bson:"uid" json:"uid"`
 	PayDate  primitive.DateTime `json:"pay_date" bson:"pay_date"`
 	Amount   float64            `json:"amount" bson:"amount"`
 	Currency string             `json:"currency" bson:"currency"`
@@ -38,7 +38,7 @@ func (i *Payroll) Collection() string {
 
 func (i *Payroll) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "employee", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "pay_date", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},

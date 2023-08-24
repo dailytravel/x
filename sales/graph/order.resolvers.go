@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ import (
 
 // CreateOrder is the resolver for the createOrder field.
 func (r *mutationResolver) CreateOrder(ctx context.Context, input model.NewOrder) (*model.Order, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +47,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.NewOrder
 
 // UpdateOrder is the resolver for the updateOrder field.
 func (r *mutationResolver) UpdateOrder(ctx context.Context, id string, input model.UpdateOrder) (*model.Order, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +99,7 @@ func (r *mutationResolver) UpdateOrder(ctx context.Context, id string, input mod
 
 // DeleteOrder is the resolver for the deleteOrder field.
 func (r *mutationResolver) DeleteOrder(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +135,7 @@ func (r *mutationResolver) DeleteOrder(ctx context.Context, id string) (map[stri
 
 // DeleteOrders is the resolver for the deleteOrders field.
 func (r *mutationResolver) DeleteOrders(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

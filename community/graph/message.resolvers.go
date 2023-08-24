@@ -9,7 +9,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/dailytravel/x/community/auth"
 	"github.com/dailytravel/x/community/graph/model"
 	"github.com/dailytravel/x/community/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -72,7 +71,7 @@ func (r *messageResolver) Recipients(ctx context.Context, obj *model.Message) ([
 
 // CreateMessage is the resolver for the createMessage field.
 func (r *mutationResolver) CreateMessage(ctx context.Context, input model.NewMessage) (*model.Message, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +93,7 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, input model.NewMes
 
 // UpdateMessage is the resolver for the updateMessage field.
 func (r *mutationResolver) UpdateMessage(ctx context.Context, id string, input model.UpdateMessage) (*model.Message, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +123,7 @@ func (r *mutationResolver) UpdateMessage(ctx context.Context, id string, input m
 
 // DeleteMessage is the resolver for the deleteMessage field.
 func (r *mutationResolver) DeleteMessage(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +158,7 @@ func (r *mutationResolver) DeleteMessage(ctx context.Context, id string) (map[st
 
 // DeleteMessages is the resolver for the deleteMessages field.
 func (r *mutationResolver) DeleteMessages(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

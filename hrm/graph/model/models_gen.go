@@ -8,21 +8,42 @@ import (
 	"strconv"
 )
 
+type Applications struct {
+	Data  []*Application `json:"data,omitempty"`
+	Count int            `json:"count"`
+}
+
 type Attendances struct {
 	Data  []*Attendance `json:"data,omitempty"`
 	Count int           `json:"count"`
 }
 
-type CreateResume struct {
-	Title          string `json:"title"`
-	Summary        string `json:"summary"`
-	Experience     string `json:"experience"`
-	Education      string `json:"education"`
-	Skills         string `json:"skills"`
-	Certifications string `json:"certifications"`
-	Languages      string `json:"languages"`
-	Projects       string `json:"projects"`
-	References     string `json:"references"`
+type Certification struct {
+	Name      string `json:"name"`
+	Authority string `json:"authority"`
+	Date      string `json:"date"`
+}
+
+type CertificationInput struct {
+	Name      string `json:"name"`
+	Authority string `json:"authority"`
+	Date      string `json:"date"`
+}
+
+type Education struct {
+	Degree      string  `json:"degree"`
+	University  string  `json:"university"`
+	StartDate   string  `json:"start_date"`
+	EndDate     *string `json:"end_date,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type EducationInput struct {
+	Degree      string  `json:"degree"`
+	University  string  `json:"university"`
+	StartDate   string  `json:"start_date"`
+	EndDate     *string `json:"end_date,omitempty"`
+	Description *string `json:"description,omitempty"`
 }
 
 type Employees struct {
@@ -30,9 +51,35 @@ type Employees struct {
 	Count int         `json:"count"`
 }
 
+type Experience struct {
+	Title       string  `json:"title"`
+	Company     string  `json:"company"`
+	StartDate   string  `json:"start_date"`
+	EndDate     *string `json:"end_date,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type ExperienceInput struct {
+	Title       string  `json:"title"`
+	Company     string  `json:"company"`
+	StartDate   string  `json:"start_date"`
+	EndDate     *string `json:"end_date,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
 type Jobs struct {
 	Data  []*Job `json:"data,omitempty"`
 	Count *int   `json:"count,omitempty"`
+}
+
+type Language struct {
+	Name        string      `json:"name"`
+	Proficiency Proficiency `json:"proficiency"`
+}
+
+type LanguageInput struct {
+	Name        string      `json:"name"`
+	Proficiency Proficiency `json:"proficiency"`
 }
 
 type Leaves struct {
@@ -40,8 +87,15 @@ type Leaves struct {
 	Count int      `json:"count"`
 }
 
+type NewApplication struct {
+	Job      string                 `json:"job"`
+	Notes    *string                `json:"notes,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+}
+
 type NewAttendance struct {
-	Owner    string                 `json:"owner"`
+	UID      string                 `json:"uid"`
 	TimeIn   string                 `json:"time_in"`
 	TimeOut  string                 `json:"time_out"`
 	Notes    *string                `json:"notes,omitempty"`
@@ -58,6 +112,7 @@ type NewEmployee struct {
 	Phone          string                 `json:"phone"`
 	Address        string                 `json:"address"`
 	Birthday       *string                `json:"birthday,omitempty"`
+	Picture        *string                `json:"picture,omitempty"`
 	Status         *string                `json:"status,omitempty"`
 	Metadata       map[string]interface{} `json:"metadata,omitempty"`
 	HireDate       *string                `json:"hire_date,omitempty"`
@@ -81,7 +136,7 @@ type NewJob struct {
 }
 
 type NewLeave struct {
-	Employee  string                 `json:"employee"`
+	UID       string                 `json:"uid"`
 	Type      string                 `json:"type"`
 	StartDate string                 `json:"start_date"`
 	EndDate   *string                `json:"end_date,omitempty"`
@@ -91,7 +146,7 @@ type NewLeave struct {
 }
 
 type NewOrganization struct {
-	Employee    *string                `json:"employee,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
 	Parent      *string                `json:"parent,omitempty"`
 	Name        string                 `json:"name"`
 	Description *string                `json:"description,omitempty"`
@@ -101,7 +156,7 @@ type NewOrganization struct {
 }
 
 type NewPayroll struct {
-	Employee string                 `json:"employee"`
+	UID      string                 `json:"uid"`
 	PayDate  string                 `json:"pay_date"`
 	Amount   float64                `json:"amount"`
 	Currency string                 `json:"currency"`
@@ -109,8 +164,19 @@ type NewPayroll struct {
 	Status   string                 `json:"status"`
 }
 
+type NewResume struct {
+	Title          string                `json:"title"`
+	Summary        string                `json:"summary"`
+	Experience     []*ExperienceInput    `json:"experience"`
+	Education      []*EducationInput     `json:"education"`
+	Skills         []*SkillInput         `json:"skills"`
+	Certifications []*CertificationInput `json:"certifications"`
+	Languages      []*LanguageInput      `json:"languages"`
+	References     []*ReferenceInput     `json:"references"`
+}
+
 type NewSalary struct {
-	Employee  string                 `json:"employee"`
+	UID       string                 `json:"uid"`
 	Amount    float64                `json:"amount"`
 	Currency  string                 `json:"currency"`
 	StartDate string                 `json:"start_date"`
@@ -128,8 +194,22 @@ type Payrolls struct {
 	Count int        `json:"count"`
 }
 
+type Reference struct {
+	Name         string  `json:"name"`
+	Relationship string  `json:"relationship"`
+	Email        string  `json:"email"`
+	Phone        *string `json:"phone,omitempty"`
+}
+
+type ReferenceInput struct {
+	Name         string  `json:"name"`
+	Relationship string  `json:"relationship"`
+	Email        string  `json:"email"`
+	Phone        *string `json:"phone,omitempty"`
+}
+
 type Resumes struct {
-	Data  []*Resume `json:"data,omitempty"`
+	Data  []*Resume `json:"data"`
 	Count int       `json:"count"`
 }
 
@@ -138,8 +218,26 @@ type Salaries struct {
 	Count int       `json:"count"`
 }
 
+type Skill struct {
+	Name        string      `json:"name"`
+	Proficiency Proficiency `json:"proficiency"`
+	Description *string     `json:"description,omitempty"`
+}
+
+type SkillInput struct {
+	Name        string      `json:"name"`
+	Proficiency Proficiency `json:"proficiency"`
+	Description *string     `json:"description,omitempty"`
+}
+
+type UpdateApplication struct {
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Notes    *string                `json:"notes,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+}
+
 type UpdateAttendance struct {
-	Owner    *string                `json:"owner,omitempty"`
+	UID      *string                `json:"uid,omitempty"`
 	TimeIn   *string                `json:"time_in,omitempty"`
 	TimeOut  *string                `json:"time_out,omitempty"`
 	Notes    *string                `json:"notes,omitempty"`
@@ -156,6 +254,7 @@ type UpdateEmployee struct {
 	Phone          *string                `json:"phone,omitempty"`
 	Address        *string                `json:"address,omitempty"`
 	Birthday       *string                `json:"birthday,omitempty"`
+	Picture        *string                `json:"picture,omitempty"`
 	Status         *string                `json:"status,omitempty"`
 	Metadata       map[string]interface{} `json:"metadata,omitempty"`
 	HireDate       *string                `json:"hire_date,omitempty"`
@@ -188,7 +287,7 @@ type UpdateLeave struct {
 }
 
 type UpdateOrganization struct {
-	Employee    *string                `json:"employee,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
 	Parent      *string                `json:"parent,omitempty"`
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
@@ -206,15 +305,14 @@ type UpdatePayroll struct {
 }
 
 type UpdateResume struct {
-	Title          *string `json:"title,omitempty"`
-	Summary        *string `json:"summary,omitempty"`
-	Experience     *string `json:"experience,omitempty"`
-	Education      *string `json:"education,omitempty"`
-	Skills         *string `json:"skills,omitempty"`
-	Certifications *string `json:"certifications,omitempty"`
-	Languages      *string `json:"languages,omitempty"`
-	Projects       *string `json:"projects,omitempty"`
-	References     *string `json:"references,omitempty"`
+	Title          *string               `json:"title,omitempty"`
+	Summary        *string               `json:"summary,omitempty"`
+	Experience     []*ExperienceInput    `json:"experience,omitempty"`
+	Education      []*EducationInput     `json:"education,omitempty"`
+	Skills         []*SkillInput         `json:"skills,omitempty"`
+	Certifications []*CertificationInput `json:"certifications,omitempty"`
+	Languages      []*LanguageInput      `json:"languages,omitempty"`
+	References     []*ReferenceInput     `json:"references,omitempty"`
 }
 
 type UpdateSalary struct {
@@ -463,5 +561,50 @@ func (e *LeaveType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e LeaveType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type Proficiency string
+
+const (
+	ProficiencyBasic        Proficiency = "BASIC"
+	ProficiencyIntermediate Proficiency = "INTERMEDIATE"
+	ProficiencyAdvanced     Proficiency = "ADVANCED"
+	ProficiencyNative       Proficiency = "NATIVE"
+)
+
+var AllProficiency = []Proficiency{
+	ProficiencyBasic,
+	ProficiencyIntermediate,
+	ProficiencyAdvanced,
+	ProficiencyNative,
+}
+
+func (e Proficiency) IsValid() bool {
+	switch e {
+	case ProficiencyBasic, ProficiencyIntermediate, ProficiencyAdvanced, ProficiencyNative:
+		return true
+	}
+	return false
+}
+
+func (e Proficiency) String() string {
+	return string(e)
+}
+
+func (e *Proficiency) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Proficiency(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Proficiency", str)
+	}
+	return nil
+}
+
+func (e Proficiency) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

@@ -3,7 +3,6 @@ type Key {
   name: String!
   type: String! #RSA, ECDSA, etc
   provider: String! #AWS KMS, GCP KMS, etc
-  kid: String!
   certificate: String!
   fingerprint: String!
   thumbprint: String!
@@ -21,7 +20,6 @@ type Keys {
 
 input NewKey {
   name: String!
-  kid: String!
 }
 
 extend type Query {

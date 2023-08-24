@@ -8,7 +8,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/dailytravel/x/base/auth"
 	"github.com/dailytravel/x/base/graph/model"
 	"github.com/dailytravel/x/base/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -101,7 +100,7 @@ func (r *goalResolver) UpdatedBy(ctx context.Context, obj *model.Goal) (*string,
 
 // CreateGoal is the resolver for the createGoal field.
 func (r *mutationResolver) CreateGoal(ctx context.Context, input model.NewGoal) (*model.Goal, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +126,7 @@ func (r *mutationResolver) CreateGoal(ctx context.Context, input model.NewGoal) 
 
 // UpdateGoal is the resolver for the updateGoal field.
 func (r *mutationResolver) UpdateGoal(ctx context.Context, id string, input model.UpdateGoal) (*model.Goal, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -8,7 +8,7 @@ type Leave {
   metadata: Map
   created_at: String!
   updated_at: String!
-  employee: Employee
+  uid: ID!
   created_by: ID
   updated_by: ID
 }
@@ -42,7 +42,7 @@ enum LeaveType {
 }
 
 input NewLeave {
-  employee: ID!
+  uid: ID!
   type: String!
   start_date: String!
   end_date: String

@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/base/auth"
 	"github.com/dailytravel/x/base/graph/model"
 	"github.com/dailytravel/x/base/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ import (
 
 // CreateTime is the resolver for the createTime field.
 func (r *mutationResolver) CreateTime(ctx context.Context, input model.NewTime) (*model.Time, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +44,7 @@ func (r *mutationResolver) CreateTime(ctx context.Context, input model.NewTime) 
 
 // UpdateTime is the resolver for the updateTime field.
 func (r *mutationResolver) UpdateTime(ctx context.Context, id string, input model.UpdateTime) (*model.Time, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

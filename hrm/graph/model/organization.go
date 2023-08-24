@@ -11,7 +11,7 @@ import (
 
 type Organization struct {
 	Model       `bson:",inline"`
-	Employee    *primitive.ObjectID `json:"employee,omitempty" bson:"employee,omitempty"`
+	UID         *primitive.ObjectID `json:"uid,omitempty" bson:"uid,omitempty"`
 	Parent      *primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
 	Type        string              `json:"type" bson:"type"`
 	Name        string              `json:"name" bson:"name"`
@@ -44,7 +44,7 @@ func (i *Organization) Sanitize(s string) string {
 
 func (i *Organization) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "employee", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "parent", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},

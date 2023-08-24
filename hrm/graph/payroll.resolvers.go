@@ -7,10 +7,8 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -21,7 +19,7 @@ import (
 
 // CreatePayroll is the resolver for the createPayroll field.
 func (r *mutationResolver) CreatePayroll(ctx context.Context, input model.NewPayroll) (*model.Payroll, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -38,12 +36,12 @@ func (r *mutationResolver) CreatePayroll(ctx context.Context, input model.NewPay
 	}
 
 	// Convert the ID string to ObjectID
-	employee, err := primitive.ObjectIDFromHex(input.Employee)
+	_uid, err := primitive.ObjectIDFromHex(input.UID)
 	if err != nil {
 		return nil, err
 	}
 
-	item.Employee = employee
+	item.UID = _uid
 
 	//convert date string to primitive.DateTime
 
@@ -64,7 +62,7 @@ func (r *mutationResolver) CreatePayroll(ctx context.Context, input model.NewPay
 
 // UpdatePayroll is the resolver for the updatePayroll field.
 func (r *mutationResolver) UpdatePayroll(ctx context.Context, id string, input model.UpdatePayroll) (*model.Payroll, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +119,7 @@ func (r *mutationResolver) UpdatePayroll(ctx context.Context, id string, input m
 
 // DeletePayroll is the resolver for the deletePayroll field.
 func (r *mutationResolver) DeletePayroll(ctx context.Context, id string) (*model.Payroll, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +163,7 @@ func (r *mutationResolver) DeletePayroll(ctx context.Context, id string) (*model
 
 // DeletePayrolls is the resolver for the deletePayrolls field.
 func (r *mutationResolver) DeletePayrolls(ctx context.Context, ids []string) ([]*model.Payroll, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -238,6 +236,11 @@ func (r *payrollResolver) UpdatedAt(ctx context.Context, obj *model.Payroll) (st
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
+// UID is the resolver for the uid field.
+func (r *payrollResolver) UID(ctx context.Context, obj *model.Payroll) (string, error) {
+	return obj.UID.Hex(), nil
+}
+
 // CreatedBy is the resolver for the created_by field.
 func (r *payrollResolver) CreatedBy(ctx context.Context, obj *model.Payroll) (*string, error) {
 	if obj.CreatedBy == nil {
@@ -258,21 +261,6 @@ func (r *payrollResolver) UpdatedBy(ctx context.Context, obj *model.Payroll) (*s
 	updatedBy := obj.UpdatedBy.Hex()
 
 	return &updatedBy, nil
-}
-
-// Employee is the resolver for the employee field.
-func (r *payrollResolver) Employee(ctx context.Context, obj *model.Payroll) (*model.Employee, error) {
-	var item *model.Employee
-
-	filter := bson.M{"_id": obj.Employee}
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("employee not found")
-		}
-		return nil, err
-	}
-
-	return item, nil
 }
 
 // Payroll is the resolver for the payroll field.

@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/base/auth"
 	"github.com/dailytravel/x/base/graph/model"
 	"github.com/dailytravel/x/base/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ import (
 
 // CreatePortfolio is the resolver for the createPortfolio field.
 func (r *mutationResolver) CreatePortfolio(ctx context.Context, input model.NewPortfolio) (*model.Portfolio, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +45,7 @@ func (r *mutationResolver) CreatePortfolio(ctx context.Context, input model.NewP
 
 // UpdatePortfolio is the resolver for the updatePortfolio field.
 func (r *mutationResolver) UpdatePortfolio(ctx context.Context, id string, input model.UpdatePortfolio) (*model.Portfolio, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

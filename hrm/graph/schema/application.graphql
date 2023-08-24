@@ -1,0 +1,42 @@
+type Application {
+  id: ID!
+  job: Job!
+  notes: String
+  metadata: Map
+  status: String
+  created_at: String!
+  updated_at: String!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
+}
+
+type Applications {
+  data: [Application]
+  count: Int!
+}
+
+input NewApplication {
+  job: ID!
+  notes: String
+  metadata: Map
+  status: String
+}
+
+input UpdateApplication {
+  metadata: Map
+  notes: String
+  status: String
+}
+
+extend type Query {
+  application(id: ID!): Application
+  applications(args: Map): Applications
+}
+
+extend type Mutation {
+  createApplication(input: NewApplication!): Application
+  updateApplication(id: ID!, input: UpdateApplication!): Application
+  deleteApplication(id: ID!): Map
+  deleteApplications(ids: [ID!]!): Map
+}

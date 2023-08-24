@@ -1,0 +1,39 @@
+type Token {
+  id: ID!
+  user: User!
+  name: String!
+  token: String!
+  abilities: [String]
+  status: String!
+  last_used_at: String!
+  expires_at: String!
+  created_at: String!
+  updated_at: String!
+}
+
+type Tokens {
+  data: [Token]
+  count: Int!
+}
+
+input NewToken {
+  name: String!
+  abilities: [String]
+}
+
+input UpdateToken {
+  name: String
+  abilities: [String]
+}
+
+extend type Query {
+  tokens(args: Map): Tokens
+  token(id: ID!): Token
+}
+
+extend type Mutation {
+  createToken(input: NewToken!): Token
+  updateToken(id: ID!, input: UpdateToken!): Token
+  deleteToken(id: ID!): Token
+  deleteTokens(ids: [ID!]!): [Token]
+}

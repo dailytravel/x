@@ -1,8 +1,4 @@
-extend type Contact @key(fields: "uid created_by updated_by") {
+extend type Contact @key(fields: "uid") {
   uid: ID! @external
-  created_by: ID! @external
-  updated_by: ID! @external
   user: User
-  created: User
-  updated: User
 }

@@ -9,7 +9,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/dailytravel/x/community/auth"
 	"github.com/dailytravel/x/community/graph/model"
 	"github.com/dailytravel/x/community/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,7 +18,7 @@ import (
 
 // CreateRecipient is the resolver for the createRecipient field.
 func (r *mutationResolver) CreateRecipient(ctx context.Context, input model.NewRecipient) (*model.Recipient, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +40,7 @@ func (r *mutationResolver) CreateRecipient(ctx context.Context, input model.NewR
 
 // UpdateRecipient is the resolver for the updateRecipient field.
 func (r *mutationResolver) UpdateRecipient(ctx context.Context, id string, input model.UpdateRecipient) (*model.Recipient, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +70,7 @@ func (r *mutationResolver) UpdateRecipient(ctx context.Context, id string, input
 
 // DeleteRecipient is the resolver for the deleteRecipient field.
 func (r *mutationResolver) DeleteRecipient(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +102,7 @@ func (r *mutationResolver) DeleteRecipient(ctx context.Context, id string) (map[
 
 // DeleteRecipients is the resolver for the deleteRecipients field.
 func (r *mutationResolver) DeleteRecipients(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

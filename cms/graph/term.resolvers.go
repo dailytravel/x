@@ -21,7 +21,7 @@ import (
 
 // CreateTerm is the resolver for the createTerm field.
 func (r *mutationResolver) CreateTerm(ctx context.Context, input model.NewTerm) (*model.Term, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (r *mutationResolver) CreateTerm(ctx context.Context, input model.NewTerm) 
 
 // UpdateTerm is the resolver for the updateTerm field.
 func (r *mutationResolver) UpdateTerm(ctx context.Context, id string, input model.UpdateTerm) (*model.Term, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -231,8 +231,7 @@ func (r *termResolver) Name(ctx context.Context, obj *model.Term) (string, error
 		return name, nil
 	}
 
-	// Return an error if the name is not found for any locale
-	return "", errors.New("Name not found for any locale")
+	return obj.Name[obj.Locale].(string), nil
 }
 
 // Description is the resolver for the description field.
@@ -248,8 +247,7 @@ func (r *termResolver) Description(ctx context.Context, obj *model.Term) (*strin
 		return &description, nil
 	}
 
-	// Return an error if the name is not found for any locale
-	return nil, errors.New("Description not found for any locale")
+	return obj.Description[obj.Locale].(*string), nil
 }
 
 // Metadata is the resolver for the metadata field.

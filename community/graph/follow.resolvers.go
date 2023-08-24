@@ -9,7 +9,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/dailytravel/x/community/auth"
 	"github.com/dailytravel/x/community/graph/model"
 	"github.com/dailytravel/x/community/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -76,7 +75,7 @@ func (r *followResolver) UpdatedBy(ctx context.Context, obj *model.Follow) (*str
 
 // CreateFollow is the resolver for the createFollow field.
 func (r *mutationResolver) CreateFollow(ctx context.Context, input model.NewFollow) (*model.Follow, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +106,7 @@ func (r *mutationResolver) CreateFollow(ctx context.Context, input model.NewFoll
 
 // UpdateFollow is the resolver for the updateFollow field.
 func (r *mutationResolver) UpdateFollow(ctx context.Context, id string, input model.UpdateFollow) (*model.Follow, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +146,7 @@ func (r *mutationResolver) UpdateFollow(ctx context.Context, id string, input mo
 
 // DeleteFollow is the resolver for the deleteFollow field.
 func (r *mutationResolver) DeleteFollow(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +177,7 @@ func (r *mutationResolver) DeleteFollow(ctx context.Context, id string) (map[str
 
 // Follows is the resolver for the follows field.
 func (r *queryResolver) Follows(ctx context.Context, ids []string) ([]*model.Follow, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +217,7 @@ func (r *queryResolver) Follows(ctx context.Context, ids []string) ([]*model.Fol
 
 // Follow is the resolver for the follow field.
 func (r *queryResolver) Follow(ctx context.Context, id string) (*model.Follow, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

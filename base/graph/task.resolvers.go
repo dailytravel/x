@@ -9,7 +9,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/dailytravel/x/base/auth"
 	"github.com/dailytravel/x/base/graph/model"
 	"github.com/dailytravel/x/base/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ import (
 
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) (*model.Task, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +85,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 
 // UpdateTask is the resolver for the updateTask field.
 func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input model.UpdateTask) (*model.Task, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +175,7 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 
 // DeleteTask is the resolver for the deleteTask field.
 func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -215,7 +214,7 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (map[strin
 
 // DeleteTasks is the resolver for the deleteTasks field.
 func (r *mutationResolver) DeleteTasks(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

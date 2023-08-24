@@ -34,44 +34,6 @@ func (r *couponResolver) User(ctx context.Context, obj *model.Coupon) (*model.Us
 	return item, nil
 }
 
-// Created is the resolver for the created field.
-func (r *couponResolver) Created(ctx context.Context, obj *model.Coupon) (*model.User, error) {
-	var item *model.User
-
-	_id, err := primitive.ObjectIDFromHex(obj.CreatedBy)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": _id})
-		}
-		return nil, err
-	}
-
-	return item, nil
-}
-
-// Updated is the resolver for the updated field.
-func (r *couponResolver) Updated(ctx context.Context, obj *model.Coupon) (*model.User, error) {
-	var item *model.User
-
-	_id, err := primitive.ObjectIDFromHex(obj.UpdatedBy)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": _id})
-		}
-		return nil, err
-	}
-
-	return item, nil
-}
-
 // Coupon returns CouponResolver implementation.
 func (r *Resolver) Coupon() CouponResolver { return &couponResolver{r} }
 

@@ -20,7 +20,7 @@ import (
 
 // CreateVariant is the resolver for the createVariant field.
 func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVariant) (*model.Variant, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVar
 
 // UpdateVariant is the resolver for the updateVariant field.
 func (r *mutationResolver) UpdateVariant(ctx context.Context, id string, input model.UpdateVariant) (*model.Variant, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (r *mutationResolver) UpdateVariant(ctx context.Context, id string, input m
 
 // DeleteVariant is the resolver for the deleteVariant field.
 func (r *mutationResolver) DeleteVariant(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (r *mutationResolver) DeleteVariant(ctx context.Context, id string) (map[st
 
 // DeleteVariants is the resolver for the deleteVariants field.
 func (r *mutationResolver) DeleteVariants(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

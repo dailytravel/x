@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/dailytravel/x/account/utils"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -53,11 +53,11 @@ func (m *Client) Migrate() error {
 	filter := bson.M{"name": "Default"}
 	if err := col.FindOne(context.Background(), filter).Err(); err != nil {
 		if err == mongo.ErrNoDocuments {
-			hash, _ := utils.Base64(32, false)
+			// hash, _ := utils.Base64(32, false)
 			//create default client
 			client := &model.Client{
 				Name:     "Default",
-				Secret:   hash,
+				Secret:   uuid.NewString(),
 				Redirect: "http://localhost:8080",
 				Domain:   "api.trip.express",
 				Provider: "local",

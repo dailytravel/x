@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -102,7 +101,7 @@ func (r *contactResolver) UpdatedBy(ctx context.Context, obj *model.Contact) (*s
 
 // CreateContact is the resolver for the createContact field.
 func (r *mutationResolver) CreateContact(ctx context.Context, input model.NewContact) (*model.Contact, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +144,7 @@ func (r *mutationResolver) CreateContact(ctx context.Context, input model.NewCon
 // UpdateContact is the resolver for the updateContact field.
 func (r *mutationResolver) UpdateContact(ctx context.Context, id string, input model.UpdateContact) (*model.Contact, error) {
 	// Get the authenticated user ID
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -265,7 +264,7 @@ func (r *mutationResolver) UpdateContact(ctx context.Context, id string, input m
 
 // DeleteContact is the resolver for the deleteContact field.
 func (r *mutationResolver) DeleteContact(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +305,7 @@ func (r *mutationResolver) DeleteContact(ctx context.Context, id string) (map[st
 
 // DeleteContacts is the resolver for the deleteContacts field.
 func (r *mutationResolver) DeleteContacts(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

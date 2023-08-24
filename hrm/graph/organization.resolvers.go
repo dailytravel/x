@@ -7,9 +7,9 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +20,7 @@ import (
 
 // CreateOrganization is the resolver for the createOrganization field.
 func (r *mutationResolver) CreateOrganization(ctx context.Context, input model.NewOrganization) (*model.Organization, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -35,12 +35,12 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input model.N
 		},
 	}
 
-	if input.Employee != nil {
-		employee, err := primitive.ObjectIDFromHex(*input.Employee)
+	if input.UID != nil {
+		uid, err := primitive.ObjectIDFromHex(*input.UID)
 		if err != nil {
 			return nil, err
 		}
-		item.Employee = &employee
+		item.UID = &uid
 	}
 
 	if input.Parent != nil {
@@ -61,7 +61,7 @@ func (r *mutationResolver) CreateOrganization(ctx context.Context, input model.N
 
 // UpdateOrganization is the resolver for the updateOrganization field.
 func (r *mutationResolver) UpdateOrganization(ctx context.Context, id string, input model.UpdateOrganization) (*model.Organization, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -90,12 +90,12 @@ func (r *mutationResolver) UpdateOrganization(ctx context.Context, id string, in
 	if input.Description != nil {
 		item.Description = input.Description
 	}
-	if input.Employee != nil {
-		employee, err := primitive.ObjectIDFromHex(*input.Employee)
+	if input.UID != nil {
+		uid, err := primitive.ObjectIDFromHex(*input.UID)
 		if err != nil {
 			return nil, err
 		}
-		item.Employee = &employee
+		item.UID = &uid
 	}
 	if input.Parent != nil {
 		parent, err := primitive.ObjectIDFromHex(*input.Parent)
@@ -111,7 +111,6 @@ func (r *mutationResolver) UpdateOrganization(ctx context.Context, id string, in
 			"type":        item.Type,
 			"name":        item.Name,
 			"description": item.Description,
-			"employee":    item.Employee,
 			"parent":      item.Parent,
 			"updated_by":  uid,
 		},
@@ -129,7 +128,7 @@ func (r *mutationResolver) UpdateOrganization(ctx context.Context, id string, in
 
 // DeleteOrganization is the resolver for the deleteOrganization field.
 func (r *mutationResolver) DeleteOrganization(ctx context.Context, id string) (*model.Organization, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -206,20 +205,9 @@ func (r *organizationResolver) UpdatedAt(ctx context.Context, obj *model.Organiz
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// Employee is the resolver for the employee field.
-func (r *organizationResolver) Employee(ctx context.Context, obj *model.Organization) (*model.Employee, error) {
-	var item *model.Employee
-
-	filter := bson.M{"_id": obj.Employee}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	return item, nil
+// UID is the resolver for the uid field.
+func (r *organizationResolver) UID(ctx context.Context, obj *model.Organization) (*string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
 // CreatedBy is the resolver for the created_by field.

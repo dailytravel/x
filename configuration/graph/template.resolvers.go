@@ -20,7 +20,7 @@ import (
 
 // CreateTemplate is the resolver for the createTemplate field.
 func (r *mutationResolver) CreateTemplate(ctx context.Context, input model.NewTemplate) (*model.Template, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (r *mutationResolver) CreateTemplate(ctx context.Context, input model.NewTe
 
 // UpdateTemplate is the resolver for the updateTemplate field.
 func (r *mutationResolver) UpdateTemplate(ctx context.Context, id string, input model.UpdateTemplate) (*model.Template, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (r *mutationResolver) UpdateTemplate(ctx context.Context, id string, input 
 
 // DeleteTemplate is the resolver for the deleteTemplate field.
 func (r *mutationResolver) DeleteTemplate(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (r *mutationResolver) DeleteTemplate(ctx context.Context, id string) (map[s
 
 // DeleteTemplates is the resolver for the deleteTemplates field.
 func (r *mutationResolver) DeleteTemplates(ctx context.Context, ids []*string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

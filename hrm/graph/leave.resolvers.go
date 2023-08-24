@@ -6,16 +6,13 @@ package graph
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -55,19 +52,9 @@ func (r *leaveResolver) UpdatedAt(ctx context.Context, obj *model.Leave) (string
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// Employee is the resolver for the employee field.
-func (r *leaveResolver) Employee(ctx context.Context, obj *model.Leave) (*model.Employee, error) {
-	var item *model.Employee
-
-	filter := bson.M{"_id": obj.Employee}
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("employee not found")
-		}
-		return nil, err
-	}
-
-	return item, nil
+// UID is the resolver for the uid field.
+func (r *leaveResolver) UID(ctx context.Context, obj *model.Leave) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
 // CreatedBy is the resolver for the created_by field.
@@ -94,7 +81,7 @@ func (r *leaveResolver) UpdatedBy(ctx context.Context, obj *model.Leave) (*strin
 
 // CreateLeave is the resolver for the createLeave field.
 func (r *mutationResolver) CreateLeave(ctx context.Context, input model.NewLeave) (*model.Leave, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +124,7 @@ func (r *mutationResolver) CreateLeave(ctx context.Context, input model.NewLeave
 
 // UpdateLeave is the resolver for the updateLeave field.
 func (r *mutationResolver) UpdateLeave(ctx context.Context, id string, input model.UpdateLeave) (*model.Leave, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +169,7 @@ func (r *mutationResolver) UpdateLeave(ctx context.Context, id string, input mod
 
 // DeleteLeave is the resolver for the deleteLeave field.
 func (r *mutationResolver) DeleteLeave(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +209,7 @@ func (r *mutationResolver) DeleteLeave(ctx context.Context, id string) (map[stri
 
 // DeleteLeaves is the resolver for the deleteLeaves field.
 func (r *mutationResolver) DeleteLeaves(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

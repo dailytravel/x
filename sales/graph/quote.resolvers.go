@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ import (
 
 // CreateQuote is the resolver for the createQuote field.
 func (r *mutationResolver) CreateQuote(ctx context.Context, input *model.NewQuote) (*model.Quote, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +44,7 @@ func (r *mutationResolver) CreateQuote(ctx context.Context, input *model.NewQuot
 
 // UpdateQuote is the resolver for the updateQuote field.
 func (r *mutationResolver) UpdateQuote(ctx context.Context, id string, input model.UpdateQuote) (*model.Quote, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +68,7 @@ func (r *mutationResolver) UpdateQuote(ctx context.Context, id string, input mod
 
 // DeleteQuote is the resolver for the deleteQuote field.
 func (r *mutationResolver) DeleteQuote(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +108,7 @@ func (r *mutationResolver) DeleteQuote(ctx context.Context, id string) (map[stri
 
 // DeleteQuotes is the resolver for the deleteQuotes field.
 func (r *mutationResolver) DeleteQuotes(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

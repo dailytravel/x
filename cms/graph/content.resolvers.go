@@ -26,15 +26,16 @@ func (r *contentResolver) ID(ctx context.Context, obj *model.Content) (string, e
 // Title is the resolver for the title field.
 func (r *contentResolver) Title(ctx context.Context, obj *model.Content) (string, error) {
 	locale := auth.Locale(ctx)
+
+	if locale == nil {
+		locale = &obj.Locale
+	}
+
 	if title, ok := obj.Title[*locale].(string); ok {
 		return title, nil
 	}
 
-	if title, ok := obj.Title[obj.Locale].(string); ok {
-		return title, nil
-	}
-
-	return "", errors.New("Title not found for any locale")
+	return obj.Title[obj.Locale].(string), nil
 }
 
 // Summary is the resolver for the summary field.
@@ -48,7 +49,7 @@ func (r *contentResolver) Summary(ctx context.Context, obj *model.Content) (stri
 		return summary, nil
 	}
 
-	return "", errors.New("Summary not found for any locale")
+	return obj.Summary[obj.Locale].(string), nil
 }
 
 // Body is the resolver for the body field.
@@ -62,7 +63,7 @@ func (r *contentResolver) Body(ctx context.Context, obj *model.Content) (string,
 		return body, nil
 	}
 
-	return "", errors.New("Body not found for any locale")
+	return obj.Body[obj.Locale].(string), nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -149,7 +150,7 @@ func (r *contentResolver) Parent(ctx context.Context, obj *model.Content) (*mode
 
 // CreateContent is the resolver for the createContent field.
 func (r *mutationResolver) CreateContent(ctx context.Context, input model.NewContent) (*model.Content, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +192,7 @@ func (r *mutationResolver) CreateContent(ctx context.Context, input model.NewCon
 
 // UpdateContent is the resolver for the updateContent field.
 func (r *mutationResolver) UpdateContent(ctx context.Context, id string, input model.UpdateContent) (*model.Content, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

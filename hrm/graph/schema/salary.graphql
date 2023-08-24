@@ -8,7 +8,7 @@ type Salary {
   status: String!
   created_at: String!
   updated_at: String!
-  employee: Employee!
+  uid: ID!
   created_by: ID
   updated_by: ID
 }
@@ -19,7 +19,7 @@ type Salaries {
 }
 
 input NewSalary {
-  employee: ID!
+  uid: ID!
   amount: Float!
   currency: String!
   start_date: String!

@@ -20,7 +20,7 @@ import (
 
 // CreateTier is the resolver for the createTier field.
 func (r *mutationResolver) CreateTier(ctx context.Context, input model.NewTier) (*model.Tier, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (r *mutationResolver) CreateTier(ctx context.Context, input model.NewTier) 
 
 // UpdateTier is the resolver for the updateTier field.
 func (r *mutationResolver) UpdateTier(ctx context.Context, id string, input model.UpdateTier) (*model.Tier, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (r *mutationResolver) UpdateTier(ctx context.Context, id string, input mode
 
 // DeleteTier is the resolver for the deleteTier field.
 func (r *mutationResolver) DeleteTier(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (r *mutationResolver) DeleteTier(ctx context.Context, id string) (map[strin
 
 // DeleteTiers is the resolver for the deleteTiers field.
 func (r *mutationResolver) DeleteTiers(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -233,22 +233,70 @@ func (r *tierResolver) ID(ctx context.Context, obj *model.Tier) (string, error) 
 
 // Name is the resolver for the name field.
 func (r *tierResolver) Name(ctx context.Context, obj *model.Tier) (string, error) {
-	panic(fmt.Errorf("not implemented: Name - name"))
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
+
+	// Try to retrieve the name for the requested locale
+	if name, ok := obj.Name[*locale].(string); ok {
+		return name, nil
+	}
+
+	return obj.Name[obj.Locale].(string), nil
 }
 
 // Description is the resolver for the description field.
 func (r *tierResolver) Description(ctx context.Context, obj *model.Tier) (string, error) {
-	panic(fmt.Errorf("not implemented: Description - description"))
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
+
+	// Try to retrieve the description for the requested locale
+	if description, ok := obj.Description[*locale].(string); ok {
+		return description, nil
+	}
+
+	return obj.Description[obj.Locale].(string), nil
 }
 
 // Benefits is the resolver for the benefits field.
 func (r *tierResolver) Benefits(ctx context.Context, obj *model.Tier) ([]*model.Benefit, error) {
-	panic(fmt.Errorf("not implemented: Benefits - benefits"))
+	var items []*model.Benefit
+
+	filter := bson.M{"_id": bson.M{"$in": obj.Benefits}}
+
+	cursor, err := r.db.Collection("benefits").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
 
 // Rewards is the resolver for the rewards field.
 func (r *tierResolver) Rewards(ctx context.Context, obj *model.Tier) ([]*model.Reward, error) {
-	panic(fmt.Errorf("not implemented: Rewards - rewards"))
+	var items []*model.Reward
+
+	filter := bson.M{"_id": bson.M{"$in": obj.Benefits}}
+
+	cursor, err := r.db.Collection("rewards").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
 
 // Metadata is the resolver for the metadata field.

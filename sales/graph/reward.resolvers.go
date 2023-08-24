@@ -20,7 +20,7 @@ import (
 
 // CreateReward is the resolver for the createReward field.
 func (r *mutationResolver) CreateReward(ctx context.Context, input model.NewReward) (*model.Reward, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (r *mutationResolver) CreateReward(ctx context.Context, input model.NewRewa
 
 // UpdateReward is the resolver for the updateReward field.
 func (r *mutationResolver) UpdateReward(ctx context.Context, id string, input model.UpdateReward) (*model.Reward, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (r *mutationResolver) UpdateReward(ctx context.Context, id string, input mo
 
 // DeleteReward is the resolver for the deleteReward field.
 func (r *mutationResolver) DeleteReward(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (r *mutationResolver) DeleteReward(ctx context.Context, id string) (map[str
 
 // DeleteRewards is the resolver for the deleteRewards field.
 func (r *mutationResolver) DeleteRewards(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

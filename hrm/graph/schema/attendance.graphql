@@ -1,13 +1,13 @@
 type Attendance {
   id: ID!
-  employee: Employee!
   time_in: String!
-  time_out: String!
+  time_out: String
   notes: String
   metadata: Map
   status: String # "present", "absent", "late", etc.
   created_at: String!
   updated_at: String!
+  uid: ID!
   created_by: ID
   updated_by: ID
 }
@@ -25,7 +25,7 @@ type Attendances {
 }
 
 input NewAttendance {
-  owner: ID!
+  uid: ID!
   time_in: String!
   time_out: String!
   notes: String
@@ -34,7 +34,7 @@ input NewAttendance {
 }
 
 input UpdateAttendance {
-  owner: ID
+  uid: ID
   time_in: String
   time_out: String
   notes: String
@@ -48,8 +48,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  checkIn(employee: ID!): Attendance @auth
-  checkOut(employee: ID!): Attendance @auth
+  checkIn: Attendance @auth
+  checkOut: Attendance @auth
   createAttendance(input: NewAttendance!): Attendance @auth
   updateAttendance(id: ID!, input: UpdateAttendance!): Attendance @auth
   deleteAttendance(id: ID!): Map @auth

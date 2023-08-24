@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -122,7 +121,7 @@ func (r *membershipResolver) UpdatedBy(ctx context.Context, obj *model.Membershi
 
 // CreateMembership is the resolver for the createMembership field.
 func (r *mutationResolver) CreateMembership(ctx context.Context, input model.NewMembership) (*model.Membership, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +157,7 @@ func (r *mutationResolver) CreateMembership(ctx context.Context, input model.New
 
 // UpdateMembership is the resolver for the updateMembership field.
 func (r *mutationResolver) UpdateMembership(ctx context.Context, id string, input model.UpdateMembership) (*model.Membership, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +229,7 @@ func (r *mutationResolver) UpdateMembership(ctx context.Context, id string, inpu
 
 // DeleteMembership is the resolver for the deleteMembership field.
 func (r *mutationResolver) DeleteMembership(ctx context.Context, id string) (*model.Membership, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +270,7 @@ func (r *mutationResolver) DeleteMembership(ctx context.Context, id string) (*mo
 
 // DeleteMemberships is the resolver for the deleteMemberships field.
 func (r *mutationResolver) DeleteMemberships(ctx context.Context, ids []string) ([]*model.Membership, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

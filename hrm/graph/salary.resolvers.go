@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ import (
 
 // CreateSalary is the resolver for the createSalary field.
 func (r *mutationResolver) CreateSalary(ctx context.Context, input model.NewSalary) (*model.Salary, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +43,7 @@ func (r *mutationResolver) CreateSalary(ctx context.Context, input model.NewSala
 
 // UpdateSalary is the resolver for the updateSalary field.
 func (r *mutationResolver) UpdateSalary(ctx context.Context, id string, input model.UpdateSalary) (*model.Salary, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +74,7 @@ func (r *mutationResolver) UpdateSalary(ctx context.Context, id string, input mo
 
 // DeleteSalary is the resolver for the deleteSalary field.
 func (r *mutationResolver) DeleteSalary(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +114,7 @@ func (r *mutationResolver) DeleteSalary(ctx context.Context, id string) (map[str
 
 // DeleteSalaries is the resolver for the deleteSalaries field.
 func (r *mutationResolver) DeleteSalaries(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -233,19 +232,9 @@ func (r *salaryResolver) UpdatedAt(ctx context.Context, obj *model.Salary) (stri
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// Employee is the resolver for the employee field.
-func (r *salaryResolver) Employee(ctx context.Context, obj *model.Salary) (*model.Employee, error) {
-	var item *model.Employee
-
-	filter := bson.M{"_id": obj.Employee}
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("employee not found")
-		}
-		return nil, err
-	}
-
-	return item, nil
+// UID is the resolver for the uid field.
+func (r *salaryResolver) UID(ctx context.Context, obj *model.Salary) (string, error) {
+	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
 // CreatedBy is the resolver for the created_by field.

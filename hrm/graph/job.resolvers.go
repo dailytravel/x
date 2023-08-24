@@ -35,8 +35,7 @@ func (r *jobResolver) Title(ctx context.Context, obj *model.Job) (string, error)
 		return title, nil
 	}
 
-	// Return an error if the name is not found for any locale
-	return "", errors.New("title not found")
+	return obj.Title[obj.Locale].(string), nil
 }
 
 // Description is the resolver for the description field.
@@ -52,8 +51,7 @@ func (r *jobResolver) Description(ctx context.Context, obj *model.Job) (string, 
 		return description, nil
 	}
 
-	// Return an error if the name is not found for any locale
-	return "", errors.New("description not found")
+	return obj.Description[obj.Locale].(string), nil
 }
 
 // Requirements is the resolver for the requirements field.
@@ -69,8 +67,7 @@ func (r *jobResolver) Requirements(ctx context.Context, obj *model.Job) (string,
 		return requirements, nil
 	}
 
-	// Return an error if the name is not found for any locale
-	return "", errors.New("requirements not found")
+	return obj.Requirements[obj.Locale].(string), nil
 }
 
 // Skills is the resolver for the skills field.
@@ -86,8 +83,7 @@ func (r *jobResolver) Skills(ctx context.Context, obj *model.Job) (*string, erro
 		return &skills, nil
 	}
 
-	// Return an error if the name is not found for any locale
-	return nil, errors.New("skills not found")
+	return obj.Skills[obj.Locale].(*string), nil
 }
 
 // Benefits is the resolver for the benefits field.
@@ -103,8 +99,7 @@ func (r *jobResolver) Benefits(ctx context.Context, obj *model.Job) (*string, er
 		return &benefits, nil
 	}
 
-	// Return an error if the name is not found for any locale
-	return nil, errors.New("benefits not found")
+	return obj.Benefits[obj.Locale].(*string), nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -146,7 +141,7 @@ func (r *jobResolver) UpdatedBy(ctx context.Context, obj *model.Job) (*string, e
 
 // CreateJob is the resolver for the createJob field.
 func (r *mutationResolver) CreateJob(ctx context.Context, input model.NewJob) (*model.Job, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +170,7 @@ func (r *mutationResolver) CreateJob(ctx context.Context, input model.NewJob) (*
 
 // UpdateJob is the resolver for the updateJob field.
 func (r *mutationResolver) UpdateJob(ctx context.Context, id string, input model.UpdateJob) (*model.Job, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +226,7 @@ func (r *mutationResolver) UpdateJob(ctx context.Context, id string, input model
 
 // DeleteJob is the resolver for the deleteJob field.
 func (r *mutationResolver) DeleteJob(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +267,7 @@ func (r *mutationResolver) DeleteJob(ctx context.Context, id string) (map[string
 
 // DeleteJobs is the resolver for the deleteJobs field.
 func (r *mutationResolver) DeleteJobs(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

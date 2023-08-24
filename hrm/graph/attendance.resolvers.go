@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -24,29 +23,19 @@ func (r *attendanceResolver) ID(ctx context.Context, obj *model.Attendance) (str
 	return obj.ID.Hex(), nil
 }
 
-// Employee is the resolver for the employee field.
-func (r *attendanceResolver) Employee(ctx context.Context, obj *model.Attendance) (*model.Employee, error) {
-	var item *model.Employee
-
-	filter := bson.M{"_id": obj.Employee}
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("employee not found")
-		}
-		return nil, err
-	}
-
-	return item, nil
-}
-
 // TimeIn is the resolver for the time_in field.
 func (r *attendanceResolver) TimeIn(ctx context.Context, obj *model.Attendance) (string, error) {
 	return time.Unix(int64(obj.TimeIn.T), 0).Format(time.RFC3339), nil
 }
 
 // TimeOut is the resolver for the time_out field.
-func (r *attendanceResolver) TimeOut(ctx context.Context, obj *model.Attendance) (string, error) {
-	return time.Unix(int64(obj.TimeOut.T), 0).Format(time.RFC3339), nil
+func (r *attendanceResolver) TimeOut(ctx context.Context, obj *model.Attendance) (*string, error) {
+	if obj.TimeOut == nil {
+		return nil, nil
+	}
+
+	timeOut := time.Unix(int64(obj.TimeOut.T), 0).Format(time.RFC3339)
+	return &timeOut, nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -62,6 +51,11 @@ func (r *attendanceResolver) CreatedAt(ctx context.Context, obj *model.Attendanc
 // UpdatedAt is the resolver for the updated_at field.
 func (r *attendanceResolver) UpdatedAt(ctx context.Context, obj *model.Attendance) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+}
+
+// UID is the resolver for the uid field.
+func (r *attendanceResolver) UID(ctx context.Context, obj *model.Attendance) (string, error) {
+	return obj.UID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.
@@ -87,14 +81,14 @@ func (r *attendanceResolver) UpdatedBy(ctx context.Context, obj *model.Attendanc
 }
 
 // CheckIn is the resolver for the checkIn field.
-func (r *mutationResolver) CheckIn(ctx context.Context, employee string) (*model.Attendance, error) {
-	_employee, err := primitive.ObjectIDFromHex(employee)
+func (r *mutationResolver) CheckIn(ctx context.Context) (*model.Attendance, error) {
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	filter := bson.M{
-		"employee": _employee,
+		"uid": uid,
 		"time_in": bson.M{
 			"$gte": primitive.Timestamp{T: uint32(time.Now().Unix()) - 86400},
 			"$lt":  primitive.Timestamp{T: uint32(time.Now().Unix())},
@@ -109,8 +103,8 @@ func (r *mutationResolver) CheckIn(ctx context.Context, employee string) (*model
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			item = &model.Attendance{
-				Employee: _employee,
-				TimeIn:   primitive.Timestamp{T: uint32(time.Now().Unix())},
+				UID:    *uid,
+				TimeIn: primitive.Timestamp{T: uint32(time.Now().Unix())},
 			}
 
 			res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil)
@@ -130,21 +124,21 @@ func (r *mutationResolver) CheckIn(ctx context.Context, employee string) (*model
 }
 
 // CheckOut is the resolver for the checkOut field.
-func (r *mutationResolver) CheckOut(ctx context.Context, employee string) (*model.Attendance, error) {
-	_employee, err := primitive.ObjectIDFromHex(employee)
+func (r *mutationResolver) CheckOut(ctx context.Context) (*model.Attendance, error) {
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	filter := bson.M{
-		"employee": _employee,
+		"uid": uid,
 		"time_in": bson.M{
 			"$gte": primitive.Timestamp{T: uint32(time.Now().Unix()) - 86400},
 			"$lt":  primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
-	var item model.Attendance
+	var item *model.Attendance
 
 	err = r.db.Collection(item.Collection()).FindOne(ctx, filter, options.FindOne().SetSort(bson.D{{Key: "time_in", Value: -1}})).Decode(&item)
 	if err != nil {
@@ -155,21 +149,19 @@ func (r *mutationResolver) CheckOut(ctx context.Context, employee string) (*mode
 	}
 
 	out := primitive.Timestamp{T: uint32(time.Now().Unix())}
-	update := &model.Attendance{
-		TimeOut: &out,
-	}
+	item.TimeOut = &out
 
-	_, err = r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": update})
+	_, err = r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item})
 	if err != nil {
 		return nil, err
 	}
 
-	return &item, nil
+	return item, nil
 }
 
 // CreateAttendance is the resolver for the createAttendance field.
 func (r *mutationResolver) CreateAttendance(ctx context.Context, input model.NewAttendance) (*model.Attendance, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +187,7 @@ func (r *mutationResolver) CreateAttendance(ctx context.Context, input model.New
 
 // UpdateAttendance is the resolver for the updateAttendance field.
 func (r *mutationResolver) UpdateAttendance(ctx context.Context, id string, input model.UpdateAttendance) (*model.Attendance, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -243,7 +235,7 @@ func (r *mutationResolver) UpdateAttendance(ctx context.Context, id string, inpu
 
 // DeleteAttendance is the resolver for the deleteAttendance field.
 func (r *mutationResolver) DeleteAttendance(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -281,7 +273,7 @@ func (r *mutationResolver) DeleteAttendance(ctx context.Context, id string) (map
 
 // DeleteAttendances is the resolver for the deleteAttendances field.
 func (r *mutationResolver) DeleteAttendances(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

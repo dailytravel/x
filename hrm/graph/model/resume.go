@@ -14,13 +14,12 @@ type Resume struct {
 	UID            primitive.ObjectID `json:"uid" bson:"uid"`
 	Title          string             `json:"title" bson:"title"`
 	Summary        string             `json:"summary" bson:"summary"`
-	Experience     string             `json:"experience" bson:"experience"`
-	Education      string             `json:"education" bson:"education"`
-	Skills         string             `json:"skills" bson:"skills"`
-	Certifications string             `json:"certifications" bson:"certifications"`
-	Languages      string             `json:"languages" bson:"languages"`
-	Projects       string             `json:"projects" bson:"projects"`
-	References     string             `json:"references" bson:"references"`
+	Experience     []Experience       `json:"experience" bson:"experience"`
+	Education      []Education        `json:"education" bson:"education"`
+	Skills         []Skill            `json:"skills" bson:"skills"`
+	Certifications []Certification    `json:"certifications" bson:"certifications"`
+	Languages      []Language         `json:"languages" bson:"languages"`
+	References     []Reference        `json:"references" bson:"references"`
 	Status         string             `json:"status" bson:"status"`
 }
 
@@ -43,7 +42,7 @@ func (i *Resume) Collection() string {
 
 func (i *Resume) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},

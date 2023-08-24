@@ -7,12 +7,13 @@ type Employee {
   phone: String!
   address: String!
   birthday: String!
+  gender: String
+  picture: String
   status: String
   metadata: Map
   hire_date: String!
   created_at: String!
   updated_at: String!
-  user: User
   organization: Organization!
   position: String!
   uid: ID!
@@ -34,6 +35,7 @@ input NewEmployee {
   phone: String!
   address: String!
   birthday: String
+  picture: String
   status: String
   metadata: Map
   hire_date: String
@@ -50,6 +52,7 @@ input UpdateEmployee {
   phone: String
   address: String
   birthday: String
+  picture: String
   status: String
   metadata: Map
   hire_date: String

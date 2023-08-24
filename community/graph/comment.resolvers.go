@@ -153,7 +153,7 @@ func (r *commentResolver) UpdatedBy(ctx context.Context, obj *model.Comment) (*s
 
 // CreateComment is the resolver for the createComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewComment) (*model.Comment, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +203,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 
 // UpdateComment is the resolver for the updateComment field.
 func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input model.UpdateComment) (*model.Comment, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input m
 // DeleteComment is the resolver for the deleteComment field.
 func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (map[string]interface{}, error) {
 	var item *model.Comment
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -289,7 +289,7 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (map[st
 
 // DeleteComments is the resolver for the deleteComments field.
 func (r *mutationResolver) DeleteComments(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 
+	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph"
 )
 

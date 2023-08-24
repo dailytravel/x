@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dailytravel/x/marketing/auth"
 	"github.com/typesense/typesense-go/typesense/api"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -42,16 +43,17 @@ func Number(n int) string {
 }
 
 func Base64(n int, padded bool) (string, error) {
-	bytes, err := Bytes(n)
+	bytes := make([]byte, n)
+	_, err := rand.Read(bytes)
 	if err != nil {
 		return "", err
 	}
-	result := base64.StdEncoding.EncodeToString(bytes)
-	result = strings.Replace(result, "\n", "", -1)
+
+	encoded := base64.RawURLEncoding.EncodeToString(bytes)
 	if !padded {
-		result = strings.Replace(result, "=", "", -1)
+		encoded = strings.TrimRight(encoded, "=")
 	}
-	return result, nil
+	return encoded, nil
 }
 
 func StructToMap(obj interface{}) (map[string]interface{}, error) {

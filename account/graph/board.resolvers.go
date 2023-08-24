@@ -34,44 +34,6 @@ func (r *boardResolver) User(ctx context.Context, obj *model.Board) (*model.User
 	return item, nil
 }
 
-// Created is the resolver for the created field.
-func (r *boardResolver) Created(ctx context.Context, obj *model.Board) (*model.User, error) {
-	var item *model.User
-
-	_id, err := primitive.ObjectIDFromHex(obj.CreatedBy)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": _id})
-		}
-		return nil, err
-	}
-
-	return item, nil
-}
-
-// Updated is the resolver for the updated field.
-func (r *boardResolver) Updated(ctx context.Context, obj *model.Board) (*model.User, error) {
-	var item *model.User
-
-	_id, err := primitive.ObjectIDFromHex(obj.UpdatedBy)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": _id})
-		}
-		return nil, err
-	}
-
-	return item, nil
-}
-
 // Board returns BoardResolver implementation.
 func (r *Resolver) Board() BoardResolver { return &boardResolver{r} }
 

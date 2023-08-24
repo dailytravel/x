@@ -8,7 +8,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/dailytravel/x/base/auth"
 	"github.com/dailytravel/x/base/graph/model"
 	"github.com/dailytravel/x/base/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -96,7 +95,7 @@ func (r *listResolver) UpdatedBy(ctx context.Context, obj *model.List) (*string,
 
 // CreateList is the resolver for the createList field.
 func (r *mutationResolver) CreateList(ctx context.Context, input model.NewList) (*model.List, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +129,7 @@ func (r *mutationResolver) CreateList(ctx context.Context, input model.NewList) 
 
 // UpdateList is the resolver for the updateList field.
 func (r *mutationResolver) UpdateList(ctx context.Context, id string, input model.UpdateList) (*model.List, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

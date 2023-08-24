@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/community/auth"
 	"github.com/dailytravel/x/community/graph/model"
 	"github.com/dailytravel/x/community/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ import (
 
 // CreateReaction is the resolver for the createReaction field.
 func (r *mutationResolver) CreateReaction(ctx context.Context, input model.NewReaction) (*model.Reaction, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +51,7 @@ func (r *mutationResolver) CreateReaction(ctx context.Context, input model.NewRe
 
 // UpdateReaction is the resolver for the updateReaction field.
 func (r *mutationResolver) UpdateReaction(ctx context.Context, id string, input model.UpdateReaction) (*model.Reaction, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -7,9 +7,9 @@ type Payroll {
   status: String!
   created_at: String!
   updated_at: String!
+  uid: ID!
   created_by: ID
   updated_by: ID
-  employee: Employee
 }
 
 type Payrolls {
@@ -18,7 +18,7 @@ type Payrolls {
 }
 
 input NewPayroll {
-  employee: ID!
+  uid: ID!
   pay_date: String!
   amount: Float!
   currency: String!

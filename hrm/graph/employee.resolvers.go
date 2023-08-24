@@ -8,7 +8,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -44,17 +43,6 @@ func (r *employeeResolver) CreatedAt(ctx context.Context, obj *model.Employee) (
 // UpdatedAt is the resolver for the updated_at field.
 func (r *employeeResolver) UpdatedAt(ctx context.Context, obj *model.Employee) (string, error) {
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// User is the resolver for the user field.
-func (r *employeeResolver) User(ctx context.Context, obj *model.Employee) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection("users").FindOne(ctx, bson.M{"_id": obj.UID}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
 }
 
 // Organization is the resolver for the organization field.
@@ -97,7 +85,7 @@ func (r *employeeResolver) UpdatedBy(ctx context.Context, obj *model.Employee) (
 
 // CreateEmployee is the resolver for the createEmployee field.
 func (r *mutationResolver) CreateEmployee(ctx context.Context, input model.NewEmployee) (*model.Employee, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +114,7 @@ func (r *mutationResolver) CreateEmployee(ctx context.Context, input model.NewEm
 
 // UpdateEmployee is the resolver for the updateEmployee field.
 func (r *mutationResolver) UpdateEmployee(ctx context.Context, id string, input model.UpdateEmployee) (*model.Employee, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +173,7 @@ func (r *mutationResolver) UpdateEmployee(ctx context.Context, id string, input 
 
 // DeleteEmployee is the resolver for the deleteEmployee field.
 func (r *mutationResolver) DeleteEmployee(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +215,7 @@ func (r *mutationResolver) DeleteEmployee(ctx context.Context, id string) (map[s
 
 // DeleteEmployees is the resolver for the deleteEmployees field.
 func (r *mutationResolver) DeleteEmployees(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +260,7 @@ func (r *queryResolver) Employee(ctx context.Context, id string) (*model.Employe
 		return nil, err
 	}
 
-	if err := r.db.Collection("employees").FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
 		return nil, err
 	}
 
@@ -312,3 +300,19 @@ func (r *queryResolver) Employees(ctx context.Context, args map[string]interface
 func (r *Resolver) Employee() EmployeeResolver { return &employeeResolver{r} }
 
 type employeeResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *employeeResolver) User(ctx context.Context, obj *model.Employee) (*model.User, error) {
+	var item *model.User
+
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"_id": obj.UID}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}

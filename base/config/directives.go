@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/dailytravel/x/base/auth"
 	"github.com/dailytravel/x/base/graph"
 )
 

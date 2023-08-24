@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/community/auth"
 	"github.com/dailytravel/x/community/graph/model"
 	"github.com/dailytravel/x/community/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ import (
 
 // UpdateNotification is the resolver for the updateNotification field.
 func (r *mutationResolver) UpdateNotification(ctx context.Context, id string) (*model.Notification, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +53,7 @@ func (r *mutationResolver) UpdateNotification(ctx context.Context, id string) (*
 
 // DeleteNotification is the resolver for the deleteNotification field.
 func (r *mutationResolver) DeleteNotification(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +85,7 @@ func (r *mutationResolver) DeleteNotification(ctx context.Context, id string) (m
 
 // DeleteNotifications is the resolver for the deleteNotifications field.
 func (r *mutationResolver) DeleteNotifications(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

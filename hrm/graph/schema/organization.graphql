@@ -8,7 +8,7 @@ type Organization @key(fields: "id") {
   metadata: Map
   created_at: String!
   updated_at: String!
-  employee: Employee
+  uid: ID
   created_by: ID
   updated_by: ID
 }
@@ -19,7 +19,7 @@ type Organizations {
 }
 
 input NewOrganization {
-  employee: ID
+  uid: ID
   parent: ID
   name: String!
   description: String
@@ -29,7 +29,7 @@ input NewOrganization {
 }
 
 input UpdateOrganization {
-  employee: ID
+  uid: ID
   parent: ID
   name: String
   description: String

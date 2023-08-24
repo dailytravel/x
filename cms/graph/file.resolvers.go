@@ -41,8 +41,7 @@ func (r *fileResolver) Name(ctx context.Context, obj *model.File) (string, error
 		return name, nil
 	}
 
-	// Return an error if the name is not found for any locale
-	return "", errors.New("Name not found for any locale")
+	return obj.Name[obj.Locale].(string), nil
 }
 
 // Description is the resolver for the description field.
@@ -58,8 +57,7 @@ func (r *fileResolver) Description(ctx context.Context, obj *model.File) (*strin
 		return &description, nil
 	}
 
-	// Return an error if the name is not found for any locale
-	return nil, errors.New("Description not found for any locale")
+	return obj.Description[obj.Locale].(*string), nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -101,7 +99,7 @@ func (r *fileResolver) UpdatedBy(ctx context.Context, obj *model.File) (*string,
 
 // CreateFile is the resolver for the createFile field.
 func (r *mutationResolver) CreateFile(ctx context.Context, input model.NewFile) (*model.File, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +130,7 @@ func (r *mutationResolver) CreateFile(ctx context.Context, input model.NewFile) 
 
 // UpdateFile is the resolver for the updateFile field.
 func (r *mutationResolver) UpdateFile(ctx context.Context, id string, input model.UpdateFile) (*model.File, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

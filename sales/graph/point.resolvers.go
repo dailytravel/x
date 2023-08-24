@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +19,7 @@ import (
 
 // CreatePoint is the resolver for the createPoint field.
 func (r *mutationResolver) CreatePoint(ctx context.Context, input model.NewPoint) (*model.Point, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +48,7 @@ func (r *mutationResolver) CreatePoint(ctx context.Context, input model.NewPoint
 
 // UpdatePoint is the resolver for the updatePoint field.
 func (r *mutationResolver) UpdatePoint(ctx context.Context, id string, input model.UpdatePoint) (*model.Point, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +105,7 @@ func (r *mutationResolver) UpdatePoint(ctx context.Context, id string, input mod
 
 // DeletePoint is the resolver for the deletePoint field.
 func (r *mutationResolver) DeletePoint(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +145,7 @@ func (r *mutationResolver) DeletePoint(ctx context.Context, id string) (map[stri
 
 // DeletePoints is the resolver for the deletePoints field.
 func (r *mutationResolver) DeletePoints(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -37,7 +37,7 @@ func (r *couponResolver) Description(ctx context.Context, obj *model.Coupon) (st
 	}
 
 	// Return an error if the name is not found for any locale
-	return "", errors.New("Description not found for any locale")
+	return obj.Description[obj.Locale].(string), nil
 }
 
 // StartDate is the resolver for the start_date field.
@@ -94,7 +94,7 @@ func (r *couponResolver) UpdatedBy(ctx context.Context, obj *model.Coupon) (*str
 
 // CreateCoupon is the resolver for the createCoupon field.
 func (r *mutationResolver) CreateCoupon(ctx context.Context, input model.NewCoupon) (*model.Coupon, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (r *mutationResolver) CreateCoupon(ctx context.Context, input model.NewCoup
 
 // UpdateCoupon is the resolver for the updateCoupon field.
 func (r *mutationResolver) UpdateCoupon(ctx context.Context, id string, input model.UpdateCoupon) (*model.Coupon, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +210,7 @@ func (r *mutationResolver) UpdateCoupon(ctx context.Context, id string, input mo
 
 // DeleteCoupon is the resolver for the deleteCoupon field.
 func (r *mutationResolver) DeleteCoupon(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -250,7 +250,7 @@ func (r *mutationResolver) DeleteCoupon(ctx context.Context, id string) (map[str
 
 // DeleteCoupons is the resolver for the deleteCoupons field.
 func (r *mutationResolver) DeleteCoupons(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(auth.Auth(ctx))
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
