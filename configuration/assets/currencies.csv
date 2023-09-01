@@ -1,0 +1,12 @@
+code,name,symbol,rate,precision,decimal,thousand,priority
+USD,US Dollar,$,1,2,.,,1
+EUR,Euro,€,1.22,2,,,2
+JPY,Japanese Yen,¥,0.0094,0,',',3
+GBP,British Pound,£,1.41,2,,,4
+CAD,Canadian Dollar,$,0.79,2,.,,5
+AUD,Australian Dollar,$,0.78,2,.,,6
+CHF,Swiss Franc,CHF,1.10,2,',',7
+CNY,Chinese Yuan Renminbi,¥,0.16,2,.,,8
+HKD,Hong Kong Dollar,$,0.13,2,.,,9
+NZD,New Zealand Dollar,$,0.72,2,.,,10
+VND,Vietnamese Dong,₫,0.000043,0,.,,11

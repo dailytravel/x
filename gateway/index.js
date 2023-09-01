@@ -14,6 +14,12 @@ const cors = require("cors");
 const app = express();
 const port = 4000;
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:4000",
+  "https://api.trip.express",
+];
+
 app.get("/.well-known/jwks.json", (req, res) => {
   res.sendFile("./.well-known/jwks.json", { root: __dirname });
 });
@@ -56,8 +62,7 @@ const gateway = new ApolloGateway({
       { name: "hrm", url: "http://localhost:4007/query" },
       { name: "insight", url: "http://localhost:4008/query" },
       { name: "marketing", url: "http://localhost:4009/query" },
-      { name: "payment", url: "http://localhost:4010/query" },
-      { name: "sales", url: "http://localhost:4011/query" },
+      { name: "sales", url: "http://localhost:4010/query" },
     ],
   }),
 });
@@ -89,6 +94,15 @@ async function startApolloServer() {
       },
     })
   );
+
+  app.use((err, req, res, next) => {
+    if (err.name === "UnauthorizedError") {
+      res.status(401).send("Invalid token...");
+    } else {
+      console.error(err.stack);
+      res.status(500).send("Something broke!");
+    }
+  });
 
   // Start the server
   app.listen({ port }, () => {

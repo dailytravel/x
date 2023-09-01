@@ -81,7 +81,7 @@ func (r *boardResolver) Lists(ctx context.Context, obj *model.Board) ([]*model.L
 
 // UID is the resolver for the uid field.
 func (r *boardResolver) UID(ctx context.Context, obj *model.Board) (string, error) {
-	return obj.ID.Hex(), nil
+	return obj.UID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.
@@ -255,7 +255,7 @@ func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, err
 
 	filter := bson.M{"_id": _id}
 
-	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, fmt.Errorf("no document found for filter %v", filter)

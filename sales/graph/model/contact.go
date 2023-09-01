@@ -65,7 +65,8 @@ func (i *Contact) Collection() string {
 
 func (i *Contact) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}, {Key: "email", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "uid", Value: 1}, {Key: "phone", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "company", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "first_name", Value: "text"}, {Key: "last_name", Value: "text"}}, Options: options.Index().SetWeights(bson.M{"first_name": 2, "last_name": 1})},

@@ -1,3 +1,0 @@
-extend type Invoice @key(fields: "id") {
-  id: ID! @external
-}

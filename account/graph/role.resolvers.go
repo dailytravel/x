@@ -149,13 +149,13 @@ func (r *mutationResolver) DeleteRoles(ctx context.Context, ids []string) (map[s
 
 // Role is the resolver for the role field.
 func (r *queryResolver) Role(ctx context.Context, id string) (*model.Role, error) {
-	item := &model.Role{}
+	var item *model.Role
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := r.db.Collection(model.RoleCollection).FindOne(ctx, bson.M{"_id": _id}).Decode(item); err != nil {
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(item); err != nil {
 		return nil, err
 	}
 

@@ -65,7 +65,7 @@ func (m *Locale) Migrate() error {
 			}
 
 			// Check if the CSV file exists before opening it
-			filePath := filepath.Join(currentDir, "cms", "assets", "languages.csv")
+			filePath := filepath.Join(currentDir, "configuration", "assets", "languages.csv")
 			if _, err := os.Stat(filePath); os.IsNotExist(err) {
 				log.Fatalf("CSV file does not exist: %s", filePath)
 			}
@@ -120,8 +120,6 @@ func (m *Locale) Migrate() error {
 				}
 			}
 
-		} else {
-			return err
 		}
 	}
 

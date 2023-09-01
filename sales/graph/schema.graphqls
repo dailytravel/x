@@ -6,7 +6,8 @@ type Query
 type Mutation
 
 scalar Map
+scalar Upload
 
 directive @api on FIELD_DEFINITION
-directive @auth(roles: [String]) on FIELD_DEFINITION
+directive @auth(roles: [String!]) on FIELD_DEFINITION
 directive @hasScope(scope: [String!]) on FIELD_DEFINITION

@@ -36,25 +36,25 @@ func (r *apiResolver) UpdatedAt(ctx context.Context, obj *model.Api) (string, er
 }
 
 // CreatedBy is the resolver for the created_by field.
-func (r *apiResolver) CreatedBy(ctx context.Context, obj *model.Api) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": obj.CreatedBy}).Decode(&item); err != nil {
-		return nil, err
+func (r *apiResolver) CreatedBy(ctx context.Context, obj *model.Api) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
 	}
 
-	return item, nil
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
-func (r *apiResolver) UpdatedBy(ctx context.Context, obj *model.Api) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": obj.UpdatedBy}).Decode(&item); err != nil {
-		return nil, err
+func (r *apiResolver) UpdatedBy(ctx context.Context, obj *model.Api) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
 	}
 
-	return item, nil
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // CreateAPI is the resolver for the createApi field.

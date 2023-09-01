@@ -13,7 +13,7 @@ type Attendance struct {
 	Model   `bson:",inline"`
 	UID     primitive.ObjectID   `json:"uid" bson:"uid"`
 	TimeIn  primitive.Timestamp  `json:"time_in" bson:"time_in"`
-	TimeOut *primitive.Timestamp `json:"time_out" bson:"time_out"`
+	TimeOut *primitive.Timestamp `json:"time_out,omitempty" bson:"time_out,omitempty"`
 	Notes   string               `json:"notes,omitempty" bson:"notes,omitempty"`
 	Status  string               `json:"status" bson:"status"`
 }

@@ -2,11 +2,13 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Query
+type Query {
+  search(args: Map): Map
+}
 type Mutation
 
 scalar Map
 
 directive @api on FIELD_DEFINITION
-directive @auth(roles: [String]) on FIELD_DEFINITION
+directive @auth(roles: [String!]) on FIELD_DEFINITION
 directive @hasScope(scope: [String!]) on FIELD_DEFINITION

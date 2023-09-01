@@ -107,8 +107,6 @@ func (m *Key) Migrate() error {
 					return err
 				}
 			}
-		} else {
-			return err
 		}
 	}
 

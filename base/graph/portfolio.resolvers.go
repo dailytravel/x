@@ -183,7 +183,7 @@ func (r *portfolioResolver) UpdatedAt(ctx context.Context, obj *model.Portfolio)
 
 // UID is the resolver for the uid field.
 func (r *portfolioResolver) UID(ctx context.Context, obj *model.Portfolio) (string, error) {
-	return obj.ID.Hex(), nil
+	return obj.UID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.

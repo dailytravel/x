@@ -47,36 +47,6 @@ func (r *membershipResolver) Payment(ctx context.Context, obj *model.Membership)
 	return obj.Payment, nil
 }
 
-// Transactions is the resolver for the transactions field.
-func (r *membershipResolver) Transactions(ctx context.Context, obj *model.Membership) ([]*model.Transaction, error) {
-	// Here you would typically query your database to fetch the transactions associated with the membership.
-	// You might need to adjust the query and collection name based on your schema.
-
-	var items []*model.Transaction
-
-	// Example query using MongoDB
-	filter := bson.M{"membership": obj.ID} // Assuming you have a field named membership_id in the Transaction schema
-	cur, err := r.db.Collection("transactions").Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-	defer cur.Close(ctx)
-
-	for cur.Next(ctx) {
-		var transaction model.Transaction
-		if err := cur.Decode(&transaction); err != nil {
-			return nil, err
-		}
-		items = append(items, &transaction)
-	}
-
-	if err := cur.Err(); err != nil {
-		return nil, err
-	}
-
-	return items, nil
-}
-
 // Metadata is the resolver for the metadata field.
 func (r *membershipResolver) Metadata(ctx context.Context, obj *model.Membership) (map[string]interface{}, error) {
 	return obj.Metadata, nil

@@ -13,7 +13,6 @@ type Benefit struct {
 	Model       `bson:",inline"`
 	Locale      string      `json:"locale" bson:"locale"`
 	Description primitive.M `json:"description" bson:"description"`
-	Metadata    primitive.M `json:"metadata,omitempty" bson:"metadata,omitempty"`
 	Status      string      `json:"status" bson:"status"`
 }
 

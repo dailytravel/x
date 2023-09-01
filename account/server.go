@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -17,9 +18,11 @@ import (
 	"github.com/dailytravel/x/account/db"
 	"github.com/dailytravel/x/account/db/migrations"
 	"github.com/dailytravel/x/account/graph"
+	"github.com/dailytravel/x/account/internal/controllers"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func init() {
@@ -73,11 +76,7 @@ func graphqlHandler() gin.HandlerFunc {
 }
 
 func main() {
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
-
+	var waitGroup sync.WaitGroup
 	// connect MongoDB
 	client, err := db.ConnectDB()
 	if err != nil {
@@ -96,6 +95,16 @@ func main() {
 
 	if err := migrations.AutoMigrate(); err != nil {
 		log.Fatal("Error running migrations: ", err)
+	}
+
+	// need restart the server if drop or create a new collection in mongodb, else will not work
+	for _, name := range []string{} {
+		stream, err := db.Database.Collection(name).Watch(context.Background(), mongo.Pipeline{})
+		if err != nil {
+			panic(err)
+		}
+		waitGroup.Add(1)
+		go controllers.IndexStream(&waitGroup, stream, name)
 	}
 
 	// setting up Gin
@@ -126,4 +135,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error starting server: ", err)
 	}
+
+	// Wait for the waitGroup to finish
+	waitGroup.Wait()
 }

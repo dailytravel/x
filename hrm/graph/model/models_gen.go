@@ -46,11 +46,6 @@ type EducationInput struct {
 	Description *string `json:"description,omitempty"`
 }
 
-type Employees struct {
-	Data  []*Employee `json:"data,omitempty"`
-	Count int         `json:"count"`
-}
-
 type Experience struct {
 	Title       string  `json:"title"`
 	Company     string  `json:"company"`
@@ -101,23 +96,6 @@ type NewAttendance struct {
 	Notes    *string                `json:"notes,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	Status   string                 `json:"status"`
-}
-
-type NewEmployee struct {
-	Reference      string                 `json:"reference"`
-	FirstName      string                 `json:"first_name"`
-	LastName       string                 `json:"last_name"`
-	Position       string                 `json:"position"`
-	Email          string                 `json:"email"`
-	Phone          string                 `json:"phone"`
-	Address        string                 `json:"address"`
-	Birthday       *string                `json:"birthday,omitempty"`
-	Picture        *string                `json:"picture,omitempty"`
-	Status         *string                `json:"status,omitempty"`
-	Metadata       map[string]interface{} `json:"metadata,omitempty"`
-	HireDate       *string                `json:"hire_date,omitempty"`
-	UserID         *string                `json:"user_id,omitempty"`
-	OrganizationID string                 `json:"organization_id"`
 }
 
 type NewJob struct {
@@ -243,23 +221,6 @@ type UpdateAttendance struct {
 	Notes    *string                `json:"notes,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	Status   *string                `json:"status,omitempty"`
-}
-
-type UpdateEmployee struct {
-	Reference      *string                `json:"reference,omitempty"`
-	FirstName      *string                `json:"first_name,omitempty"`
-	LastName       *string                `json:"last_name,omitempty"`
-	Position       *string                `json:"position,omitempty"`
-	Email          *string                `json:"email,omitempty"`
-	Phone          *string                `json:"phone,omitempty"`
-	Address        *string                `json:"address,omitempty"`
-	Birthday       *string                `json:"birthday,omitempty"`
-	Picture        *string                `json:"picture,omitempty"`
-	Status         *string                `json:"status,omitempty"`
-	Metadata       map[string]interface{} `json:"metadata,omitempty"`
-	HireDate       *string                `json:"hire_date,omitempty"`
-	UserID         *string                `json:"user_id,omitempty"`
-	OrganizationID *string                `json:"organization_id,omitempty"`
 }
 
 type UpdateJob struct {

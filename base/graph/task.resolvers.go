@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/base/graph/model"
@@ -400,7 +401,7 @@ func (r *taskResolver) UpdatedAt(ctx context.Context, obj *model.Task) (string, 
 
 // UID is the resolver for the uid field.
 func (r *taskResolver) UID(ctx context.Context, obj *model.Task) (string, error) {
-	return obj.ID.Hex(), nil
+	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
 // CreatedBy is the resolver for the created_by field.

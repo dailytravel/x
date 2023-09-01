@@ -25,24 +25,34 @@ func Directives(c *graph.Config) {
 			return nil, ErrAPIKeyRequired
 		}
 
+		// Return next(ctx) without the need for an additional "else" block
 		return next(ctx)
 	}
 
-	c.Directives.Auth = func(ctx context.Context, obj interface{}, next graphql.Resolver, roles []*string) (interface{}, error) {
+	c.Directives.Auth = func(ctx context.Context, obj interface{}, next graphql.Resolver, roles []string) (interface{}, error) {
 		claims := auth.Auth(ctx)
 		if claims == nil {
 			return nil, ErrNotAuthenticated
+		}
+
+		rolesClaim, ok := claims["roles"].(string)
+		if !ok {
+			return nil, ErrMissingRole
 		}
 
 		if len(roles) == 0 {
 			return next(ctx)
 		}
 
-		for _, require := range roles {
-			for _, role := range strings.Split(claims["roles"].(string), " ") {
-				if role == *require {
-					return next(ctx)
-				}
+		requiredRoles := make(map[string]bool)
+		for _, role := range roles {
+			requiredRoles[strings.ToLower(role)] = true
+		}
+
+		roleArray := strings.Split(rolesClaim, " ")
+		for _, role := range roleArray {
+			if requiredRoles[strings.ToLower(role)] {
+				return next(ctx)
 			}
 		}
 
@@ -55,15 +65,24 @@ func Directives(c *graph.Config) {
 			return nil, ErrNotAuthenticated
 		}
 
-		if len(scope) == 0 {
+		scopeClaim, ok := claims["scope"].(string)
+		if !ok {
+			return nil, ErrMissingScope
+		}
+
+		if len(scope) == 0 || scopeClaim == "*" {
 			return next(ctx)
 		}
 
+		requiredScopes := make(map[string]bool)
 		for _, s := range scope {
-			for _, r := range strings.Split(claims["scopes"].(string), " ") {
-				if r == s {
-					return next(ctx)
-				}
+			requiredScopes[s] = true
+		}
+
+		scopeArray := strings.Split(scopeClaim, " ")
+		for _, s := range scopeArray {
+			if requiredScopes[s] {
+				return next(ctx)
 			}
 		}
 

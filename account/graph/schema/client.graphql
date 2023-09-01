@@ -1,19 +1,19 @@
 type Client {
   id: ID!
-  uid: ID!
-  user: User
   type: String!
   name: String!
   description: String
   domain: String
   secret: String!
-  redirect: String!
+  provider: String!
+  redirect: String
   metadata: Map
   status: String!
-  last_used: String
   created_at: String!
   updated_at: String!
-  expires_at: String
+  created_by: ID
+  updated_by: ID
+  uid: ID
 }
 
 type Clients {
@@ -22,11 +22,10 @@ type Clients {
 }
 
 input NewClient {
-  type: String!
   name: String!
   description: String
   domain: String
-  redirect: String!
+  redirect: String
   metadata: Map
 }
 
@@ -36,7 +35,6 @@ input UpdateClient {
   domain: String
   redirect: String
   metadata: Map
-  expires_at: String
 }
 
 extend type Query {

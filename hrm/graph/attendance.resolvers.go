@@ -99,7 +99,7 @@ func (r *mutationResolver) CheckIn(ctx context.Context) (*model.Attendance, erro
 	}
 
 	var item *model.Attendance
-	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter, options.FindOne().SetSort(bson.D{{Key: "time_in", Value: -1}})).Decode(&item)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			item = &model.Attendance{
@@ -138,7 +138,7 @@ func (r *mutationResolver) CheckOut(ctx context.Context) (*model.Attendance, err
 		},
 	}
 
-	var item *model.Attendance
+	var item *model.Attendance // Initialize an instance of the Attendance model
 
 	err = r.db.Collection(item.Collection()).FindOne(ctx, filter, options.FindOne().SetSort(bson.D{{Key: "time_in", Value: -1}})).Decode(&item)
 	if err != nil {
@@ -151,12 +151,12 @@ func (r *mutationResolver) CheckOut(ctx context.Context) (*model.Attendance, err
 	out := primitive.Timestamp{T: uint32(time.Now().Unix())}
 	item.TimeOut = &out
 
-	_, err = r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item})
+	_, err = r.db.Collection(item.Collection()).UpdateOne(ctx, bson.M{"_id": item.ID}, bson.M{"$set": item}, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return item, nil
+	return item, nil // Return a pointer to the updated item
 }
 
 // CreateAttendance is the resolver for the createAttendance field.

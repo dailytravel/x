@@ -1,0 +1,48 @@
+type Balance {
+  id: ID!
+  type: String! #earn, redeem, transfer
+  points: Int!
+  notes: String
+  metadata: Map
+  status: String!
+  expired_at: String
+  created_at: String!
+  updated_at: String!
+  uid: ID!
+  created_by: ID
+  updated_by: ID
+}
+
+type Balances {
+  count: Int!
+  data: [Balance]
+}
+
+input NewBalance {
+  uid: ID!
+  type: String! #earn, redeem, transfer
+  points: Int!
+  notes: String
+  metadata: Map
+  status: String!
+}
+
+input UpdateBalance {
+  type: String #earn, redeem, transfer
+  points: Int
+  notes: String
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  balance(id: ID!): Balance
+  balances(args: Map): Balances
+}
+
+extend type Mutation {
+  createBalance(input: NewBalance!): Balance
+  updateBalance(id: ID!, input: UpdateBalance!): Balance
+  deleteBalance(id: ID!): Map
+  deleteBalances(ids: [ID!]!): Map
+}

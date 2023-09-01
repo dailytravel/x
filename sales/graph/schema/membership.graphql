@@ -6,7 +6,6 @@ type Membership @key(fields: "id") {
   until: String!
   billing: Map
   payment: Map
-  transactions: [Transaction]
   metadata: Map
   status: String!
   created_at: String!

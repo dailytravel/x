@@ -8,6 +8,11 @@ import (
 	"strconv"
 )
 
+type Balances struct {
+	Count int        `json:"count"`
+	Data  []*Balance `json:"data,omitempty"`
+}
+
 type Benefits struct {
 	Data  []*Benefit `json:"data,omitempty"`
 	Count int        `json:"count"`
@@ -43,6 +48,15 @@ type EmailInput struct {
 type Memberships struct {
 	Data  []*Membership `json:"data,omitempty"`
 	Count int           `json:"count"`
+}
+
+type NewBalance struct {
+	UID      string                 `json:"uid"`
+	Type     string                 `json:"type"`
+	Points   int                    `json:"points"`
+	Notes    *string                `json:"notes,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   string                 `json:"status"`
 }
 
 type NewBenefit struct {
@@ -195,17 +209,6 @@ type NewTier struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type NewTransaction struct {
-	UID         string                 `json:"uid"`
-	Type        string                 `json:"type"`
-	Status      string                 `json:"status"`
-	Amount      float64                `json:"amount"`
-	Currency    string                 `json:"currency"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Date        string                 `json:"date"`
-	Description string                 `json:"description"`
-}
-
 type NewVariant struct {
 	Locale      string                 `json:"locale"`
 	Sku         string                 `json:"sku"`
@@ -271,9 +274,12 @@ type Tiers struct {
 	Count int     `json:"count"`
 }
 
-type Transactions struct {
-	Data  []*Transaction `json:"data,omitempty"`
-	Count int            `json:"count"`
+type UpdateBalance struct {
+	Type     *string                `json:"type,omitempty"`
+	Points   *int                   `json:"points,omitempty"`
+	Notes    *string                `json:"notes,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
 }
 
 type UpdateBenefit struct {
@@ -425,17 +431,6 @@ type UpdateTier struct {
 	Rewards     []string               `json:"rewards,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateTransaction struct {
-	UID         *string                `json:"uid,omitempty"`
-	Type        *string                `json:"type,omitempty"`
-	Status      *string                `json:"status,omitempty"`
-	Amount      *float64               `json:"amount,omitempty"`
-	Currency    *string                `json:"currency,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Date        *string                `json:"date,omitempty"`
-	Description *string                `json:"description,omitempty"`
 }
 
 type UpdateVariant struct {
@@ -822,96 +817,6 @@ func (e *PromotionType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e PromotionType) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type TransactionMethod string
-
-const (
-	TransactionMethodCreditCard TransactionMethod = "CREDIT_CARD"
-	TransactionMethodDebitCard  TransactionMethod = "DEBIT_CARD"
-	TransactionMethodPaypal     TransactionMethod = "PAYPAL"
-	TransactionMethodStripe     TransactionMethod = "STRIPE"
-)
-
-var AllTransactionMethod = []TransactionMethod{
-	TransactionMethodCreditCard,
-	TransactionMethodDebitCard,
-	TransactionMethodPaypal,
-	TransactionMethodStripe,
-}
-
-func (e TransactionMethod) IsValid() bool {
-	switch e {
-	case TransactionMethodCreditCard, TransactionMethodDebitCard, TransactionMethodPaypal, TransactionMethodStripe:
-		return true
-	}
-	return false
-}
-
-func (e TransactionMethod) String() string {
-	return string(e)
-}
-
-func (e *TransactionMethod) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = TransactionMethod(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid TransactionMethod", str)
-	}
-	return nil
-}
-
-func (e TransactionMethod) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type TransactionStatus string
-
-const (
-	TransactionStatusPending   TransactionStatus = "PENDING"
-	TransactionStatusCompleted TransactionStatus = "COMPLETED"
-	TransactionStatusFailed    TransactionStatus = "FAILED"
-	TransactionStatusRefunded  TransactionStatus = "REFUNDED"
-)
-
-var AllTransactionStatus = []TransactionStatus{
-	TransactionStatusPending,
-	TransactionStatusCompleted,
-	TransactionStatusFailed,
-	TransactionStatusRefunded,
-}
-
-func (e TransactionStatus) IsValid() bool {
-	switch e {
-	case TransactionStatusPending, TransactionStatusCompleted, TransactionStatusFailed, TransactionStatusRefunded:
-		return true
-	}
-	return false
-}
-
-func (e TransactionStatus) String() string {
-	return string(e)
-}
-
-func (e *TransactionStatus) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = TransactionStatus(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid TransactionStatus", str)
-	}
-	return nil
-}
-
-func (e TransactionStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

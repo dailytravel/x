@@ -8,8 +8,10 @@ type Migrator interface {
 
 func AutoMigrate() error {
 	migrators := []Migrator{
-		&Invoice{Database: db.Database},
 		&Expense{Database: db.Database},
+		&Invoice{Database: db.Database},
+		&Payment{Database: db.Database},
+		&Transaction{Database: db.Database},
 	}
 
 	for _, migration := range migrators {

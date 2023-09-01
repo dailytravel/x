@@ -1,7 +1,7 @@
 type Api {
   id: ID!
   name: String!
-  description: String!
+  description: String
   identifier: String!
   algorithm: String!
   expiration: Int!
@@ -9,8 +9,8 @@ type Api {
   status: String!
   created_at: String!
   updated_at: String!
-  created_by: User
-  updated_by: User
+  created_by: ID
+  updated_by: ID
 }
 
 type Apis {

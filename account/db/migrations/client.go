@@ -61,7 +61,6 @@ func (m *Client) Migrate() error {
 				Redirect: "http://localhost:8080",
 				Domain:   "api.trip.express",
 				Provider: "local",
-				Revoked:  false,
 			}
 
 			if _, err := col.InsertOne(context.Background(), client); err != nil {

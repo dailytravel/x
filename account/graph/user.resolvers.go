@@ -140,13 +140,15 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 	}
 
 	access_token, err := auth.Token(jwt.MapClaims{
-		"sub": newUser.ID.Hex(),
-		"aud": a.Identifier,
-		"iss": strings.Join([]string{"https://", c.Domain}, ""),
-		"azp": c.ID.Hex(),
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
-	}, k)
+		"sub":   newUser.ID.Hex(),
+		"roles": strings.Join(newUser.Roles, " "),
+		"scope": "*",
+		"aud":   a.Identifier,
+		"iss":   strings.Join([]string{"https://", c.Domain}, ""),
+		"azp":   c.ID.Hex(),
+		"iat":   time.Now().Unix(),
+		"exp":   time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
+	}, *k)
 
 	if err != nil {
 		return nil, err
@@ -159,7 +161,7 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 		"azp": c.ID.Hex(),
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
-	}, k)
+	}, *k)
 
 	if err != nil {
 		return nil, err
@@ -230,14 +232,21 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	}
 
 	access_token, err := auth.Token(jwt.MapClaims{
-		"jti": t.Token,
-		"sub": u.ID.Hex(),
-		"aud": a.Identifier,
-		"iss": strings.Join([]string{"https://", c.Domain}, ""),
-		"azp": c.ID.Hex(),
-		"iat": time.Now().Unix(),
-		"exp": t.ExpiresAt.T,
-	}, k)
+		"jti":      t.Token,
+		"sub":      u.ID.Hex(),
+		"email":    u.Email,
+		"name":     u.Name,
+		"locale":   u.Locale,
+		"timezone": u.Timezone,
+		"picture":  u.Picture,
+		"roles":    strings.Join(u.Roles, " "),
+		"scope":    "*",
+		"aud":      a.Identifier,
+		"iss":      strings.Join([]string{"https://", c.Domain}, ""),
+		"azp":      c.ID.Hex(),
+		"iat":      time.Now().Unix(),
+		"exp":      t.ExpiresAt.T,
+	}, *k)
 
 	if err != nil {
 		return nil, err
@@ -251,7 +260,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 		"azp": c.ID.Hex(),
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
-	}, k)
+	}, *k)
 
 	if err != nil {
 		return nil, err
@@ -298,13 +307,15 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.Socia
 	}
 
 	access_token, err := auth.Token(jwt.MapClaims{
-		"sub": u.ID.Hex(),
-		"aud": a.Identifier,
-		"iss": strings.Join([]string{"https://", c.Domain}, ""),
-		"azp": c.ID.Hex(),
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
-	}, k)
+		"sub":   u.ID.Hex(),
+		"roles": strings.Join(u.Roles, " "),
+		"scope": "*",
+		"aud":   a.Identifier,
+		"iss":   strings.Join([]string{"https://", c.Domain}, ""),
+		"azp":   c.ID.Hex(),
+		"iat":   time.Now().Unix(),
+		"exp":   time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
+	}, *k)
 
 	if err != nil {
 		return nil, err
@@ -317,7 +328,7 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.Socia
 		"azp": c.ID.Hex(),
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
-	}, k)
+	}, *k)
 
 	if err != nil {
 		return nil, err

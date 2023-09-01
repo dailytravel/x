@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -70,6 +71,7 @@ func graphqlHandler() gin.HandlerFunc {
 }
 
 func main() {
+	var waitGroup sync.WaitGroup
 	// connect MongoDB
 	client, err := db.ConnectDB()
 	if err != nil {
@@ -118,4 +120,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Error starting server: ", err)
 	}
+
+	waitGroup.Wait()
 }

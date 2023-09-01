@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/hrm/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -36,50 +35,85 @@ func (r *userResolver) Resume(ctx context.Context, obj *model.User) (*model.Resu
 
 // Salaries is the resolver for the salaries field.
 func (r *userResolver) Salaries(ctx context.Context, obj *model.User) ([]*model.Salary, error) {
-	panic(fmt.Errorf("not implemented: Salaries - salaries"))
+	var items []*model.Salary
+	//find all items
+	cur, err := r.db.Collection("salaries").Find(ctx, bson.M{"uid": obj.ID})
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Salary
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Payrolls is the resolver for the payrolls field.
 func (r *userResolver) Payrolls(ctx context.Context, obj *model.User) ([]*model.Payroll, error) {
-	panic(fmt.Errorf("not implemented: Payrolls - payrolls"))
+	var items []*model.Payroll
+	//find all items
+	cur, err := r.db.Collection("payrolls").Find(ctx, bson.M{"uid": obj.ID})
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Payroll
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Leaves is the resolver for the leaves field.
 func (r *userResolver) Leaves(ctx context.Context, obj *model.User) ([]*model.Leave, error) {
-	panic(fmt.Errorf("not implemented: Leaves - leaves"))
+	var items []*model.Leave
+	//find all items
+	cur, err := r.db.Collection("leaves").Find(ctx, bson.M{"uid": obj.ID})
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Leave
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Attendances is the resolver for the attendances field.
 func (r *userResolver) Attendances(ctx context.Context, obj *model.User) ([]*model.Attendance, error) {
-	panic(fmt.Errorf("not implemented: Attendances - attendances"))
+	var items []*model.Attendance
+	//find all items
+	cur, err := r.db.Collection("attendances").Find(ctx, bson.M{"uid": obj.ID})
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Attendance
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
 type userResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *userResolver) Employee(ctx context.Context, obj *model.User) (*model.Employee, error) {
-	var item *model.Employee
-
-	_id, err := primitive.ObjectIDFromHex(obj.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"uid": _id}).Decode(&item); err != nil {
-		if err.Error() == mongo.ErrNoDocuments.Error() {
-			return nil, nil
-		}
-
-		return nil, err
-	}
-
-	return item, nil
-}

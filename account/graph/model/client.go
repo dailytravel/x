@@ -11,17 +11,14 @@ import (
 
 type Client struct {
 	Model       `bson:",inline"`
-	UID         primitive.ObjectID  `json:"uid" bson:"uid"`
+	UID         *primitive.ObjectID `json:"uid,omitempty" bson:"uid,omitempty"`
 	Type        string              `json:"type" bson:"type"`
 	Name        string              `json:"name" bson:"name"`
-	Description string              `json:"description,omitempty" bson:"description,omitempty"`
+	Description *string             `json:"description,omitempty" bson:"description,omitempty"`
 	Secret      string              `json:"secret" bson:"secret"`
 	Domain      string              `json:"domain" bson:"domain"`
 	Redirect    string              `json:"redirect,omitempty" bson:"redirect,omitempty"`
-	Revoked     bool                `json:"revoked,omitempty" bson:"revoked,omitempty"`
 	Provider    string              `json:"provider,omitempty" bson:"provider,omitempty"`
-	LastUsed    primitive.Timestamp `json:"last_used,omitempty" bson:"last_used,omitempty"`
-	ExpiresAt   primitive.Timestamp `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
 	Status      string              `json:"status" bson:"status"`
 }
 
@@ -44,6 +41,8 @@ func (i *Client) Collection() string {
 
 func (i *Client) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
+		{Keys: bson.D{{Key: "name", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "secret", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "domain", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},

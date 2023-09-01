@@ -232,3 +232,14 @@ func GenerateMembershipCardNumber() string {
 
 	return cardNumber
 }
+
+// indexOf finds the index of a string in a slice.
+// It returns -1 if the string is not present in the slice.
+func IndexOf(slice []string, value string) int {
+	for i, v := range slice {
+		if v == value {
+			return i
+		}
+	}
+	return -1
+}

@@ -8,6 +8,7 @@ type Migrator interface {
 
 func AutoMigrate() error {
 	migrators := []Migrator{
+		&Balance{Database: db.Database},
 		&Benefit{Database: db.Database},
 		&Company{Database: db.Database},
 		&Contact{Database: db.Database},
@@ -20,7 +21,6 @@ func AutoMigrate() error {
 		&Quote{Database: db.Database},
 		&Reward{Database: db.Database},
 		&Tier{Database: db.Database},
-		&Transaction{Database: db.Database},
 		&Wishlist{Database: db.Database},
 	}
 

@@ -164,6 +164,7 @@ extend type Query {
 extend type Mutation {
   createContact(input: NewContact!): Contact @auth
   updateContact(id: ID!, input: UpdateContact!): Contact @auth
+  importContacts(file: Upload!): Map @auth
   deleteContact(id: ID!): Map @auth
   deleteContacts(ids: [ID!]!): Map @auth
 }

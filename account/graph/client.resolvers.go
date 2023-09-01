@@ -11,7 +11,9 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
+	"github.com/dailytravel/x/account/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -20,38 +22,9 @@ func (r *clientResolver) ID(ctx context.Context, obj *model.Client) (string, err
 	return obj.ID.Hex(), nil
 }
 
-// UID is the resolver for the uid field.
-func (r *clientResolver) UID(ctx context.Context, obj *model.Client) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
-}
-
-// User is the resolver for the user field.
-func (r *clientResolver) User(ctx context.Context, obj *model.Client) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": obj.UID}).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": obj.UID})
-		}
-		return nil, err
-	}
-
-	return item, nil
-}
-
 // Metadata is the resolver for the metadata field.
 func (r *clientResolver) Metadata(ctx context.Context, obj *model.Client) (map[string]interface{}, error) {
 	return obj.Metadata, nil
-}
-
-// LastUsed is the resolver for the last_used field.
-func (r *clientResolver) LastUsed(ctx context.Context, obj *model.Client) (*string, error) {
-	if obj.LastUsed.IsZero() {
-		return nil, nil
-	}
-
-	lastUsed := time.Unix(int64(obj.LastUsed.T), 0).Format(time.RFC3339)
-	return &lastUsed, nil
 }
 
 // CreatedAt is the resolver for the created_at field.
@@ -64,47 +37,212 @@ func (r *clientResolver) UpdatedAt(ctx context.Context, obj *model.Client) (stri
 	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// ExpiresAt is the resolver for the expires_at field.
-func (r *clientResolver) ExpiresAt(ctx context.Context, obj *model.Client) (*string, error) {
-	if obj.ExpiresAt.IsZero() {
+// CreatedBy is the resolver for the created_by field.
+func (r *clientResolver) CreatedBy(ctx context.Context, obj *model.Client) (*string, error) {
+	if obj.CreatedBy == nil {
 		return nil, nil
 	}
 
-	expiresAt := time.Unix(int64(obj.ExpiresAt.T), 0).Format(time.RFC3339)
-	return &expiresAt, nil
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
+}
+
+// UpdatedBy is the resolver for the updated_by field.
+func (r *clientResolver) UpdatedBy(ctx context.Context, obj *model.Client) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
+}
+
+// UID is the resolver for the uid field.
+func (r *clientResolver) UID(ctx context.Context, obj *model.Client) (*string, error) {
+	if obj.UID == nil {
+		return nil, nil
+	}
+
+	uid := obj.UID.Hex()
+
+	return &uid, nil
 }
 
 // CreateClient is the resolver for the createClient field.
 func (r *mutationResolver) CreateClient(ctx context.Context, input model.NewClient) (*model.Client, error) {
-	panic(fmt.Errorf("not implemented: CreateClient - createClient"))
+	uid, err := utils.UID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	item := &model.Client{
+		Name:        input.Name,
+		Description: input.Description,
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
+	}
+
+	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	item.ID = res.InsertedID.(primitive.ObjectID)
+
+	return item, nil
 }
 
 // UpdateClient is the resolver for the updateClient field.
 func (r *mutationResolver) UpdateClient(ctx context.Context, id string, input model.UpdateClient) (*model.Client, error) {
-	panic(fmt.Errorf("not implemented: UpdateClient - updateClient"))
+	uid, err := utils.UID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": _id}
+
+	var item *model.Client
+
+	if input.Name != nil {
+		item.Name = *input.Name
+	}
+
+	if input.Description != nil {
+		item.Description = input.Description
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item); err != nil {
+		return nil, err
+	}
+
+	item.Model.UpdatedBy = uid
+
+	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, bson.M{"_id": uid}, bson.M{"$set": item}); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // DeleteClient is the resolver for the deleteClient field.
 func (r *mutationResolver) DeleteClient(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteClient - deleteClient"))
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := r.db.Collection("clients").DeleteOne(ctx, bson.M{"_id": _id})
+	if err != nil {
+		return nil, fmt.Errorf("error deleting role: %v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("role not found")
+	}
+
+	return map[string]interface{}{
+		"success": true,
+	}, nil
 }
 
 // DeleteClients is the resolver for the deleteClients field.
 func (r *mutationResolver) DeleteClients(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteClients - deleteClients"))
+	_ids := make([]primitive.ObjectID, len(ids))
+	for i, id := range ids {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		_ids[i] = _id
+	}
+	filter := bson.M{"_id": bson.M{"$in": _ids}}
+
+	res, err := r.db.Collection("clients").DeleteMany(ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("error deleting roles: %v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, fmt.Errorf("roles not found")
+	}
+
+	return map[string]interface{}{
+		"success": true,
+	}, nil
 }
 
 // Client is the resolver for the client field.
 func (r *queryResolver) Client(ctx context.Context, id string) (*model.Client, error) {
-	panic(fmt.Errorf("not implemented: Client - client"))
+	var item *model.Client
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Clients is the resolver for the clients field.
 func (r *queryResolver) Clients(ctx context.Context, args map[string]interface{}) (*model.Clients, error) {
-	panic(fmt.Errorf("not implemented: Clients - clients"))
+	var items []*model.Client
+	//find all items
+	cur, err := r.db.Collection("clients").Find(ctx, r.model.Query(args), r.model.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Client
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("clients").CountDocuments(ctx, r.model.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Clients{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Client returns ClientResolver implementation.
 func (r *Resolver) Client() ClientResolver { return &clientResolver{r} }
 
 type clientResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *clientResolver) User(ctx context.Context, obj *model.Client) (*model.User, error) {
+	var item *model.User
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": obj.UID}).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": obj.UID})
+		}
+		return nil, err
+	}
+
+	return item, nil
+}

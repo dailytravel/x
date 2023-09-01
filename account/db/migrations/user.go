@@ -103,8 +103,6 @@ func (m *User) Migrate() error {
 				if _, err := col.InsertOne(context.Background(), item); err != nil {
 					return err
 				}
-			} else {
-				return err
 			}
 		}
 	}

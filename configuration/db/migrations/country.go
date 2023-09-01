@@ -54,7 +54,7 @@ func (m *Country) Migrate() error {
 		}
 	}
 
-	// check if certificate exists
+	// check if the "countries" collection is empty
 	filter := bson.D{}
 	if err := col.FindOne(context.Background(), filter).Err(); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -66,7 +66,7 @@ func (m *Country) Migrate() error {
 			}
 
 			// Check if the CSV file exists before opening it
-			filePath := filepath.Join(currentDir, "cms", "assets", "countries.csv")
+			filePath := filepath.Join(currentDir, "configuration", "assets", "countries.csv")
 			if _, err := os.Stat(filePath); os.IsNotExist(err) {
 				log.Fatalf("CSV file does not exist: %s", filePath)
 			}
@@ -113,8 +113,6 @@ func (m *Country) Migrate() error {
 				}
 			}
 
-		} else {
-			return err
 		}
 	}
 

@@ -65,7 +65,7 @@ func (m *Timezone) Migrate() error {
 			}
 
 			// Check if the CSV file exists before opening it
-			filePath := filepath.Join(currentDir, "cms", "assets", "timezones.csv")
+			filePath := filepath.Join(currentDir, "configuration", "assets", "timezones.csv")
 			if _, err := os.Stat(filePath); os.IsNotExist(err) {
 				log.Fatalf("CSV file does not exist: %s", filePath)
 			}
@@ -108,9 +108,6 @@ func (m *Timezone) Migrate() error {
 					log.Fatal(err)
 				}
 			}
-
-		} else {
-			return err
 		}
 	}
 

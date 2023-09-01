@@ -84,11 +84,10 @@ type NewAPI struct {
 }
 
 type NewClient struct {
-	Type        string                 `json:"type"`
 	Name        string                 `json:"name"`
 	Description *string                `json:"description,omitempty"`
 	Domain      *string                `json:"domain,omitempty"`
-	Redirect    string                 `json:"redirect"`
+	Redirect    *string                `json:"redirect,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
@@ -223,7 +222,6 @@ type UpdateClient struct {
 	Domain      *string                `json:"domain,omitempty"`
 	Redirect    *string                `json:"redirect,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	ExpiresAt   *string                `json:"expires_at,omitempty"`
 }
 
 type UpdateConnection struct {

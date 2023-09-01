@@ -37,7 +37,7 @@ func CreateToken(claims map[string]interface{}, kid string, key interface{}) (st
 	return "", errors.New("invalid private key")
 }
 
-func Token(claims jwt.MapClaims, k *model.Key) (*string, error) {
+func Token(claims jwt.MapClaims, k model.Key) (*string, error) {
 	privBlock, _ := pem.Decode([]byte(k.Certificate))
 	if privBlock == nil {
 		return nil, fmt.Errorf("error decoding private key PEM block")

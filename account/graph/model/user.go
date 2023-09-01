@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -60,4 +62,47 @@ func (i *User) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "deleted_at", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "name", Value: "text"}, {Key: "email", Value: "text"}}, Options: options.Index().SetWeights(bson.M{"name": 2, "email": 1})},
 	}
+}
+
+func (i *User) Schema() interface{} {
+	return &api.CollectionSchema{
+		Name: i.Collection(),
+		Fields: []api.Field{
+			{Name: "name", Type: "string", Optional: pointer.True()},
+			{Name: "first_name", Type: "string", Optional: pointer.True()},
+			{Name: "last_name", Type: "string", Optional: pointer.True()},
+			{Name: "picture", Type: "string", Optional: pointer.True()},
+			{Name: "email", Type: "string"},
+			{Name: "phone", Type: "string", Optional: pointer.True()},
+			{Name: "locale", Type: "string", Optional: pointer.True()},
+			{Name: "timezone", Type: "string", Optional: pointer.True()},
+			{Name: "status", Type: "string", Facet: pointer.True()},
+			{Name: "created_at", Type: "int32"},
+			{Name: "updated_at", Type: "int32"},
+			{Name: "profile", Type: "object", Optional: pointer.True()},
+			{Name: "verified_at", Type: "int32", Optional: pointer.True()},
+			{Name: "last_login", Type: "int32", Optional: pointer.True()},
+			{Name: "last_activity", Type: "int32"},
+			{Name: "roles", Type: "string[]"},
+		},
+		DefaultSortingField: pointer.String("created_at"),
+		EnableNestedFields:  pointer.True(),
+	}
+}
+
+func (i *User) Document() map[string]interface{} {
+	document := map[string]interface{}{
+		"id":         i.ID.Hex(),
+		"name":       i.Name,
+		"email":      i.Email,
+		"phone":      i.Phone,
+		"status":     i.Status,
+		"roles":      i.Roles,
+		"locale":     i.Locale,
+		"timezone":   i.Timezone,
+		"created_at": i.CreatedAt.T,
+		"updated_at": i.UpdatedAt.T,
+	}
+
+	return document
 }

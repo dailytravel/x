@@ -6,10 +6,13 @@ package graph
 
 import (
 	"context"
+	"encoding/csv"
 	"errors"
 	"fmt"
+	"io"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -106,6 +109,17 @@ func (r *mutationResolver) CreateContact(ctx context.Context, input model.NewCon
 		return nil, err
 	}
 
+	// Check if the contact already exists by email or phone
+	filter := bson.M{"$and": []bson.M{{"uid": uid}, {"$or": []bson.M{{"email": input.Email}, {"phone": input.Phone}}}}}
+	var existingContact model.Contact
+	err = r.db.Collection(existingContact.Collection()).FindOne(ctx, filter).Decode(&existingContact)
+	if err != nil && err != mongo.ErrNoDocuments {
+		return nil, err
+	}
+	if err != mongo.ErrNoDocuments {
+		return nil, errors.New("contact with this email or phone already exists")
+	}
+
 	item := &model.Contact{
 		FirstName: input.FirstName,
 		LastName:  input.LastName,
@@ -132,6 +146,26 @@ func (r *mutationResolver) CreateContact(ctx context.Context, input model.NewCon
 		},
 	}
 
+	// Set the birthday
+	if input.Birthday != nil {
+		birthday, err := time.Parse("2006-01-02", *input.Birthday)
+		if err != nil {
+			return nil, err
+		}
+		item.Birthday = primitive.NewDateTimeFromTime(birthday)
+	}
+
+	//set owner
+	if input.UID != nil {
+		_id, err := primitive.ObjectIDFromHex(*input.UID)
+		if err != nil {
+			return nil, err
+		}
+		item.UID = _id
+	} else {
+		item.UID = *uid
+	}
+
 	// Set the fields from the input
 	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
@@ -143,19 +177,16 @@ func (r *mutationResolver) CreateContact(ctx context.Context, input model.NewCon
 
 // UpdateContact is the resolver for the updateContact field.
 func (r *mutationResolver) UpdateContact(ctx context.Context, id string, input model.UpdateContact) (*model.Contact, error) {
-	// Get the authenticated user ID
 	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 
-	// Retrieve the existing contact from the database
 	item := &model.Contact{}
 	filter := bson.M{"_id": _id}
 	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
@@ -163,103 +194,175 @@ func (r *mutationResolver) UpdateContact(ctx context.Context, id string, input m
 		return nil, err
 	}
 
+	update := bson.M{}
 	if input.FirstName != nil {
-		item.FirstName = input.FirstName
+		update["first_name"] = *input.FirstName
 	}
 
 	if input.LastName != nil {
-		item.LastName = input.LastName
+		update["last_name"] = *input.LastName
 	}
 
 	if input.Email != nil {
-		item.Email = *input.Email
+		update["email"] = *input.Email
 	}
 
 	if input.Phone != nil {
-		item.Phone = input.Phone
+		update["phone"] = *input.Phone
 	}
 
 	if input.City != nil {
-		item.City = input.City
-	}
-
-	if item.Country != nil {
-		item.Country = input.Country
+		update["city"] = *input.City
 	}
 
 	if input.Zip != nil {
-		item.Zip = input.Zip
+		update["zip"] = *input.Zip
 	}
 
 	if input.State != nil {
-		item.State = input.State
+		update["state"] = *input.State
 	}
 
 	if input.Source != nil {
-		item.Source = *input.Source
+		update["source"] = *input.Source
 	}
 
 	if input.Language != nil {
-		item.Language = input.Language
+		update["language"] = *input.Language
 	}
 
 	if input.JobTitle != nil {
-		item.JobTitle = input.JobTitle
+		update["job_title"] = *input.JobTitle
 	}
 
-	if input.Website != nil {
-		item.Website = input.Website
+	if input.Country != nil {
+		update["country"] = *input.Country
 	}
 
 	if input.Timezone != nil {
-		item.Timezone = input.Timezone
+		update["timezone"] = *input.Timezone
 	}
 
-	if input.Rating != nil {
-		item.Rating = input.Rating
+	if input.Website != nil {
+		update["website"] = *input.Website
 	}
 
-	if input.Source != nil {
-		item.Source = *input.Source
+	if input.Status != nil {
+		update["status"] = *input.Status
+	}
+
+	if input.Notes != nil {
+		update["notes"] = *input.Notes
 	}
 
 	if input.Picture != nil {
-		item.Picture = input.Picture
+		update["picture"] = *input.Picture
 	}
 
-	if item.Notes != nil {
-		item.Notes = input.Notes
+	if input.Rating != nil {
+		update["rating"] = *input.Rating
 	}
 
-	if input.Labels != nil {
-		for _, label := range input.Labels {
-			item.Labels = append(item.Labels, *label)
+	if input.Birthday != nil {
+		birthday, err := time.Parse("2006-01-02", *input.Birthday)
+		if err != nil {
+			return nil, err
 		}
+		update["birthday"] = primitive.NewDateTimeFromTime(birthday)
 	}
 
-	if input.Metadata != nil {
-		for k, v := range input.Metadata {
-			item.Metadata[k] = v
-		}
+	if len(update) > 0 {
+		update["updated_by"] = uid
 	}
 
-	item.UpdatedBy = uid
-	utils.Date(input.Birthday, &item.Birthday)
-
-	// Perform the update operation in the database
-	updated := &model.Contact{}
-	res := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, bson.M{"$set": item})
+	res := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, bson.M{"$set": update})
 	if res.Err() != nil {
 		return nil, res.Err()
 	}
 
-	// Decode the updated contact
+	updated := &model.Contact{}
 	err = res.Decode(updated)
 	if err != nil {
 		return nil, err
 	}
 
 	return updated, nil
+}
+
+// ImportContacts is the resolver for the importContacts field.
+func (r *mutationResolver) ImportContacts(ctx context.Context, file graphql.Upload) (map[string]interface{}, error) {
+	// Step 1: Read the uploaded file
+	reader := csv.NewReader(file.File)
+	header, err := reader.Read()
+	if err != nil {
+		return nil, err
+	}
+
+	// Step 2: Read and validate the data
+	var contacts []model.Contact
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		contact := model.Contact{
+			FirstName: &record[utils.IndexOf(header, "FirstName")],
+			LastName:  &record[utils.IndexOf(header, "LastName")],
+			Email:     record[utils.IndexOf(header, "Email")],
+			Phone:     &record[utils.IndexOf(header, "Phone")],
+		}
+
+		if contact.Email == "" || contact.Phone == nil {
+			return nil, fmt.Errorf("invalid contact data")
+		}
+
+		contacts = append(contacts, contact)
+	}
+
+	// Step 3: Insert the data into the database
+	uid, err := utils.UID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	collection := r.db.Collection("contacts")
+	var insertedCount int
+	for _, contact := range contacts {
+		// Check if the contact already exists by email or phone
+		filter := bson.M{"$and": []bson.M{{"uid": uid}, {"$or": []bson.M{{"email": contact.Email}, {"phone": contact.Phone}}}}}
+		var existingContact model.Contact
+		err = collection.FindOne(ctx, filter).Decode(&existingContact)
+		if err != nil && err != mongo.ErrNoDocuments {
+			return nil, err
+		}
+		if err == mongo.ErrNoDocuments {
+			item := &model.Contact{
+				UID:       *uid,
+				FirstName: contact.FirstName,
+				LastName:  contact.LastName,
+				Email:     contact.Email,
+				Phone:     contact.Phone,
+				Model: model.Model{
+					CreatedBy: uid,
+					UpdatedBy: uid,
+				},
+			}
+			_, err := collection.InsertOne(ctx, item)
+			if err != nil {
+				return nil, err
+			}
+			insertedCount++
+		}
+	}
+
+	return map[string]interface{}{
+		"status": "success",
+		"count":  insertedCount,
+	}, nil
 }
 
 // DeleteContact is the resolver for the deleteContact field.

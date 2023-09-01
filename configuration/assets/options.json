@@ -1,0 +1,13 @@
+{
+  "email": "contact@trip.express",
+  "phone": "(236) 355-1555",
+  "address": "1234 Main St, Vancouver, BC V6A 2W5",
+  "contact_label": "[\"contact\", \"lead\"]",
+  "contact_type": "[\"customer\", \"lead\", \"supplier\"]",
+  "contact_source": "[\"email\", \"phone\", \"web\"]",
+  "contact_status": "[\"active\", \"inactive\"]",
+  "expense_type": "[\"debit\", \"credit\"]",
+  "expense_status": "[\"paid\", \"unpaid\"]",
+  "invoice_status": "[\"paid\", \"unpaid\"]",
+  "quote_status": "[\"accepted\", \"declined\", \"pending\"]"
+}

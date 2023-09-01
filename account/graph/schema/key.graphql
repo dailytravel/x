@@ -23,11 +23,11 @@ input NewKey {
 }
 
 extend type Query {
-  keys(args: Map): Keys @auth(roles: [ADMIN])
-  key(id: ID!): Key @auth(roles: [ADMIN])
+  keys(args: Map): Keys @auth(roles: [admin])
+  key(id: ID!): Key @auth(roles: [admin])
 }
 
 extend type Mutation {
-  revokeKey: Key @auth(roles: [ADMIN])
-  rotateKey: Key @auth(roles: [ADMIN])
+  revokeKey: Key @auth(roles: [admin])
+  rotateKey: Key @auth(roles: [admin])
 }

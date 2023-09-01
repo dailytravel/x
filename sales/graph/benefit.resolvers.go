@@ -146,11 +146,6 @@ func (r *mutationResolver) DeleteBenefit(ctx context.Context, id string) (map[st
 		return nil, err
 	}
 
-	// Check if the user has permission to delete the benefit
-	if benefit.CreatedBy != uid {
-		return nil, fmt.Errorf("you don't have permission to delete this benefit")
-	}
-
 	// Define the update to mark the benefit as deleted
 	update := bson.M{
 		"$set": bson.M{
@@ -256,7 +251,7 @@ func (r *queryResolver) Benefit(ctx context.Context, id string) (*model.Benefit,
 		return nil, err
 	}
 
-	if err := r.db.Collection("benefits").FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
 		return nil, err
 	}
 
