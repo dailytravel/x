@@ -99,10 +99,6 @@ type ComplexityRoot struct {
 		FindUserByID     func(childComplexity int, id string) int
 	}
 
-	Follow struct {
-		ID func(childComplexity int) int
-	}
-
 	Link struct {
 		CreatedAt   func(childComplexity int) int
 		CreatedBy   func(childComplexity int) int
@@ -191,6 +187,10 @@ type ComplexityRoot struct {
 	Segments struct {
 		Count func(childComplexity int) int
 		Data  func(childComplexity int) int
+	}
+
+	Share struct {
+		ID func(childComplexity int) int
 	}
 
 	Term struct {
@@ -472,13 +472,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.FindUserByID(childComplexity, args["id"].(string)), true
-
-	case "Follow.id":
-		if e.complexity.Follow.ID == nil {
-			break
-		}
-
-		return e.complexity.Follow.ID(childComplexity), true
 
 	case "Link.created_at":
 		if e.complexity.Link.CreatedAt == nil {
@@ -1067,6 +1060,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Segments.Data(childComplexity), true
 
+	case "Share.id":
+		if e.complexity.Share.ID == nil {
+			break
+		}
+
+		return e.complexity.Share.ID(childComplexity), true
+
 	case "Term.id":
 		if e.complexity.Term.ID == nil {
 			break
@@ -1214,7 +1214,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/audience.graphql" "schema/campaign.graphql" "schema/comment.graphql" "schema/follow.graphql" "schema/link.graphql" "schema/schedule.graphql" "schema/segment.graphql" "schema/term.graphql" "schema/user.graphql"
+//go:embed "schema.graphqls" "schema/audience.graphql" "schema/campaign.graphql" "schema/comment.graphql" "schema/link.graphql" "schema/schedule.graphql" "schema/segment.graphql" "schema/share.graphql" "schema/term.graphql" "schema/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1230,10 +1230,10 @@ var sources = []*ast.Source{
 	{Name: "schema/audience.graphql", Input: sourceData("schema/audience.graphql"), BuiltIn: false},
 	{Name: "schema/campaign.graphql", Input: sourceData("schema/campaign.graphql"), BuiltIn: false},
 	{Name: "schema/comment.graphql", Input: sourceData("schema/comment.graphql"), BuiltIn: false},
-	{Name: "schema/follow.graphql", Input: sourceData("schema/follow.graphql"), BuiltIn: false},
 	{Name: "schema/link.graphql", Input: sourceData("schema/link.graphql"), BuiltIn: false},
 	{Name: "schema/schedule.graphql", Input: sourceData("schema/schedule.graphql"), BuiltIn: false},
 	{Name: "schema/segment.graphql", Input: sourceData("schema/segment.graphql"), BuiltIn: false},
+	{Name: "schema/share.graphql", Input: sourceData("schema/share.graphql"), BuiltIn: false},
 	{Name: "schema/term.graphql", Input: sourceData("schema/term.graphql"), BuiltIn: false},
 	{Name: "schema/user.graphql", Input: sourceData("schema/user.graphql"), BuiltIn: false},
 	{Name: "../federation/directives.graphql", Input: `
@@ -1274,7 +1274,7 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Campaign | Comment | Follow | Term | User
+union _Entity = Campaign | Comment | Share | Term | User
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
@@ -3089,50 +3089,6 @@ func (ec *executionContext) fieldContext_Entity_findUserByID(ctx context.Context
 	if fc.Args, err = ec.field_Entity_findUserByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Follow_id(ctx context.Context, field graphql.CollectedField, obj *model.Follow) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Follow_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Follow_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Follow",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
 	}
 	return fc, nil
 }
@@ -7243,6 +7199,50 @@ func (ec *executionContext) fieldContext_Segments_data(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Share_id(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Share_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Share_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Share",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Term_id(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Term_id(ctx, field)
 	if err != nil {
@@ -9810,13 +9810,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._Comment(ctx, sel, obj)
-	case model.Follow:
-		return ec._Follow(ctx, sel, &obj)
-	case *model.Follow:
+	case model.Share:
+		return ec._Share(ctx, sel, &obj)
+	case *model.Share:
 		if obj == nil {
 			return graphql.Null
 		}
-		return ec._Follow(ctx, sel, obj)
+		return ec._Share(ctx, sel, obj)
 	case model.Term:
 		return ec._Term(ctx, sel, &obj)
 	case *model.Term:
@@ -10598,45 +10598,6 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 	return out
 }
 
-var followImplementors = []string{"Follow", "_Entity"}
-
-func (ec *executionContext) _Follow(ctx context.Context, sel ast.SelectionSet, obj *model.Follow) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, followImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Follow")
-		case "id":
-			out.Values[i] = ec._Follow_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var linkImplementors = []string{"Link"}
 
 func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj *model.Link) graphql.Marshaler {
@@ -11328,6 +11289,45 @@ func (ec *executionContext) _Segments(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "data":
 			out.Values[i] = ec._Segments_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var shareImplementors = []string{"Share", "_Entity"}
+
+func (ec *executionContext) _Share(ctx context.Context, sel ast.SelectionSet, obj *model.Share) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, shareImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Share")
+		case "id":
+			out.Values[i] = ec._Share_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

@@ -16,6 +16,7 @@ type Comments struct {
 type Contact struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`
+	Shares   []*Share   `json:"shares,omitempty"`
 }
 
 func (Contact) IsEntity() {}
@@ -35,6 +36,7 @@ type Conversations struct {
 type Expense struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`
+	Shares   []*Share   `json:"shares,omitempty"`
 }
 
 func (Expense) IsEntity() {}
@@ -42,14 +44,10 @@ func (Expense) IsEntity() {}
 type File struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`
+	Shares   []*Share   `json:"shares,omitempty"`
 }
 
 func (File) IsEntity() {}
-
-type Follows struct {
-	Count int       `json:"count"`
-	Data  []*Follow `json:"data,omitempty"`
-}
 
 type Messages struct {
 	Data  []*Message `json:"data,omitempty"`
@@ -75,13 +73,6 @@ type NewConversation struct {
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type NewFollow struct {
-	User       string                 `json:"user"`
-	Followable map[string]interface{} `json:"followable"`
-	Role       string                 `json:"role"`
-	Status     string                 `json:"status"`
 }
 
 type NewMessage struct {
@@ -112,6 +103,7 @@ type Notifications struct {
 type Quote struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`
+	Shares   []*Share   `json:"shares,omitempty"`
 }
 
 func (Quote) IsEntity() {}
@@ -126,9 +118,35 @@ type Recipients struct {
 	Data  []*Recipient `json:"data,omitempty"`
 }
 
+type ShareInput struct {
+	UID        string                 `json:"uid"`
+	Shareable  map[string]interface{} `json:"shareable"`
+	Permission string                 `json:"permission"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+	Status     string                 `json:"status"`
+	CreatedBy  *string                `json:"created_by,omitempty"`
+	UpdatedBy  *string                `json:"updated_by,omitempty"`
+}
+
+type ShareUpdateInput struct {
+	UID        *string                `json:"uid,omitempty"`
+	Shareable  map[string]interface{} `json:"shareable,omitempty"`
+	Permission *string                `json:"permission,omitempty"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+	Status     *string                `json:"status,omitempty"`
+	CreatedBy  *string                `json:"created_by,omitempty"`
+	UpdatedBy  *string                `json:"updated_by,omitempty"`
+}
+
+type Shares struct {
+	Data  []*Share `json:"data,omitempty"`
+	Count int      `json:"count"`
+}
+
 type Task struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`
+	Shares   []*Share   `json:"shares,omitempty"`
 }
 
 func (Task) IsEntity() {}
@@ -151,11 +169,6 @@ type UpdateConversation struct {
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateFollow struct {
-	Role   *string `json:"role,omitempty"`
-	Status *string `json:"status,omitempty"`
 }
 
 type UpdateMessage struct {
@@ -216,92 +229,6 @@ func (e *ConversationStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ConversationStatus) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type FollowRole string
-
-const (
-	FollowRoleViewer    FollowRole = "VIEWER"
-	FollowRoleCommenter FollowRole = "COMMENTER"
-	FollowRoleEditor    FollowRole = "EDITOR"
-)
-
-var AllFollowRole = []FollowRole{
-	FollowRoleViewer,
-	FollowRoleCommenter,
-	FollowRoleEditor,
-}
-
-func (e FollowRole) IsValid() bool {
-	switch e {
-	case FollowRoleViewer, FollowRoleCommenter, FollowRoleEditor:
-		return true
-	}
-	return false
-}
-
-func (e FollowRole) String() string {
-	return string(e)
-}
-
-func (e *FollowRole) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = FollowRole(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid FollowRole", str)
-	}
-	return nil
-}
-
-func (e FollowRole) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type FollowStatus string
-
-const (
-	FollowStatusPending  FollowStatus = "PENDING"
-	FollowStatusAccepted FollowStatus = "ACCEPTED"
-	FollowStatusRejected FollowStatus = "REJECTED"
-)
-
-var AllFollowStatus = []FollowStatus{
-	FollowStatusPending,
-	FollowStatusAccepted,
-	FollowStatusRejected,
-}
-
-func (e FollowStatus) IsValid() bool {
-	switch e {
-	case FollowStatusPending, FollowStatusAccepted, FollowStatusRejected:
-		return true
-	}
-	return false
-}
-
-func (e FollowStatus) String() string {
-	return string(e)
-}
-
-func (e *FollowStatus) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = FollowStatus(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid FollowStatus", str)
-	}
-	return nil
-}
-
-func (e FollowStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

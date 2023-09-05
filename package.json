@@ -6,6 +6,7 @@
     "start": "node ./gateway/index.js",
     "dev": "nodemon ./gateway/index.js"
   },
+  "type": "module",
   "dependencies": {
     "@apollo/gateway": "^2.5.1",
     "@apollo/server": "^4.9.0",

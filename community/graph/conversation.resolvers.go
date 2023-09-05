@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/community/graph/model"
@@ -101,26 +102,9 @@ func (r *conversationResolver) UpdatedBy(ctx context.Context, obj *model.Convers
 	return &updatedBy, nil
 }
 
-// Followers is the resolver for the followers field.
-func (r *conversationResolver) Followers(ctx context.Context, obj *model.Conversation) ([]*model.Follow, error) {
-	var items []*model.Follow
-
-	filter := bson.M{"followable._id": obj.ID, "followable.type": "conversations"}
-
-	cur, err := r.db.Collection("followers").Find(ctx, filter, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	for cur.Next(ctx) {
-		var item *model.Follow
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
-
-	return items, nil
+// Shares is the resolver for the shares field.
+func (r *conversationResolver) Shares(ctx context.Context, obj *model.Conversation) ([]*model.Share, error) {
+	panic(fmt.Errorf("not implemented: Shares - shares"))
 }
 
 // Comments is the resolver for the comments field.

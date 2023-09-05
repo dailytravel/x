@@ -1,6 +1,5 @@
 type Contact @key(fields: "id") {
   id: ID!
-  type: String!
   first_name: String
   last_name: String
   email: String!
@@ -100,7 +99,6 @@ enum ContactStatus {
 input NewContact {
   company: ID
   uid: ID
-  type: String
   first_name: String
   last_name: String
   picture: String
@@ -114,7 +112,7 @@ input NewContact {
   website: String
   birthday: String
   job_title: String
-  gender: Gender
+  gender: String
   timezone: String
   language: String
   source: String!
@@ -129,8 +127,6 @@ input NewContact {
 input UpdateContact {
   company: ID
   uid: ID
-  reference: String
-  type: String
   first_name: String
   last_name: String
   picture: String
@@ -144,7 +140,7 @@ input UpdateContact {
   website: String
   birthday: String
   job_title: String
-  gender: Gender
+  gender: String
   timezone: String
   language: String
   source: String
@@ -157,14 +153,14 @@ input UpdateContact {
 }
 
 extend type Query {
-  contacts(args: Map): Map @auth
+  contacts(args: Map): Map @auth @api
   contact(id: ID!): Contact @auth
 }
 
 extend type Mutation {
   createContact(input: NewContact!): Contact @auth
   updateContact(id: ID!, input: UpdateContact!): Contact @auth
-  importContacts(file: Upload!): Map @auth
+  importContacts(file: String!): Map @auth
   deleteContact(id: ID!): Map @auth
   deleteContacts(ids: [ID!]!): Map @auth
 }

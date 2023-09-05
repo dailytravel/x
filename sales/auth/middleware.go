@@ -24,6 +24,7 @@ func Middleware() gin.HandlerFunc {
 		ctx := context.WithValue(c.Request.Context(), GinContextKey, c)
 		ctx = context.WithValue(ctx, LocaleContextKey, c.GetHeader("x-locale"))
 		ctx = context.WithValue(ctx, APIKeyContextKey, c.GetHeader("x-api-key"))
+
 		// Decode the "auth" header into a map
 		authHeader := c.GetHeader("auth")
 

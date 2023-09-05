@@ -120,9 +120,9 @@ func (r *userResolver) Reactions(ctx context.Context, obj *model.User) ([]*model
 	return items, nil
 }
 
-// Following is the resolver for the following field.
-func (r *userResolver) Following(ctx context.Context, obj *model.User) ([]*model.Follow, error) {
-	var items []*model.Follow
+// Shares is the resolver for the shares field.
+func (r *userResolver) Shares(ctx context.Context, obj *model.User) ([]*model.Share, error) {
+	var items []*model.Share
 
 	uid, err := primitive.ObjectIDFromHex(obj.ID)
 	if err != nil {
@@ -131,13 +131,13 @@ func (r *userResolver) Following(ctx context.Context, obj *model.User) ([]*model
 
 	filter := bson.M{"uid": uid}
 	//find all items
-	cur, err := r.db.Collection("follows").Find(ctx, filter)
+	cur, err := r.db.Collection("shares").Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
 	for cur.Next(ctx) {
-		var item *model.Follow
+		var item *model.Share
 		if err := cur.Decode(&item); err != nil {
 			return nil, err
 		}

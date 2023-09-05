@@ -180,26 +180,6 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				list[idx[i]] = entity
 				return nil
 			}
-		case "Follow":
-			resolverName, err := entityResolverNameForFollow(ctx, rep)
-			if err != nil {
-				return fmt.Errorf(`finding resolver for Entity "Follow": %w`, err)
-			}
-			switch resolverName {
-
-			case "findFollowByID":
-				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findFollowByID(): %w`, err)
-				}
-				entity, err := ec.resolvers.Entity().FindFollowByID(ctx, id0)
-				if err != nil {
-					return fmt.Errorf(`resolving Entity "Follow": %w`, err)
-				}
-
-				list[idx[i]] = entity
-				return nil
-			}
 		case "Quote":
 			resolverName, err := entityResolverNameForQuote(ctx, rep)
 			if err != nil {
@@ -235,6 +215,26 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				entity, err := ec.resolvers.Entity().FindReactionByID(ctx, id0)
 				if err != nil {
 					return fmt.Errorf(`resolving Entity "Reaction": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Share":
+			resolverName, err := entityResolverNameForShare(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Share": %w`, err)
+			}
+			switch resolverName {
+
+			case "findShareByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findShareByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindShareByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Share": %w`, err)
 				}
 
 				list[idx[i]] = entity
@@ -434,23 +434,6 @@ func entityResolverNameForFile(ctx context.Context, rep map[string]interface{}) 
 	return "", fmt.Errorf("%w for File", ErrTypeNotFound)
 }
 
-func entityResolverNameForFollow(ctx context.Context, rep map[string]interface{}) (string, error) {
-	for {
-		var (
-			m   map[string]interface{}
-			val interface{}
-			ok  bool
-		)
-		_ = val
-		m = rep
-		if _, ok = m["id"]; !ok {
-			break
-		}
-		return "findFollowByID", nil
-	}
-	return "", fmt.Errorf("%w for Follow", ErrTypeNotFound)
-}
-
 func entityResolverNameForQuote(ctx context.Context, rep map[string]interface{}) (string, error) {
 	for {
 		var (
@@ -483,6 +466,23 @@ func entityResolverNameForReaction(ctx context.Context, rep map[string]interface
 		return "findReactionByID", nil
 	}
 	return "", fmt.Errorf("%w for Reaction", ErrTypeNotFound)
+}
+
+func entityResolverNameForShare(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findShareByID", nil
+	}
+	return "", fmt.Errorf("%w for Share", ErrTypeNotFound)
 }
 
 func entityResolverNameForTask(ctx context.Context, rep map[string]interface{}) (string, error) {

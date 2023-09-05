@@ -19,12 +19,6 @@ type Expenses struct {
 	Data  []*Expense `json:"data,omitempty"`
 }
 
-type Follow struct {
-	ID string `json:"id"`
-}
-
-func (Follow) IsEntity() {}
-
 type Invoices struct {
 	Data  []*Invoice `json:"data,omitempty"`
 	Count int        `json:"count"`

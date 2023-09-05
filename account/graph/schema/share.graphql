@@ -1,0 +1,4 @@
+extend type Share @key(fields: "uid") {
+  uid: ID! @external
+  user: User
+}

@@ -1,4 +1,0 @@
-extend type Follow @key(fields: "uid") {
-  uid: ID! @external
-  user: User
-}

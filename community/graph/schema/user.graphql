@@ -4,5 +4,5 @@ extend type User @key(fields: "id") {
   conversations: [Conversation]
   comments: [Comment]
   reactions: [Reaction]
-  following: [Follow]
+  shares: [Share]
 }

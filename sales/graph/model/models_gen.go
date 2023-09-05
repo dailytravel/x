@@ -87,7 +87,6 @@ type NewCompany struct {
 type NewContact struct {
 	Company   *string                `json:"company,omitempty"`
 	UID       *string                `json:"uid,omitempty"`
-	Type      *string                `json:"type,omitempty"`
 	FirstName *string                `json:"first_name,omitempty"`
 	LastName  *string                `json:"last_name,omitempty"`
 	Picture   *string                `json:"picture,omitempty"`
@@ -101,7 +100,7 @@ type NewContact struct {
 	Website   *string                `json:"website,omitempty"`
 	Birthday  *string                `json:"birthday,omitempty"`
 	JobTitle  *string                `json:"job_title,omitempty"`
-	Gender    *Gender                `json:"gender,omitempty"`
+	Gender    *string                `json:"gender,omitempty"`
 	Timezone  *string                `json:"timezone,omitempty"`
 	Language  *string                `json:"language,omitempty"`
 	Source    string                 `json:"source"`
@@ -310,8 +309,6 @@ type UpdateCompany struct {
 type UpdateContact struct {
 	Company   *string                `json:"company,omitempty"`
 	UID       *string                `json:"uid,omitempty"`
-	Reference *string                `json:"reference,omitempty"`
-	Type      *string                `json:"type,omitempty"`
 	FirstName *string                `json:"first_name,omitempty"`
 	LastName  *string                `json:"last_name,omitempty"`
 	Picture   *string                `json:"picture,omitempty"`
@@ -325,7 +322,7 @@ type UpdateContact struct {
 	Website   *string                `json:"website,omitempty"`
 	Birthday  *string                `json:"birthday,omitempty"`
 	JobTitle  *string                `json:"job_title,omitempty"`
-	Gender    *Gender                `json:"gender,omitempty"`
+	Gender    *string                `json:"gender,omitempty"`
 	Timezone  *string                `json:"timezone,omitempty"`
 	Language  *string                `json:"language,omitempty"`
 	Source    *string                `json:"source,omitempty"`

@@ -1,4 +1,5 @@
 extend type Expense @key(fields: "id") {
   id: ID! @external
   comments: [Comment]
+  shares: [Share]
 }

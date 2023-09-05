@@ -6,24 +6,20 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/finance/graph/model"
+	"github.com/dailytravel/x/finance/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ID is the resolver for the id field.
 func (r *expenseResolver) ID(ctx context.Context, obj *model.Expense) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
-}
-
-// Followers is the resolver for the followers field.
-func (r *expenseResolver) Followers(ctx context.Context, obj *model.Expense) ([]*model.Follow, error) {
-	panic(fmt.Errorf("not implemented: Followers - followers"))
-}
-
-// Comments is the resolver for the comments field.
-func (r *expenseResolver) Comments(ctx context.Context, obj *model.Expense) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
+	return obj.ID.Hex(), nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -33,17 +29,17 @@ func (r *expenseResolver) Metadata(ctx context.Context, obj *model.Expense) (map
 
 // Date is the resolver for the date field.
 func (r *expenseResolver) Date(ctx context.Context, obj *model.Expense) (string, error) {
-	panic(fmt.Errorf("not implemented: Date - date"))
+	return obj.Date.Time().Format(time.RFC3339), nil
 }
 
 // CreatedAt is the resolver for the created_at field.
 func (r *expenseResolver) CreatedAt(ctx context.Context, obj *model.Expense) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *expenseResolver) UpdatedAt(ctx context.Context, obj *model.Expense) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
@@ -53,12 +49,24 @@ func (r *expenseResolver) UID(ctx context.Context, obj *model.Expense) (string, 
 
 // CreatedBy is the resolver for the created_by field.
 func (r *expenseResolver) CreatedBy(ctx context.Context, obj *model.Expense) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	createdBy := obj.CreatedBy.Hex()
+
+	return &createdBy, nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
 func (r *expenseResolver) UpdatedBy(ctx context.Context, obj *model.Expense) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	updatedBy := obj.UpdatedBy.Hex()
+
+	return &updatedBy, nil
 }
 
 // CreateExpense is the resolver for the createExpense field.
@@ -72,23 +80,102 @@ func (r *mutationResolver) UpdateExpense(ctx context.Context, id string, input m
 }
 
 // DeleteExpense is the resolver for the deleteExpense field.
-func (r *mutationResolver) DeleteExpense(ctx context.Context, id string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteExpense - deleteExpense"))
+func (r *mutationResolver) DeleteExpense(ctx context.Context, id string) (bool, error) {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	// Delete the share from the MongoDB collection
+	result, err := r.db.Collection("expenses").DeleteOne(ctx, bson.M{"_id": objID})
+	if err != nil {
+		return false, err
+	}
+
+	// Check if any document was deleted
+	if result.DeletedCount == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 // DeleteExpenses is the resolver for the deleteExpenses field.
-func (r *mutationResolver) DeleteExpenses(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeleteExpenses - deleteExpenses"))
+func (r *mutationResolver) DeleteExpenses(ctx context.Context, ids []string) (bool, error) {
+	// Convert string IDs to ObjectIDs
+	objIDs := make([]primitive.ObjectID, 0, len(ids))
+	for _, id := range ids {
+		objID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return false, err
+		}
+		objIDs = append(objIDs, objID)
+	}
+
+	// Build the filter to match multiple IDs
+	filter := bson.M{"_id": bson.M{"$in": objIDs}}
+
+	// Delete the expenses from the MongoDB collection
+	result, err := r.db.Collection("expenses").DeleteMany(ctx, filter)
+	if err != nil {
+		return false, err
+	}
+
+	// Check if any documents were deleted
+	if result.DeletedCount == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 // Expenses is the resolver for the expenses field.
-func (r *queryResolver) Expenses(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Expenses - expenses"))
+func (r *queryResolver) Expenses(ctx context.Context, args map[string]interface{}) (*model.Expenses, error) {
+	var items []*model.Expense
+	//find all items
+	cur, err := r.db.Collection("expenses").Find(ctx, utils.Query(args), utils.Options(args))
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Expense
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("expenses").CountDocuments(ctx, utils.Query(args), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Expenses{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Expense is the resolver for the expense field.
 func (r *queryResolver) Expense(ctx context.Context, id string) (*model.Expense, error) {
-	panic(fmt.Errorf("not implemented: Expense - expense"))
+	var item *model.Expense
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("document not found")
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Expense returns ExpenseResolver implementation.

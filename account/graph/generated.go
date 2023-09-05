@@ -52,7 +52,6 @@ type ResolverRoot interface {
 	Entity() EntityResolver
 	Expense() ExpenseResolver
 	File() FileResolver
-	Follow() FollowResolver
 	Goal() GoalResolver
 	Integration() IntegrationResolver
 	Invitation() InvitationResolver
@@ -67,6 +66,7 @@ type ResolverRoot interface {
 	Query() QueryResolver
 	Reaction() ReactionResolver
 	Role() RoleResolver
+	Share() ShareResolver
 	Task() TaskResolver
 	Token() TokenResolver
 	User() UserResolver
@@ -194,7 +194,6 @@ type ComplexityRoot struct {
 		FindCouponByUID                         func(childComplexity int, uid string) int
 		FindExpenseByUID                        func(childComplexity int, uid string) int
 		FindFileByUID                           func(childComplexity int, uid string) int
-		FindFollowByUID                         func(childComplexity int, uid string) int
 		FindGoalByUID                           func(childComplexity int, uid string) int
 		FindInvoiceByUID                        func(childComplexity int, uid string) int
 		FindLinkByUID                           func(childComplexity int, uid string) int
@@ -206,6 +205,7 @@ type ComplexityRoot struct {
 		FindPortfolioByUID                      func(childComplexity int, uid string) int
 		FindQuoteByUID                          func(childComplexity int, uid string) int
 		FindReactionByUID                       func(childComplexity int, uid string) int
+		FindShareByUID                          func(childComplexity int, uid string) int
 		FindTaskByUID                           func(childComplexity int, uid string) int
 		FindUserByID                            func(childComplexity int, id string) int
 		FindWishlistByUID                       func(childComplexity int, uid string) int
@@ -217,11 +217,6 @@ type ComplexityRoot struct {
 	}
 
 	File struct {
-		UID  func(childComplexity int) int
-		User func(childComplexity int) int
-	}
-
-	Follow struct {
 		UID  func(childComplexity int) int
 		User func(childComplexity int) int
 	}
@@ -474,6 +469,11 @@ type ComplexityRoot struct {
 		Data  func(childComplexity int) int
 	}
 
+	Share struct {
+		UID  func(childComplexity int) int
+		User func(childComplexity int) int
+	}
+
 	Task struct {
 		UID  func(childComplexity int) int
 		User func(childComplexity int) int
@@ -594,7 +594,6 @@ type EntityResolver interface {
 	FindCouponByUID(ctx context.Context, uid string) (*model.Coupon, error)
 	FindExpenseByUID(ctx context.Context, uid string) (*model.Expense, error)
 	FindFileByUID(ctx context.Context, uid string) (*model.File, error)
-	FindFollowByUID(ctx context.Context, uid string) (*model.Follow, error)
 	FindGoalByUID(ctx context.Context, uid string) (*model.Goal, error)
 	FindInvoiceByUID(ctx context.Context, uid string) (*model.Invoice, error)
 	FindLinkByUID(ctx context.Context, uid string) (*model.Link, error)
@@ -606,6 +605,7 @@ type EntityResolver interface {
 	FindPortfolioByUID(ctx context.Context, uid string) (*model.Portfolio, error)
 	FindQuoteByUID(ctx context.Context, uid string) (*model.Quote, error)
 	FindReactionByUID(ctx context.Context, uid string) (*model.Reaction, error)
+	FindShareByUID(ctx context.Context, uid string) (*model.Share, error)
 	FindTaskByUID(ctx context.Context, uid string) (*model.Task, error)
 	FindUserByID(ctx context.Context, id string) (*model.User, error)
 	FindWishlistByUID(ctx context.Context, uid string) (*model.Wishlist, error)
@@ -615,9 +615,6 @@ type ExpenseResolver interface {
 }
 type FileResolver interface {
 	User(ctx context.Context, obj *model.File) (*model.User, error)
-}
-type FollowResolver interface {
-	User(ctx context.Context, obj *model.Follow) (*model.User, error)
 }
 type GoalResolver interface {
 	User(ctx context.Context, obj *model.Goal) (*model.User, error)
@@ -753,6 +750,9 @@ type RoleResolver interface {
 	UpdatedAt(ctx context.Context, obj *model.Role) (string, error)
 	CreatedBy(ctx context.Context, obj *model.Role) (*model.User, error)
 	UpdatedBy(ctx context.Context, obj *model.Role) (*model.User, error)
+}
+type ShareResolver interface {
+	User(ctx context.Context, obj *model.Share) (*model.User, error)
 }
 type TaskResolver interface {
 	User(ctx context.Context, obj *model.Task) (*model.User, error)
@@ -1329,18 +1329,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.FindFileByUID(childComplexity, args["uid"].(string)), true
 
-	case "Entity.findFollowByUID":
-		if e.complexity.Entity.FindFollowByUID == nil {
-			break
-		}
-
-		args, err := ec.field_Entity_findFollowByUID_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Entity.FindFollowByUID(childComplexity, args["uid"].(string)), true
-
 	case "Entity.findGoalByUID":
 		if e.complexity.Entity.FindGoalByUID == nil {
 			break
@@ -1473,6 +1461,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.FindReactionByUID(childComplexity, args["uid"].(string)), true
 
+	case "Entity.findShareByUID":
+		if e.complexity.Entity.FindShareByUID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findShareByUID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindShareByUID(childComplexity, args["uid"].(string)), true
+
 	case "Entity.findTaskByUID":
 		if e.complexity.Entity.FindTaskByUID == nil {
 			break
@@ -1536,20 +1536,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.File.User(childComplexity), true
-
-	case "Follow.uid":
-		if e.complexity.Follow.UID == nil {
-			break
-		}
-
-		return e.complexity.Follow.UID(childComplexity), true
-
-	case "Follow.user":
-		if e.complexity.Follow.User == nil {
-			break
-		}
-
-		return e.complexity.Follow.User(childComplexity), true
 
 	case "Goal.uid":
 		if e.complexity.Goal.UID == nil {
@@ -3050,6 +3036,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Roles.Data(childComplexity), true
 
+	case "Share.uid":
+		if e.complexity.Share.UID == nil {
+			break
+		}
+
+		return e.complexity.Share.UID(childComplexity), true
+
+	case "Share.user":
+		if e.complexity.Share.User == nil {
+			break
+		}
+
+		return e.complexity.Share.User(childComplexity), true
+
 	case "Task.uid":
 		if e.complexity.Task.UID == nil {
 			break
@@ -3402,7 +3402,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/api.graphql" "schema/attendance.graphql" "schema/board.graphql" "schema/campaign.graphql" "schema/client.graphql" "schema/comment.graphql" "schema/company.graphql" "schema/connection.graphql" "schema/contact.graphql" "schema/content.graphql" "schema/coupon.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/follow.graphql" "schema/goal.graphql" "schema/identity.graphql" "schema/integration.graphql" "schema/invitation.graphql" "schema/invoice.graphql" "schema/key.graphql" "schema/link.graphql" "schema/list.graphql" "schema/membership.graphql" "schema/order.graphql" "schema/organization.graphql" "schema/payment.graphql" "schema/permission.graphql" "schema/point.graphql" "schema/portfolio.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/role.graphql" "schema/task.graphql" "schema/token.graphql" "schema/user.graphql" "schema/wishlist.graphql"
+//go:embed "schema.graphqls" "schema/api.graphql" "schema/attendance.graphql" "schema/board.graphql" "schema/campaign.graphql" "schema/client.graphql" "schema/comment.graphql" "schema/company.graphql" "schema/connection.graphql" "schema/contact.graphql" "schema/content.graphql" "schema/coupon.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/goal.graphql" "schema/identity.graphql" "schema/integration.graphql" "schema/invitation.graphql" "schema/invoice.graphql" "schema/key.graphql" "schema/link.graphql" "schema/list.graphql" "schema/membership.graphql" "schema/order.graphql" "schema/organization.graphql" "schema/payment.graphql" "schema/permission.graphql" "schema/point.graphql" "schema/portfolio.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/role.graphql" "schema/share.graphql" "schema/task.graphql" "schema/token.graphql" "schema/user.graphql" "schema/wishlist.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -3428,7 +3428,6 @@ var sources = []*ast.Source{
 	{Name: "schema/coupon.graphql", Input: sourceData("schema/coupon.graphql"), BuiltIn: false},
 	{Name: "schema/expense.graphql", Input: sourceData("schema/expense.graphql"), BuiltIn: false},
 	{Name: "schema/file.graphql", Input: sourceData("schema/file.graphql"), BuiltIn: false},
-	{Name: "schema/follow.graphql", Input: sourceData("schema/follow.graphql"), BuiltIn: false},
 	{Name: "schema/goal.graphql", Input: sourceData("schema/goal.graphql"), BuiltIn: false},
 	{Name: "schema/identity.graphql", Input: sourceData("schema/identity.graphql"), BuiltIn: false},
 	{Name: "schema/integration.graphql", Input: sourceData("schema/integration.graphql"), BuiltIn: false},
@@ -3447,6 +3446,7 @@ var sources = []*ast.Source{
 	{Name: "schema/quote.graphql", Input: sourceData("schema/quote.graphql"), BuiltIn: false},
 	{Name: "schema/reaction.graphql", Input: sourceData("schema/reaction.graphql"), BuiltIn: false},
 	{Name: "schema/role.graphql", Input: sourceData("schema/role.graphql"), BuiltIn: false},
+	{Name: "schema/share.graphql", Input: sourceData("schema/share.graphql"), BuiltIn: false},
 	{Name: "schema/task.graphql", Input: sourceData("schema/task.graphql"), BuiltIn: false},
 	{Name: "schema/token.graphql", Input: sourceData("schema/token.graphql"), BuiltIn: false},
 	{Name: "schema/user.graphql", Input: sourceData("schema/user.graphql"), BuiltIn: false},
@@ -3489,7 +3489,7 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Attendance | Board | Campaign | Comment | Company | Contact | Content | Coupon | Expense | File | Follow | Goal | Invoice | Link | List | Membership | Order | Organization | Payment | Point | Portfolio | Quote | Reaction | Task | User | Wishlist
+union _Entity = Attendance | Board | Campaign | Comment | Company | Contact | Content | Coupon | Expense | File | Goal | Invoice | Link | List | Membership | Order | Organization | Payment | Point | Portfolio | Quote | Reaction | Share | Task | User | Wishlist
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
@@ -3503,7 +3503,6 @@ type Entity {
 	findCouponByUID(uid: ID!,): Coupon!
 	findExpenseByUID(uid: ID!,): Expense!
 	findFileByUID(uid: ID!,): File!
-	findFollowByUID(uid: ID!,): Follow!
 	findGoalByUID(uid: ID!,): Goal!
 	findInvoiceByUID(uid: ID!,): Invoice!
 	findLinkByUID(uid: ID!,): Link!
@@ -3515,6 +3514,7 @@ type Entity {
 	findPortfolioByUID(uid: ID!,): Portfolio!
 	findQuoteByUID(uid: ID!,): Quote!
 	findReactionByUID(uid: ID!,): Reaction!
+	findShareByUID(uid: ID!,): Share!
 	findTaskByUID(uid: ID!,): Task!
 	findUserByID(id: ID!,): User!
 	findWishlistByUID(uid: ID!,): Wishlist!
@@ -3732,21 +3732,6 @@ func (ec *executionContext) field_Entity_findFileByUID_args(ctx context.Context,
 	return args, nil
 }
 
-func (ec *executionContext) field_Entity_findFollowByUID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["uid"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uid"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["uid"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Entity_findGoalByUID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3907,6 +3892,21 @@ func (ec *executionContext) field_Entity_findQuoteByUID_args(ctx context.Context
 }
 
 func (ec *executionContext) field_Entity_findReactionByUID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["uid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uid"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findShareByUID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -8683,67 +8683,6 @@ func (ec *executionContext) fieldContext_Entity_findFileByUID(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Entity_findFollowByUID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Entity_findFollowByUID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Entity().FindFollowByUID(rctx, fc.Args["uid"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Follow)
-	fc.Result = res
-	return ec.marshalNFollow2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐFollow(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Entity_findFollowByUID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Entity",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "uid":
-				return ec.fieldContext_Follow_uid(ctx, field)
-			case "user":
-				return ec.fieldContext_Follow_user(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Follow", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Entity_findFollowByUID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Entity_findGoalByUID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Entity_findGoalByUID(ctx, field)
 	if err != nil {
@@ -9419,6 +9358,67 @@ func (ec *executionContext) fieldContext_Entity_findReactionByUID(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Entity_findShareByUID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findShareByUID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindShareByUID(rctx, fc.Args["uid"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Share)
+	fc.Result = res
+	return ec.marshalNShare2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐShare(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findShareByUID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "uid":
+				return ec.fieldContext_Share_uid(ctx, field)
+			case "user":
+				return ec.fieldContext_Share_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findShareByUID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Entity_findTaskByUID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Entity_findTaskByUID(ctx, field)
 	if err != nil {
@@ -9812,119 +9812,6 @@ func (ec *executionContext) _File_user(ctx context.Context, field graphql.Collec
 func (ec *executionContext) fieldContext_File_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "File",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "phone":
-				return ec.fieldContext_User_phone(ctx, field)
-			case "roles":
-				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
-			case "timezone":
-				return ec.fieldContext_User_timezone(ctx, field)
-			case "locale":
-				return ec.fieldContext_User_locale(ctx, field)
-			case "picture":
-				return ec.fieldContext_User_picture(ctx, field)
-			case "created_at":
-				return ec.fieldContext_User_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_User_updated_at(ctx, field)
-			case "metadata":
-				return ec.fieldContext_User_metadata(ctx, field)
-			case "status":
-				return ec.fieldContext_User_status(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Follow_uid(ctx context.Context, field graphql.CollectedField, obj *model.Follow) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Follow_uid(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Follow_uid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Follow",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Follow_user(ctx context.Context, field graphql.CollectedField, obj *model.Follow) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Follow_user(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Follow().User(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Follow_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Follow",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
@@ -20299,6 +20186,119 @@ func (ec *executionContext) fieldContext_Roles_count(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Share_uid(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Share_uid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Share_uid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Share",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Share_user(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Share_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Share().User(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Share_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Share",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "mfa":
+				return ec.fieldContext_User_mfa(ctx, field)
+			case "timezone":
+				return ec.fieldContext_User_timezone(ctx, field)
+			case "locale":
+				return ec.fieldContext_User_locale(ctx, field)
+			case "picture":
+				return ec.fieldContext_User_picture(ctx, field)
+			case "created_at":
+				return ec.fieldContext_User_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_User_updated_at(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
+			case "status":
+				return ec.fieldContext_User_status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Task_uid(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_uid(ctx, field)
 	if err != nil {
@@ -24937,13 +24937,6 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._File(ctx, sel, obj)
-	case model.Follow:
-		return ec._Follow(ctx, sel, &obj)
-	case *model.Follow:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Follow(ctx, sel, obj)
 	case model.Goal:
 		return ec._Goal(ctx, sel, &obj)
 	case *model.Goal:
@@ -25028,6 +25021,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._Reaction(ctx, sel, obj)
+	case model.Share:
+		return ec._Share(ctx, sel, &obj)
+	case *model.Share:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Share(ctx, sel, obj)
 	case model.Task:
 		return ec._Task(ctx, sel, &obj)
 	case *model.Task:
@@ -26863,28 +26863,6 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "findFollowByUID":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Entity_findFollowByUID(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "findGoalByUID":
 			field := field
 
@@ -27127,6 +27105,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findShareByUID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findShareByUID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "findTaskByUID":
 			field := field
 
@@ -27314,78 +27314,6 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._File_user(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var followImplementors = []string{"Follow", "_Entity"}
-
-func (ec *executionContext) _Follow(ctx context.Context, sel ast.SelectionSet, obj *model.Follow) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, followImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Follow")
-		case "uid":
-			out.Values[i] = ec._Follow_uid(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "user":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Follow_user(ctx, field, obj)
 				return res
 			}
 
@@ -30428,6 +30356,78 @@ func (ec *executionContext) _Roles(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var shareImplementors = []string{"Share", "_Entity"}
+
+func (ec *executionContext) _Share(ctx context.Context, sel ast.SelectionSet, obj *model.Share) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, shareImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Share")
+		case "uid":
+			out.Values[i] = ec._Share_uid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "user":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Share_user(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var taskImplementors = []string{"Task", "_Entity"}
 
 func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj *model.Task) graphql.Marshaler {
@@ -31631,20 +31631,6 @@ func (ec *executionContext) marshalNFile2ᚖgithubᚗcomᚋdailytravelᚋxᚋacc
 	return ec._File(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNFollow2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐFollow(ctx context.Context, sel ast.SelectionSet, v model.Follow) graphql.Marshaler {
-	return ec._Follow(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNFollow2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐFollow(ctx context.Context, sel ast.SelectionSet, v *model.Follow) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Follow(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNGoal2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐGoal(ctx context.Context, sel ast.SelectionSet, v model.Goal) graphql.Marshaler {
 	return ec._Goal(ctx, sel, &v)
 }
@@ -31948,6 +31934,20 @@ func (ec *executionContext) marshalNReaction2ᚖgithubᚗcomᚋdailytravelᚋx�
 func (ec *executionContext) unmarshalNRegisterInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐRegisterInput(ctx context.Context, v interface{}) (model.RegisterInput, error) {
 	res, err := ec.unmarshalInputRegisterInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNShare2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐShare(ctx context.Context, sel ast.SelectionSet, v model.Share) graphql.Marshaler {
+	return ec._Share(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNShare2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐShare(ctx context.Context, sel ast.SelectionSet, v *model.Share) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Share(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNSocialProvider2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐSocialProvider(ctx context.Context, v interface{}) (model.SocialProvider, error) {

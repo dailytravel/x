@@ -1,7 +1,7 @@
 ## Services
 
-rm -rf account base cms community configuration finance hrm insight marketing payment sales
-./init.sh account base cms community configuration finance hrm insight marketing payment sales
+rm -rf account base cms community configuration finance hrm insight marketing sales
+./init.sh account base cms community configuration finance hrm insight marketing sales
 
 {
   aud: 'https://api.trip.express/graphql',

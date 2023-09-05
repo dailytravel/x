@@ -19,6 +19,7 @@ import (
 	"github.com/dailytravel/x/sales/db/migrations"
 	"github.com/dailytravel/x/sales/graph"
 	"github.com/dailytravel/x/sales/internal/controllers"
+	"github.com/dailytravel/x/sales/scheduler"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -93,6 +94,10 @@ func main() {
 	if err := migrations.AutoMigrate(); err != nil {
 		log.Fatal("Error running migrations: ", err)
 	}
+
+	db.Client.Collection("contacts").Delete()
+	// start scheduler jobs
+	scheduler.SyncContactsJob()
 
 	// need restart the server if drop or create a new collection in mongodb, else will not work
 	for _, name := range []string{

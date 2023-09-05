@@ -200,7 +200,7 @@ type ComplexityRoot struct {
 		Portfolio          func(childComplexity int, id string) int
 		Portfolios         func(childComplexity int, args map[string]interface{}) int
 		Task               func(childComplexity int, id string) int
-		Tasks              func(childComplexity int, list string) int
+		Tasks              func(childComplexity int, args map[string]interface{}) int
 		Time               func(childComplexity int, id string) int
 		Times              func(childComplexity int, args map[string]interface{}) int
 		__resolve__service func(childComplexity int) int
@@ -210,7 +210,7 @@ type ComplexityRoot struct {
 	Task struct {
 		CreatedAt func(childComplexity int) int
 		CreatedBy func(childComplexity int) int
-		DueDate   func(childComplexity int) int
+		EndAt     func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Labels    func(childComplexity int) int
 		List      func(childComplexity int) int
@@ -220,7 +220,7 @@ type ComplexityRoot struct {
 		Order     func(childComplexity int) int
 		Parent    func(childComplexity int) int
 		Priority  func(childComplexity int) int
-		StartDate func(childComplexity int) int
+		StartAt   func(childComplexity int) int
 		Status    func(childComplexity int) int
 		Subtasks  func(childComplexity int) int
 		UID       func(childComplexity int) int
@@ -360,7 +360,7 @@ type QueryResolver interface {
 	Portfolio(ctx context.Context, id string) (*model.Portfolio, error)
 	Portfolios(ctx context.Context, args map[string]interface{}) (*model.Portfolios, error)
 	Task(ctx context.Context, id string) (*model.Task, error)
-	Tasks(ctx context.Context, list string) (*model.Tasks, error)
+	Tasks(ctx context.Context, args map[string]interface{}) (*model.Tasks, error)
 	Time(ctx context.Context, id string) (*model.Time, error)
 	Times(ctx context.Context, args map[string]interface{}) (*model.Times, error)
 }
@@ -371,8 +371,8 @@ type TaskResolver interface {
 	Subtasks(ctx context.Context, obj *model.Task) ([]*model.Task, error)
 	List(ctx context.Context, obj *model.Task) (*model.List, error)
 
-	StartDate(ctx context.Context, obj *model.Task) (*string, error)
-	DueDate(ctx context.Context, obj *model.Task) (*string, error)
+	StartAt(ctx context.Context, obj *model.Task) (*string, error)
+	EndAt(ctx context.Context, obj *model.Task) (*string, error)
 
 	Metadata(ctx context.Context, obj *model.Task) (map[string]interface{}, error)
 	CreatedAt(ctx context.Context, obj *model.Task) (string, error)
@@ -1329,7 +1329,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Tasks(childComplexity, args["list"].(string)), true
+		return e.complexity.Query.Tasks(childComplexity, args["args"].(map[string]interface{})), true
 
 	case "Query.time":
 		if e.complexity.Query.Time == nil {
@@ -1388,12 +1388,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.CreatedBy(childComplexity), true
 
-	case "Task.due_date":
-		if e.complexity.Task.DueDate == nil {
+	case "Task.end_at":
+		if e.complexity.Task.EndAt == nil {
 			break
 		}
 
-		return e.complexity.Task.DueDate(childComplexity), true
+		return e.complexity.Task.EndAt(childComplexity), true
 
 	case "Task.id":
 		if e.complexity.Task.ID == nil {
@@ -1458,12 +1458,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.Priority(childComplexity), true
 
-	case "Task.start_date":
-		if e.complexity.Task.StartDate == nil {
+	case "Task.start_at":
+		if e.complexity.Task.StartAt == nil {
 			break
 		}
 
-		return e.complexity.Task.StartDate(childComplexity), true
+		return e.complexity.Task.StartAt(childComplexity), true
 
 	case "Task.status":
 		if e.complexity.Task.Status == nil {
@@ -2511,15 +2511,15 @@ func (ec *executionContext) field_Query_task_args(ctx context.Context, rawArgs m
 func (ec *executionContext) field_Query_tasks_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["list"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("list"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+	var arg0 map[string]interface{}
+	if tmp, ok := rawArgs["args"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["list"] = arg0
+	args["args"] = arg0
 	return args, nil
 }
 
@@ -4847,10 +4847,10 @@ func (ec *executionContext) fieldContext_List_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Task_start_date(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Task_due_date(ctx, field)
+			case "start_at":
+				return ec.fieldContext_Task_start_at(ctx, field)
+			case "end_at":
+				return ec.fieldContext_Task_end_at(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -6749,10 +6749,10 @@ func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Task_start_date(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Task_due_date(ctx, field)
+			case "start_at":
+				return ec.fieldContext_Task_start_at(ctx, field)
+			case "end_at":
+				return ec.fieldContext_Task_end_at(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -6859,10 +6859,10 @@ func (ec *executionContext) fieldContext_Mutation_updateTask(ctx context.Context
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Task_start_date(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Task_due_date(ctx, field)
+			case "start_at":
+				return ec.fieldContext_Task_start_at(ctx, field)
+			case "end_at":
+				return ec.fieldContext_Task_end_at(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -8670,10 +8670,10 @@ func (ec *executionContext) fieldContext_Query_task(ctx context.Context, field g
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Task_start_date(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Task_due_date(ctx, field)
+			case "start_at":
+				return ec.fieldContext_Task_start_at(ctx, field)
+			case "end_at":
+				return ec.fieldContext_Task_end_at(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -8725,7 +8725,7 @@ func (ec *executionContext) _Query_tasks(ctx context.Context, field graphql.Coll
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Tasks(rctx, fc.Args["list"].(string))
+			return ec.resolvers.Query().Tasks(rctx, fc.Args["args"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -9292,10 +9292,10 @@ func (ec *executionContext) fieldContext_Task_parent(ctx context.Context, field 
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Task_start_date(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Task_due_date(ctx, field)
+			case "start_at":
+				return ec.fieldContext_Task_start_at(ctx, field)
+			case "end_at":
+				return ec.fieldContext_Task_end_at(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -9371,10 +9371,10 @@ func (ec *executionContext) fieldContext_Task_subtasks(ctx context.Context, fiel
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Task_start_date(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Task_due_date(ctx, field)
+			case "start_at":
+				return ec.fieldContext_Task_start_at(ctx, field)
+			case "end_at":
+				return ec.fieldContext_Task_end_at(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -9553,8 +9553,8 @@ func (ec *executionContext) fieldContext_Task_priority(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_start_date(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_start_date(ctx, field)
+func (ec *executionContext) _Task_start_at(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_start_at(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9567,7 +9567,7 @@ func (ec *executionContext) _Task_start_date(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Task().StartDate(rctx, obj)
+		return ec.resolvers.Task().StartAt(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9581,7 +9581,7 @@ func (ec *executionContext) _Task_start_date(ctx context.Context, field graphql.
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_start_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_start_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -9594,8 +9594,8 @@ func (ec *executionContext) fieldContext_Task_start_date(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_due_date(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_due_date(ctx, field)
+func (ec *executionContext) _Task_end_at(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_end_at(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9608,7 +9608,7 @@ func (ec *executionContext) _Task_due_date(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Task().DueDate(rctx, obj)
+		return ec.resolvers.Task().EndAt(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9622,7 +9622,7 @@ func (ec *executionContext) _Task_due_date(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_due_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_end_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -10066,10 +10066,10 @@ func (ec *executionContext) fieldContext_Tasks_data(ctx context.Context, field g
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Task_start_date(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Task_due_date(ctx, field)
+			case "start_at":
+				return ec.fieldContext_Task_start_at(ctx, field)
+			case "end_at":
+				return ec.fieldContext_Task_end_at(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -11118,10 +11118,10 @@ func (ec *executionContext) fieldContext_User_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Task_start_date(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Task_due_date(ctx, field)
+			case "start_at":
+				return ec.fieldContext_Task_start_at(ctx, field)
+			case "end_at":
+				return ec.fieldContext_Task_end_at(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -13309,7 +13309,7 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "order", "start_date", "due_date", "labels", "status", "metadata"}
+	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "order", "start_at", "end_at", "labels", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13379,24 +13379,24 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Order = data
-		case "start_date":
+		case "start_at":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_date"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_at"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.StartDate = data
-		case "due_date":
+			it.StartAt = data
+		case "end_at":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("due_date"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end_at"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.DueDate = data
+			it.EndAt = data
 		case "labels":
 			var err error
 
@@ -13834,7 +13834,7 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "order", "start_date", "due_date", "labels", "status", "metadata"}
+	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "order", "start_at", "end_at", "labels", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13904,24 +13904,24 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 				return it, err
 			}
 			it.Order = data
-		case "start_date":
+		case "start_at":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_date"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_at"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.StartDate = data
-		case "due_date":
+			it.StartAt = data
+		case "end_at":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("due_date"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end_at"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.DueDate = data
+			it.EndAt = data
 		case "labels":
 			var err error
 
@@ -16516,7 +16516,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "start_date":
+		case "start_at":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16525,7 +16525,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Task_start_date(ctx, field, obj)
+				res = ec._Task_start_at(ctx, field, obj)
 				return res
 			}
 
@@ -16549,7 +16549,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "due_date":
+		case "end_at":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16558,7 +16558,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Task_due_date(ctx, field, obj)
+				res = ec._Task_end_at(ctx, field, obj)
 				return res
 			}
 

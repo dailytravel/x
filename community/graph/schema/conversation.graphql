@@ -13,7 +13,7 @@ type Conversation {
   uid: String!
   created_by: String
   updated_by: String
-  followers: [Follow]
+  shares: [Share]
   comments: [Comment]
 }
 

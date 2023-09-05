@@ -64,9 +64,16 @@ func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.Fi
 	}, nil
 }
 
-// FindFollowByID is the resolver for the findFollowByID field.
-func (r *entityResolver) FindFollowByID(ctx context.Context, id string) (*model.Follow, error) {
-	var item *model.Follow
+// FindQuoteByID is the resolver for the findQuoteByID field.
+func (r *entityResolver) FindQuoteByID(ctx context.Context, id string) (*model.Quote, error) {
+	return &model.Quote{
+		ID: id,
+	}, nil
+}
+
+// FindReactionByID is the resolver for the findReactionByID field.
+func (r *entityResolver) FindReactionByID(ctx context.Context, id string) (*model.Reaction, error) {
+	var item *model.Reaction
 
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -85,16 +92,9 @@ func (r *entityResolver) FindFollowByID(ctx context.Context, id string) (*model.
 	return item, nil
 }
 
-// FindQuoteByID is the resolver for the findQuoteByID field.
-func (r *entityResolver) FindQuoteByID(ctx context.Context, id string) (*model.Quote, error) {
-	return &model.Quote{
-		ID: id,
-	}, nil
-}
-
-// FindReactionByID is the resolver for the findReactionByID field.
-func (r *entityResolver) FindReactionByID(ctx context.Context, id string) (*model.Reaction, error) {
-	var item *model.Reaction
+// FindShareByID is the resolver for the findShareByID field.
+func (r *entityResolver) FindShareByID(ctx context.Context, id string) (*model.Share, error) {
+	var item *model.Share
 
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

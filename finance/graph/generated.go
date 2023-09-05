@@ -68,13 +68,11 @@ type ComplexityRoot struct {
 
 	Expense struct {
 		Amount      func(childComplexity int) int
-		Comments    func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
 		CreatedBy   func(childComplexity int) int
 		Currency    func(childComplexity int) int
 		Date        func(childComplexity int) int
 		Description func(childComplexity int) int
-		Followers   func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Metadata    func(childComplexity int) int
 		Notes       func(childComplexity int) int
@@ -89,10 +87,6 @@ type ComplexityRoot struct {
 	Expenses struct {
 		Count func(childComplexity int) int
 		Data  func(childComplexity int) int
-	}
-
-	Follow struct {
-		ID func(childComplexity int) int
 	}
 
 	Invoice struct {
@@ -164,6 +158,10 @@ type ComplexityRoot struct {
 		__resolve_entities func(childComplexity int, representations []map[string]interface{}) int
 	}
 
+	Share struct {
+		ID func(childComplexity int) int
+	}
+
 	Transaction struct {
 		Amount      func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
@@ -203,8 +201,6 @@ type EntityResolver interface {
 type ExpenseResolver interface {
 	ID(ctx context.Context, obj *model.Expense) (string, error)
 
-	Followers(ctx context.Context, obj *model.Expense) ([]*model.Follow, error)
-	Comments(ctx context.Context, obj *model.Expense) ([]*model.Comment, error)
 	Metadata(ctx context.Context, obj *model.Expense) (map[string]interface{}, error)
 
 	Date(ctx context.Context, obj *model.Expense) (string, error)
@@ -235,8 +231,8 @@ type InvoiceResolver interface {
 type MutationResolver interface {
 	CreateExpense(ctx context.Context, input model.NewExpense) (*model.Expense, error)
 	UpdateExpense(ctx context.Context, id string, input model.UpdateExpense) (*model.Expense, error)
-	DeleteExpense(ctx context.Context, id string) (map[string]interface{}, error)
-	DeleteExpenses(ctx context.Context, ids []string) (map[string]interface{}, error)
+	DeleteExpense(ctx context.Context, id string) (bool, error)
+	DeleteExpenses(ctx context.Context, ids []string) (bool, error)
 	CreateInvoice(ctx context.Context, input model.NewInvoice) (*model.Invoice, error)
 	UpdateInvoice(ctx context.Context, id string, input model.UpdateInvoice) (*model.Invoice, error)
 	DeleteInvoice(ctx context.Context, id string) (map[string]interface{}, error)
@@ -262,7 +258,7 @@ type PaymentResolver interface {
 	UpdatedBy(ctx context.Context, obj *model.Payment) (*string, error)
 }
 type QueryResolver interface {
-	Expenses(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
+	Expenses(ctx context.Context, args map[string]interface{}) (*model.Expenses, error)
 	Expense(ctx context.Context, id string) (*model.Expense, error)
 	Invoice(ctx context.Context, id string) (*model.Invoice, error)
 	Invoices(ctx context.Context, args map[string]interface{}) (*model.Invoices, error)
@@ -341,13 +337,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Expense.Amount(childComplexity), true
 
-	case "Expense.comments":
-		if e.complexity.Expense.Comments == nil {
-			break
-		}
-
-		return e.complexity.Expense.Comments(childComplexity), true
-
 	case "Expense.created_at":
 		if e.complexity.Expense.CreatedAt == nil {
 			break
@@ -382,13 +371,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Expense.Description(childComplexity), true
-
-	case "Expense.followers":
-		if e.complexity.Expense.Followers == nil {
-			break
-		}
-
-		return e.complexity.Expense.Followers(childComplexity), true
 
 	case "Expense.id":
 		if e.complexity.Expense.ID == nil {
@@ -466,13 +448,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Expenses.Data(childComplexity), true
-
-	case "Follow.id":
-		if e.complexity.Follow.ID == nil {
-			break
-		}
-
-		return e.complexity.Follow.ID(childComplexity), true
 
 	case "Invoice.amount":
 		if e.complexity.Invoice.Amount == nil {
@@ -962,6 +937,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.__resolve_entities(childComplexity, args["representations"].([]map[string]interface{})), true
 
+	case "Share.id":
+		if e.complexity.Share.ID == nil {
+			break
+		}
+
+		return e.complexity.Share.ID(childComplexity), true
+
 	case "Transaction.amount":
 		if e.complexity.Transaction.Amount == nil {
 			break
@@ -1207,7 +1189,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/comment.graphql" "schema/expense.graphql" "schema/follow.graphql" "schema/invoice.graphql" "schema/payment.graphql" "schema/transaction.graphql" "schema/user.graphql"
+//go:embed "schema.graphqls" "schema/comment.graphql" "schema/expense.graphql" "schema/invoice.graphql" "schema/payment.graphql" "schema/share.graphql" "schema/transaction.graphql" "schema/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1222,9 +1204,9 @@ var sources = []*ast.Source{
 	{Name: "schema.graphqls", Input: sourceData("schema.graphqls"), BuiltIn: false},
 	{Name: "schema/comment.graphql", Input: sourceData("schema/comment.graphql"), BuiltIn: false},
 	{Name: "schema/expense.graphql", Input: sourceData("schema/expense.graphql"), BuiltIn: false},
-	{Name: "schema/follow.graphql", Input: sourceData("schema/follow.graphql"), BuiltIn: false},
 	{Name: "schema/invoice.graphql", Input: sourceData("schema/invoice.graphql"), BuiltIn: false},
 	{Name: "schema/payment.graphql", Input: sourceData("schema/payment.graphql"), BuiltIn: false},
+	{Name: "schema/share.graphql", Input: sourceData("schema/share.graphql"), BuiltIn: false},
 	{Name: "schema/transaction.graphql", Input: sourceData("schema/transaction.graphql"), BuiltIn: false},
 	{Name: "schema/user.graphql", Input: sourceData("schema/user.graphql"), BuiltIn: false},
 	{Name: "../federation/directives.graphql", Input: `
@@ -1265,7 +1247,7 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Comment | Follow | Invoice | User
+union _Entity = Comment | Invoice | Share | User
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
@@ -2244,96 +2226,6 @@ func (ec *executionContext) fieldContext_Expense_currency(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Expense_followers(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Expense_followers(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Expense().Followers(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Follow)
-	fc.Result = res
-	return ec.marshalOFollow2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐFollow(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Expense_followers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Expense",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Follow_id(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Follow", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Expense_comments(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Expense_comments(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Expense().Comments(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Comment)
-	fc.Result = res
-	return ec.marshalOComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Expense_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Expense",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Comment_id(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Expense_metadata(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Expense_metadata(ctx, field)
 	if err != nil {
@@ -2807,10 +2699,6 @@ func (ec *executionContext) fieldContext_Expenses_data(ctx context.Context, fiel
 				return ec.fieldContext_Expense_amount(ctx, field)
 			case "currency":
 				return ec.fieldContext_Expense_currency(ctx, field)
-			case "followers":
-				return ec.fieldContext_Expense_followers(ctx, field)
-			case "comments":
-				return ec.fieldContext_Expense_comments(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Expense_metadata(ctx, field)
 			case "status":
@@ -2831,50 +2719,6 @@ func (ec *executionContext) fieldContext_Expenses_data(ctx context.Context, fiel
 				return ec.fieldContext_Expense_updated_by(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Follow_id(ctx context.Context, field graphql.CollectedField, obj *model.Follow) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Follow_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Follow_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Follow",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3756,10 +3600,6 @@ func (ec *executionContext) fieldContext_Mutation_createExpense(ctx context.Cont
 				return ec.fieldContext_Expense_amount(ctx, field)
 			case "currency":
 				return ec.fieldContext_Expense_currency(ctx, field)
-			case "followers":
-				return ec.fieldContext_Expense_followers(ctx, field)
-			case "comments":
-				return ec.fieldContext_Expense_comments(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Expense_metadata(ctx, field)
 			case "status":
@@ -3864,10 +3704,6 @@ func (ec *executionContext) fieldContext_Mutation_updateExpense(ctx context.Cont
 				return ec.fieldContext_Expense_amount(ctx, field)
 			case "currency":
 				return ec.fieldContext_Expense_currency(ctx, field)
-			case "followers":
-				return ec.fieldContext_Expense_followers(ctx, field)
-			case "comments":
-				return ec.fieldContext_Expense_comments(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Expense_metadata(ctx, field)
 			case "status":
@@ -3935,21 +3771,24 @@ func (ec *executionContext) _Mutation_deleteExpense(ctx context.Context, field g
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(map[string]interface{}); ok {
+		if data, ok := tmp.(bool); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be map[string]interface{}`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteExpense(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3959,7 +3798,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteExpense(ctx context.Cont
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	defer func() {
@@ -4007,21 +3846,24 @@ func (ec *executionContext) _Mutation_deleteExpenses(ctx context.Context, field 
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(map[string]interface{}); ok {
+		if data, ok := tmp.(bool); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be map[string]interface{}`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteExpenses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4031,7 +3873,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteExpenses(ctx context.Con
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	defer func() {
@@ -5440,10 +5282,10 @@ func (ec *executionContext) _Query_expenses(ctx context.Context, field graphql.C
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(map[string]interface{}); ok {
+		if data, ok := tmp.(*model.Expenses); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be map[string]interface{}`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/dailytravel/x/finance/graph/model.Expenses`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5452,9 +5294,9 @@ func (ec *executionContext) _Query_expenses(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(*model.Expenses)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOExpenses2ᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐExpenses(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_expenses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5464,7 +5306,13 @@ func (ec *executionContext) fieldContext_Query_expenses(ctx context.Context, fie
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_Expenses_count(ctx, field)
+			case "data":
+				return ec.fieldContext_Expenses_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Expenses", field.Name)
 		},
 	}
 	defer func() {
@@ -5549,10 +5397,6 @@ func (ec *executionContext) fieldContext_Query_expense(ctx context.Context, fiel
 				return ec.fieldContext_Expense_amount(ctx, field)
 			case "currency":
 				return ec.fieldContext_Expense_currency(ctx, field)
-			case "followers":
-				return ec.fieldContext_Expense_followers(ctx, field)
-			case "comments":
-				return ec.fieldContext_Expense_comments(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Expense_metadata(ctx, field)
 			case "status":
@@ -6328,6 +6172,50 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Share_id(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Share_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Share_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Share",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Transaction_id(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Transaction_id(ctx, field)
 	if err != nil {
@@ -7096,10 +6984,6 @@ func (ec *executionContext) fieldContext_User_expenses(ctx context.Context, fiel
 				return ec.fieldContext_Expense_amount(ctx, field)
 			case "currency":
 				return ec.fieldContext_Expense_currency(ctx, field)
-			case "followers":
-				return ec.fieldContext_Expense_followers(ctx, field)
-			case "comments":
-				return ec.fieldContext_Expense_comments(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Expense_metadata(ctx, field)
 			case "status":
@@ -9801,13 +9685,6 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._Comment(ctx, sel, obj)
-	case model.Follow:
-		return ec._Follow(ctx, sel, &obj)
-	case *model.Follow:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Follow(ctx, sel, obj)
 	case model.Invoice:
 		return ec._Invoice(ctx, sel, &obj)
 	case *model.Invoice:
@@ -9815,6 +9692,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._Invoice(ctx, sel, obj)
+	case model.Share:
+		return ec._Share(ctx, sel, &obj)
+	case *model.Share:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Share(ctx, sel, obj)
 	case model.User:
 		return ec._User(ctx, sel, &obj)
 	case *model.User:
@@ -10028,72 +9912,6 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "followers":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Expense_followers(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "comments":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Expense_comments(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "metadata":
 			field := field
 
@@ -10382,45 +10200,6 @@ func (ec *executionContext) _Expenses(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "data":
 			out.Values[i] = ec._Expenses_data(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var followImplementors = []string{"Follow", "_Entity"}
-
-func (ec *executionContext) _Follow(ctx context.Context, sel ast.SelectionSet, obj *model.Follow) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, followImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Follow")
-		case "id":
-			out.Values[i] = ec._Follow_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10956,10 +10735,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteExpense(ctx, field)
 			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "deleteExpenses":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteExpenses(ctx, field)
 			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createInvoice":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createInvoice(ctx, field)
@@ -11616,6 +11401,45 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var shareImplementors = []string{"Share", "_Entity"}
+
+func (ec *executionContext) _Share(ctx context.Context, sel ast.SelectionSet, obj *model.Share) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, shareImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Share")
+		case "id":
+			out.Values[i] = ec._Share_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13095,54 +12919,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOComment2ᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐComment(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOComment2ᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v *model.Comment) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Comment(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalOExpense2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐExpense(ctx context.Context, sel ast.SelectionSet, v []*model.Expense) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -13191,6 +12967,13 @@ func (ec *executionContext) marshalOExpense2ᚖgithubᚗcomᚋdailytravelᚋxᚋ
 	return ec._Expense(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOExpenses2ᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐExpenses(ctx context.Context, sel ast.SelectionSet, v *model.Expenses) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Expenses(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
 	if v == nil {
 		return nil, nil
@@ -13205,54 +12988,6 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	}
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
-}
-
-func (ec *executionContext) marshalOFollow2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐFollow(ctx context.Context, sel ast.SelectionSet, v []*model.Follow) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOFollow2ᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐFollow(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOFollow2ᚖgithubᚗcomᚋdailytravelᚋxᚋfinanceᚋgraphᚋmodelᚐFollow(ctx context.Context, sel ast.SelectionSet, v *model.Follow) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Follow(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {

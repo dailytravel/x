@@ -196,7 +196,6 @@ func (r *mutationResolver) DeleteList(ctx context.Context, id string) (map[strin
 
 // DeleteLists is the resolver for the deleteLists field.
 func (r *mutationResolver) DeleteLists(ctx context.Context, ids []string) (map[string]interface{}, error) {
-
 	var objectIDs []primitive.ObjectID
 	for _, id := range ids {
 		_id, err := primitive.ObjectIDFromHex(id)
@@ -227,7 +226,6 @@ func (r *mutationResolver) DeleteLists(ctx context.Context, ids []string) (map[s
 
 // List is the resolver for the list field.
 func (r *queryResolver) List(ctx context.Context, id string) (*model.List, error) {
-
 	var item *model.List
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -243,7 +241,6 @@ func (r *queryResolver) List(ctx context.Context, id string) (*model.List, error
 
 // Lists is the resolver for the lists field.
 func (r *queryResolver) Lists(ctx context.Context, board string) (*model.Lists, error) {
-
 	var items []*model.List
 	_id, err := primitive.ObjectIDFromHex(board)
 	if err != nil {

@@ -5,8 +5,6 @@ type Expense {
   description: String!
   amount: Float!
   currency: String!
-  followers: [Follow]
-  comments: [Comment]
   metadata: Map
   status: String
   date: String!
@@ -70,13 +68,13 @@ input UpdateExpense {
 }
 
 extend type Query {
-  expenses(args: Map): Map @auth
+  expenses(args: Map): Expenses @auth
   expense(id: ID!): Expense @auth
 }
 
 extend type Mutation {
   createExpense(input: NewExpense!): Expense @auth
   updateExpense(id: ID!, input: UpdateExpense!): Expense @auth
-  deleteExpense(id: ID!): Map @auth
-  deleteExpenses(ids: [ID!]!): Map @auth
+  deleteExpense(id: ID!): Boolean! @auth
+  deleteExpenses(ids: [ID!]!): Boolean! @auth
 }

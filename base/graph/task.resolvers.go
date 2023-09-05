@@ -60,19 +60,23 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 		item.List = &_id
 	}
 
-	// Handle StartDate and DueDate input
-	handleDate := func(dateStr *string, targetDate *primitive.DateTime) {
-		if dateStr != nil {
-			dateTime, err := time.Parse(time.RFC3339, *dateStr)
-			if err == nil {
-				date := primitive.NewDateTimeFromTime(dateTime)
-				*targetDate = date
-			}
+	if input.StartAt != nil {
+		startAt, err := time.Parse(time.RFC3339, *input.StartAt)
+		if err != nil {
+			return nil, fmt.Errorf("invalid StartAt format: %v", err)
 		}
+		dt := primitive.NewDateTimeFromTime(startAt)
+		item.StartAt = &dt
 	}
 
-	handleDate(input.StartDate, item.StartDate)
-	handleDate(input.DueDate, item.DueDate)
+	if input.EndAt != nil {
+		endAt, err := time.Parse(time.RFC3339, *input.EndAt)
+		if err != nil {
+			return nil, fmt.Errorf("invalid EndAt format: %v", err)
+		}
+		dt := primitive.NewDateTimeFromTime(endAt)
+		item.EndAt = &dt
+	}
 
 	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
@@ -147,19 +151,23 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 
 	item.UpdatedBy = uid
 
-	// Handle StartDate and DueDate input
-	handleDate := func(dateStr *string, targetDate *primitive.DateTime) {
-		if dateStr != nil {
-			dateTime, err := time.Parse(time.RFC3339, *dateStr)
-			if err == nil {
-				date := primitive.NewDateTimeFromTime(dateTime)
-				*targetDate = date
-			}
+	if input.StartAt != nil {
+		startAt, err := time.Parse(time.RFC3339, *input.StartAt)
+		if err != nil {
+			return nil, fmt.Errorf("invalid StartAt format: %v", err)
 		}
+		dt := primitive.NewDateTimeFromTime(startAt)
+		item.StartAt = &dt
 	}
 
-	handleDate(input.StartDate, item.StartDate)
-	handleDate(input.DueDate, item.DueDate)
+	if input.EndAt != nil {
+		endAt, err := time.Parse(time.RFC3339, *input.EndAt)
+		if err != nil {
+			return nil, fmt.Errorf("invalid EndAt format: %v", err)
+		}
+		dt := primitive.NewDateTimeFromTime(endAt)
+		item.EndAt = &dt
+	}
 
 	// Update the task in the database
 	update := bson.M{"$set": item}
@@ -265,42 +273,49 @@ func (r *queryResolver) Task(ctx context.Context, id string) (*model.Task, error
 }
 
 // Tasks is the resolver for the tasks field.
-func (r *queryResolver) Tasks(ctx context.Context, list string) (*model.Tasks, error) {
+func (r *queryResolver) Tasks(ctx context.Context, args map[string]interface{}) (*model.Tasks, error) {
 	var items []*model.Task
 
-	_id, err := primitive.ObjectIDFromHex(list)
-	if err != nil {
-		return nil, err
-	}
-
-	opts := options.Find().SetSort(bson.M{"order": 1})
+	opts := utils.Options(args)
+	opts.SetSort(bson.M{"order": 1})
 	opts.SetSort(bson.M{"created_at": -1})
 
-	filter := bson.M{"list": _id}
-	//find all items
-	cur, err := r.db.Collection("tasks").Find(ctx, filter, opts)
+	// Build the filter based on the provided arguments
+	filter := bson.M{}
+
+	// Add filters based on the arguments, if provided
+	if name, ok := args["name"].(string); ok && name != "" {
+		filter["name"] = name
+	}
+
+	// Create a cursor for the query
+	cursor, err := r.db.Collection("tasks").Find(ctx, utils.Query(args), opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
+	// Iterate over the cursor and decode documents
+	for cursor.Next(ctx) {
 		var item *model.Task
-		if err := cur.Decode(&item); err != nil {
+		if err := cursor.Decode(&item); err != nil {
 			return nil, err
 		}
 		items = append(items, item)
 	}
 
-	//get total count
+	// Check for cursor errors
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	// You can get the total count using CountDocuments method
 	count, err := r.db.Collection("tasks").CountDocuments(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Tasks{
-		Count: int(count),
-		Data:  items,
-	}, nil
+	return &model.Tasks{Data: items, Count: int(count)}, nil
 }
 
 // ID is the resolver for the id field.
@@ -364,24 +379,30 @@ func (r *taskResolver) List(ctx context.Context, obj *model.Task) (*model.List, 
 	return item, nil
 }
 
-// StartDate is the resolver for the start_date field.
-func (r *taskResolver) StartDate(ctx context.Context, obj *model.Task) (*string, error) {
-	if obj.StartDate == nil {
+// StartAt is the resolver for the start_at field.
+func (r *taskResolver) StartAt(ctx context.Context, obj *model.Task) (*string, error) {
+	if obj.StartAt == nil {
 		return nil, nil
 	}
 
-	startDate := time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339)
-	return &startDate, nil
+	// Assuming the DateTime from MongoDB is similar to time.Time. Convert it to a string.
+	t := obj.StartAt.Time()             // Convert primitive.DateTime to time.Time
+	formatted := t.Format(time.RFC3339) // Convert to string in RFC3339 format
+
+	return &formatted, nil
 }
 
-// DueDate is the resolver for the due_date field.
-func (r *taskResolver) DueDate(ctx context.Context, obj *model.Task) (*string, error) {
-	if obj.DueDate == nil {
+// EndAt is the resolver for the end_at field.
+func (r *taskResolver) EndAt(ctx context.Context, obj *model.Task) (*string, error) {
+	if obj.EndAt == nil {
 		return nil, nil
 	}
 
-	dueDate := obj.DueDate.Time().Format(time.RFC3339)
-	return &dueDate, nil
+	// Assuming the DateTime from MongoDB is similar to time.Time. Convert it to a string.
+	t := obj.EndAt.Time()               // Convert primitive.DateTime to time.Time
+	formatted := t.Format(time.RFC3339) // Convert to string in RFC3339 format
+
+	return &formatted, nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -401,7 +422,7 @@ func (r *taskResolver) UpdatedAt(ctx context.Context, obj *model.Task) (string, 
 
 // UID is the resolver for the uid field.
 func (r *taskResolver) UID(ctx context.Context, obj *model.Task) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.UID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.

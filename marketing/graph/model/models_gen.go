@@ -24,12 +24,6 @@ type Comment struct {
 
 func (Comment) IsEntity() {}
 
-type Follow struct {
-	ID string `json:"id"`
-}
-
-func (Follow) IsEntity() {}
-
 type Link struct {
 	ID          string                 `json:"id"`
 	Domain      string                 `json:"domain"`

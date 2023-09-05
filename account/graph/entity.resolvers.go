@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/dailytravel/x/account/graph/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -77,13 +78,6 @@ func (r *entityResolver) FindExpenseByUID(ctx context.Context, uid string) (*mod
 // FindFileByUID is the resolver for the findFileByUID field.
 func (r *entityResolver) FindFileByUID(ctx context.Context, uid string) (*model.File, error) {
 	return &model.File{
-		UID: uid,
-	}, nil
-}
-
-// FindFollowByUID is the resolver for the findFollowByUID field.
-func (r *entityResolver) FindFollowByUID(ctx context.Context, uid string) (*model.Follow, error) {
-	return &model.Follow{
 		UID: uid,
 	}, nil
 }
@@ -164,6 +158,11 @@ func (r *entityResolver) FindReactionByUID(ctx context.Context, uid string) (*mo
 	return &model.Reaction{
 		UID: uid,
 	}, nil
+}
+
+// FindShareByUID is the resolver for the findShareByUID field.
+func (r *entityResolver) FindShareByUID(ctx context.Context, uid string) (*model.Share, error) {
+	panic(fmt.Errorf("not implemented: FindShareByUID - findShareByUID"))
 }
 
 // FindTaskByUID is the resolver for the findTaskByUID field.

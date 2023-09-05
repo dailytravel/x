@@ -6,8 +6,8 @@ type Task {
   list: List!
   notes: String
   priority: String! # enum of low, medium, high
-  start_date: String
-  due_date: String
+  start_at: String
+  end_at: String
   labels: [String]
   order: Int
   status: String!
@@ -38,8 +38,8 @@ input NewTask {
   notes: String
   priority: String
   order: Int
-  start_date: String
-  due_date: String
+  start_at: String
+  end_at: String
   labels: [String]
   status: String
   metadata: Map
@@ -53,8 +53,8 @@ input UpdateTask {
   notes: String
   priority: String
   order: Int
-  start_date: String
-  due_date: String
+  start_at: String
+  end_at: String
   labels: [String]
   status: String
   metadata: Map
@@ -62,7 +62,7 @@ input UpdateTask {
 
 extend type Query {
   task(id: ID!): Task
-  tasks(list: ID!): Tasks @auth
+  tasks(args: Map): Tasks @auth
 }
 
 extend type Mutation {

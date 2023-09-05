@@ -1,0 +1,49 @@
+type Share @key(fields: "id") {
+  id: ID!
+  uid: ID!
+  shareable: Map!
+  permission: String!
+  metadata: Map
+  status: String!
+  created_at: String!
+  updated_at: String!
+  created_by: ID
+  updated_by: ID
+}
+
+type Shares {
+  data: [Share]
+  count: Int!
+}
+
+input ShareInput {
+  uid: ID!
+  shareable: Map!
+  permission: String!
+  metadata: Map
+  status: String!
+  created_by: ID
+  updated_by: ID
+}
+
+input ShareUpdateInput {
+  uid: ID
+  shareable: Map
+  permission: String
+  metadata: Map
+  status: String
+  created_by: ID
+  updated_by: ID
+}
+
+extend type Query {
+  share(id: ID!): Share
+  shares(args: Map): Shares
+}
+
+extend type Mutation {
+  createShare(input: ShareInput!): Share
+  updateShare(id: ID!, input: ShareUpdateInput!): Share
+  deleteShare(id: ID!): Boolean!
+  deleteShares(ids: [ID!]!): Boolean!
+}

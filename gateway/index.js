@@ -1,24 +1,25 @@
-const express = require("express");
-const {
+import {
   ApolloGateway,
   IntrospectAndCompose,
   RemoteGraphQLDataSource,
-} = require("@apollo/gateway");
-const { ApolloServer } = require("@apollo/server");
-const { expressMiddleware } = require("@apollo/server/express4");
-const { expressjwt } = require("express-jwt");
-const { json } = require("body-parser");
-const jwks = require("jwks-rsa");
-const cors = require("cors");
+} from "@apollo/gateway";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import { expressjwt } from "express-jwt";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import express from "express";
+import http from "http";
+import cors from "cors";
+import bodyParser from "body-parser";
+import jwks from "jwks-rsa";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
-const port = 4000;
-
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:4000",
-  "https://api.trip.express",
-];
+const httpServer = http.createServer(app);
 
 app.get("/.well-known/jwks.json", (req, res) => {
   res.sendFile("./.well-known/jwks.json", { root: __dirname });
@@ -29,7 +30,7 @@ const authenticate = expressjwt({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: "http://localhost:4000/.well-known/jwks.json", // Replace with your Auth0 domain
+    jwksUri: "http://localhost:4000/.well-known/jwks.json",
   }),
   audience: "https://api.trip.express/graphql",
   issuer: "https://api.trip.express",
@@ -39,11 +40,16 @@ const authenticate = expressjwt({
 
 class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   willSendRequest({ request, context }) {
-    request.http.headers.set(
-      "auth",
-      context.auth ? JSON.stringify(context.auth) : null
-    );
-    request.http.headers.set("x-api-key", context.apiKey);
+    for (const [key, value] of Object.entries(context)) {
+      // Set the auth header
+      if (key === "auth") {
+        request.http.headers.set(key, JSON.stringify(value));
+      }
+      // Set headers that start with "x-" or are explicitly "x-api-key"
+      else if (key.startsWith("x-")) {
+        request.http.headers.set(key, value);
+      }
+    }
   }
 }
 
@@ -70,44 +76,39 @@ const gateway = new ApolloGateway({
 async function startApolloServer() {
   const server = new ApolloServer({
     gateway,
+    uploads: false,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
   await server.start();
 
-  // Use the Apollo server middleware along with authentication and CORS
   app.use(
     cors({
       origin: [
         "http://localhost:3000",
-        "http://localhost:4000",
         "https://api.trip.express",
+        "https://app.trip.express",
+        "https://trip.express",
+        "https://www.trip.express",
       ],
-    }),
-    json(),
-    authenticate,
+    })
+  );
+  app.use(bodyParser.json({ limit: "50mb" }));
+  app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+  app.use(authenticate);
+  app.use(
     expressMiddleware(server, {
-      context: async ({ req }) => {
-        return {
-          apiKey: req.headers["x-api-key"],
-          auth: req.auth,
-        };
-      },
+      context: async ({ req }) => ({
+        ...req.headers,
+        auth: req.auth,
+      }),
     })
   );
 
-  app.use((err, req, res, next) => {
-    if (err.name === "UnauthorizedError") {
-      res.status(401).send("Invalid token...");
-    } else {
-      console.error(err.stack);
-      res.status(500).send("Something broke!");
-    }
-  });
+  // Modified server startup
+  await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
 
-  // Start the server
-  app.listen({ port }, () => {
-    console.log(`🚀 Server ready at http://localhost:${port}/graphql`);
-  });
+  console.log(`🚀 Server ready at http://localhost:4000/`);
 }
 
 startApolloServer().catch((err) => {

@@ -80,18 +80,18 @@ type NewPortfolio struct {
 }
 
 type NewTask struct {
-	User      *string                `json:"user,omitempty"`
-	Parent    *string                `json:"parent,omitempty"`
-	List      *string                `json:"list,omitempty"`
-	Name      string                 `json:"name"`
-	Notes     *string                `json:"notes,omitempty"`
-	Priority  *string                `json:"priority,omitempty"`
-	Order     *int                   `json:"order,omitempty"`
-	StartDate *string                `json:"start_date,omitempty"`
-	DueDate   *string                `json:"due_date,omitempty"`
-	Labels    []*string              `json:"labels,omitempty"`
-	Status    *string                `json:"status,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	User     *string                `json:"user,omitempty"`
+	Parent   *string                `json:"parent,omitempty"`
+	List     *string                `json:"list,omitempty"`
+	Name     string                 `json:"name"`
+	Notes    *string                `json:"notes,omitempty"`
+	Priority *string                `json:"priority,omitempty"`
+	Order    *int                   `json:"order,omitempty"`
+	StartAt  *string                `json:"start_at,omitempty"`
+	EndAt    *string                `json:"end_at,omitempty"`
+	Labels   []*string              `json:"labels,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewTime struct {
@@ -158,18 +158,18 @@ type UpdatePortfolio struct {
 }
 
 type UpdateTask struct {
-	User      *string                `json:"user,omitempty"`
-	Parent    *string                `json:"parent,omitempty"`
-	List      *string                `json:"list,omitempty"`
-	Name      *string                `json:"name,omitempty"`
-	Notes     *string                `json:"notes,omitempty"`
-	Priority  *string                `json:"priority,omitempty"`
-	Order     *int                   `json:"order,omitempty"`
-	StartDate *string                `json:"start_date,omitempty"`
-	DueDate   *string                `json:"due_date,omitempty"`
-	Labels    []*string              `json:"labels,omitempty"`
-	Status    *string                `json:"status,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	User     *string                `json:"user,omitempty"`
+	Parent   *string                `json:"parent,omitempty"`
+	List     *string                `json:"list,omitempty"`
+	Name     *string                `json:"name,omitempty"`
+	Notes    *string                `json:"notes,omitempty"`
+	Priority *string                `json:"priority,omitempty"`
+	Order    *int                   `json:"order,omitempty"`
+	StartAt  *string                `json:"start_at,omitempty"`
+	EndAt    *string                `json:"end_at,omitempty"`
+	Labels   []*string              `json:"labels,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateTime struct {
