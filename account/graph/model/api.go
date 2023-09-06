@@ -46,8 +46,8 @@ func (i *Api) Collection() string {
 func (i *Api) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "identifier", Value: 1}}, Options: options.Index().SetUnique(true)},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created_at", Value: 1}}},
+		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
 	}
 }

@@ -46,3 +46,7 @@ $response = Http::asForm()->post('http://passport-app.test/oauth/token', [
     'scope' => '',
 ]);
  
+// EncodeToBase64 encodes a string to its Base64 representation
+func EncodeToBase64(s string) string {
+	return base64.StdEncoding.EncodeToString([]byte(s))
+}

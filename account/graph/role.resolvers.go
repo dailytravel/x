@@ -171,6 +171,8 @@ func (r *queryResolver) Roles(ctx context.Context, args map[string]interface{}) 
 		return nil, err
 	}
 
+	defer cur.Close(ctx)
+
 	for cur.Next(ctx) {
 		var item *model.Role
 		if err := cur.Decode(&item); err != nil {

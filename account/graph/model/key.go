@@ -6,7 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Key struct {
@@ -41,11 +40,11 @@ func (i *Key) Collection() string {
 
 func (i *Key) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "provider", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}},
+		{Keys: bson.D{{Key: "provider", Value: 1}}},
+		{Keys: bson.D{{Key: "type", Value: 1}}},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created_at", Value: 1}}},
+		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
 	}
 }

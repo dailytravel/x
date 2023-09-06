@@ -41,8 +41,7 @@ extend type Query {
 
 extend type Mutation {
   invite(input: NewInvitation!): Invitation @auth
-  accept(id: ID!): Invitation
-  decline(id: ID!): Invitation
+  accept(token: ID!): Invitation @auth
   deleteInvitation(id: ID!): Boolean @auth
   deleteInvitations(ids: [ID!]!): Boolean @auth
 }

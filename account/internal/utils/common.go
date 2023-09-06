@@ -193,3 +193,20 @@ func UID(ctx context.Context) (*primitive.ObjectID, error) {
 
 	return &uid, nil
 }
+
+func Contains(slice []string, target string) bool {
+	for _, value := range slice {
+		if value == target {
+			return true
+		}
+	}
+	return false
+}
+
+func DecodeFromBase64(s string) (string, error) {
+	decodedBytes, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return "", err
+	}
+	return string(decodedBytes), nil
+}

@@ -14,50 +14,23 @@ import (
 )
 
 type User struct {
-	Model           `bson:",inline"`
-	Name            string               `json:"name" bson:"name"`
-	Email           string               `json:"email" bson:"email"`
-	Phone           *string              `json:"phone,omitempty" bson:"phone,omitempty"`
-	Password        string               `json:"password" bson:"password"`
-	Roles           []string             `json:"roles,omitempty" bson:"roles,omitempty"`
-	Mfa             *Mfa                 `json:"mfa,omitempty" bson:"mfa,omitempty"`
-	Locale          *string              `json:"locale,omitempty" bson:"locale,omitempty"`
-	Timezone        *string              `json:"timezone,omitempty" bson:"timezone,omitempty"`
-	Picture         *string              `json:"picture,omitempty" bson:"picture,omitempty"`
-	Profile         *Profile             `json:"profile,omitempty" bson:"profile,omitempty"`
-	Address         *Address             `json:"address,omitempty" bson:"address,omitempty"`
-	Security        *Security            `json:"security,omitempty" bson:"security,omitempty"`
-	EmailVerifiedAt *primitive.Timestamp `json:"emailVerifiedAt,omitempty" bson:"email_verified_at,omitempty"`
-	PhoneVerifiedAt *primitive.Timestamp `json:"phoneVerifiedAt,omitempty" bson:"phone_verified_at,omitempty"`
-	Status          *string              `json:"status" bson:"status"`
+	Model         `bson:",inline"`
+	Name          string               `json:"name" bson:"name"`
+	Email         string               `json:"email" bson:"email"`
+	Phone         *string              `json:"phone,omitempty" bson:"phone,omitempty"`
+	Password      string               `json:"password" bson:"password"`
+	Roles         []string             `json:"roles,omitempty" bson:"roles,omitempty"`
+	Mfa           *Mfa                 `json:"mfa,omitempty" bson:"mfa,omitempty"`
+	Locale        *string              `json:"locale,omitempty" bson:"locale,omitempty"`
+	Timezone      *string              `json:"timezone,omitempty" bson:"timezone,omitempty"`
+	Picture       *string              `json:"picture,omitempty" bson:"picture,omitempty"`
+	LastLogin     *primitive.Timestamp `json:"lastLogin,omitempty" bson:"last_login,omitempty"`
+	EmailVerified *bool                `json:"emailVerified,omitempty" bson:"email_verified,omitempty"`
+	PhoneVerified *bool                `json:"phoneVerified,omitempty" bson:"phone_verified,omitempty"`
+	Status        *string              `json:"status" bson:"status"`
 }
 
 func (User) IsEntity() {}
-
-type Address struct {
-	Street  *string `json:"street,omitempty" bson:"street,omitempty"`
-	City    string  `json:"city" bson:"city"`
-	State   string  `json:"state" bson:"state"`
-	Zip     string  `json:"zip" bson:"zip"`
-	Country string  `json:"country" bson:"country"`
-}
-
-type Profile struct {
-	FirstName *string `json:"firstName,omitempty" bson:"first_name,omitempty"`
-	LastName  *string `json:"lastName,omitempty" bson:"last_name,omitempty"`
-	JobTitle  *string `json:"jobTitle,omitempty" bson:"job_title,omitempty"`
-	Birthday  *string `json:"birthday,omitempty" bson:"birthday,omitempty"`
-	Gender    *string `json:"gender,omitempty" bson:"gender,omitempty"`
-	Bio       *string `json:"bio,omitempty" bson:"bio,omitempty"`
-	Company   *string `json:"company,omitempty" bson:"company,omitempty"`
-	Website   *string `json:"website,omitempty" bson:"website,omitempty"`
-}
-
-type Security struct {
-	LastLogin          string `json:"lastLogin" bson:"last_login"`
-	LastPasswordChange string `json:"lastPasswordChange" bson:"last_password_change"`
-	Has2fa             bool   `json:"has2FA" bson:"has_2fa"`
-}
 
 // remove spacing characters
 func (i *User) Santize(s string) string {
@@ -85,11 +58,11 @@ func (i *User) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "email", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "phone", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "verified_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "deleted_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created_at", Value: 1}}},
+		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
+		{Keys: bson.D{{Key: "verified_at", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted_at", Value: 1}}},
 		{Keys: bson.D{{Key: "name", Value: "text"}, {Key: "email", Value: "text"}}, Options: options.Index().SetWeights(bson.M{"name": 2, "email": 1})},
 	}
 }

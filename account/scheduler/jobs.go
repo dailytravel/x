@@ -13,8 +13,8 @@ import (
 
 func SyncUsersJob() {
 	c := cron.New()
-	// c.AddFunc("@daily", func() {
-	c.AddFunc("*/5 * * * * *", func() {
+	c.AddFunc("@daily", func() {
+		// c.AddFunc("*/5 * * * * *", func() {
 		log.Println("Starting synchronization...")
 		syncUsersToTypesense()
 		log.Println("Synchronization complete.")

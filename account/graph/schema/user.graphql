@@ -8,40 +8,13 @@ type User @key(fields: "id") {
   timezone: String
   locale: String
   picture: String
-  profile: Profile
-  address: Address
-  security: Security
-  emailVerifiedAt: String
-  phoneVerifiedAt: String
+  lastLogin: String
+  emailVerified: Boolean
+  phoneVerified: Boolean
   createdAt: String!
   updatedAt: String!
   metadata: Map
   status: String
-}
-
-type Address {
-  street: String
-  city: String!
-  state: String!
-  zip: String!
-  country: String!
-}
-
-type Profile {
-  firstName: String
-  lastName: String
-  birthday: String
-  jobTitle: String
-  gender: String
-  bio: String
-  company: String
-  website: String
-}
-
-type Security {
-  lastLogin: String!
-  lastPasswordChange: String!
-  has2FA: Boolean!
 }
 
 enum UserStatus {
@@ -81,7 +54,7 @@ input MFAInput {
   code: String!
 }
 
-input UserInput {
+input NewUser {
   name: String!
   email: String!
   phone: String
@@ -90,34 +63,18 @@ input UserInput {
   timezone: String
   locale: String
   picture: String
-  profile: ProfileInput
-  address: AddressInput
   status: String
 }
 
-input AddressInput {
-  street: String
-  city: String!
-  state: String!
-  zip: String!
-  country: String!
-}
-
-input ProfileInput {
-  firstName: String
-  lastName: String
-  jobTitle: String
-  birthday: String
-  gender: String
-  bio: String
-  company: String
-  website: String
-}
-
-input PasswordInput {
-  currentPassword: String!
-  newPassword: String!
-  passwordConfirmation: String!
+input UpdateUser {
+  name: String
+  password: String
+  roles: [String]
+  timezone: String
+  locale: String
+  picture: String
+  status: String
+  metadata: Map
 }
 
 extend type Query {
@@ -128,16 +85,16 @@ extend type Query {
 }
 
 extend type Mutation {
-  updateUser(id: ID!, input: UserInput!): User
-  deleteUser(id: ID!): Boolean
-  register(input: UserInput!): User
+  createUser(input: NewUser!): User @auth(roles: [ADMIN])
+  updateUser(id: ID!, input: UpdateUser!): User
+  register(input: NewUser!): User
+  verifyEmail(token: String!): Map
+  verifyPhone(token: String!): Map
   login(email: String!, password: String!): Payload
   socialLogin(provider: SocialProvider!, accessToken: String!): Payload
-  updatePassword(input: PasswordInput!): User
   forgotPassword(email: String!): Map
-  resetPassword(
-    token: String!
-    password: String!
-    passwordConfirmation: String!
-  ): Map
+  resetPassword(token: String!, password: String!): Map
+  deactivate: User @auth
+  deleteUser(id: ID!): Boolean
+  deleteUsers(ids: [ID!]!): Boolean
 }

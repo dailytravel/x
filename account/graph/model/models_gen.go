@@ -8,14 +8,6 @@ import (
 	"strconv"
 )
 
-type AddressInput struct {
-	Street  *string `json:"street,omitempty"`
-	City    string  `json:"city"`
-	State   string  `json:"state"`
-	Zip     string  `json:"zip"`
-	Country string  `json:"country"`
-}
-
 type Apis struct {
 	Data  []*Api `json:"data,omitempty"`
 	Count int    `json:"count"`
@@ -137,6 +129,18 @@ type NewToken struct {
 	Abilities []*string `json:"abilities,omitempty"`
 }
 
+type NewUser struct {
+	Name     string    `json:"name"`
+	Email    string    `json:"email"`
+	Phone    *string   `json:"phone,omitempty"`
+	Password string    `json:"password"`
+	Roles    []*string `json:"roles,omitempty"`
+	Timezone *string   `json:"timezone,omitempty"`
+	Locale   *string   `json:"locale,omitempty"`
+	Picture  *string   `json:"picture,omitempty"`
+	Status   *string   `json:"status,omitempty"`
+}
+
 type Order struct {
 	UID  string `json:"uid"`
 	User *User  `json:"user,omitempty"`
@@ -152,12 +156,6 @@ type Organization struct {
 }
 
 func (Organization) IsEntity() {}
-
-type PasswordInput struct {
-	CurrentPassword      string `json:"currentPassword"`
-	NewPassword          string `json:"newPassword"`
-	PasswordConfirmation string `json:"passwordConfirmation"`
-}
 
 type Payload struct {
 	AccessToken  string `json:"accessToken"`
@@ -176,17 +174,6 @@ type Point struct {
 }
 
 func (Point) IsEntity() {}
-
-type ProfileInput struct {
-	FirstName *string `json:"firstName,omitempty"`
-	LastName  *string `json:"lastName,omitempty"`
-	JobTitle  *string `json:"jobTitle,omitempty"`
-	Birthday  *string `json:"birthday,omitempty"`
-	Gender    *string `json:"gender,omitempty"`
-	Bio       *string `json:"bio,omitempty"`
-	Company   *string `json:"company,omitempty"`
-	Website   *string `json:"website,omitempty"`
-}
 
 type Quote struct {
 	UID  string `json:"uid"`
@@ -258,18 +245,15 @@ type UpdateToken struct {
 	Abilities []*string `json:"abilities,omitempty"`
 }
 
-type UserInput struct {
-	Name     string        `json:"name"`
-	Email    string        `json:"email"`
-	Phone    *string       `json:"phone,omitempty"`
-	Password string        `json:"password"`
-	Roles    []*string     `json:"roles,omitempty"`
-	Timezone *string       `json:"timezone,omitempty"`
-	Locale   *string       `json:"locale,omitempty"`
-	Picture  *string       `json:"picture,omitempty"`
-	Profile  *ProfileInput `json:"profile,omitempty"`
-	Address  *AddressInput `json:"address,omitempty"`
-	Status   *string       `json:"status,omitempty"`
+type UpdateUser struct {
+	Name     *string                `json:"name,omitempty"`
+	Password *string                `json:"password,omitempty"`
+	Roles    []*string              `json:"roles,omitempty"`
+	Timezone *string                `json:"timezone,omitempty"`
+	Locale   *string                `json:"locale,omitempty"`
+	Picture  *string                `json:"picture,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type Users struct {
