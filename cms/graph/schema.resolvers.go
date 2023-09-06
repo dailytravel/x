@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/dailytravel/x/cms/utils"
+	"github.com/dailytravel/x/cms/internal/utils"
 	"github.com/typesense/typesense-go/typesense/api"
 )
 

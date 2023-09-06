@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/dailytravel/x/sales/db"
+	"github.com/dailytravel/x/sales/pkg/database"
 	"github.com/typesense/typesense-go/typesense"
 	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/api/pointer"
@@ -48,7 +48,8 @@ func (Contact) IsEntity() {}
 func (i *Contact) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.UpdatedBy == nil {
+	// If CreatedAt is zero, then set it to the current timestamp.
+	if i.CreatedAt.IsZero() {
 		i.CreatedAt = now
 	}
 
@@ -152,7 +153,7 @@ func (i *Contact) Insert(collection typesense.CollectionInterface) error {
 	// Retrieve Typesense collection schema and create it if it doesn't exist
 	if _, err := collection.Retrieve(); err != nil {
 		// Create collection
-		if _, err := db.Client.Collections().Create(i.Schema().(*api.CollectionSchema)); err != nil {
+		if _, err := database.Client.Collections().Create(i.Schema().(*api.CollectionSchema)); err != nil {
 			return err
 		}
 	}
@@ -201,7 +202,7 @@ func (i *Contact) Update(collection typesense.CollectionInterface, documentKey p
 	if err != nil {
 		// If update fails, try to fetch the item from MongoDB and re-insert into Typesense
 		var item Contact
-		if err := db.Database.Collection(i.Collection()).FindOne(context.Background(), documentKey).Decode(&item); err != nil {
+		if err := database.Database.Collection(i.Collection()).FindOne(context.Background(), documentKey).Decode(&item); err != nil {
 			return err
 		}
 		return i.Insert(collection)

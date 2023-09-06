@@ -7,22 +7,32 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/dailytravel/x/account/utils"
+	"github.com/dailytravel/x/account/internal/utils"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // ID is the resolver for the id field.
 func (r *invitationResolver) ID(ctx context.Context, obj *model.Invitation) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
-// Sender is the resolver for the sender field.
-func (r *invitationResolver) Sender(ctx context.Context, obj *model.Invitation) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Sender - sender"))
+// User is the resolver for the user field.
+func (r *invitationResolver) User(ctx context.Context, obj *model.Invitation) (*model.User, error) {
+	var item *model.User
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": obj.UID}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -30,18 +40,41 @@ func (r *invitationResolver) Metadata(ctx context.Context, obj *model.Invitation
 	return obj.Metadata, nil
 }
 
+// ExpiresAt is the resolver for the expiresAt field.
+func (r *invitationResolver) ExpiresAt(ctx context.Context, obj *model.Invitation) (string, error) {
+	return time.Unix(int64(obj.ExpiresAt.T), 0).Format(time.RFC3339), nil
+}
+
 // CreatedAt is the resolver for the created_at field.
 func (r *invitationResolver) CreatedAt(ctx context.Context, obj *model.Invitation) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // UpdatedAt is the resolver for the updated_at field.
 func (r *invitationResolver) UpdatedAt(ctx context.Context, obj *model.Invitation) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
-// CreateInvitation is the resolver for the createInvitation field.
-func (r *mutationResolver) CreateInvitation(ctx context.Context, input model.NewInvitation) (*model.Invitation, error) {
+// CreatedBy is the resolver for the createdBy field.
+func (r *invitationResolver) CreatedBy(ctx context.Context, obj *model.Invitation) (*string, error) {
+	if obj.CreatedBy == nil {
+		return nil, nil
+	}
+
+	return pointer.String(obj.CreatedBy.Hex()), nil
+}
+
+// UpdatedBy is the resolver for the updatedBy field.
+func (r *invitationResolver) UpdatedBy(ctx context.Context, obj *model.Invitation) (*string, error) {
+	if obj.UpdatedBy == nil {
+		return nil, nil
+	}
+
+	return pointer.String(obj.UpdatedBy.Hex()), nil
+}
+
+// Invite is the resolver for the invite field.
+func (r *mutationResolver) Invite(ctx context.Context, input model.NewInvitation) (*model.Invitation, error) {
 	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
@@ -49,7 +82,15 @@ func (r *mutationResolver) CreateInvitation(ctx context.Context, input model.New
 
 	// Create a new Invitation object using the input data
 	item := &model.Invitation{
-		Sender: *uid,
+		UID:       *uid,
+		Email:     input.Email,
+		Roles:     input.Roles,
+		Status:    "PENDING",
+		ExpiresAt: primitive.Timestamp{T: uint32(time.Now().Add(time.Hour * 24 * 7).Unix())},
+		Model: model.Model{
+			CreatedBy: uid,
+			UpdatedBy: uid,
+		},
 	}
 
 	// Save the new Invitation to the database
@@ -64,47 +105,128 @@ func (r *mutationResolver) CreateInvitation(ctx context.Context, input model.New
 	return item, nil
 }
 
-// UpdateInvitation is the resolver for the updateInvitation field.
-func (r *mutationResolver) UpdateInvitation(ctx context.Context, id string, input model.UpdateInvitation) (*model.Invitation, error) {
-	objID, err := primitive.ObjectIDFromHex(id)
+// Accept is the resolver for the accept field.
+func (r *mutationResolver) Accept(ctx context.Context, id string) (*model.Invitation, error) {
+	// Convert string ID to ObjectID
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ID format")
+	}
+
+	// Fetch the invitation from the database
+	filter := bson.M{"_id": objectID}
+	var invitation *model.Invitation
+	err = r.db.Collection(invitation.Collection()).FindOne(ctx, filter).Decode(&invitation)
+	if err != nil {
+		return nil, fmt.Errorf("invitation not found")
+	}
+
+	// Check if the invitation has expired
+	now := time.Now()
+	if now.After(time.Unix(int64(invitation.ExpiresAt.T), 0)) {
+		return nil, fmt.Errorf("invitation has expired")
+	}
+
+	// Check if the invitation has already been accepted or declined
+	if invitation.Status != "PENDING" {
+		return nil, fmt.Errorf("invitation has already been %s", invitation.Status)
+	}
+
+	// Check if the user already exists
+	var existingUser model.User
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": invitation.Email}).Decode(&existingUser); err != nil && err != mongo.ErrNoDocuments {
+		return nil, fmt.Errorf("error checking for existing user: %v", err)
+	}
+
+	// Random password for the new user
+	password, err := utils.Base64(16, false)
 	if err != nil {
 		return nil, err
 	}
 
-	// Create an update filter
-	filter := bson.M{"_id": objID}
-
-	// Create an update set with the fields to be updated
-	update := bson.M{}
-	// if input.Role != nil {
-	// 	update["role"] = input.Role
-	// }
-
-	if input.Status != nil {
-		update["status"] = input.Status
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
 
-	// Define options for the update operation
-	updateOptions := options.Update().SetUpsert(false)
+	// Create a new user
+	newUser := &model.User{
+		Email:           invitation.Email,
+		Roles:           invitation.Roles,
+		Password:        string(hashedPassword),
+		Status:          pointer.String("ACTIVE"),
+		EmailVerifiedAt: &primitive.Timestamp{T: uint32(time.Now().Unix())},
+	}
 
-	// Perform the update operation
-	_, err = r.db.Collection("invitations").UpdateOne(ctx, filter, bson.M{"$set": update}, updateOptions)
+	res, err := r.db.Collection(newUser.Collection()).InsertOne(ctx, newUser)
 	if err != nil {
 		return nil, err
 	}
 
-	// Fetch the updated Invitation from the database and return it
-	updatedInvitation := &model.Invitation{}
-	err = r.db.Collection("invitations").FindOne(ctx, filter).Decode(updatedInvitation)
+	newUser.ID = res.InsertedID.(primitive.ObjectID)
+
+	// Update the invitation's status to ACCEPTED
+	update := bson.M{"$set": bson.M{"status": "ACCEPTED"}}
+	_, err = r.db.Collection(invitation.Collection()).UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, err
 	}
 
-	return updatedInvitation, nil
+	// Refresh the invitation object before returning (optional, based on use-case)
+	err = r.db.Collection(invitation.Collection()).FindOne(ctx, filter).Decode(&invitation)
+	if err != nil {
+		return nil, err
+	}
+
+	return invitation, nil
+}
+
+// Decline is the resolver for the decline field.
+func (r *mutationResolver) Decline(ctx context.Context, id string) (*model.Invitation, error) {
+	// Convert string ID to ObjectID
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ID format")
+	}
+
+	// Fetch the invitation from the database
+	filter := bson.M{"_id": objectID}
+	var invitation model.Invitation
+	err = r.db.Collection(invitation.Collection()).FindOne(ctx, filter).Decode(&invitation)
+	if err != nil {
+		return nil, fmt.Errorf("invitation not found")
+	}
+
+	// Check if the invitation has expired
+	expiresAtTime := time.Unix(int64(invitation.ExpiresAt.T), 0) // Convert from Timestamp to time.Time
+	now := time.Now()
+	if now.After(expiresAtTime) {
+		return nil, fmt.Errorf("invitation has expired")
+	}
+
+	// Check if the invitation has already been accepted or declined
+	if invitation.Status != "PENDING" {
+		return nil, fmt.Errorf("invitation has already been %s", invitation.Status)
+	}
+
+	// Update the invitation's status to DECLINED
+	update := bson.M{"$set": bson.M{"status": "DECLINED"}}
+	_, err = r.db.Collection(invitation.Collection()).UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	// Refresh the invitation object before returning (optional, based on use-case)
+	err = r.db.Collection(invitation.Collection()).FindOne(ctx, filter).Decode(&invitation)
+	if err != nil {
+		return nil, err
+	}
+
+	return &invitation, nil
 }
 
 // DeleteInvitation is the resolver for the deleteInvitation field.
-func (r *mutationResolver) DeleteInvitation(ctx context.Context, id string) (map[string]interface{}, error) {
+func (r *mutationResolver) DeleteInvitation(ctx context.Context, id string) (*bool, error) {
 	var item *model.Invitation
 
 	uid, err := utils.UID(ctx)
@@ -119,19 +241,14 @@ func (r *mutationResolver) DeleteInvitation(ctx context.Context, id string) (map
 	}
 
 	if result.DeletedCount == 0 {
-		return map[string]interface{}{
-			"deleted": false,
-			"error":   "document not found",
-		}, nil
+		return nil, nil
 	}
 
-	return map[string]interface{}{
-		"success": true,
-	}, nil
+	return pointer.True(), nil
 }
 
 // DeleteInvitations is the resolver for the deleteInvitations field.
-func (r *mutationResolver) DeleteInvitations(ctx context.Context, ids []string) (map[string]interface{}, error) {
+func (r *mutationResolver) DeleteInvitations(ctx context.Context, ids []string) (*bool, error) {
 	var itemsToDelete []primitive.ObjectID
 
 	// Convert the list of IDs to ObjectIDs
@@ -149,41 +266,42 @@ func (r *mutationResolver) DeleteInvitations(ctx context.Context, ids []string) 
 		return nil, err
 	}
 
-	// Check if any documents were deleted
 	if result.DeletedCount == 0 {
-		return map[string]interface{}{
-			"deleted": false,
-			"error":   "no documents found",
-		}, nil
+		return nil, nil
 	}
 
-	// Return a success response
-	return map[string]interface{}{
-		"success": true,
-	}, nil
+	return pointer.True(), nil
 }
 
 // Invitations is the resolver for the invitations field.
-func (r *queryResolver) Invitations(ctx context.Context, args map[string]interface{}) (*model.Invitations, error) {
+func (r *queryResolver) Invitations(ctx context.Context, filter map[string]interface{}, limit *int, offset *int) (*model.Invitations, error) {
 	var items []*model.Invitation
-	// Perform the database query with the constructed filter
-	cursor, err := r.db.Collection("invitations").Find(ctx, utils.Query(args))
+
+	opts := options.Find()
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+
+	if offset != nil {
+		opts.SetSkip(int64(*offset))
+	}
+
+	//find all items
+	cur, err := r.db.Collection(model.RoleCollection).Find(ctx, r.model.Query(filter), opts)
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(ctx)
 
-	// Iterate through the cursor and decode results into Invitation objects
-	for cursor.Next(ctx) {
-		var invitation *model.Invitation
-		if err := cursor.Decode(&invitation); err != nil {
+	for cur.Next(ctx) {
+		var item *model.Invitation
+		if err := cur.Decode(&item); err != nil {
 			return nil, err
 		}
-		items = append(items, invitation)
+		items = append(items, item)
 	}
 
 	//get total count
-	count, err := r.db.Collection(model.RoleCollection).CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection(model.RoleCollection).CountDocuments(ctx, r.model.Query(filter), nil)
 	if err != nil {
 		return nil, err
 	}

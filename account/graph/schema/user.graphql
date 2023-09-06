@@ -8,10 +8,54 @@ type User @key(fields: "id") {
   timezone: String
   locale: String
   picture: String
-  created_at: String!
-  updated_at: String!
+  profile: Profile
+  address: Address
+  security: Security
+  emailVerifiedAt: String
+  phoneVerifiedAt: String
+  createdAt: String!
+  updatedAt: String!
   metadata: Map
   status: String
+}
+
+type Address {
+  street: String
+  city: String!
+  state: String!
+  zip: String!
+  country: String!
+}
+
+type Profile {
+  firstName: String
+  lastName: String
+  birthday: String
+  jobTitle: String
+  gender: String
+  bio: String
+  company: String
+  website: String
+}
+
+type Security {
+  lastLogin: String!
+  lastPasswordChange: String!
+  has2FA: Boolean!
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum SocialProvider {
+  FACEBOOK
+  GOOGLE
+  TWITTER
+  GITHUB
 }
 
 type Users {
@@ -24,90 +68,76 @@ type MFA {
   code: String!
 }
 
+type Payload {
+  accessToken: String!
+  refreshToken: String!
+  tokenType: String!
+  expiresIn: Int!
+}
+
+# Input Types
 input MFAInput {
   enabled: Boolean!
   code: String!
 }
 
-enum SocialProvider {
-  FACEBOOK
-  GOOGLE
-  TWITTER
-  GITHUB
-}
-
-type Payload {
-  access_token: String!
-  refresh_token: String!
-  token_type: String!
-  expires_in: Int!
-}
-
-input NewUser {
+input UserInput {
   name: String!
   email: String!
-  password: String!
-  roles: [String]
-  mfa: MFAInput
-}
-
-input RegisterInput {
-  locale: String!
-  name: String!
-  email: String!
-  password: String!
-}
-
-input LoginInput {
-  email: String!
-  password: String!
-}
-
-input UpdateUser {
-  name: String
-  email: String
   phone: String
+  password: String!
   roles: [String]
-  mfa: MFAInput
   timezone: String
   locale: String
   picture: String
+  profile: ProfileInput
+  address: AddressInput
   status: String
 }
 
-input PasswordInput {
-  current_password: String!
-  password: String!
-  password_confirmation: String!
+input AddressInput {
+  street: String
+  city: String!
+  state: String!
+  zip: String!
+  country: String!
 }
 
-input VerifyEmailInput {
-  token: String!
+input ProfileInput {
+  firstName: String
+  lastName: String
+  jobTitle: String
+  birthday: String
+  gender: String
+  bio: String
+  company: String
+  website: String
+}
+
+input PasswordInput {
+  currentPassword: String!
+  newPassword: String!
+  passwordConfirmation: String!
 }
 
 extend type Query {
-  users(args: Map): Map @auth(roles: [ADMIN])
+  users(args: Map): Map @auth(roles: [ADMIN]) #for search users on typesense
   user(id: ID!): User @auth(roles: [ADMIN])
+  owners(ids: [String!]!, limit: Int, offset: Int): Users @auth
   me: User @auth
 }
 
 extend type Mutation {
-  createUser(input: NewUser!): User
-  register(input: RegisterInput!): Payload
-  login(input: LoginInput!): Payload
-  socialLogin(provider: SocialProvider!, access_token: String!): Payload
-  updateUser(id: ID!, input: UpdateUser!): User @auth(roles: [ADMIN])
-  updateAccount(input: UpdateUser!): User @auth
-  deleteUser(id: ID!): Map @auth(roles: [ADMIN])
-  deleteUsers(ids: [ID!]!): Map @auth(roles: [ADMIN])
-  deleteAccount: Map @auth
-  restoreUser(id: ID!): Map @auth
+  updateUser(id: ID!, input: UserInput!): User
+  deleteUser(id: ID!): Boolean
+  register(input: UserInput!): User
+  login(email: String!, password: String!): Payload
+  socialLogin(provider: SocialProvider!, accessToken: String!): Payload
+  updatePassword(input: PasswordInput!): User
   forgotPassword(email: String!): Map
   resetPassword(
     token: String!
     password: String!
-    password_confirmation: String!
+    passwordConfirmation: String!
   ): Map
-  updatePassword(input: PasswordInput!): User @auth
-  verify(token: String!): Map
 }

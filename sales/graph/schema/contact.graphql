@@ -2,7 +2,7 @@ type Contact @key(fields: "id") {
   id: ID!
   first_name: String
   last_name: String
-  email: String!
+  email: String
   phone: String
   picture: String
   street: String
@@ -11,7 +11,7 @@ type Contact @key(fields: "id") {
   zip: String
   country: String
   website: String
-  gender: Gender
+  gender: String
   birthday: String
   company: Company
   job_title: String

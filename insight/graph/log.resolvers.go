@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/insight/graph/model"
-	"github.com/dailytravel/x/insight/utils"
+	"github.com/dailytravel/x/insight/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

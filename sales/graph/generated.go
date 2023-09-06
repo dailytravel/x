@@ -553,7 +553,6 @@ type CompanyResolver interface {
 type ContactResolver interface {
 	ID(ctx context.Context, obj *model.Contact) (string, error)
 
-	Gender(ctx context.Context, obj *model.Contact) (*model.Gender, error)
 	Birthday(ctx context.Context, obj *model.Contact) (*string, error)
 	Company(ctx context.Context, obj *model.Contact) (*model.Company, error)
 
@@ -7646,14 +7645,11 @@ func (ec *executionContext) _Contact_email(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Contact_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8011,7 +8007,7 @@ func (ec *executionContext) _Contact_gender(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Contact().Gender(rctx, obj)
+		return obj.Gender, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8020,19 +8016,19 @@ func (ec *executionContext) _Contact_gender(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Gender)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOGender2ᚖgithubᚗcomᚋdailytravelᚋxᚋsalesᚋgraphᚋmodelᚐGender(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Contact_gender(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Contact",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Gender does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -30837,9 +30833,6 @@ func (ec *executionContext) _Contact(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Contact_last_name(ctx, field, obj)
 		case "email":
 			out.Values[i] = ec._Contact_email(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "phone":
 			out.Values[i] = ec._Contact_phone(ctx, field, obj)
 		case "picture":
@@ -30857,38 +30850,7 @@ func (ec *executionContext) _Contact(ctx context.Context, sel ast.SelectionSet, 
 		case "website":
 			out.Values[i] = ec._Contact_website(ctx, field, obj)
 		case "gender":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Contact_gender(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			out.Values[i] = ec._Contact_gender(ctx, field, obj)
 		case "birthday":
 			field := field
 
@@ -38567,22 +38529,6 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	}
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
-}
-
-func (ec *executionContext) unmarshalOGender2ᚖgithubᚗcomᚋdailytravelᚋxᚋsalesᚋgraphᚋmodelᚐGender(ctx context.Context, v interface{}) (*model.Gender, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.Gender)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOGender2ᚖgithubᚗcomᚋdailytravelᚋxᚋsalesᚋgraphᚋmodelᚐGender(ctx context.Context, sel ast.SelectionSet, v *model.Gender) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
 }
 
 func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {

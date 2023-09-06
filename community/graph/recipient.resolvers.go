@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/community/graph/model"
-	"github.com/dailytravel/x/community/utils"
+	"github.com/dailytravel/x/community/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

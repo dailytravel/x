@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/dailytravel/x/sales/db"
+	"github.com/dailytravel/x/sales/pkg/database"
 	"github.com/typesense/typesense-go/typesense"
 	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/api/pointer"
@@ -102,7 +102,7 @@ func (i *Company) Insert(collection typesense.CollectionInterface) error {
 	// Retrieve Typesense collection schema and create it if it doesn't exist
 	if _, err := collection.Retrieve(); err != nil {
 		// Create collection
-		if _, err := db.Client.Collections().Create(i.Schema().(*api.CollectionSchema)); err != nil {
+		if _, err := database.Client.Collections().Create(i.Schema().(*api.CollectionSchema)); err != nil {
 			return err
 		}
 	}
@@ -150,7 +150,7 @@ func (i *Company) Update(collection typesense.CollectionInterface, documentKey p
 	if _, err := collection.Document(documentID).Update(updatePayload); err != nil {
 		// If the update fails, attempt to retrieve the item from the dataModel
 		var item *Company
-		if err := db.Database.Collection(i.Collection()).FindOne(context.Background(), documentKey).Decode(&item); err != nil {
+		if err := database.Database.Collection(i.Collection()).FindOne(context.Background(), documentKey).Decode(&item); err != nil {
 			return err
 		}
 

@@ -13,9 +13,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/dailytravel/x/account/utils"
+	"github.com/dailytravel/x/account/internal/utils"
+	"github.com/dailytravel/x/account/pkg/auth"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

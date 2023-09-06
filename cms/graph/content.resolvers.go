@@ -9,9 +9,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/dailytravel/x/cms/auth"
 	"github.com/dailytravel/x/cms/graph/model"
-	"github.com/dailytravel/x/cms/utils"
+	"github.com/dailytravel/x/cms/internal/utils"
+	"github.com/dailytravel/x/cms/pkg/auth"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -92,9 +93,7 @@ func (r *contentResolver) CreatedBy(ctx context.Context, obj *model.Content) (*s
 		return nil, nil
 	}
 
-	createdBy := obj.CreatedBy.Hex()
-
-	return &createdBy, nil
+	return pointer.String(obj.CreatedBy.Hex()), nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
@@ -103,9 +102,7 @@ func (r *contentResolver) UpdatedBy(ctx context.Context, obj *model.Content) (*s
 		return nil, nil
 	}
 
-	updatedBy := obj.UpdatedBy.Hex()
-
-	return &updatedBy, nil
+	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // Terms is the resolver for the terms field.

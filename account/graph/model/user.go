@@ -14,20 +14,50 @@ import (
 )
 
 type User struct {
-	Model    `bson:",inline"`
-	Name     string   `json:"name" bson:"name"`
-	Email    string   `json:"email" bson:"email"`
-	Phone    *string  `json:"phone,omitempty" bson:"phone,omitempty"`
-	Password string   `json:"password" bson:"password"`
-	Roles    []string `json:"roles,omitempty" bson:"roles,omitempty"`
-	Mfa      *Mfa     `json:"mfa,omitempty" bson:"mfa,omitempty"`
-	Locale   *string  `json:"locale,omitempty" bson:"locale,omitempty"`
-	Timezone *string  `json:"timezone,omitempty" bson:"timezone,omitempty"`
-	Picture  *string  `json:"picture,omitempty" bson:"picture,omitempty"`
-	Status   string   `json:"status" bson:"status"`
+	Model           `bson:",inline"`
+	Name            string               `json:"name" bson:"name"`
+	Email           string               `json:"email" bson:"email"`
+	Phone           *string              `json:"phone,omitempty" bson:"phone,omitempty"`
+	Password        string               `json:"password" bson:"password"`
+	Roles           []string             `json:"roles,omitempty" bson:"roles,omitempty"`
+	Mfa             *Mfa                 `json:"mfa,omitempty" bson:"mfa,omitempty"`
+	Locale          *string              `json:"locale,omitempty" bson:"locale,omitempty"`
+	Timezone        *string              `json:"timezone,omitempty" bson:"timezone,omitempty"`
+	Picture         *string              `json:"picture,omitempty" bson:"picture,omitempty"`
+	Profile         *Profile             `json:"profile,omitempty" bson:"profile,omitempty"`
+	Address         *Address             `json:"address,omitempty" bson:"address,omitempty"`
+	Security        *Security            `json:"security,omitempty" bson:"security,omitempty"`
+	EmailVerifiedAt *primitive.Timestamp `json:"emailVerifiedAt,omitempty" bson:"email_verified_at,omitempty"`
+	PhoneVerifiedAt *primitive.Timestamp `json:"phoneVerifiedAt,omitempty" bson:"phone_verified_at,omitempty"`
+	Status          *string              `json:"status" bson:"status"`
 }
 
 func (User) IsEntity() {}
+
+type Address struct {
+	Street  *string `json:"street,omitempty" bson:"street,omitempty"`
+	City    string  `json:"city" bson:"city"`
+	State   string  `json:"state" bson:"state"`
+	Zip     string  `json:"zip" bson:"zip"`
+	Country string  `json:"country" bson:"country"`
+}
+
+type Profile struct {
+	FirstName *string `json:"firstName,omitempty" bson:"first_name,omitempty"`
+	LastName  *string `json:"lastName,omitempty" bson:"last_name,omitempty"`
+	JobTitle  *string `json:"jobTitle,omitempty" bson:"job_title,omitempty"`
+	Birthday  *string `json:"birthday,omitempty" bson:"birthday,omitempty"`
+	Gender    *string `json:"gender,omitempty" bson:"gender,omitempty"`
+	Bio       *string `json:"bio,omitempty" bson:"bio,omitempty"`
+	Company   *string `json:"company,omitempty" bson:"company,omitempty"`
+	Website   *string `json:"website,omitempty" bson:"website,omitempty"`
+}
+
+type Security struct {
+	LastLogin          string `json:"lastLogin" bson:"last_login"`
+	LastPasswordChange string `json:"lastPasswordChange" bson:"last_password_change"`
+	Has2fa             bool   `json:"has2FA" bson:"has_2fa"`
+}
 
 // remove spacing characters
 func (i *User) Santize(s string) string {
@@ -69,20 +99,12 @@ func (i *User) Schema() interface{} {
 		Name: i.Collection(),
 		Fields: []api.Field{
 			{Name: "name", Type: "string", Optional: pointer.True()},
-			{Name: "first_name", Type: "string", Optional: pointer.True()},
-			{Name: "last_name", Type: "string", Optional: pointer.True()},
 			{Name: "picture", Type: "string", Optional: pointer.True()},
 			{Name: "email", Type: "string"},
 			{Name: "phone", Type: "string", Optional: pointer.True()},
-			{Name: "locale", Type: "string", Optional: pointer.True()},
-			{Name: "timezone", Type: "string", Optional: pointer.True()},
 			{Name: "status", Type: "string", Facet: pointer.True()},
 			{Name: "created_at", Type: "int32"},
 			{Name: "updated_at", Type: "int32"},
-			{Name: "profile", Type: "object", Optional: pointer.True()},
-			{Name: "verified_at", Type: "int32", Optional: pointer.True()},
-			{Name: "last_login", Type: "int32", Optional: pointer.True()},
-			{Name: "last_activity", Type: "int32"},
 			{Name: "roles", Type: "string[]"},
 		},
 		DefaultSortingField: pointer.String("created_at"),
@@ -96,10 +118,9 @@ func (i *User) Document() map[string]interface{} {
 		"name":       i.Name,
 		"email":      i.Email,
 		"phone":      i.Phone,
+		"picture":    i.Picture,
 		"status":     i.Status,
 		"roles":      i.Roles,
-		"locale":     i.Locale,
-		"timezone":   i.Timezone,
 		"created_at": i.CreatedAt.T,
 		"updated_at": i.UpdatedAt.T,
 	}

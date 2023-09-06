@@ -9,9 +9,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/dailytravel/x/hrm/auth"
 	"github.com/dailytravel/x/hrm/graph/model"
-	"github.com/dailytravel/x/hrm/utils"
+	"github.com/dailytravel/x/hrm/internal/utils"
+	"github.com/dailytravel/x/hrm/pkg/auth"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -123,9 +124,7 @@ func (r *jobResolver) CreatedBy(ctx context.Context, obj *model.Job) (*string, e
 		return nil, nil
 	}
 
-	createdBy := obj.CreatedBy.Hex()
-
-	return &createdBy, nil
+	return pointer.String(obj.CreatedBy.Hex()), nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
@@ -134,9 +133,7 @@ func (r *jobResolver) UpdatedBy(ctx context.Context, obj *model.Job) (*string, e
 		return nil, nil
 	}
 
-	updatedBy := obj.UpdatedBy.Hex()
-
-	return &updatedBy, nil
+	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // CreateJob is the resolver for the createJob field.

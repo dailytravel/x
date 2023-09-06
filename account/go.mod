@@ -11,6 +11,8 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.5.0
+	github.com/robfig/cron v1.2.0
+	github.com/streadway/amqp v1.1.0
 	github.com/typesense/typesense-go v0.7.0
 	github.com/vektah/gqlparser/v2 v2.5.8
 	go.mongodb.org/mongo-driver v1.12.0

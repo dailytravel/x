@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dailytravel/x/account/auth"
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/dailytravel/x/account/utils"
+	"github.com/dailytravel/x/account/internal/utils"
+	"github.com/dailytravel/x/account/pkg/auth"
 	"github.com/go-redis/redis"
 	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
@@ -25,158 +25,104 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	// Check if the user is authenticated
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UserInput) (*model.User, error) {
 	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Check if the email already exists
-	existingUser := &model.User{}
-	err = r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"email": input.Email}, nil).Decode(existingUser)
-	if err == nil {
-		return nil, fmt.Errorf("email already exists")
-	} else if err != mongo.ErrNoDocuments {
-		return nil, err
-	}
-
-	// Hash the password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
+	filter := bson.M{"_id": _id}
 
-	// Create the new user
-	newUser := &model.User{
+	item := &model.User{
 		Name:     input.Name,
 		Email:    input.Email,
-		Password: string(hashedPassword),
+		Timezone: input.Timezone,
+		Locale:   input.Locale,
+		Picture:  input.Picture,
+		Phone:    input.Phone,
+		Status:   input.Status,
 		Model: model.Model{
-			CreatedBy: uid,
 			UpdatedBy: uid,
 		},
 	}
 
 	for _, role := range input.Roles {
-		newUser.Roles = append(newUser.Roles, *role)
+		item.Roles = append(item.Roles, *role)
 	}
 
-	// Insert the new user into the database
-	res, err := r.db.Collection(newUser.Collection()).InsertOne(ctx, newUser, nil)
+	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, bson.M{"$set": item}).Decode(item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}
+
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*bool, error) {
+	// Convert the string ID to MongoDB's ObjectID format
+	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 
-	newUser.ID = res.InsertedID.(primitive.ObjectID)
+	// Delete the user from the database
+	res, err := r.db.Collection("users").DeleteOne(ctx, bson.M{"_id": _id})
+	if err != nil {
+		return nil, err
+	}
 
-	return newUser, nil
+	// Check if any document was deleted
+	if res.DeletedCount == 0 {
+		return nil, nil
+	}
+
+	return pointer.True(), nil
 }
 
 // Register is the resolver for the register field.
-func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.Payload, error) {
-	var k *model.Key
-	var a *model.Api
-	var c *model.Client
-
-	client := auth.APIKey(ctx)
-	if client == nil {
-		return nil, fmt.Errorf("client not found")
+func (r *mutationResolver) Register(ctx context.Context, input model.UserInput) (*model.User, error) {
+	// 1. Validate the input (you might have more validation rules)
+	if input.Email == "" || input.Password == "" || input.Name == "" {
+		return nil, fmt.Errorf("email, password and name are required")
 	}
 
-	//check client
-	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"secret": client}, nil).Decode(&c); err != nil {
-		return nil, fmt.Errorf("client not found")
+	// 2. Check if a user with the same email already exists
+	var existingUser model.User
+	err := r.db.Collection("users").FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingUser)
+	if err != nil && err != mongo.ErrNoDocuments {
+		return nil, fmt.Errorf("error checking for existing user: %v", err)
 	}
 
-	//check api
-	if err := r.db.Collection("apis").FindOne(ctx, bson.M{"identifier": "https://api.trip.express/graphql"}, nil).Decode(&a); err != nil {
-		return nil, fmt.Errorf("api not found")
-	}
-
-	// Check if the user is already authenticated
-	// authenticatedUser := auth.Auth(ctx)
-	// if authenticatedUser != nil {
-	// 	return nil, fmt.Errorf("user is already authenticated")
-	// }
-
-	// Check if the email already exists
-	existingUser := &model.User{}
-	err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"email": input.Email}, nil).Decode(existingUser)
-	if err == nil {
-		return nil, fmt.Errorf("email already exists")
-	} else if err != mongo.ErrNoDocuments {
-		return nil, err
-	}
-
-	// Hash the password
+	// 3. Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
 
-	// Create the new user
+	// 4. Create the user
 	newUser := &model.User{
 		Name:     input.Name,
 		Email:    input.Email,
 		Password: string(hashedPassword),
-		Model: model.Model{
-			CreatedBy: nil, // Set createdBy to nil for new registration
-			UpdatedBy: nil,
-		},
+		// Add other fields from input if they exist
 	}
-
-	// Insert the new user into the database
-	res, err := r.db.Collection(newUser.Collection()).InsertOne(ctx, newUser, nil)
+	_, err = r.db.Collection("users").InsertOne(ctx, newUser)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to insert user: %v", err)
 	}
 
-	newUser.ID = res.InsertedID.(primitive.ObjectID)
-
-	if err := r.db.Collection(k.Collection()).FindOne(ctx, bson.M{"status": "current"}, nil).Decode(&k); err != nil {
-		return nil, fmt.Errorf("key not found")
-	}
-
-	access_token, err := auth.Token(jwt.MapClaims{
-		"sub":   newUser.ID.Hex(),
-		"roles": strings.Join(newUser.Roles, " "),
-		"scope": "*",
-		"aud":   a.Identifier,
-		"iss":   strings.Join([]string{"https://", c.Domain}, ""),
-		"azp":   c.ID.Hex(),
-		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
-	}, *k)
-
-	if err != nil {
-		return nil, err
-	}
-
-	refresh_token, err := auth.Token(jwt.MapClaims{
-		"sub": newUser.ID.Hex(),
-		"aud": a.Identifier,
-		"iss": strings.Join([]string{"https://", c.Domain}, ""),
-		"azp": c.ID.Hex(),
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
-	}, *k)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &model.Payload{
-		AccessToken:  *access_token,
-		RefreshToken: *refresh_token,
-		TokenType:    "Bearer",
-		ExpiresIn:    3600,
-	}, nil
+	// 5. Return the created user (excluding the hashed password for security reasons)
+	newUser.Password = ""
+	return newUser, nil
 }
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.Payload, error) {
+func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*model.Payload, error) {
 	var u *model.User
 	var k *model.Key
 	var a *model.Api
@@ -198,12 +144,12 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	}
 
 	//find user by email
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"email": input.Email}, nil).Decode(&u); err != nil {
+	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"email": email}, nil).Decode(&u); err != nil {
 		return nil, fmt.Errorf("user not found")
 	}
 
 	//check password
-	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(input.Password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
 		return nil, fmt.Errorf("password not match")
 	}
 
@@ -211,11 +157,6 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	if err := r.db.Collection(model.KeyCollection).FindOne(ctx, bson.M{"status": "current"}, nil).Decode(&k); err != nil {
 		return nil, fmt.Errorf("key not found")
 	}
-
-	// token, err := utils.Base64(32, false)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	//create token
 	t := &model.Token{
@@ -342,206 +283,43 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.Socia
 	}, nil
 }
 
-// UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUser) (*model.User, error) {
+// UpdatePassword is the resolver for the updatePassword field.
+func (r *mutationResolver) UpdatePassword(ctx context.Context, input model.PasswordInput) (*model.User, error) {
 	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-	filter := bson.M{"_id": _id}
-
-	item := &model.User{
-		Name:     *input.Name,
-		Email:    *input.Email,
-		Timezone: input.Timezone,
-		Locale:   input.Locale,
-		Picture:  input.Picture,
-		Phone:    input.Phone,
-		Status:   *input.Status,
-		Model: model.Model{
-			UpdatedBy: uid,
-		},
-	}
-
-	for _, role := range input.Roles {
-		item.Roles = append(item.Roles, *role)
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, bson.M{"$set": item}).Decode(item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
-}
-
-// UpdateAccount is the resolver for the updateAccount field.
-func (r *mutationResolver) UpdateAccount(ctx context.Context, input model.UpdateUser) (*model.User, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	//find user by id
+	// Find item by ID
 	var item *model.User
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": uid}, nil).Decode(&item); err != nil {
+	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": uid}).Decode(&item); err != nil {
 		return nil, fmt.Errorf("user not found")
 	}
 
-	//update user
-	if input.Name != nil {
-		item.Name = *input.Name
+	// Check if new password and confirmation match
+	if input.NewPassword != input.PasswordConfirmation {
+		return nil, fmt.Errorf("passwords do not match")
 	}
 
-	if input.Email != nil {
-		item.Email = *input.Email
+	// Check current password
+	err = bcrypt.CompareHashAndPassword([]byte(item.Password), []byte(input.CurrentPassword))
+	if err != nil {
+		return nil, fmt.Errorf("current password is incorrect")
 	}
 
-	if input.Timezone != nil {
-		item.Timezone = input.Timezone
+	// Hash the new password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.NewPassword), 10)
+	if err != nil {
+		return nil, fmt.Errorf("error hashing the password")
 	}
 
-	if input.Locale != nil {
-		item.Locale = input.Locale
-	}
-
-	if input.Picture != nil {
-		item.Picture = input.Picture
-	}
-
-	if input.Phone != nil {
-		item.Phone = input.Phone
-	}
-
-	if input.Status != nil {
-		item.Status = *input.Status
-	}
-
-	if input.Roles != nil {
-		for _, role := range input.Roles {
-			item.Roles = append(item.Roles, *role)
-		}
-	}
-
-	if _, err := r.db.Collection("users").UpdateOne(ctx, bson.M{"_id": uid}, bson.M{"$set": item}); err != nil {
-		return nil, err
+	// Update user's password
+	_, err = r.db.Collection(model.UserCollection).UpdateOne(ctx, bson.M{"_id": uid}, bson.M{"$set": bson.M{"password": hashedPassword}})
+	if err != nil {
+		return nil, fmt.Errorf("error updating password")
 	}
 
 	return item, nil
-}
-
-// DeleteUser is the resolver for the deleteUser field.
-func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (map[string]interface{}, error) {
-	var item *model.User
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	// Find the appointment by _id and delete it
-	if err := r.db.Collection(model.UserCollection).FindOneAndUpdate(ctx, bson.M{"_id": bson.M{"$eq": _id, "$ne": uid}, "roles": bson.M{"$nin": []string{"admin"}}}, bson.M{"$set": bson.M{"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())}, "deleted_by": uid}}, nil).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return map[string]interface{}{"status": "success"}, nil
-}
-
-// DeleteUsers is the resolver for the deleteUsers field.
-func (r *mutationResolver) DeleteUsers(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	objectIDs := make([]primitive.ObjectID, len(ids))
-	for i, id := range ids {
-		objectID, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			return nil, err
-		}
-		objectIDs[i] = objectID
-	}
-
-	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
-	update := bson.M{
-		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
-			"deleted_by": uid,
-		},
-	}
-
-	// Update multiple users by filtering with their _ids
-	result, err := r.db.Collection(model.UserCollection).UpdateMany(ctx, filter, update)
-	if err != nil {
-		return nil, err
-	}
-
-	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
-}
-
-// DeleteAccount is the resolver for the deleteAccount field.
-func (r *mutationResolver) DeleteAccount(ctx context.Context) (map[string]interface{}, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	update := bson.M{
-		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
-			"deleted_by": uid,
-		},
-	}
-
-	// Find the user by _id and mark it as deleted
-	result, err := r.db.Collection(model.UserCollection).UpdateByID(ctx, uid, update)
-	if err != nil {
-		return nil, err
-	}
-
-	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
-}
-
-// RestoreUser is the resolver for the restoreUser field.
-func (r *mutationResolver) RestoreUser(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	update := bson.M{
-		"$set": bson.M{
-			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
-		},
-		"$unset": bson.M{
-			"deleted_at": "",
-			"deleted_by": "",
-		},
-	}
-
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	result, err := r.db.Collection(model.UserCollection).UpdateByID(ctx, _id, update)
-	if err != nil {
-		return nil, err
-	}
-
-	return map[string]interface{}{
-		"status":        "success",
-		"modifiedCount": result.ModifiedCount,
-	}, nil
 }
 
 // ForgotPassword is the resolver for the forgotPassword field.
@@ -567,9 +345,11 @@ func (r *mutationResolver) ForgotPassword(ctx context.Context, email string) (ma
 		return nil, fmt.Errorf("failed to store code: %s", err.Error())
 	}
 
-	return map[string]interface{}{
-		"code": code,
-	}, nil
+	// Return a response
+	response := map[string]interface{}{
+		"message": "A password reset email has been sent.",
+	}
+	return response, nil
 }
 
 // ResetPassword is the resolver for the resetPassword field.
@@ -613,90 +393,6 @@ func (r *mutationResolver) ResetPassword(ctx context.Context, token string, pass
 	}, nil
 }
 
-// UpdatePassword is the resolver for the updatePassword field.
-func (r *mutationResolver) UpdatePassword(ctx context.Context, input model.PasswordInput) (*model.User, error) {
-	var item *model.User
-
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	if input.Password != input.PasswordConfirmation {
-		return nil, fmt.Errorf("passwords do not match")
-	}
-
-	//find user by id
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": uid}, nil).Decode(&item); err != nil {
-		return nil, fmt.Errorf("user not found")
-	}
-
-	//check password
-	if err := bcrypt.CompareHashAndPassword([]byte(item.Password), []byte(input.CurrentPassword)); err != nil {
-		return nil, fmt.Errorf("password is incorrect")
-	}
-
-	//hash password
-	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), 10)
-	if err != nil {
-		return nil, fmt.Errorf("password is incorrect")
-	}
-
-	//update password
-	if _, err := r.db.Collection(model.UserCollection).UpdateOne(ctx, bson.M{"_id": uid}, bson.M{"$set": bson.M{"password": string(hash)}}); err != nil {
-		return nil, fmt.Errorf("user not found")
-	}
-
-	return item, nil
-}
-
-// Verify is the resolver for the verify field.
-func (r *mutationResolver) Verify(ctx context.Context, token string) (map[string]interface{}, error) {
-	// Define constants
-	const (
-		invalidTokenError = "invalid token"
-		failedToRetrieve  = "failed to retrieve token from Redis: %s"
-		failedToUpdate    = "failed to update user status: %s"
-		userNotFound      = "user not found"
-		failedToDelete    = "failed to delete token from Redis: %s"
-	)
-
-	// Retrieve email from Redis
-	email, err := r.redis.Get(ctx, token).Result()
-	if err == redis.Nil {
-		return nil, fmt.Errorf(invalidTokenError)
-	} else if err != nil {
-		return nil, fmt.Errorf(failedToRetrieve, err.Error())
-	}
-
-	// Update user status
-	result, err := r.db.Collection(model.UserCollection).UpdateOne(
-		ctx,
-		bson.M{"email": email},
-		bson.M{"$set": bson.M{"status": "active"}},
-	)
-	if err != nil {
-		return nil, fmt.Errorf(failedToUpdate, err.Error())
-	}
-	if result.ModifiedCount == 0 {
-		return nil, fmt.Errorf(userNotFound)
-	}
-
-	// Delete token from Redis
-	deleted, err := r.redis.Del(ctx, token).Result()
-	if err != nil {
-		return nil, fmt.Errorf(failedToDelete, err.Error())
-	}
-	if deleted == 0 {
-		return nil, fmt.Errorf(invalidTokenError)
-	}
-
-	// Return success message
-	return map[string]interface{}{
-		"success": true,
-	}, nil
-}
-
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
 	res, err := r.ts.Collection(model.UserCollection).Documents().Search(utils.Params(args))
@@ -734,6 +430,65 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 	return item, nil
 }
 
+// Owners is the resolver for the owners field.
+func (r *queryResolver) Owners(ctx context.Context, ids []string, limit *int, offset *int) (*model.Users, error) {
+	var users []*model.User
+
+	// Convert string IDs to ObjectIDs
+	objectIds := make([]primitive.ObjectID, 0, len(ids))
+	for _, idStr := range ids {
+		objectId, err := primitive.ObjectIDFromHex(idStr)
+		if err != nil {
+			return nil, fmt.Errorf("invalid _id format: %s", idStr)
+		}
+		objectIds = append(objectIds, objectId)
+	}
+
+	// Construct the query
+	query := bson.M{"_id": bson.M{"$in": objectIds}}
+
+	opts := options.Find()
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+
+	if offset != nil {
+		opts.SetSkip(int64(*offset))
+	}
+
+	// Fetch the users based on the filter and pagination options
+	cursor, err := r.db.Collection("users").Find(ctx, query, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	// Decode each found document into a user struct
+	for cursor.Next(ctx) {
+		var user model.User
+		if err := cursor.Decode(&user); err != nil {
+			return nil, err
+		}
+		users = append(users, &user)
+	}
+
+	// In case there's an error during the cursor iteration
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	// Get the total count of users based on the filter
+	count, err := r.db.Collection("users").CountDocuments(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Users{
+		Count: int(count),
+		Data:  users,
+	}, nil
+}
+
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	uid, err := utils.UID(ctx)
@@ -753,6 +508,24 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 // ID is the resolver for the id field.
 func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) {
 	return obj.ID.Hex(), nil
+}
+
+// EmailVerifiedAt is the resolver for the emailVerifiedAt field.
+func (r *userResolver) EmailVerifiedAt(ctx context.Context, obj *model.User) (*string, error) {
+	if obj.EmailVerifiedAt == nil {
+		return nil, nil
+	}
+
+	return pointer.String(time.Unix(int64(obj.EmailVerifiedAt.T), 0).Format(time.RFC3339)), nil
+}
+
+// PhoneVerifiedAt is the resolver for the phoneVerifiedAt field.
+func (r *userResolver) PhoneVerifiedAt(ctx context.Context, obj *model.User) (*string, error) {
+	if obj.PhoneVerifiedAt == nil {
+		return nil, nil
+	}
+
+	return pointer.String(time.Unix(int64(obj.PhoneVerifiedAt.T), 0).Format(time.RFC3339)), nil
 }
 
 // CreatedAt is the resolver for the created_at field.

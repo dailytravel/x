@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/dailytravel/x/cms/db"
+	"github.com/dailytravel/x/cms/pkg/database"
 	"github.com/typesense/typesense-go/typesense"
 	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/api/pointer"
@@ -113,7 +113,7 @@ func (i *File) Insert(collection typesense.CollectionInterface) error {
 
 	if _, err := collection.Retrieve(); err != nil {
 		// Create collection
-		if _, err := db.Client.Collections().Create(i.Schema().(*api.CollectionSchema)); err != nil {
+		if _, err := database.Client.Collections().Create(i.Schema().(*api.CollectionSchema)); err != nil {
 			return err
 		}
 	}
@@ -147,7 +147,7 @@ func (i *File) Update(collection typesense.CollectionInterface, documentKey prim
 
 	if _, err := collection.Document(documentID).Update(updatePayload); err != nil {
 		var item *File
-		if err := db.Database.Collection(i.Collection()).FindOne(context.Background(), documentKey).Decode(&item); err != nil {
+		if err := database.Database.Collection(i.Collection()).FindOne(context.Background(), documentKey).Decode(&item); err != nil {
 			return err
 		}
 

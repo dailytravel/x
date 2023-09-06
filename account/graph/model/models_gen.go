@@ -8,6 +8,14 @@ import (
 	"strconv"
 )
 
+type AddressInput struct {
+	Street  *string `json:"street,omitempty"`
+	City    string  `json:"city"`
+	State   string  `json:"state"`
+	Zip     string  `json:"zip"`
+	Country string  `json:"country"`
+}
+
 type Apis struct {
 	Data  []*Api `json:"data,omitempty"`
 	Count int    `json:"count"`
@@ -50,11 +58,6 @@ type Invitations struct {
 type Keys struct {
 	Data  []*Key `json:"data,omitempty"`
 	Count int    `json:"count"`
-}
-
-type LoginInput struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
 }
 
 type Mfa struct {
@@ -109,10 +112,9 @@ type NewIntegration struct {
 }
 
 type NewInvitation struct {
-	Recipient string                 `json:"recipient"`
-	Roles     []string               `json:"roles"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    *string                `json:"status,omitempty"`
+	Email    string                 `json:"email"`
+	Roles    []string               `json:"roles"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewKey struct {
@@ -135,14 +137,6 @@ type NewToken struct {
 	Abilities []*string `json:"abilities,omitempty"`
 }
 
-type NewUser struct {
-	Name     string    `json:"name"`
-	Email    string    `json:"email"`
-	Password string    `json:"password"`
-	Roles    []*string `json:"roles,omitempty"`
-	Mfa      *MFAInput `json:"mfa,omitempty"`
-}
-
 type Order struct {
 	UID  string `json:"uid"`
 	User *User  `json:"user,omitempty"`
@@ -160,16 +154,16 @@ type Organization struct {
 func (Organization) IsEntity() {}
 
 type PasswordInput struct {
-	CurrentPassword      string `json:"current_password"`
-	Password             string `json:"password"`
-	PasswordConfirmation string `json:"password_confirmation"`
+	CurrentPassword      string `json:"currentPassword"`
+	NewPassword          string `json:"newPassword"`
+	PasswordConfirmation string `json:"passwordConfirmation"`
 }
 
 type Payload struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+	TokenType    string `json:"tokenType"`
+	ExpiresIn    int    `json:"expiresIn"`
 }
 
 type Permissions struct {
@@ -183,19 +177,23 @@ type Point struct {
 
 func (Point) IsEntity() {}
 
+type ProfileInput struct {
+	FirstName *string `json:"firstName,omitempty"`
+	LastName  *string `json:"lastName,omitempty"`
+	JobTitle  *string `json:"jobTitle,omitempty"`
+	Birthday  *string `json:"birthday,omitempty"`
+	Gender    *string `json:"gender,omitempty"`
+	Bio       *string `json:"bio,omitempty"`
+	Company   *string `json:"company,omitempty"`
+	Website   *string `json:"website,omitempty"`
+}
+
 type Quote struct {
 	UID  string `json:"uid"`
 	User *User  `json:"user,omitempty"`
 }
 
 func (Quote) IsEntity() {}
-
-type RegisterInput struct {
-	Locale   string `json:"locale"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
 
 type Roles struct {
 	Data  []*Role `json:"data,omitempty"`
@@ -260,25 +258,23 @@ type UpdateToken struct {
 	Abilities []*string `json:"abilities,omitempty"`
 }
 
-type UpdateUser struct {
-	Name     *string   `json:"name,omitempty"`
-	Email    *string   `json:"email,omitempty"`
-	Phone    *string   `json:"phone,omitempty"`
-	Roles    []*string `json:"roles,omitempty"`
-	Mfa      *MFAInput `json:"mfa,omitempty"`
-	Timezone *string   `json:"timezone,omitempty"`
-	Locale   *string   `json:"locale,omitempty"`
-	Picture  *string   `json:"picture,omitempty"`
-	Status   *string   `json:"status,omitempty"`
+type UserInput struct {
+	Name     string        `json:"name"`
+	Email    string        `json:"email"`
+	Phone    *string       `json:"phone,omitempty"`
+	Password string        `json:"password"`
+	Roles    []*string     `json:"roles,omitempty"`
+	Timezone *string       `json:"timezone,omitempty"`
+	Locale   *string       `json:"locale,omitempty"`
+	Picture  *string       `json:"picture,omitempty"`
+	Profile  *ProfileInput `json:"profile,omitempty"`
+	Address  *AddressInput `json:"address,omitempty"`
+	Status   *string       `json:"status,omitempty"`
 }
 
 type Users struct {
 	Count int     `json:"count"`
 	Data  []*User `json:"data,omitempty"`
-}
-
-type VerifyEmailInput struct {
-	Token string `json:"token"`
 }
 
 type Wishlist struct {
@@ -434,5 +430,50 @@ func (e *SocialProvider) UnmarshalGQL(v interface{}) error {
 }
 
 func (e SocialProvider) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type UserStatus string
+
+const (
+	UserStatusActive    UserStatus = "ACTIVE"
+	UserStatusInactive  UserStatus = "INACTIVE"
+	UserStatusSuspended UserStatus = "SUSPENDED"
+	UserStatusPending   UserStatus = "PENDING"
+)
+
+var AllUserStatus = []UserStatus{
+	UserStatusActive,
+	UserStatusInactive,
+	UserStatusSuspended,
+	UserStatusPending,
+}
+
+func (e UserStatus) IsValid() bool {
+	switch e {
+	case UserStatusActive, UserStatusInactive, UserStatusSuspended, UserStatusPending:
+		return true
+	}
+	return false
+}
+
+func (e UserStatus) String() string {
+	return string(e)
+}
+
+func (e *UserStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserStatus", str)
+	}
+	return nil
+}
+
+func (e UserStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

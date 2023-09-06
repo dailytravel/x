@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/base/graph/model"
-	"github.com/dailytravel/x/base/utils"
+	"github.com/dailytravel/x/base/internal/utils"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -77,9 +78,7 @@ func (r *listResolver) CreatedBy(ctx context.Context, obj *model.List) (*string,
 		return nil, nil
 	}
 
-	createdBy := obj.CreatedBy.Hex()
-
-	return &createdBy, nil
+	return pointer.String(obj.CreatedBy.Hex()), nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.

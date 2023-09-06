@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
-	"github.com/dailytravel/x/sales/utils"
+	"github.com/dailytravel/x/sales/internal/utils"
+	"github.com/dailytravel/x/sales/pkg/auth"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

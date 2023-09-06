@@ -5,8 +5,8 @@ import (
 	"log"
 	"sync"
 
-	"github.com/dailytravel/x/sales/db"
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/pkg/database"
 	"github.com/typesense/typesense-go/typesense"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -22,7 +22,7 @@ type Indexer interface {
 
 func Index(item Indexer, data primitive.M) error {
 	operationType := data["operationType"].(string)
-	collection := db.Client.Collection(item.Collection())
+	collection := database.Client.Collection(item.Collection())
 
 	switch operationType {
 	case "insert":
@@ -53,7 +53,7 @@ func Index(item Indexer, data primitive.M) error {
 		updatedFields := data["updateDescription"].(primitive.M)["updatedFields"].(primitive.M)
 		removedFields := data["updateDescription"].(primitive.M)["removedFields"].(primitive.A)
 
-		if err := db.Database.Collection(item.Collection()).FindOne(context.TODO(), bson.M{"_id": documentKey["_id"].(primitive.ObjectID)}).Decode(item); err != nil {
+		if err := database.Database.Collection(item.Collection()).FindOne(context.TODO(), bson.M{"_id": documentKey["_id"].(primitive.ObjectID)}).Decode(item); err != nil {
 			return err
 		}
 

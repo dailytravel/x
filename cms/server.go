@@ -13,12 +13,12 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/dailytravel/x/cms/auth"
-	"github.com/dailytravel/x/cms/config"
-	"github.com/dailytravel/x/cms/db"
-	"github.com/dailytravel/x/cms/db/migrations"
 	"github.com/dailytravel/x/cms/graph"
 	"github.com/dailytravel/x/cms/internal/controllers"
+	"github.com/dailytravel/x/cms/pkg/auth"
+	"github.com/dailytravel/x/cms/pkg/config"
+	"github.com/dailytravel/x/cms/pkg/database"
+	"github.com/dailytravel/x/cms/pkg/database/migrations"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -44,7 +44,7 @@ func playgroundHandler() gin.HandlerFunc {
 
 // Defining the Graphql handler
 func graphqlHandler() gin.HandlerFunc {
-	resolver := graph.NewResolver(db.Database, db.Redis, db.Client)
+	resolver := graph.NewResolver(database.Database, database.Redis, database.Client)
 	c := graph.Config{Resolvers: resolver}
 	config.Directives(&c)
 
@@ -75,7 +75,7 @@ func graphqlHandler() gin.HandlerFunc {
 func main() {
 	var waitGroup sync.WaitGroup
 	// connect MongoDB
-	client, err := db.ConnectDB()
+	client, err := database.ConnectDB()
 	if err != nil {
 		log.Fatal("Error connecting to MongoDB: ", err)
 	}
@@ -86,9 +86,9 @@ func main() {
 		}
 	}()
 
-	db.Database = client.Database(os.Getenv("DB_NAME"))
-	db.Redis = db.ConnectRedis()
-	db.Client = db.ConnectTypesense()
+	database.Database = client.Database(os.Getenv("DB_NAME"))
+	database.Redis = database.ConnectRedis()
+	database.Client = database.ConnectTypesense()
 
 	if err := migrations.AutoMigrate(); err != nil {
 		log.Fatal("Error running migrations: ", err)
@@ -96,7 +96,7 @@ func main() {
 
 	// need restart the server if drop or create a new collection in mongodb, else will not work
 	for _, name := range []string{} {
-		stream, err := db.Database.Collection(name).Watch(context.Background(), mongo.Pipeline{})
+		stream, err := database.Database.Collection(name).Watch(context.Background(), mongo.Pipeline{})
 		if err != nil {
 			panic(err)
 		}

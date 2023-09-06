@@ -11,7 +11,8 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/dailytravel/x/account/utils"
+	"github.com/dailytravel/x/account/internal/utils"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -43,9 +44,7 @@ func (r *clientResolver) CreatedBy(ctx context.Context, obj *model.Client) (*str
 		return nil, nil
 	}
 
-	createdBy := obj.CreatedBy.Hex()
-
-	return &createdBy, nil
+	return pointer.String(obj.CreatedBy.Hex()), nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
@@ -54,9 +53,7 @@ func (r *clientResolver) UpdatedBy(ctx context.Context, obj *model.Client) (*str
 		return nil, nil
 	}
 
-	updatedBy := obj.UpdatedBy.Hex()
-
-	return &updatedBy, nil
+	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // UID is the resolver for the uid field.

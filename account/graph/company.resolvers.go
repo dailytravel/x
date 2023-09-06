@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/dailytravel/x/account/graph/model"
@@ -17,18 +16,19 @@ import (
 
 // User is the resolver for the user field.
 func (r *companyResolver) User(ctx context.Context, obj *model.Company) (*model.User, error) {
-	var item *model.User
-
 	_id, err := primitive.ObjectIDFromHex(obj.UID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to convert UID to ObjectID: %w", err)
 	}
 
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": _id})
+	var item *model.User
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // Return nil if no user is found, rather than an error.
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch user from database: %w", err)
 	}
 
 	return item, nil

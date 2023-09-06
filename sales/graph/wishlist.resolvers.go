@@ -11,7 +11,8 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
-	"github.com/dailytravel/x/sales/utils"
+	"github.com/dailytravel/x/sales/internal/utils"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -213,9 +214,7 @@ func (r *wishlistResolver) CreatedBy(ctx context.Context, obj *model.Wishlist) (
 		return nil, nil
 	}
 
-	createdBy := obj.CreatedBy.Hex()
-
-	return &createdBy, nil
+	return pointer.String(obj.CreatedBy.Hex()), nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
@@ -224,9 +223,7 @@ func (r *wishlistResolver) UpdatedBy(ctx context.Context, obj *model.Wishlist) (
 		return nil, nil
 	}
 
-	updatedBy := obj.UpdatedBy.Hex()
-
-	return &updatedBy, nil
+	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // Wishlist returns WishlistResolver implementation.

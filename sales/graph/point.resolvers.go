@@ -11,7 +11,8 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
-	"github.com/dailytravel/x/sales/utils"
+	"github.com/dailytravel/x/sales/internal/utils"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -239,9 +240,7 @@ func (r *pointResolver) CreatedBy(ctx context.Context, obj *model.Point) (*strin
 		return nil, nil
 	}
 
-	createdBy := obj.CreatedBy.Hex()
-
-	return &createdBy, nil
+	return pointer.String(obj.CreatedBy.Hex()), nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
@@ -250,9 +249,7 @@ func (r *pointResolver) UpdatedBy(ctx context.Context, obj *model.Point) (*strin
 		return nil, nil
 	}
 
-	updatedBy := obj.UpdatedBy.Hex()
-
-	return &updatedBy, nil
+	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // Points is the resolver for the points field.

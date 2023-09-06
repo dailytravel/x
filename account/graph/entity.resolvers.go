@@ -6,9 +6,9 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/account/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -162,7 +162,9 @@ func (r *entityResolver) FindReactionByUID(ctx context.Context, uid string) (*mo
 
 // FindShareByUID is the resolver for the findShareByUID field.
 func (r *entityResolver) FindShareByUID(ctx context.Context, uid string) (*model.Share, error) {
-	panic(fmt.Errorf("not implemented: FindShareByUID - findShareByUID"))
+	return &model.Share{
+		UID: uid,
+	}, nil
 }
 
 // FindTaskByUID is the resolver for the findTaskByUID field.
@@ -179,11 +181,13 @@ func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.Us
 		return nil, err
 	}
 
-	return &model.User{
-		Model: model.Model{
-			ID: _id,
-		},
-	}, nil
+	var item *model.User
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindWishlistByUID is the resolver for the findWishlistByUID field.

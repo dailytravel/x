@@ -1,12 +1,15 @@
 type Invitation {
   id: ID!
-  sender: User!
-  recipient: String!
+  user: User!
+  email: String!
   roles: [String!]!
   status: String!
   metadata: Map
-  created_at: String!
-  updated_at: String!
+  expiresAt: String!
+  createdAt: String!
+  updatedAt: String!
+  createdBy: String
+  updatedBy: String
 }
 
 enum InvitationStatus {
@@ -21,10 +24,9 @@ type Invitations {
 }
 
 input NewInvitation {
-  recipient: String!
+  email: String!
   roles: [String!]!
   metadata: Map
-  status: String
 }
 
 input UpdateInvitation {
@@ -33,13 +35,14 @@ input UpdateInvitation {
 }
 
 extend type Query {
-  invitations(args: Map): Invitations @auth
+  invitations(filter: Map, limit: Int, offset: Int): Invitations @auth
   invitation(id: ID!): Invitation
 }
 
 extend type Mutation {
-  createInvitation(input: NewInvitation!): Invitation @auth
-  updateInvitation(id: ID!, input: UpdateInvitation!): Invitation @auth
-  deleteInvitation(id: ID!): Map @auth
-  deleteInvitations(ids: [ID!]!): Map @auth
+  invite(input: NewInvitation!): Invitation @auth
+  accept(id: ID!): Invitation
+  decline(id: ID!): Invitation
+  deleteInvitation(id: ID!): Boolean @auth
+  deleteInvitations(ids: [ID!]!): Boolean @auth
 }

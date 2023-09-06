@@ -10,9 +10,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/sales/auth"
 	"github.com/dailytravel/x/sales/graph/model"
-	"github.com/dailytravel/x/sales/utils"
+	"github.com/dailytravel/x/sales/internal/utils"
+	"github.com/dailytravel/x/sales/pkg/auth"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -308,9 +309,7 @@ func (r *rewardResolver) CreatedBy(ctx context.Context, obj *model.Reward) (*str
 		return nil, nil
 	}
 
-	createdBy := obj.CreatedBy.Hex()
-
-	return &createdBy, nil
+	return pointer.String(obj.CreatedBy.Hex()), nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
@@ -319,9 +318,7 @@ func (r *rewardResolver) UpdatedBy(ctx context.Context, obj *model.Reward) (*str
 		return nil, nil
 	}
 
-	updatedBy := obj.UpdatedBy.Hex()
-
-	return &updatedBy, nil
+	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // Reward returns RewardResolver implementation.

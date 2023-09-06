@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/dailytravel/x/cms/db"
+	"github.com/dailytravel/x/cms/pkg/database"
 	"github.com/typesense/typesense-go/typesense"
 	"github.com/typesense/typesense-go/typesense/api"
 	"github.com/typesense/typesense-go/typesense/api/pointer"
@@ -101,7 +101,7 @@ func (i *Term) Insert(collection typesense.CollectionInterface) error {
 
 	if _, err := collection.Retrieve(); err != nil {
 		// Create collection
-		if _, err := db.Client.Collections().Create(i.Schema().(*api.CollectionSchema)); err != nil {
+		if _, err := database.Client.Collections().Create(i.Schema().(*api.CollectionSchema)); err != nil {
 			return err
 		}
 	}

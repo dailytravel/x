@@ -12,11 +12,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"regexp"
 	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
-	"github.com/dailytravel/x/sales/utils"
+	"github.com/dailytravel/x/sales/internal/utils"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -27,19 +27,13 @@ func (r *contactResolver) ID(ctx context.Context, obj *model.Contact) (string, e
 	return obj.ID.Hex(), nil
 }
 
-// Gender is the resolver for the gender field.
-func (r *contactResolver) Gender(ctx context.Context, obj *model.Contact) (*model.Gender, error) {
-	panic(fmt.Errorf("not implemented: Gender - gender"))
-}
-
 // Birthday is the resolver for the birthday field.
 func (r *contactResolver) Birthday(ctx context.Context, obj *model.Contact) (*string, error) {
-	if obj.Birthday.Time().IsZero() {
+	if obj.Birthday == 0 {
 		return nil, nil
 	}
 
-	birthday := obj.Birthday.Time().Format(time.RFC3339)
-	return &birthday, nil
+	return pointer.String(time.Unix(int64(obj.Birthday), 0).Format(time.RFC3339)), nil
 }
 
 // Company is the resolver for the company field.
@@ -49,7 +43,7 @@ func (r *contactResolver) Company(ctx context.Context, obj *model.Contact) (*mod
 	filter := bson.M{"_id": obj.Company}
 	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("document not found")
+			return nil, nil
 		}
 		return nil, err
 	}
@@ -64,7 +58,7 @@ func (r *contactResolver) Metadata(ctx context.Context, obj *model.Contact) (map
 
 // LastActivity is the resolver for the last_activity field.
 func (r *contactResolver) LastActivity(ctx context.Context, obj *model.Contact) (*string, error) {
-	if obj.LastActivity.IsZero() {
+	if obj.LastActivity == nil {
 		return nil, nil
 	}
 
@@ -84,7 +78,7 @@ func (r *contactResolver) UpdatedAt(ctx context.Context, obj *model.Contact) (st
 
 // UID is the resolver for the uid field.
 func (r *contactResolver) UID(ctx context.Context, obj *model.Contact) (string, error) {
-	return obj.ID.Hex(), nil
+	return obj.UID.Hex(), nil
 }
 
 // CreatedBy is the resolver for the created_by field.
@@ -93,9 +87,7 @@ func (r *contactResolver) CreatedBy(ctx context.Context, obj *model.Contact) (*s
 		return nil, nil
 	}
 
-	createdBy := obj.CreatedBy.Hex()
-
-	return &createdBy, nil
+	return pointer.String(obj.CreatedBy.Hex()), nil
 }
 
 // UpdatedBy is the resolver for the updated_by field.
@@ -104,9 +96,7 @@ func (r *contactResolver) UpdatedBy(ctx context.Context, obj *model.Contact) (*s
 		return nil, nil
 	}
 
-	updatedBy := obj.UpdatedBy.Hex()
-
-	return &updatedBy, nil
+	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // CreateContact is the resolver for the createContact field.
@@ -320,11 +310,19 @@ func (r *mutationResolver) ImportContacts(ctx context.Context, file string) (map
 	// Create a bytes buffer from the decoded data
 	reader := csv.NewReader(bytes.NewReader(data))
 
-	// Define regex patterns
-	phoneRegex := regexp.MustCompile(`\(?(\+?\d{2,3})?\)?[\s-]?\d{3}[\s-]?\d{2,4}[\s-]?\d{2,4}`)
-	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+	// Read the header
+	header, err := reader.Read()
+	if err != nil {
+		return nil, err
+	}
 
-	var contacts []model.Contact
+	// Indices
+	indexFirstName := utils.IndexOf(header, "FirstName")
+	indexLastName := utils.IndexOf(header, "LastName")
+	indexEmail := utils.IndexOf(header, "Email")
+	indexPhone := utils.IndexOf(header, "Phone")
+
+	var contacts []*model.Contact
 
 	for {
 		record, err := reader.Read()
@@ -335,27 +333,19 @@ func (r *mutationResolver) ImportContacts(ctx context.Context, file string) (map
 			return nil, err
 		}
 
-		contact := model.Contact{
+		contact := &model.Contact{
 			UID:       *uid,
-			FirstName: &record[0],
-			Status:    "active",
+			FirstName: &record[indexFirstName],
+			LastName:  &record[indexLastName],
+			Email:     &record[indexEmail],
+			Phone:     &record[indexPhone],
 			Model: model.Model{
 				CreatedBy: uid,
 				UpdatedBy: uid,
 			},
 		}
 
-		for _, field := range record {
-			if contact.Phone == nil && phoneRegex.MatchString(field) {
-				phoneField := field
-				contact.Phone = &phoneField
-			} else if contact.Email == nil && emailRegex.MatchString(field) {
-				emailField := field
-				contact.Email = &emailField
-			}
-		}
-
-		if (contact.Phone != nil && *contact.Phone != "") || (contact.Email != nil && *contact.Email != "") {
+		if contact.Email != nil || contact.Phone == nil {
 			contacts = append(contacts, contact)
 		}
 	}
