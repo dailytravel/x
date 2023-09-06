@@ -5,16 +5,16 @@ type Invoice @key(fields: "id") {
   amount: Int!
   currency: String!
   billing: Map!
-  due_date: String!
+  dueDate: String!
   notes: String
   metadata: Map
   status: String
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
   contact: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Invoices {

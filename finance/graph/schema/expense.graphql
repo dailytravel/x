@@ -9,11 +9,11 @@ type Expense {
   status: String
   date: String!
   notes: String
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 enum ExpenseType {

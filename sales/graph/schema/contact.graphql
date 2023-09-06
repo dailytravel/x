@@ -1,7 +1,7 @@
 type Contact @key(fields: "id") {
   id: ID!
-  first_name: String
-  last_name: String
+  firstName: String
+  lastName: String
   email: String
   phone: String
   picture: String
@@ -14,7 +14,7 @@ type Contact @key(fields: "id") {
   gender: String
   birthday: String
   company: Company
-  job_title: String
+  jobTitle: String
   timezone: String
   language: String
   source: String
@@ -24,12 +24,12 @@ type Contact @key(fields: "id") {
   status: String
   labels: [String]
   metadata: Map
-  last_activity: String
-  created_at: String!
-  updated_at: String!
+  lastActivity: String
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Phone {
@@ -99,8 +99,8 @@ enum ContactStatus {
 input NewContact {
   company: ID
   uid: ID
-  first_name: String
-  last_name: String
+  firstName: String
+  lastName: String
   picture: String
   email: String!
   phone: String
@@ -111,7 +111,7 @@ input NewContact {
   country: String
   website: String
   birthday: String
-  job_title: String
+  jobTitle: String
   gender: String
   timezone: String
   language: String
@@ -127,8 +127,8 @@ input NewContact {
 input UpdateContact {
   company: ID
   uid: ID
-  first_name: String
-  last_name: String
+  firstName: String
+  lastName: String
   picture: String
   email: String
   phone: String
@@ -139,7 +139,7 @@ input UpdateContact {
   country: String
   website: String
   birthday: String
-  job_title: String
+  jobTitle: String
   gender: String
   timezone: String
   language: String

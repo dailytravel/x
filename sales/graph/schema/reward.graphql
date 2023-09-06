@@ -8,10 +8,10 @@ type Reward {
   status: String!
   metadata: Map
   expires_at: String
-  created_at: String!
-  updated_at: String!
-  created_by: ID
-  updated_by: ID
+  createdAt: String!
+  updatedAt: String!
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Rewards {
@@ -36,7 +36,7 @@ input UpdateReward {
   cost: ID
   name: String
   description: String
-  points: Int
+  credits: Int
   expires_at: String
   status: String
   metadata: Map

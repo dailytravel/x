@@ -2,12 +2,12 @@ type Identity {
   id: ID!
   user: User!
   provider: String!
-  access_token: String!
-  expires_in: Int!
+  accessToken: String!
+  expiresIn: Int!
   connection: String! #google-oauth2
-  is_social: Boolean!
+  isSocial: Boolean!
   metadata: Map
   status: String!
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
 }

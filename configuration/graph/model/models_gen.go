@@ -172,14 +172,14 @@ type UpdateWebhook struct {
 }
 
 type WebhookEvent struct {
-	ObjectID   string                `json:"object_id"`
-	ObjectType string                `json:"object_type"`
+	ObjectID   string                `json:"objectId"`
+	ObjectType string                `json:"objectType"`
 	Actions    []*WebhookEventAction `json:"actions,omitempty"`
 }
 
 type WebhookEventInput struct {
-	ObjectID   string                `json:"object_id"`
-	ObjectType string                `json:"object_type"`
+	ObjectID   string                `json:"objectId"`
+	ObjectType string                `json:"objectType"`
 	Actions    []*WebhookEventAction `json:"actions,omitempty"`
 }
 

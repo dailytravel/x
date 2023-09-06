@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/dailytravel/x/sales/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -174,33 +175,6 @@ func (r *userResolver) Quotes(ctx context.Context, obj *model.User) ([]*model.Qu
 	return items, nil
 }
 
-// Points is the resolver for the points field.
-func (r *userResolver) Points(ctx context.Context, obj *model.User) ([]*model.Point, error) {
-	var items []*model.Point
-
-	uid, err := primitive.ObjectIDFromHex(obj.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	filter := bson.M{"uid": uid}
-	//find all items
-	cur, err := r.db.Collection("points").Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	for cur.Next(ctx) {
-		var item *model.Point
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
-
-	return items, nil
-}
-
 // Orders is the resolver for the orders field.
 func (r *userResolver) Orders(ctx context.Context, obj *model.User) ([]*model.Order, error) {
 	var items []*model.Order
@@ -226,6 +200,11 @@ func (r *userResolver) Orders(ctx context.Context, obj *model.User) ([]*model.Or
 	}
 
 	return items, nil
+}
+
+// Credits is the resolver for the credits field.
+func (r *userResolver) Credits(ctx context.Context, obj *model.User) (*int, error) {
+	panic(fmt.Errorf("not implemented: Credits - credits"))
 }
 
 // User returns UserResolver implementation.

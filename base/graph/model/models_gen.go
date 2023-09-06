@@ -44,8 +44,8 @@ type NewBoard struct {
 	Organization *string                `json:"organization,omitempty"`
 	Title        string                 `json:"title"`
 	Description  *string                `json:"description,omitempty"`
-	DueDate      *string                `json:"due_date,omitempty"`
-	IsTemplate   bool                   `json:"is_template"`
+	DueDate      *string                `json:"dueDate,omitempty"`
+	IsTemplate   bool                   `json:"isTemplate"`
 	Starred      bool                   `json:"starred"`
 	Order        int                    `json:"order"`
 	Background   *string                `json:"background,omitempty"`
@@ -87,15 +87,14 @@ type NewTask struct {
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`
 	Order    *int                   `json:"order,omitempty"`
-	StartAt  *string                `json:"start_at,omitempty"`
-	EndAt    *string                `json:"end_at,omitempty"`
+	Start    *string                `json:"start,omitempty"`
+	End      *string                `json:"end,omitempty"`
 	Labels   []*string              `json:"labels,omitempty"`
 	Status   *string                `json:"status,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewTime struct {
-	Parent      *string                `json:"parent,omitempty"`
 	Name        string                 `json:"name"`
 	Description string                 `json:"description"`
 	StartDate   string                 `json:"start_date"`
@@ -119,12 +118,13 @@ type Times struct {
 }
 
 type UpdateBoard struct {
+	Type         *string                `json:"type,omitempty"`
 	User         *string                `json:"user,omitempty"`
 	Organization *string                `json:"organization,omitempty"`
 	Title        *string                `json:"title,omitempty"`
 	Description  *string                `json:"description,omitempty"`
-	DueDate      *string                `json:"due_date,omitempty"`
-	IsTemplate   *bool                  `json:"is_template,omitempty"`
+	DueDate      *string                `json:"dueDate,omitempty"`
+	IsTemplate   *bool                  `json:"isTemplate,omitempty"`
 	Starred      *bool                  `json:"starred,omitempty"`
 	Order        *int                   `json:"order,omitempty"`
 	Background   *string                `json:"background,omitempty"`
@@ -165,8 +165,8 @@ type UpdateTask struct {
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`
 	Order    *int                   `json:"order,omitempty"`
-	StartAt  *string                `json:"start_at,omitempty"`
-	EndAt    *string                `json:"end_at,omitempty"`
+	Start    *string                `json:"start,omitempty"`
+	End      *string                `json:"end,omitempty"`
 	Labels   []*string              `json:"labels,omitempty"`
 	Status   *string                `json:"status,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`

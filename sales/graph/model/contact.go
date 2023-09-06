@@ -18,11 +18,11 @@ type Contact struct {
 	Model        `bson:",inline"`
 	UID          primitive.ObjectID   `json:"uid" bson:"uid"`
 	Company      *primitive.ObjectID  `json:"company,omitempty" bson:"company,omitempty"`
-	FirstName    *string              `json:"first_name,omitempty" bson:"first_name,omitempty"`
-	LastName     *string              `json:"last_name,omitempty" bson:"last_name,omitempty"`
+	FirstName    *string              `json:"firstName,omitempty" bson:"first_name,omitempty"`
+	LastName     *string              `json:"lastName,omitempty" bson:"last_name,omitempty"`
 	Birthday     primitive.DateTime   `json:"birthday,omitempty" bson:"birthday,omitempty"`
 	Gender       *string              `json:"gender,omitempty" bson:"gender,omitempty"`
-	JobTitle     *string              `json:"job_title,omitempty" bson:"job_title,omitempty"`
+	JobTitle     *string              `json:"jobTitle,omitempty" bson:"job_title,omitempty"`
 	Email        *string              `json:"email,omitempty" bson:"email,omitempty"`
 	Phone        *string              `json:"phone,omitempty" bson:"phone,omitempty"`
 	Picture      *string              `json:"picture,omitempty" bson:"picture,omitempty"`
@@ -39,7 +39,7 @@ type Contact struct {
 	Subscribed   bool                 `json:"subscribed,omitempty" bson:"subscribed,omitempty"`
 	Notes        *string              `json:"notes,omitempty" bson:"notes,omitempty"`
 	Status       string               `json:"status" bson:"status"`
-	LastActivity *primitive.Timestamp `json:"last_activity,omitempty" bson:"last_activity,omitempty"`
+	LastActivity *primitive.Timestamp `json:"lastActivity,omitempty" bson:"last_activity,omitempty"`
 	Labels       []*string            `json:"labels,omitempty" bson:"labels,omitempty"`
 }
 

@@ -165,7 +165,7 @@ func (r *mutationResolver) CreateAttendance(ctx context.Context, input model.New
 
 	// Create a new attendance
 	item := &model.Attendance{
-		Status: input.Status,
+		Status: *input.Status,
 		Model: model.Model{
 			CreatedBy: uid,
 			UpdatedBy: uid,

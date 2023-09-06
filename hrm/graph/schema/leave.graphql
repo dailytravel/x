@@ -1,16 +1,16 @@
 type Leave {
   id: ID!
   type: String!
-  start_date: String!
-  end_date: String
+  start: String!
+  end: String
   reason: String!
   status: String! # "pending", "approved", "rejected", etc.
   metadata: Map
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Leaves {
@@ -42,19 +42,18 @@ enum LeaveType {
 }
 
 input NewLeave {
-  uid: ID!
   type: String!
-  start_date: String!
-  end_date: String
+  start: String!
+  end: String
   reason: String!
-  status: String! # "pending", "approved", "rejected", etc.
+  status: String # "pending", "approved", "rejected", etc.
   metadata: Map
 }
 
 input UpdateLeave {
   type: String
-  start_date: String
-  end_date: String
+  start: String
+  end: String
   reason: String
   status: String # "pending", "approved", "rejected", etc.
   metadata: Map

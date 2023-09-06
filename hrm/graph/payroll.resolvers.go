@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/hrm/graph/model"
@@ -46,12 +47,12 @@ func (r *mutationResolver) CreatePayroll(ctx context.Context, input model.NewPay
 
 	//convert date string to primitive.DateTime
 
-	payDate, err := time.Parse(time.RFC3339, input.PayDate)
+	payDate, err := time.Parse(time.RFC3339, input.Date)
 	if err != nil {
 		return nil, err
 	}
 
-	item.PayDate = primitive.NewDateTimeFromTime(payDate)
+	item.Date = primitive.NewDateTimeFromTime(payDate)
 
 	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
@@ -100,13 +101,13 @@ func (r *mutationResolver) UpdatePayroll(ctx context.Context, id string, input m
 		}
 	}
 
-	if input.PayDate != nil {
-		payDate, err := time.Parse(time.RFC3339, *input.PayDate)
+	if input.Date != nil {
+		payDate, err := time.Parse(time.RFC3339, *input.Date)
 		if err != nil {
 			return nil, err
 		}
 
-		item.PayDate = primitive.NewDateTimeFromTime(payDate)
+		item.Date = primitive.NewDateTimeFromTime(payDate)
 	}
 
 	item.UpdatedBy = uid
@@ -217,9 +218,9 @@ func (r *payrollResolver) ID(ctx context.Context, obj *model.Payroll) (string, e
 	return obj.ID.Hex(), nil
 }
 
-// PayDate is the resolver for the pay_date field.
-func (r *payrollResolver) PayDate(ctx context.Context, obj *model.Payroll) (string, error) {
-	return obj.PayDate.Time().String(), nil
+// Date is the resolver for the date field.
+func (r *payrollResolver) Date(ctx context.Context, obj *model.Payroll) (string, error) {
+	panic(fmt.Errorf("not implemented: Date - date"))
 }
 
 // Metadata is the resolver for the metadata field.

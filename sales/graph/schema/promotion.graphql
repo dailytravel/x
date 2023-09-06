@@ -4,12 +4,12 @@ type Promotion {
   locale: String!
   name: String!
   description: String!
-  points: Int!
+  credits: Int!
   metadata: Map
-  created_at: String!
-  updated_at: String!
-  created_by: ID
-  updated_by: ID
+  createdAt: String!
+  updatedAt: String!
+  createdBy: ID
+  updatedBy: ID
 }
 
 enum PromotionType {
@@ -31,7 +31,7 @@ input NewPromotion {
   locale: String!
   name: String!
   description: String!
-  points: Int!
+  credits: Int!
   metadata: Map
 }
 
@@ -39,7 +39,7 @@ input UpdatePromotion {
   locale: String
   name: String
   description: String
-  points: Int
+  credits: Int
   metadata: Map
 }
 

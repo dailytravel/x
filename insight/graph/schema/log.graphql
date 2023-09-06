@@ -7,9 +7,9 @@ type Log {
   utm: Map
   metadata: Map
   status: String!
-  client_ip: String
-  user_agent: String
-  created_at: String
+  clientIp: String
+  userAgent: String
+  createdAt: String
 }
 
 type Logs {
@@ -25,8 +25,8 @@ input NewLog {
   utm: Map
   metadata: Map
   status: String!
-  client_ip: String
-  user_agent: String
+  clientIp: String
+  userAgent: String
 }
 
 input UpdateLog {
@@ -36,8 +36,8 @@ input UpdateLog {
   utm: Map
   metadata: Map
   status: String
-  client_ip: String
-  user_agent: String
+  clientIp: String
+  userAgent: String
 }
 
 extend type Query {

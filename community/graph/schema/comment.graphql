@@ -8,14 +8,14 @@ type Comment @key(fields: "id") {
   rating: Int
   status: String!
   metadata: Map
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   parent: Comment
   children: [Comment]
   commentable: Map!
   reactions: [Reaction]
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Comments {

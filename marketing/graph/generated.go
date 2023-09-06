@@ -155,13 +155,13 @@ type ComplexityRoot struct {
 		Campaign  func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
 		Days      func(childComplexity int) int
-		EndDate   func(childComplexity int) int
+		End       func(childComplexity int) int
 		Frequency func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Interval  func(childComplexity int) int
 		Metadata  func(childComplexity int) int
 		Recurring func(childComplexity int) int
-		StartDate func(childComplexity int) int
+		Start     func(childComplexity int) int
 		Time      func(childComplexity int) int
 		Timezone  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
@@ -281,7 +281,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Audience.created_at":
+	case "Audience.createdAt":
 		if e.complexity.Audience.CreatedAt == nil {
 			break
 		}
@@ -330,7 +330,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Audience.Status(childComplexity), true
 
-	case "Audience.updated_at":
+	case "Audience.updatedAt":
 		if e.complexity.Audience.UpdatedAt == nil {
 			break
 		}
@@ -358,14 +358,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Campaign.Audience(childComplexity), true
 
-	case "Campaign.created_at":
+	case "Campaign.createdAt":
 		if e.complexity.Campaign.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Campaign.CreatedAt(childComplexity), true
 
-	case "Campaign.created_by":
+	case "Campaign.createdBy":
 		if e.complexity.Campaign.CreatedBy == nil {
 			break
 		}
@@ -414,14 +414,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Campaign.UID(childComplexity), true
 
-	case "Campaign.updated_at":
+	case "Campaign.updatedAt":
 		if e.complexity.Campaign.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Campaign.UpdatedAt(childComplexity), true
 
-	case "Campaign.updated_by":
+	case "Campaign.updatedBy":
 		if e.complexity.Campaign.UpdatedBy == nil {
 			break
 		}
@@ -473,14 +473,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.FindUserByID(childComplexity, args["id"].(string)), true
 
-	case "Link.created_at":
+	case "Link.createdAt":
 		if e.complexity.Link.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Link.CreatedAt(childComplexity), true
 
-	case "Link.created_by":
+	case "Link.createdBy":
 		if e.complexity.Link.CreatedBy == nil {
 			break
 		}
@@ -543,14 +543,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Link.UID(childComplexity), true
 
-	case "Link.updated_at":
+	case "Link.updatedAt":
 		if e.complexity.Link.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Link.UpdatedAt(childComplexity), true
 
-	case "Link.updated_by":
+	case "Link.updatedBy":
 		if e.complexity.Link.UpdatedBy == nil {
 			break
 		}
@@ -885,7 +885,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Schedule.Campaign(childComplexity), true
 
-	case "Schedule.created_at":
+	case "Schedule.createdAt":
 		if e.complexity.Schedule.CreatedAt == nil {
 			break
 		}
@@ -899,12 +899,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Schedule.Days(childComplexity), true
 
-	case "Schedule.end_date":
-		if e.complexity.Schedule.EndDate == nil {
+	case "Schedule.end":
+		if e.complexity.Schedule.End == nil {
 			break
 		}
 
-		return e.complexity.Schedule.EndDate(childComplexity), true
+		return e.complexity.Schedule.End(childComplexity), true
 
 	case "Schedule.frequency":
 		if e.complexity.Schedule.Frequency == nil {
@@ -941,12 +941,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Schedule.Recurring(childComplexity), true
 
-	case "Schedule.start_date":
-		if e.complexity.Schedule.StartDate == nil {
+	case "Schedule.start":
+		if e.complexity.Schedule.Start == nil {
 			break
 		}
 
-		return e.complexity.Schedule.StartDate(childComplexity), true
+		return e.complexity.Schedule.Start(childComplexity), true
 
 	case "Schedule.time":
 		if e.complexity.Schedule.Time == nil {
@@ -962,21 +962,21 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Schedule.Timezone(childComplexity), true
 
-	case "Schedule.updated_at":
+	case "Schedule.updatedAt":
 		if e.complexity.Schedule.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Schedule.UpdatedAt(childComplexity), true
 
-	case "Segment.created_at":
+	case "Segment.createdAt":
 		if e.complexity.Segment.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Segment.CreatedAt(childComplexity), true
 
-	case "Segment.created_by":
+	case "Segment.createdBy":
 		if e.complexity.Segment.CreatedBy == nil {
 			break
 		}
@@ -1011,14 +1011,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Segment.Name(childComplexity), true
 
-	case "Segment.updated_at":
+	case "Segment.updatedAt":
 		if e.complexity.Segment.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Segment.UpdatedAt(childComplexity), true
 
-	case "Segment.updated_by":
+	case "Segment.updatedBy":
 		if e.complexity.Segment.UpdatedBy == nil {
 			break
 		}
@@ -2014,14 +2014,14 @@ func (ec *executionContext) fieldContext_Audience_segments(ctx context.Context, 
 				return ec.fieldContext_Segment_description(ctx, field)
 			case "criteria":
 				return ec.fieldContext_Segment_criteria(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Segment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Segment_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Segment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Segment_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Segment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Segment_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Segment_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Segment_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Segment", field.Name)
 		},
@@ -2114,8 +2114,8 @@ func (ec *executionContext) fieldContext_Audience_status(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Audience_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Audience) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Audience_created_at(ctx, field)
+func (ec *executionContext) _Audience_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Audience) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Audience_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2145,7 +2145,7 @@ func (ec *executionContext) _Audience_created_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Audience_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Audience_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Audience",
 		Field:      field,
@@ -2158,8 +2158,8 @@ func (ec *executionContext) fieldContext_Audience_created_at(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Audience_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Audience) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Audience_updated_at(ctx, field)
+func (ec *executionContext) _Audience_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Audience) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Audience_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2189,7 +2189,7 @@ func (ec *executionContext) _Audience_updated_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Audience_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Audience_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Audience",
 		Field:      field,
@@ -2250,10 +2250,10 @@ func (ec *executionContext) fieldContext_Audiences_data(ctx context.Context, fie
 				return ec.fieldContext_Audience_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Audience_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Audience_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Audience_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Audience_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Audience_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Audience", field.Name)
 		},
@@ -2400,10 +2400,10 @@ func (ec *executionContext) fieldContext_Campaign_audience(ctx context.Context, 
 				return ec.fieldContext_Audience_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Audience_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Audience_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Audience_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Audience_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Audience_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Audience", field.Name)
 		},
@@ -2584,8 +2584,8 @@ func (ec *executionContext) fieldContext_Campaign_status(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Campaign_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Campaign) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Campaign_created_at(ctx, field)
+func (ec *executionContext) _Campaign_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Campaign) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Campaign_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2615,7 +2615,7 @@ func (ec *executionContext) _Campaign_created_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Campaign_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Campaign_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Campaign",
 		Field:      field,
@@ -2628,8 +2628,8 @@ func (ec *executionContext) fieldContext_Campaign_created_at(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Campaign_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Campaign) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Campaign_updated_at(ctx, field)
+func (ec *executionContext) _Campaign_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Campaign) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Campaign_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2659,7 +2659,7 @@ func (ec *executionContext) _Campaign_updated_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Campaign_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Campaign_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Campaign",
 		Field:      field,
@@ -2716,8 +2716,8 @@ func (ec *executionContext) fieldContext_Campaign_uid(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Campaign_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Campaign) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Campaign_created_by(ctx, field)
+func (ec *executionContext) _Campaign_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Campaign) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Campaign_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2744,7 +2744,7 @@ func (ec *executionContext) _Campaign_created_by(ctx context.Context, field grap
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Campaign_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Campaign_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Campaign",
 		Field:      field,
@@ -2757,8 +2757,8 @@ func (ec *executionContext) fieldContext_Campaign_created_by(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Campaign_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Campaign) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Campaign_updated_by(ctx, field)
+func (ec *executionContext) _Campaign_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Campaign) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Campaign_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2785,7 +2785,7 @@ func (ec *executionContext) _Campaign_updated_by(ctx context.Context, field grap
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Campaign_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Campaign_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Campaign",
 		Field:      field,
@@ -2890,16 +2890,16 @@ func (ec *executionContext) fieldContext_Campaigns_data(ctx context.Context, fie
 				return ec.fieldContext_Campaign_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Campaign_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Campaign_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Campaign_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Campaign_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Campaign_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Campaign_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Campaign_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Campaign_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Campaign_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Campaign_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Campaign", field.Name)
 		},
@@ -3002,16 +3002,16 @@ func (ec *executionContext) fieldContext_Entity_findCampaignByID(ctx context.Con
 				return ec.fieldContext_Campaign_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Campaign_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Campaign_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Campaign_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Campaign_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Campaign_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Campaign_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Campaign_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Campaign_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Campaign_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Campaign_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Campaign", field.Name)
 		},
@@ -3392,8 +3392,8 @@ func (ec *executionContext) fieldContext_Link_status(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Link_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Link_created_at(ctx, field)
+func (ec *executionContext) _Link_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3423,7 +3423,7 @@ func (ec *executionContext) _Link_created_at(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Link_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Link_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Link",
 		Field:      field,
@@ -3436,8 +3436,8 @@ func (ec *executionContext) fieldContext_Link_created_at(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Link_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Link_updated_at(ctx, field)
+func (ec *executionContext) _Link_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3467,7 +3467,7 @@ func (ec *executionContext) _Link_updated_at(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Link_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Link_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Link",
 		Field:      field,
@@ -3524,8 +3524,8 @@ func (ec *executionContext) fieldContext_Link_uid(ctx context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _Link_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Link_created_by(ctx, field)
+func (ec *executionContext) _Link_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3552,7 +3552,7 @@ func (ec *executionContext) _Link_created_by(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Link_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Link_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Link",
 		Field:      field,
@@ -3565,8 +3565,8 @@ func (ec *executionContext) fieldContext_Link_created_by(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Link_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Link_updated_by(ctx, field)
+func (ec *executionContext) _Link_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3593,7 +3593,7 @@ func (ec *executionContext) _Link_updated_by(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Link_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Link_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Link",
 		Field:      field,
@@ -3656,16 +3656,16 @@ func (ec *executionContext) fieldContext_Links_data(ctx context.Context, field g
 				return ec.fieldContext_Link_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Link_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Link_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Link_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Link_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Link_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Link_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -3789,10 +3789,10 @@ func (ec *executionContext) fieldContext_Mutation_createAudience(ctx context.Con
 				return ec.fieldContext_Audience_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Audience_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Audience_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Audience_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Audience_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Audience_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Audience", field.Name)
 		},
@@ -3883,10 +3883,10 @@ func (ec *executionContext) fieldContext_Mutation_updateAudience(ctx context.Con
 				return ec.fieldContext_Audience_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Audience_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Audience_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Audience_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Audience_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Audience_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Audience", field.Name)
 		},
@@ -4125,16 +4125,16 @@ func (ec *executionContext) fieldContext_Mutation_createCampaign(ctx context.Con
 				return ec.fieldContext_Campaign_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Campaign_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Campaign_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Campaign_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Campaign_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Campaign_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Campaign_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Campaign_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Campaign_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Campaign_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Campaign_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Campaign", field.Name)
 		},
@@ -4221,16 +4221,16 @@ func (ec *executionContext) fieldContext_Mutation_updateCampaign(ctx context.Con
 				return ec.fieldContext_Campaign_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Campaign_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Campaign_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Campaign_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Campaign_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Campaign_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Campaign_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Campaign_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Campaign_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Campaign_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Campaign_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Campaign", field.Name)
 		},
@@ -4463,16 +4463,16 @@ func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context
 				return ec.fieldContext_Link_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Link_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Link_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Link_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Link_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Link_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Link_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -4561,16 +4561,16 @@ func (ec *executionContext) fieldContext_Mutation_updateLink(ctx context.Context
 				return ec.fieldContext_Link_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Link_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Link_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Link_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Link_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Link_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Link_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -4801,14 +4801,14 @@ func (ec *executionContext) fieldContext_Mutation_createSegment(ctx context.Cont
 				return ec.fieldContext_Segment_description(ctx, field)
 			case "criteria":
 				return ec.fieldContext_Segment_criteria(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Segment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Segment_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Segment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Segment_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Segment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Segment_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Segment_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Segment_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Segment", field.Name)
 		},
@@ -4895,14 +4895,14 @@ func (ec *executionContext) fieldContext_Mutation_updateSegment(ctx context.Cont
 				return ec.fieldContext_Segment_description(ctx, field)
 			case "criteria":
 				return ec.fieldContext_Segment_criteria(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Segment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Segment_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Segment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Segment_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Segment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Segment_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Segment_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Segment_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Segment", field.Name)
 		},
@@ -5145,10 +5145,10 @@ func (ec *executionContext) fieldContext_Query_audience(ctx context.Context, fie
 				return ec.fieldContext_Audience_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Audience_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Audience_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Audience_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Audience_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Audience_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Audience", field.Name)
 		},
@@ -5239,10 +5239,10 @@ func (ec *executionContext) fieldContext_Query_audiences(ctx context.Context, fi
 				return ec.fieldContext_Audience_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Audience_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Audience_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Audience_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Audience_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Audience_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Audience", field.Name)
 		},
@@ -5329,16 +5329,16 @@ func (ec *executionContext) fieldContext_Query_campaigns(ctx context.Context, fi
 				return ec.fieldContext_Campaign_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Campaign_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Campaign_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Campaign_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Campaign_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Campaign_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Campaign_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Campaign_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Campaign_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Campaign_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Campaign_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Campaign", field.Name)
 		},
@@ -5425,16 +5425,16 @@ func (ec *executionContext) fieldContext_Query_campaign(ctx context.Context, fie
 				return ec.fieldContext_Campaign_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Campaign_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Campaign_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Campaign_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Campaign_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Campaign_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Campaign_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Campaign_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Campaign_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Campaign_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Campaign_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Campaign", field.Name)
 		},
@@ -5601,16 +5601,16 @@ func (ec *executionContext) fieldContext_Query_link(ctx context.Context, field g
 				return ec.fieldContext_Link_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Link_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Link_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Link_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Link_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Link_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Link_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -5697,14 +5697,14 @@ func (ec *executionContext) fieldContext_Query_segment(ctx context.Context, fiel
 				return ec.fieldContext_Segment_description(ctx, field)
 			case "criteria":
 				return ec.fieldContext_Segment_criteria(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Segment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Segment_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Segment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Segment_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Segment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Segment_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Segment_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Segment_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Segment", field.Name)
 		},
@@ -6125,8 +6125,8 @@ func (ec *executionContext) fieldContext_Schedule_campaign(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Schedule_start_date(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Schedule_start_date(ctx, field)
+func (ec *executionContext) _Schedule_start(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Schedule_start(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6139,7 +6139,7 @@ func (ec *executionContext) _Schedule_start_date(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.StartDate, nil
+		return obj.Start, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6156,7 +6156,7 @@ func (ec *executionContext) _Schedule_start_date(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Schedule_start_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Schedule_start(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Schedule",
 		Field:      field,
@@ -6169,8 +6169,8 @@ func (ec *executionContext) fieldContext_Schedule_start_date(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Schedule_end_date(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Schedule_end_date(ctx, field)
+func (ec *executionContext) _Schedule_end(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Schedule_end(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6183,7 +6183,7 @@ func (ec *executionContext) _Schedule_end_date(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.EndDate, nil
+		return obj.End, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6200,7 +6200,7 @@ func (ec *executionContext) _Schedule_end_date(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Schedule_end_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Schedule_end(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Schedule",
 		Field:      field,
@@ -6509,8 +6509,8 @@ func (ec *executionContext) fieldContext_Schedule_metadata(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Schedule_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Schedule_created_at(ctx, field)
+func (ec *executionContext) _Schedule_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Schedule_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6540,7 +6540,7 @@ func (ec *executionContext) _Schedule_created_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Schedule_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Schedule_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Schedule",
 		Field:      field,
@@ -6553,8 +6553,8 @@ func (ec *executionContext) fieldContext_Schedule_created_at(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Schedule_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Schedule_updated_at(ctx, field)
+func (ec *executionContext) _Schedule_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Schedule_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6584,7 +6584,7 @@ func (ec *executionContext) _Schedule_updated_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Schedule_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Schedule_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Schedule",
 		Field:      field,
@@ -6778,8 +6778,8 @@ func (ec *executionContext) fieldContext_Segment_criteria(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Segment_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Segment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Segment_created_at(ctx, field)
+func (ec *executionContext) _Segment_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Segment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Segment_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6809,7 +6809,7 @@ func (ec *executionContext) _Segment_created_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Segment_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Segment_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Segment",
 		Field:      field,
@@ -6822,8 +6822,8 @@ func (ec *executionContext) fieldContext_Segment_created_at(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Segment_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Segment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Segment_updated_at(ctx, field)
+func (ec *executionContext) _Segment_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Segment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Segment_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6853,7 +6853,7 @@ func (ec *executionContext) _Segment_updated_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Segment_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Segment_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Segment",
 		Field:      field,
@@ -6866,8 +6866,8 @@ func (ec *executionContext) fieldContext_Segment_updated_at(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Segment_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Segment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Segment_created_by(ctx, field)
+func (ec *executionContext) _Segment_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Segment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Segment_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6889,34 +6889,26 @@ func (ec *executionContext) _Segment_created_by(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋmarketingᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Segment_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Segment_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Segment",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "campaigns":
-				return ec.fieldContext_User_campaigns(ctx, field)
-			case "links":
-				return ec.fieldContext_User_links(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Segment_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Segment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Segment_updated_by(ctx, field)
+func (ec *executionContext) _Segment_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Segment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Segment_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6938,27 +6930,19 @@ func (ec *executionContext) _Segment_updated_by(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋmarketingᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Segment_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Segment_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Segment",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "campaigns":
-				return ec.fieldContext_User_campaigns(ctx, field)
-			case "links":
-				return ec.fieldContext_User_links(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7184,14 +7168,14 @@ func (ec *executionContext) fieldContext_Segments_data(ctx context.Context, fiel
 				return ec.fieldContext_Segment_description(ctx, field)
 			case "criteria":
 				return ec.fieldContext_Segment_criteria(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Segment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Segment_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Segment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Segment_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Segment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Segment_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Segment_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Segment_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Segment", field.Name)
 		},
@@ -7379,16 +7363,16 @@ func (ec *executionContext) fieldContext_User_campaigns(ctx context.Context, fie
 				return ec.fieldContext_Campaign_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Campaign_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Campaign_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Campaign_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Campaign_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Campaign_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Campaign_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Campaign_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Campaign_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Campaign_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Campaign_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Campaign", field.Name)
 		},
@@ -7446,16 +7430,16 @@ func (ec *executionContext) fieldContext_User_links(ctx context.Context, field g
 				return ec.fieldContext_Link_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Link_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Link_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Link_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Link_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Link_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Link_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Link_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Link_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -9968,7 +9952,7 @@ func (ec *executionContext) _Audience(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9977,7 +9961,7 @@ func (ec *executionContext) _Audience(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Audience_created_at(ctx, field, obj)
+				res = ec._Audience_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10004,7 +9988,7 @@ func (ec *executionContext) _Audience(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10013,7 +9997,7 @@ func (ec *executionContext) _Audience(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Audience_updated_at(ctx, field, obj)
+				res = ec._Audience_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10235,7 +10219,7 @@ func (ec *executionContext) _Campaign(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10244,7 +10228,7 @@ func (ec *executionContext) _Campaign(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Campaign_created_at(ctx, field, obj)
+				res = ec._Campaign_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10271,7 +10255,7 @@ func (ec *executionContext) _Campaign(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10280,7 +10264,7 @@ func (ec *executionContext) _Campaign(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Campaign_updated_at(ctx, field, obj)
+				res = ec._Campaign_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10343,7 +10327,7 @@ func (ec *executionContext) _Campaign(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10352,7 +10336,7 @@ func (ec *executionContext) _Campaign(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Campaign_created_by(ctx, field, obj)
+				res = ec._Campaign_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -10376,7 +10360,7 @@ func (ec *executionContext) _Campaign(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10385,7 +10369,7 @@ func (ec *executionContext) _Campaign(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Campaign_updated_by(ctx, field, obj)
+				res = ec._Campaign_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -10635,13 +10619,13 @@ func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Link_metadata(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._Link_status(ctx, field, obj)
-		case "created_at":
-			out.Values[i] = ec._Link_created_at(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._Link_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updated_at":
-			out.Values[i] = ec._Link_updated_at(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._Link_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -10650,10 +10634,10 @@ func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "created_by":
-			out.Values[i] = ec._Link_created_by(ctx, field, obj)
-		case "updated_by":
-			out.Values[i] = ec._Link_updated_by(ctx, field, obj)
+		case "createdBy":
+			out.Values[i] = ec._Link_createdBy(ctx, field, obj)
+		case "updatedBy":
+			out.Values[i] = ec._Link_updatedBy(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11091,13 +11075,13 @@ func (ec *executionContext) _Schedule(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "start_date":
-			out.Values[i] = ec._Schedule_start_date(ctx, field, obj)
+		case "start":
+			out.Values[i] = ec._Schedule_start(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "end_date":
-			out.Values[i] = ec._Schedule_end_date(ctx, field, obj)
+		case "end":
+			out.Values[i] = ec._Schedule_end(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -11124,13 +11108,13 @@ func (ec *executionContext) _Schedule(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "metadata":
 			out.Values[i] = ec._Schedule_metadata(ctx, field, obj)
-		case "created_at":
-			out.Values[i] = ec._Schedule_created_at(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._Schedule_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updated_at":
-			out.Values[i] = ec._Schedule_updated_at(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._Schedule_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -11185,20 +11169,20 @@ func (ec *executionContext) _Segment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "created_at":
-			out.Values[i] = ec._Segment_created_at(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._Segment_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updated_at":
-			out.Values[i] = ec._Segment_updated_at(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._Segment_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "created_by":
-			out.Values[i] = ec._Segment_created_by(ctx, field, obj)
-		case "updated_by":
-			out.Values[i] = ec._Segment_updated_by(ctx, field, obj)
+		case "createdBy":
+			out.Values[i] = ec._Segment_createdBy(ctx, field, obj)
+		case "updatedBy":
+			out.Values[i] = ec._Segment_updatedBy(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12953,13 +12937,6 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
-}
-
-func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋmarketingᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._User(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO_Entity2githubᚗcomᚋ99designsᚋgqlgenᚋpluginᚋfederationᚋfedruntimeᚐEntity(ctx context.Context, sel ast.SelectionSet, v fedruntime.Entity) graphql.Marshaler {

@@ -90,9 +90,8 @@ type NewReaction struct {
 }
 
 type NewRecipient struct {
-	Recipient string `json:"recipient"`
-	Message   string `json:"message"`
-	ReadAt    *int   `json:"read_at,omitempty"`
+	UID     string `json:"uid"`
+	Message string `json:"message"`
 }
 
 type Notifications struct {
@@ -124,8 +123,8 @@ type ShareInput struct {
 	Permission string                 `json:"permission"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 	Status     string                 `json:"status"`
-	CreatedBy  *string                `json:"created_by,omitempty"`
-	UpdatedBy  *string                `json:"updated_by,omitempty"`
+	CreatedBy  *string                `json:"createdBy,omitempty"`
+	UpdatedBy  *string                `json:"updatedBy,omitempty"`
 }
 
 type ShareUpdateInput struct {
@@ -134,8 +133,8 @@ type ShareUpdateInput struct {
 	Permission *string                `json:"permission,omitempty"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 	Status     *string                `json:"status,omitempty"`
-	CreatedBy  *string                `json:"created_by,omitempty"`
-	UpdatedBy  *string                `json:"updated_by,omitempty"`
+	CreatedBy  *string                `json:"createdBy,omitempty"`
+	UpdatedBy  *string                `json:"updatedBy,omitempty"`
 }
 
 type Shares struct {
@@ -185,8 +184,7 @@ type UpdateReaction struct {
 }
 
 type UpdateRecipient struct {
-	ID     string `json:"id"`
-	ReadAt *int   `json:"read_at,omitempty"`
+	ReadAt *string `json:"readAt,omitempty"`
 }
 
 type ConversationStatus string

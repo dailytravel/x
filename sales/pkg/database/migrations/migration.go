@@ -15,7 +15,6 @@ func AutoMigrate() error {
 		&Coupon{Database: database.Database},
 		&Membership{Database: database.Database},
 		&Order{Database: database.Database},
-		&Point{Database: database.Database},
 		&Variant{Database: database.Database},
 		&Promotion{Database: database.Database},
 		&Quote{Database: database.Database},

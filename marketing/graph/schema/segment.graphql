@@ -3,10 +3,10 @@ type Segment {
   name: String!
   description: String
   criteria: [SegmentCriteria!]!
-  created_at: String!
-  updated_at: String!
-  created_by: User
-  updated_by: User
+  createdAt: String!
+  updatedAt: String!
+  createdBy: String
+  updatedBy: String
 }
 
 type Segments {

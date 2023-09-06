@@ -1,15 +1,15 @@
 type Attendance {
   id: ID!
-  time_in: String!
-  time_out: String
+  timeIn: String!
+  timeOut: String
   notes: String
   metadata: Map
   status: String # "present", "absent", "late", etc.
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 enum AttendanceStatus {
@@ -25,18 +25,17 @@ type Attendances {
 }
 
 input NewAttendance {
-  uid: ID!
-  time_in: String!
-  time_out: String!
+  timeIn: String
+  timeOut: String
   notes: String
   metadata: Map
-  status: String!
+  status: String
 }
 
 input UpdateAttendance {
   uid: ID
-  time_in: String
-  time_out: String
+  timeIn: String
+  timeOut: String
   notes: String
   metadata: Map
   status: String

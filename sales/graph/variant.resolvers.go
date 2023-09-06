@@ -38,8 +38,8 @@ func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVar
 		},
 	}
 
-	utils.Date(&input.StartDate, &item.StartDate)
-	utils.Date(&input.EndDate, &item.EndDate)
+	utils.Date(&input.Start, &item.Start)
+	utils.Date(&input.End, &item.End)
 
 	// Set the fields from the input
 	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -267,14 +267,14 @@ func (r *variantResolver) Metadata(ctx context.Context, obj *model.Variant) (map
 	return obj.Metadata, nil
 }
 
-// StartDate is the resolver for the start_date field.
-func (r *variantResolver) StartDate(ctx context.Context, obj *model.Variant) (string, error) {
-	return obj.StartDate.Time().String(), nil
+// Start is the resolver for the start field.
+func (r *variantResolver) Start(ctx context.Context, obj *model.Variant) (string, error) {
+	panic(fmt.Errorf("not implemented: Start - start"))
 }
 
-// EndDate is the resolver for the end_date field.
-func (r *variantResolver) EndDate(ctx context.Context, obj *model.Variant) (string, error) {
-	return obj.EndDate.Time().String(), nil
+// End is the resolver for the end field.
+func (r *variantResolver) End(ctx context.Context, obj *model.Variant) (string, error) {
+	panic(fmt.Errorf("not implemented: End - end"))
 }
 
 // CreatedAt is the resolver for the created_at field.

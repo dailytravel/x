@@ -1,8 +1,8 @@
 type Schedule {
   id: ID!
   campaign: ID!
-  start_date: String!
-  end_date: String!
+  start: String!
+  end: String!
   recurring: Boolean!
   frequency: String
   interval: Int
@@ -10,6 +10,6 @@ type Schedule {
   time: String!
   timezone: String!
   metadata: Map
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
 }

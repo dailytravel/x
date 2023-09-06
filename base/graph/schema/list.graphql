@@ -4,12 +4,12 @@ type List {
   board: Board!
   order: Int!
   metadata: Map
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   tasks: [Task]
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Lists {

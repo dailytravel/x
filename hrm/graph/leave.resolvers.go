@@ -22,20 +22,14 @@ func (r *leaveResolver) ID(ctx context.Context, obj *model.Leave) (string, error
 	return obj.ID.Hex(), nil
 }
 
-// StartDate is the resolver for the start_date field.
-func (r *leaveResolver) StartDate(ctx context.Context, obj *model.Leave) (string, error) {
-	return obj.StartDate.Time().String(), nil
+// Start is the resolver for the start field.
+func (r *leaveResolver) Start(ctx context.Context, obj *model.Leave) (string, error) {
+	panic(fmt.Errorf("not implemented: Start - start"))
 }
 
-// EndDate is the resolver for the end_date field.
-func (r *leaveResolver) EndDate(ctx context.Context, obj *model.Leave) (*string, error) {
-	if obj.EndDate.Time().IsZero() {
-		return nil, nil
-	}
-
-	endDate := obj.EndDate.Time().String()
-
-	return &endDate, nil
+// End is the resolver for the end field.
+func (r *leaveResolver) End(ctx context.Context, obj *model.Leave) (*string, error) {
+	panic(fmt.Errorf("not implemented: End - end"))
 }
 
 // Metadata is the resolver for the metadata field.
@@ -86,7 +80,7 @@ func (r *mutationResolver) CreateLeave(ctx context.Context, input model.NewLeave
 	item := &model.Leave{
 		Type:   input.Type,
 		Reason: input.Reason,
-		Status: input.Status,
+		Status: *input.Status,
 		Model: model.Model{
 			CreatedBy: uid,
 			UpdatedBy: uid,
@@ -94,20 +88,20 @@ func (r *mutationResolver) CreateLeave(ctx context.Context, input model.NewLeave
 	}
 
 	//convert string to primitive.DateTime
-	startDate, err := time.Parse(time.RFC3339, input.StartDate)
+	Start, err := time.Parse(time.RFC3339, input.Start)
 	if err != nil {
 		return nil, err
 	}
 
-	item.StartDate = primitive.NewDateTimeFromTime(startDate)
+	item.Start = primitive.NewDateTimeFromTime(Start)
 
 	//convert string to primitive.DateTime
-	if input.EndDate != nil {
-		endDate, err := time.Parse(time.RFC3339, *input.EndDate)
+	if input.End != nil {
+		End, err := time.Parse(time.RFC3339, *input.End)
 		if err != nil {
 			return nil, err
 		}
-		item.EndDate = primitive.NewDateTimeFromTime(endDate)
+		item.End = primitive.NewDateTimeFromTime(End)
 	}
 
 	// Set the fields from the input

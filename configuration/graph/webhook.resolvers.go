@@ -67,12 +67,12 @@ func (r *webhookResolver) UpdatedAt(ctx context.Context, obj *model.Webhook) (st
 }
 
 // CreatedBy is the resolver for the created_by field.
-func (r *webhookResolver) CreatedBy(ctx context.Context, obj *model.Webhook) (*model.User, error) {
+func (r *webhookResolver) CreatedBy(ctx context.Context, obj *model.Webhook) (*string, error) {
 	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
 }
 
 // UpdatedBy is the resolver for the updated_by field.
-func (r *webhookResolver) UpdatedBy(ctx context.Context, obj *model.Webhook) (*model.User, error) {
+func (r *webhookResolver) UpdatedBy(ctx context.Context, obj *model.Webhook) (*string, error) {
 	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 

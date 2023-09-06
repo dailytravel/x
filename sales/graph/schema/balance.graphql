@@ -1,16 +1,16 @@
 type Balance {
   id: ID!
   type: String! #earn, redeem, transfer
-  points: Int!
+  credits: Int! #positive or negative
   notes: String
   metadata: Map
   status: String!
-  expired_at: String
-  created_at: String!
-  updated_at: String!
+  expiredAt: String
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Balances {
@@ -21,7 +21,7 @@ type Balances {
 input NewBalance {
   uid: ID!
   type: String! #earn, redeem, transfer
-  points: Int!
+  credits: Int!
   notes: String
   metadata: Map
   status: String!
@@ -29,7 +29,7 @@ input NewBalance {
 
 input UpdateBalance {
   type: String #earn, redeem, transfer
-  points: Int
+  credits: Int
   notes: String
   metadata: Map
   status: String

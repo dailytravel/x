@@ -9,13 +9,13 @@ type Variant {
   quantity: Int!
   currency: String!
   metadata: Map
-  start_date: String!
-  end_date: String!
+  start: String!
+  end: String!
   status: String!
-  created_at: String!
-  updated_at: String!
-  created_by: ID
-  updated_by: ID
+  createdAt: String!
+  updatedAt: String!
+  createdBy: ID
+  updatedBy: ID
   package: ID!
 }
 
@@ -34,8 +34,8 @@ input NewVariant {
   discount: Float!
   quantity: Int!
   metadata: Map
-  start_date: String!
-  end_date: String!
+  start: String!
+  end: String!
   status: String!
   package: ID!
 }
@@ -50,8 +50,8 @@ input UpdateVariant {
   discount: Float
   quantity: Int
   metadata: Map
-  start_date: String
-  end_date: String
+  start: String
+  end: String
   status: String
   package: ID
 }

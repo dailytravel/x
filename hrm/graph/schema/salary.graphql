@@ -2,15 +2,15 @@ type Salary {
   id: ID!
   amount: Float!
   currency: String!
-  start_date: String!
-  end_date: String
+  start: String!
+  end: String
   metadata: Map
   status: String!
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Salaries {
@@ -19,19 +19,18 @@ type Salaries {
 }
 
 input NewSalary {
-  uid: ID!
   amount: Float!
   currency: String!
-  start_date: String!
-  end_date: String
+  start: String!
+  end: String
   metadata: Map
 }
 
 input UpdateSalary {
   amount: Float
   currency: String
-  start_date: String
-  end_date: String
+  start: String
+  end: String
   metadata: Map
 }
 

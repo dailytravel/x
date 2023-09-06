@@ -79,9 +79,9 @@ func (r *tokenResolver) User(ctx context.Context, obj *model.Token) (*model.User
 	return item, nil
 }
 
-// LastUsedAt is the resolver for the last_used_at field.
-func (r *tokenResolver) LastUsedAt(ctx context.Context, obj *model.Token) (string, error) {
-	return time.Unix(int64(obj.LastUsedAt.T), 0).Format(time.RFC3339), nil
+// LastUsed is the resolver for the lastUsed field.
+func (r *tokenResolver) LastUsed(ctx context.Context, obj *model.Token) (string, error) {
+	panic(fmt.Errorf("not implemented: LastUsed - lastUsed"))
 }
 
 // ExpiresAt is the resolver for the expires_at field.
@@ -103,3 +103,13 @@ func (r *tokenResolver) UpdatedAt(ctx context.Context, obj *model.Token) (string
 func (r *Resolver) Token() TokenResolver { return &tokenResolver{r} }
 
 type tokenResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *tokenResolver) LastUsedAt(ctx context.Context, obj *model.Token) (string, error) {
+	return time.Unix(int64(obj.LastUsedAt.T), 0).Format(time.RFC3339), nil
+}

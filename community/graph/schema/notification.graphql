@@ -3,9 +3,9 @@ type Notification {
   uid: ID!
   type: String!
   locale: String!
-  read_at: String
-  created_at: String!
-  updated_at: String!
+  readAt: String
+  createdAt: String!
+  updatedAt: String!
   notifiable: Map!
   metadata: Map
 }

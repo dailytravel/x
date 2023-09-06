@@ -2,8 +2,8 @@ type Option {
   id: ID!
   name: String!
   data: String!
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
 }
 
 type Options {

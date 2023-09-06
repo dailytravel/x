@@ -1,15 +1,15 @@
 type Payroll {
   id: ID!
-  pay_date: String!
+  date: String!
   amount: Float!
   currency: String!
   metadata: Map
   status: String!
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Payrolls {
@@ -19,7 +19,7 @@ type Payrolls {
 
 input NewPayroll {
   uid: ID!
-  pay_date: String!
+  date: String!
   amount: Float!
   currency: String!
   metadata: Map
@@ -27,7 +27,7 @@ input NewPayroll {
 }
 
 input UpdatePayroll {
-  pay_date: String
+  date: String
   amount: Float
   currency: String
   metadata: Map

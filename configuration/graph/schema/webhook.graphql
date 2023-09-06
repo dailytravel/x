@@ -4,10 +4,10 @@ type Webhook {
   url: String!
   headers: [WebhookHeader!]
   events: [WebhookEvent]
-  created_at: String!
-  updated_at: String!
-  created_by: User
-  updated_by: User
+  createdAt: String!
+  updatedAt: String!
+  createdBy: String
+  updatedBy: String
 }
 
 type Webhooks {
@@ -21,8 +21,8 @@ type WebhookHeader {
 }
 
 type WebhookEvent {
-  object_id: ID!
-  object_type: String!
+  objectId: ID!
+  objectType: String!
   actions: [WebhookEventAction]
 }
 
@@ -54,8 +54,8 @@ input WebhookHeaderInput {
 }
 
 input WebhookEventInput {
-  object_id: ID!
-  object_type: String!
+  objectId: ID!
+  objectType: String!
   actions: [WebhookEventAction]
 }
 

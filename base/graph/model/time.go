@@ -14,8 +14,8 @@ type Time struct {
 	Parent      *primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
 	Name        string              `json:"name" bson:"name"`
 	Description string              `json:"description,omitempty" bson:"description,omitempty"`
-	StartDate   primitive.DateTime  `json:"start_date" bson:"start_date"`
-	EndDate     primitive.DateTime  `json:"end_date" bson:"end_date"`
+	Start       primitive.DateTime  `json:"start" bson:"start"`
+	End         primitive.DateTime  `json:"end" bson:"end"`
 }
 
 func (i *Time) MarshalBSON() ([]byte, error) {
@@ -37,8 +37,9 @@ func (i *Time) Collection() string {
 
 func (i *Time) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "start", Value: 1}, {Key: "end", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "created_at", Value: 1}}},
+		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
 	}
 }

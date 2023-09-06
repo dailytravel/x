@@ -13,7 +13,7 @@ type Balance struct {
 	Model     `bson:",inline"`
 	UID       primitive.ObjectID   `json:"uid" bson:"uid"`
 	Type      string               `json:"type" bson:"type"`
-	Points    int                  `json:"points" bson:"points"`
+	Credits   int                  `json:"credits" bson:"credits"`
 	Notes     *string              `json:"notes,omitempty" bson:"notes,omitempty"`
 	ExpiredAt *primitive.Timestamp `json:"expired_at,omitempty" bson:"expired_at,omitempty"`
 	Status    string               `json:"status" bson:"status"`

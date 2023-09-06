@@ -3,13 +3,13 @@ type Time {
   parent: Time
   name: String!
   description: String!
-  start_date: String!
-  end_date: String!
+  start: String!
+  end: String!
   metadata: Map
-  created_at: String!
-  updated_at: String!
-  created_by: ID
-  updated_by: ID
+  createdAt: String!
+  updatedAt: String!
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Times {
@@ -18,7 +18,6 @@ type Times {
 }
 
 input NewTime {
-  parent: ID
   name: String!
   description: String!
   start_date: String!

@@ -384,8 +384,8 @@ type WebhookResolver interface {
 	Events(ctx context.Context, obj *model.Webhook) ([]*model.WebhookEvent, error)
 	CreatedAt(ctx context.Context, obj *model.Webhook) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.Webhook) (string, error)
-	CreatedBy(ctx context.Context, obj *model.Webhook) (*model.User, error)
-	UpdatedBy(ctx context.Context, obj *model.Webhook) (*model.User, error)
+	CreatedBy(ctx context.Context, obj *model.Webhook) (*string, error)
+	UpdatedBy(ctx context.Context, obj *model.Webhook) (*string, error)
 }
 
 type executableSchema struct {
@@ -438,14 +438,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Country.Continent(childComplexity), true
 
-	case "Country.created_at":
+	case "Country.createdAt":
 		if e.complexity.Country.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Country.CreatedAt(childComplexity), true
 
-	case "Country.created_by":
+	case "Country.createdBy":
 		if e.complexity.Country.CreatedBy == nil {
 			break
 		}
@@ -501,14 +501,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Country.Name(childComplexity), true
 
-	case "Country.updated_at":
+	case "Country.updatedAt":
 		if e.complexity.Country.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Country.UpdatedAt(childComplexity), true
 
-	case "Country.updated_by":
+	case "Country.updatedBy":
 		if e.complexity.Country.UpdatedBy == nil {
 			break
 		}
@@ -536,14 +536,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Currency.Code(childComplexity), true
 
-	case "Currency.created_at":
+	case "Currency.createdAt":
 		if e.complexity.Currency.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Currency.CreatedAt(childComplexity), true
 
-	case "Currency.created_by":
+	case "Currency.createdBy":
 		if e.complexity.Currency.CreatedBy == nil {
 			break
 		}
@@ -620,14 +620,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Currency.Thousand(childComplexity), true
 
-	case "Currency.updated_at":
+	case "Currency.updatedAt":
 		if e.complexity.Currency.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Currency.UpdatedAt(childComplexity), true
 
-	case "Currency.updated_by":
+	case "Currency.updatedBy":
 		if e.complexity.Currency.UpdatedBy == nil {
 			break
 		}
@@ -653,14 +653,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Locale.Code(childComplexity), true
 
-	case "Locale.created_at":
+	case "Locale.createdAt":
 		if e.complexity.Locale.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Locale.CreatedAt(childComplexity), true
 
-	case "Locale.created_by":
+	case "Locale.createdBy":
 		if e.complexity.Locale.CreatedBy == nil {
 			break
 		}
@@ -702,14 +702,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Locale.Order(childComplexity), true
 
-	case "Locale.updated_at":
+	case "Locale.updatedAt":
 		if e.complexity.Locale.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Locale.UpdatedAt(childComplexity), true
 
-	case "Locale.updated_by":
+	case "Locale.updatedBy":
 		if e.complexity.Locale.UpdatedBy == nil {
 			break
 		}
@@ -1090,7 +1090,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpsertOption(childComplexity, args["name"].(string), args["data"].(*string)), true
 
-	case "Option.created_at":
+	case "Option.createdAt":
 		if e.complexity.Option.CreatedAt == nil {
 			break
 		}
@@ -1118,7 +1118,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Option.Name(childComplexity), true
 
-	case "Option.updated_at":
+	case "Option.updatedAt":
 		if e.complexity.Option.UpdatedAt == nil {
 			break
 		}
@@ -1333,14 +1333,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Template.Body(childComplexity), true
 
-	case "Template.created_at":
+	case "Template.createdAt":
 		if e.complexity.Template.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Template.CreatedAt(childComplexity), true
 
-	case "Template.created_by":
+	case "Template.createdBy":
 		if e.complexity.Template.CreatedBy == nil {
 			break
 		}
@@ -1382,14 +1382,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Template.Subject(childComplexity), true
 
-	case "Template.updated_at":
+	case "Template.updatedAt":
 		if e.complexity.Template.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Template.UpdatedAt(childComplexity), true
 
-	case "Template.updated_by":
+	case "Template.updatedBy":
 		if e.complexity.Template.UpdatedBy == nil {
 			break
 		}
@@ -1410,14 +1410,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Templates.Data(childComplexity), true
 
-	case "Timezone.created_at":
+	case "Timezone.createdAt":
 		if e.complexity.Timezone.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Timezone.CreatedAt(childComplexity), true
 
-	case "Timezone.created_by":
+	case "Timezone.createdBy":
 		if e.complexity.Timezone.CreatedBy == nil {
 			break
 		}
@@ -1459,14 +1459,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Timezone.Offset(childComplexity), true
 
-	case "Timezone.updated_at":
+	case "Timezone.updatedAt":
 		if e.complexity.Timezone.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Timezone.UpdatedAt(childComplexity), true
 
-	case "Timezone.updated_by":
+	case "Timezone.updatedBy":
 		if e.complexity.Timezone.UpdatedBy == nil {
 			break
 		}
@@ -1501,14 +1501,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Webhooks(childComplexity), true
 
-	case "Webhook.created_at":
+	case "Webhook.createdAt":
 		if e.complexity.Webhook.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Webhook.CreatedAt(childComplexity), true
 
-	case "Webhook.created_by":
+	case "Webhook.createdBy":
 		if e.complexity.Webhook.CreatedBy == nil {
 			break
 		}
@@ -1550,14 +1550,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Webhook.URL(childComplexity), true
 
-	case "Webhook.updated_at":
+	case "Webhook.updatedAt":
 		if e.complexity.Webhook.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Webhook.UpdatedAt(childComplexity), true
 
-	case "Webhook.updated_by":
+	case "Webhook.updatedBy":
 		if e.complexity.Webhook.UpdatedBy == nil {
 			break
 		}
@@ -1571,14 +1571,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.WebhookEvent.Actions(childComplexity), true
 
-	case "WebhookEvent.object_id":
+	case "WebhookEvent.objectId":
 		if e.complexity.WebhookEvent.ObjectID == nil {
 			break
 		}
 
 		return e.complexity.WebhookEvent.ObjectID(childComplexity), true
 
-	case "WebhookEvent.object_type":
+	case "WebhookEvent.objectType":
 		if e.complexity.WebhookEvent.ObjectType == nil {
 			break
 		}
@@ -2730,14 +2730,14 @@ func (ec *executionContext) fieldContext_Countries_data(ctx context.Context, fie
 				return ec.fieldContext_Country_flag(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Country_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Country_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Country_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Country_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Country_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Country_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Country_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Country_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Country_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Country", field.Name)
 		},
@@ -3214,8 +3214,8 @@ func (ec *executionContext) fieldContext_Country_metadata(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Country_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Country) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Country_created_at(ctx, field)
+func (ec *executionContext) _Country_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Country) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Country_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3245,7 +3245,7 @@ func (ec *executionContext) _Country_created_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Country_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Country_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Country",
 		Field:      field,
@@ -3258,8 +3258,8 @@ func (ec *executionContext) fieldContext_Country_created_at(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Country_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Country) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Country_updated_at(ctx, field)
+func (ec *executionContext) _Country_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Country) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Country_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3289,7 +3289,7 @@ func (ec *executionContext) _Country_updated_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Country_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Country_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Country",
 		Field:      field,
@@ -3302,8 +3302,8 @@ func (ec *executionContext) fieldContext_Country_updated_at(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Country_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Country) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Country_created_by(ctx, field)
+func (ec *executionContext) _Country_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Country) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Country_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3330,7 +3330,7 @@ func (ec *executionContext) _Country_created_by(ctx context.Context, field graph
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Country_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Country_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Country",
 		Field:      field,
@@ -3343,8 +3343,8 @@ func (ec *executionContext) fieldContext_Country_created_by(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Country_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Country) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Country_updated_by(ctx, field)
+func (ec *executionContext) _Country_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Country) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Country_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3371,7 +3371,7 @@ func (ec *executionContext) _Country_updated_by(ctx context.Context, field graph
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Country_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Country_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Country",
 		Field:      field,
@@ -3442,14 +3442,14 @@ func (ec *executionContext) fieldContext_Currencies_data(ctx context.Context, fi
 				return ec.fieldContext_Currency_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Currency_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Currency_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Currency_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Currency_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Currency_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Currency_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Currency_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Currency_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Currency_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Currency", field.Name)
 		},
@@ -3982,8 +3982,8 @@ func (ec *executionContext) fieldContext_Currency_metadata(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Currency_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Currency) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Currency_created_at(ctx, field)
+func (ec *executionContext) _Currency_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Currency) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Currency_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4013,7 +4013,7 @@ func (ec *executionContext) _Currency_created_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Currency_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Currency_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Currency",
 		Field:      field,
@@ -4026,8 +4026,8 @@ func (ec *executionContext) fieldContext_Currency_created_at(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Currency_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Currency) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Currency_updated_at(ctx, field)
+func (ec *executionContext) _Currency_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Currency) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Currency_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4057,7 +4057,7 @@ func (ec *executionContext) _Currency_updated_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Currency_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Currency_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Currency",
 		Field:      field,
@@ -4070,8 +4070,8 @@ func (ec *executionContext) fieldContext_Currency_updated_at(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Currency_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Currency) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Currency_created_by(ctx, field)
+func (ec *executionContext) _Currency_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Currency) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Currency_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4098,7 +4098,7 @@ func (ec *executionContext) _Currency_created_by(ctx context.Context, field grap
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Currency_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Currency_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Currency",
 		Field:      field,
@@ -4111,8 +4111,8 @@ func (ec *executionContext) fieldContext_Currency_created_by(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Currency_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Currency) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Currency_updated_by(ctx, field)
+func (ec *executionContext) _Currency_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Currency) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Currency_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4139,7 +4139,7 @@ func (ec *executionContext) _Currency_updated_by(ctx context.Context, field grap
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Currency_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Currency_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Currency",
 		Field:      field,
@@ -4474,8 +4474,8 @@ func (ec *executionContext) fieldContext_Locale_metadata(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Locale_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Locale) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Locale_created_at(ctx, field)
+func (ec *executionContext) _Locale_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Locale) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Locale_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4505,7 +4505,7 @@ func (ec *executionContext) _Locale_created_at(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Locale_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Locale_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Locale",
 		Field:      field,
@@ -4518,8 +4518,8 @@ func (ec *executionContext) fieldContext_Locale_created_at(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Locale_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Locale) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Locale_updated_at(ctx, field)
+func (ec *executionContext) _Locale_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Locale) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Locale_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4549,7 +4549,7 @@ func (ec *executionContext) _Locale_updated_at(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Locale_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Locale_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Locale",
 		Field:      field,
@@ -4562,8 +4562,8 @@ func (ec *executionContext) fieldContext_Locale_updated_at(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Locale_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Locale) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Locale_created_by(ctx, field)
+func (ec *executionContext) _Locale_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Locale) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Locale_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4590,7 +4590,7 @@ func (ec *executionContext) _Locale_created_by(ctx context.Context, field graphq
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Locale_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Locale_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Locale",
 		Field:      field,
@@ -4603,8 +4603,8 @@ func (ec *executionContext) fieldContext_Locale_created_by(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Locale_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Locale) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Locale_updated_by(ctx, field)
+func (ec *executionContext) _Locale_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Locale) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Locale_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4631,7 +4631,7 @@ func (ec *executionContext) _Locale_updated_by(ctx context.Context, field graphq
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Locale_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Locale_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Locale",
 		Field:      field,
@@ -4736,14 +4736,14 @@ func (ec *executionContext) fieldContext_Locales_data(ctx context.Context, field
 				return ec.fieldContext_Locale_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Locale_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Locale_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Locale_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Locale_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Locale_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Locale_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Locale_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Locale_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Locale_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Locale", field.Name)
 		},
@@ -4827,14 +4827,14 @@ func (ec *executionContext) fieldContext_Mutation_createCountry(ctx context.Cont
 				return ec.fieldContext_Country_flag(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Country_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Country_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Country_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Country_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Country_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Country_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Country_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Country_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Country_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Country", field.Name)
 		},
@@ -4929,14 +4929,14 @@ func (ec *executionContext) fieldContext_Mutation_updateCountry(ctx context.Cont
 				return ec.fieldContext_Country_flag(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Country_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Country_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Country_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Country_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Country_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Country_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Country_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Country_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Country_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Country", field.Name)
 		},
@@ -5177,14 +5177,14 @@ func (ec *executionContext) fieldContext_Mutation_createCurrency(ctx context.Con
 				return ec.fieldContext_Currency_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Currency_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Currency_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Currency_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Currency_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Currency_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Currency_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Currency_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Currency_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Currency_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Currency", field.Name)
 		},
@@ -5281,14 +5281,14 @@ func (ec *executionContext) fieldContext_Mutation_updateCurrency(ctx context.Con
 				return ec.fieldContext_Currency_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Currency_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Currency_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Currency_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Currency_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Currency_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Currency_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Currency_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Currency_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Currency_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Currency", field.Name)
 		},
@@ -5523,14 +5523,14 @@ func (ec *executionContext) fieldContext_Mutation_createLocale(ctx context.Conte
 				return ec.fieldContext_Locale_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Locale_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Locale_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Locale_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Locale_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Locale_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Locale_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Locale_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Locale_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Locale_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Locale", field.Name)
 		},
@@ -5621,14 +5621,14 @@ func (ec *executionContext) fieldContext_Mutation_updateLocale(ctx context.Conte
 				return ec.fieldContext_Locale_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Locale_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Locale_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Locale_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Locale_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Locale_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Locale_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Locale_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Locale_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Locale_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Locale", field.Name)
 		},
@@ -5861,10 +5861,10 @@ func (ec *executionContext) fieldContext_Mutation_createOption(ctx context.Conte
 				return ec.fieldContext_Option_name(ctx, field)
 			case "data":
 				return ec.fieldContext_Option_data(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Option_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Option_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Option_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Option_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Option", field.Name)
 		},
@@ -5945,10 +5945,10 @@ func (ec *executionContext) fieldContext_Mutation_updateOption(ctx context.Conte
 				return ec.fieldContext_Option_name(ctx, field)
 			case "data":
 				return ec.fieldContext_Option_data(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Option_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Option_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Option_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Option_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Option", field.Name)
 		},
@@ -6029,10 +6029,10 @@ func (ec *executionContext) fieldContext_Mutation_upsertOption(ctx context.Conte
 				return ec.fieldContext_Option_name(ctx, field)
 			case "data":
 				return ec.fieldContext_Option_data(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Option_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Option_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Option_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Option_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Option", field.Name)
 		},
@@ -6243,14 +6243,14 @@ func (ec *executionContext) fieldContext_Mutation_createTemplate(ctx context.Con
 				return ec.fieldContext_Template_body(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Template_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Template_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Template_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Template_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Template_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Template_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Template_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Template_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Template_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Template", field.Name)
 		},
@@ -6317,14 +6317,14 @@ func (ec *executionContext) fieldContext_Mutation_updateTemplate(ctx context.Con
 				return ec.fieldContext_Template_body(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Template_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Template_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Template_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Template_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Template_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Template_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Template_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Template_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Template_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Template", field.Name)
 		},
@@ -6513,14 +6513,14 @@ func (ec *executionContext) fieldContext_Mutation_createTimezone(ctx context.Con
 				return ec.fieldContext_Timezone_description(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Timezone_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Timezone_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Timezone_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Timezone_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Timezone_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Timezone_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Timezone_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Timezone_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Timezone_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Timezone", field.Name)
 		},
@@ -6605,14 +6605,14 @@ func (ec *executionContext) fieldContext_Mutation_updateTimezone(ctx context.Con
 				return ec.fieldContext_Timezone_description(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Timezone_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Timezone_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Timezone_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Timezone_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Timezone_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Timezone_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Timezone_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Timezone_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Timezone_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Timezone", field.Name)
 		},
@@ -6697,14 +6697,14 @@ func (ec *executionContext) fieldContext_Mutation_importTimezones(ctx context.Co
 				return ec.fieldContext_Timezone_description(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Timezone_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Timezone_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Timezone_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Timezone_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Timezone_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Timezone_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Timezone_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Timezone_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Timezone_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Timezone", field.Name)
 		},
@@ -6916,14 +6916,14 @@ func (ec *executionContext) fieldContext_Mutation_createWebhook(ctx context.Cont
 				return ec.fieldContext_Webhook_headers(ctx, field)
 			case "events":
 				return ec.fieldContext_Webhook_events(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Webhook_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Webhook_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Webhook_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Webhook_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Webhook_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Webhook_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Webhook_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Webhook_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Webhook", field.Name)
 		},
@@ -6991,14 +6991,14 @@ func (ec *executionContext) fieldContext_Mutation_updateWebhook(ctx context.Cont
 				return ec.fieldContext_Webhook_headers(ctx, field)
 			case "events":
 				return ec.fieldContext_Webhook_events(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Webhook_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Webhook_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Webhook_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Webhook_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Webhook_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Webhook_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Webhook_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Webhook_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Webhook", field.Name)
 		},
@@ -7293,8 +7293,8 @@ func (ec *executionContext) fieldContext_Option_data(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Option_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Option) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Option_created_at(ctx, field)
+func (ec *executionContext) _Option_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Option) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Option_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7324,7 +7324,7 @@ func (ec *executionContext) _Option_created_at(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Option_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Option_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Option",
 		Field:      field,
@@ -7337,8 +7337,8 @@ func (ec *executionContext) fieldContext_Option_created_at(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Option_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Option) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Option_updated_at(ctx, field)
+func (ec *executionContext) _Option_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Option) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Option_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7368,7 +7368,7 @@ func (ec *executionContext) _Option_updated_at(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Option_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Option_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Option",
 		Field:      field,
@@ -7423,10 +7423,10 @@ func (ec *executionContext) fieldContext_Options_data(ctx context.Context, field
 				return ec.fieldContext_Option_name(ctx, field)
 			case "data":
 				return ec.fieldContext_Option_data(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Option_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Option_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Option_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Option_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Option", field.Name)
 		},
@@ -7534,14 +7534,14 @@ func (ec *executionContext) fieldContext_Query_country(ctx context.Context, fiel
 				return ec.fieldContext_Country_flag(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Country_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Country_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Country_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Country_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Country_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Country_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Country_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Country_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Country_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Country", field.Name)
 		},
@@ -7676,14 +7676,14 @@ func (ec *executionContext) fieldContext_Query_currency(ctx context.Context, fie
 				return ec.fieldContext_Currency_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Currency_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Currency_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Currency_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Currency_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Currency_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Currency_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Currency_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Currency_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Currency_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Currency", field.Name)
 		},
@@ -7866,14 +7866,14 @@ func (ec *executionContext) fieldContext_Query_locale(ctx context.Context, field
 				return ec.fieldContext_Locale_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Locale_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Locale_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Locale_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Locale_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Locale_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Locale_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Locale_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Locale_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Locale_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Locale", field.Name)
 		},
@@ -7954,10 +7954,10 @@ func (ec *executionContext) fieldContext_Query_option(ctx context.Context, field
 				return ec.fieldContext_Option_name(ctx, field)
 			case "data":
 				return ec.fieldContext_Option_data(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Option_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Option_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Option_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Option_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Option", field.Name)
 		},
@@ -8102,14 +8102,14 @@ func (ec *executionContext) fieldContext_Query_template(ctx context.Context, fie
 				return ec.fieldContext_Template_body(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Template_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Template_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Template_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Template_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Template_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Template_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Template_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Template_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Template_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Template", field.Name)
 		},
@@ -8333,14 +8333,14 @@ func (ec *executionContext) fieldContext_Query_timezone(ctx context.Context, fie
 				return ec.fieldContext_Timezone_description(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Timezone_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Timezone_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Timezone_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Timezone_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Timezone_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Timezone_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Timezone_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Timezone_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Timezone_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Timezone", field.Name)
 		},
@@ -8405,14 +8405,14 @@ func (ec *executionContext) fieldContext_Query_webhooks(ctx context.Context, fie
 				return ec.fieldContext_Webhook_headers(ctx, field)
 			case "events":
 				return ec.fieldContext_Webhook_events(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Webhook_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Webhook_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Webhook_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Webhook_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Webhook_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Webhook_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Webhook_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Webhook_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Webhook", field.Name)
 		},
@@ -8477,14 +8477,14 @@ func (ec *executionContext) fieldContext_Query_webhook(ctx context.Context, fiel
 				return ec.fieldContext_Webhook_headers(ctx, field)
 			case "events":
 				return ec.fieldContext_Webhook_events(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Webhook_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Webhook_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Webhook_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Webhook_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Webhook_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Webhook_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Webhook_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Webhook_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Webhook", field.Name)
 		},
@@ -8996,8 +8996,8 @@ func (ec *executionContext) fieldContext_Template_metadata(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Template_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Template_created_at(ctx, field)
+func (ec *executionContext) _Template_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9027,7 +9027,7 @@ func (ec *executionContext) _Template_created_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Template_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Template_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Template",
 		Field:      field,
@@ -9040,8 +9040,8 @@ func (ec *executionContext) fieldContext_Template_created_at(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Template_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Template_updated_at(ctx, field)
+func (ec *executionContext) _Template_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9071,7 +9071,7 @@ func (ec *executionContext) _Template_updated_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Template_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Template_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Template",
 		Field:      field,
@@ -9084,8 +9084,8 @@ func (ec *executionContext) fieldContext_Template_updated_at(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Template_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Template_created_by(ctx, field)
+func (ec *executionContext) _Template_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9112,7 +9112,7 @@ func (ec *executionContext) _Template_created_by(ctx context.Context, field grap
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Template_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Template_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Template",
 		Field:      field,
@@ -9125,8 +9125,8 @@ func (ec *executionContext) fieldContext_Template_created_by(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Template_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Template_updated_by(ctx, field)
+func (ec *executionContext) _Template_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9153,7 +9153,7 @@ func (ec *executionContext) _Template_updated_by(ctx context.Context, field grap
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Template_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Template_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Template",
 		Field:      field,
@@ -9258,14 +9258,14 @@ func (ec *executionContext) fieldContext_Templates_data(ctx context.Context, fie
 				return ec.fieldContext_Template_body(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Template_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Template_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Template_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Template_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Template_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Template_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Template_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Template_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Template_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Template", field.Name)
 		},
@@ -9487,8 +9487,8 @@ func (ec *executionContext) fieldContext_Timezone_metadata(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Timezone_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Timezone) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Timezone_created_at(ctx, field)
+func (ec *executionContext) _Timezone_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Timezone) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timezone_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9518,7 +9518,7 @@ func (ec *executionContext) _Timezone_created_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Timezone_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Timezone_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Timezone",
 		Field:      field,
@@ -9531,8 +9531,8 @@ func (ec *executionContext) fieldContext_Timezone_created_at(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Timezone_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Timezone) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Timezone_updated_at(ctx, field)
+func (ec *executionContext) _Timezone_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Timezone) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timezone_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9562,7 +9562,7 @@ func (ec *executionContext) _Timezone_updated_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Timezone_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Timezone_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Timezone",
 		Field:      field,
@@ -9575,8 +9575,8 @@ func (ec *executionContext) fieldContext_Timezone_updated_at(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Timezone_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Timezone) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Timezone_created_by(ctx, field)
+func (ec *executionContext) _Timezone_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Timezone) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timezone_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9603,7 +9603,7 @@ func (ec *executionContext) _Timezone_created_by(ctx context.Context, field grap
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Timezone_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Timezone_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Timezone",
 		Field:      field,
@@ -9616,8 +9616,8 @@ func (ec *executionContext) fieldContext_Timezone_created_by(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Timezone_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Timezone) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Timezone_updated_by(ctx, field)
+func (ec *executionContext) _Timezone_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Timezone) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timezone_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9644,7 +9644,7 @@ func (ec *executionContext) _Timezone_updated_by(ctx context.Context, field grap
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Timezone_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Timezone_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Timezone",
 		Field:      field,
@@ -9747,14 +9747,14 @@ func (ec *executionContext) fieldContext_Timezones_data(ctx context.Context, fie
 				return ec.fieldContext_Timezone_description(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Timezone_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Timezone_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Timezone_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Timezone_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Timezone_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Timezone_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Timezone_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Timezone_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Timezone_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Timezone", field.Name)
 		},
@@ -9852,14 +9852,14 @@ func (ec *executionContext) fieldContext_User_webhooks(ctx context.Context, fiel
 				return ec.fieldContext_Webhook_headers(ctx, field)
 			case "events":
 				return ec.fieldContext_Webhook_events(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Webhook_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Webhook_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Webhook_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Webhook_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Webhook_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Webhook_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Webhook_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Webhook_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Webhook", field.Name)
 		},
@@ -10082,10 +10082,10 @@ func (ec *executionContext) fieldContext_Webhook_events(ctx context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "object_id":
-				return ec.fieldContext_WebhookEvent_object_id(ctx, field)
-			case "object_type":
-				return ec.fieldContext_WebhookEvent_object_type(ctx, field)
+			case "objectId":
+				return ec.fieldContext_WebhookEvent_objectId(ctx, field)
+			case "objectType":
+				return ec.fieldContext_WebhookEvent_objectType(ctx, field)
 			case "actions":
 				return ec.fieldContext_WebhookEvent_actions(ctx, field)
 			}
@@ -10095,8 +10095,8 @@ func (ec *executionContext) fieldContext_Webhook_events(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Webhook_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Webhook) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Webhook_created_at(ctx, field)
+func (ec *executionContext) _Webhook_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Webhook) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Webhook_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10126,7 +10126,7 @@ func (ec *executionContext) _Webhook_created_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Webhook_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Webhook_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Webhook",
 		Field:      field,
@@ -10139,8 +10139,8 @@ func (ec *executionContext) fieldContext_Webhook_created_at(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Webhook_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Webhook) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Webhook_updated_at(ctx, field)
+func (ec *executionContext) _Webhook_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Webhook) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Webhook_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10170,7 +10170,7 @@ func (ec *executionContext) _Webhook_updated_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Webhook_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Webhook_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Webhook",
 		Field:      field,
@@ -10183,8 +10183,8 @@ func (ec *executionContext) fieldContext_Webhook_updated_at(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Webhook_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Webhook) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Webhook_created_by(ctx, field)
+func (ec *executionContext) _Webhook_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Webhook) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Webhook_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10206,32 +10206,26 @@ func (ec *executionContext) _Webhook_created_by(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋconfigurationᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Webhook_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Webhook_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Webhook",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "webhooks":
-				return ec.fieldContext_User_webhooks(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Webhook_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Webhook) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Webhook_updated_by(ctx, field)
+func (ec *executionContext) _Webhook_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Webhook) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Webhook_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10253,32 +10247,26 @@ func (ec *executionContext) _Webhook_updated_by(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋconfigurationᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Webhook_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Webhook_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Webhook",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "webhooks":
-				return ec.fieldContext_User_webhooks(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _WebhookEvent_object_id(ctx context.Context, field graphql.CollectedField, obj *model.WebhookEvent) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WebhookEvent_object_id(ctx, field)
+func (ec *executionContext) _WebhookEvent_objectId(ctx context.Context, field graphql.CollectedField, obj *model.WebhookEvent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WebhookEvent_objectId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10308,7 +10296,7 @@ func (ec *executionContext) _WebhookEvent_object_id(ctx context.Context, field g
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_WebhookEvent_object_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_WebhookEvent_objectId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "WebhookEvent",
 		Field:      field,
@@ -10321,8 +10309,8 @@ func (ec *executionContext) fieldContext_WebhookEvent_object_id(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _WebhookEvent_object_type(ctx context.Context, field graphql.CollectedField, obj *model.WebhookEvent) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WebhookEvent_object_type(ctx, field)
+func (ec *executionContext) _WebhookEvent_objectType(ctx context.Context, field graphql.CollectedField, obj *model.WebhookEvent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WebhookEvent_objectType(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10352,7 +10340,7 @@ func (ec *executionContext) _WebhookEvent_object_type(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_WebhookEvent_object_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_WebhookEvent_objectType(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "WebhookEvent",
 		Field:      field,
@@ -10540,14 +10528,14 @@ func (ec *executionContext) fieldContext_Webhooks_data(ctx context.Context, fiel
 				return ec.fieldContext_Webhook_headers(ctx, field)
 			case "events":
 				return ec.fieldContext_Webhook_events(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Webhook_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Webhook_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Webhook_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Webhook_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Webhook_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Webhook_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Webhook_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Webhook_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Webhook", field.Name)
 		},
@@ -13519,26 +13507,26 @@ func (ec *executionContext) unmarshalInputWebhookEventInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"object_id", "object_type", "actions"}
+	fieldsInOrder := [...]string{"objectId", "objectType", "actions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "object_id":
+		case "objectId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("object_id"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("objectId"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ObjectID = data
-		case "object_type":
+		case "objectType":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("object_type"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("objectType"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
@@ -13801,7 +13789,7 @@ func (ec *executionContext) _Country(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -13810,7 +13798,7 @@ func (ec *executionContext) _Country(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Country_created_at(ctx, field, obj)
+				res = ec._Country_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -13837,7 +13825,7 @@ func (ec *executionContext) _Country(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -13846,7 +13834,7 @@ func (ec *executionContext) _Country(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Country_updated_at(ctx, field, obj)
+				res = ec._Country_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -13873,7 +13861,7 @@ func (ec *executionContext) _Country(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -13882,7 +13870,7 @@ func (ec *executionContext) _Country(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Country_created_by(ctx, field, obj)
+				res = ec._Country_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -13906,7 +13894,7 @@ func (ec *executionContext) _Country(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -13915,7 +13903,7 @@ func (ec *executionContext) _Country(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Country_updated_by(ctx, field, obj)
+				res = ec._Country_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -14159,7 +14147,7 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14168,7 +14156,7 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Currency_created_at(ctx, field, obj)
+				res = ec._Currency_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -14195,7 +14183,7 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14204,7 +14192,7 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Currency_updated_at(ctx, field, obj)
+				res = ec._Currency_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -14231,7 +14219,7 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14240,7 +14228,7 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Currency_created_by(ctx, field, obj)
+				res = ec._Currency_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -14264,7 +14252,7 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14273,7 +14261,7 @@ func (ec *executionContext) _Currency(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Currency_updated_by(ctx, field, obj)
+				res = ec._Currency_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -14515,7 +14503,7 @@ func (ec *executionContext) _Locale(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14524,7 +14512,7 @@ func (ec *executionContext) _Locale(ctx context.Context, sel ast.SelectionSet, o
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Locale_created_at(ctx, field, obj)
+				res = ec._Locale_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -14551,7 +14539,7 @@ func (ec *executionContext) _Locale(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14560,7 +14548,7 @@ func (ec *executionContext) _Locale(ctx context.Context, sel ast.SelectionSet, o
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Locale_updated_at(ctx, field, obj)
+				res = ec._Locale_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -14587,7 +14575,7 @@ func (ec *executionContext) _Locale(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14596,7 +14584,7 @@ func (ec *executionContext) _Locale(ctx context.Context, sel ast.SelectionSet, o
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Locale_created_by(ctx, field, obj)
+				res = ec._Locale_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -14620,7 +14608,7 @@ func (ec *executionContext) _Locale(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14629,7 +14617,7 @@ func (ec *executionContext) _Locale(ctx context.Context, sel ast.SelectionSet, o
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Locale_updated_by(ctx, field, obj)
+				res = ec._Locale_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -14942,7 +14930,7 @@ func (ec *executionContext) _Option(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14951,7 +14939,7 @@ func (ec *executionContext) _Option(ctx context.Context, sel ast.SelectionSet, o
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Option_created_at(ctx, field, obj)
+				res = ec._Option_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -14978,7 +14966,7 @@ func (ec *executionContext) _Option(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14987,7 +14975,7 @@ func (ec *executionContext) _Option(ctx context.Context, sel ast.SelectionSet, o
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Option_updated_at(ctx, field, obj)
+				res = ec._Option_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15603,7 +15591,7 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15612,7 +15600,7 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Template_created_at(ctx, field, obj)
+				res = ec._Template_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15639,7 +15627,7 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15648,7 +15636,7 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Template_updated_at(ctx, field, obj)
+				res = ec._Template_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15675,7 +15663,7 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15684,7 +15672,7 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Template_created_by(ctx, field, obj)
+				res = ec._Template_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -15708,7 +15696,7 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15717,7 +15705,7 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Template_updated_by(ctx, field, obj)
+				res = ec._Template_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -15897,7 +15885,7 @@ func (ec *executionContext) _Timezone(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15906,7 +15894,7 @@ func (ec *executionContext) _Timezone(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Timezone_created_at(ctx, field, obj)
+				res = ec._Timezone_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15933,7 +15921,7 @@ func (ec *executionContext) _Timezone(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15942,7 +15930,7 @@ func (ec *executionContext) _Timezone(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Timezone_updated_at(ctx, field, obj)
+				res = ec._Timezone_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15969,7 +15957,7 @@ func (ec *executionContext) _Timezone(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15978,7 +15966,7 @@ func (ec *executionContext) _Timezone(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Timezone_created_by(ctx, field, obj)
+				res = ec._Timezone_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -16002,7 +15990,7 @@ func (ec *executionContext) _Timezone(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16011,7 +15999,7 @@ func (ec *executionContext) _Timezone(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Timezone_updated_by(ctx, field, obj)
+				res = ec._Timezone_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -16294,7 +16282,7 @@ func (ec *executionContext) _Webhook(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16303,7 +16291,7 @@ func (ec *executionContext) _Webhook(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Webhook_created_at(ctx, field, obj)
+				res = ec._Webhook_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -16330,7 +16318,7 @@ func (ec *executionContext) _Webhook(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16339,7 +16327,7 @@ func (ec *executionContext) _Webhook(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Webhook_updated_at(ctx, field, obj)
+				res = ec._Webhook_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -16366,7 +16354,7 @@ func (ec *executionContext) _Webhook(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16375,7 +16363,7 @@ func (ec *executionContext) _Webhook(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Webhook_created_by(ctx, field, obj)
+				res = ec._Webhook_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -16399,7 +16387,7 @@ func (ec *executionContext) _Webhook(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16408,7 +16396,7 @@ func (ec *executionContext) _Webhook(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Webhook_updated_by(ctx, field, obj)
+				res = ec._Webhook_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -16466,13 +16454,13 @@ func (ec *executionContext) _WebhookEvent(ctx context.Context, sel ast.Selection
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("WebhookEvent")
-		case "object_id":
-			out.Values[i] = ec._WebhookEvent_object_id(ctx, field, obj)
+		case "objectId":
+			out.Values[i] = ec._WebhookEvent_objectId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "object_type":
-			out.Values[i] = ec._WebhookEvent_object_type(ctx, field, obj)
+		case "objectType":
+			out.Values[i] = ec._WebhookEvent_objectType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -18120,13 +18108,6 @@ func (ec *executionContext) unmarshalOUpdateCurrency2ᚖgithubᚗcomᚋdailytrav
 	}
 	res, err := ec.unmarshalInputUpdateCurrency(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋconfigurationᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._User(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOWebhook2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋconfigurationᚋgraphᚋmodelᚐWebhook(ctx context.Context, sel ast.SelectionSet, v []*model.Webhook) graphql.Marshaler {

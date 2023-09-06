@@ -225,14 +225,14 @@ func (r *timeResolver) Parent(ctx context.Context, obj *model.Time) (*model.Time
 	return item, nil
 }
 
-// StartDate is the resolver for the start_date field.
-func (r *timeResolver) StartDate(ctx context.Context, obj *model.Time) (string, error) {
-	return obj.StartDate.Time().Format(time.RFC3339), nil
+// Start is the resolver for the start field.
+func (r *timeResolver) Start(ctx context.Context, obj *model.Time) (string, error) {
+	panic(fmt.Errorf("not implemented: Start - start"))
 }
 
-// EndDate is the resolver for the end_date field.
-func (r *timeResolver) EndDate(ctx context.Context, obj *model.Time) (string, error) {
-	return obj.EndDate.Time().Format(time.RFC3339), nil
+// End is the resolver for the end field.
+func (r *timeResolver) End(ctx context.Context, obj *model.Time) (string, error) {
+	panic(fmt.Errorf("not implemented: End - end"))
 }
 
 // Metadata is the resolver for the metadata field.

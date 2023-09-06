@@ -20,8 +20,8 @@ type Variant struct {
 	Price       float64            `json:"price" bson:"price"`
 	Discount    float64            `json:"discount,omitempty" bson:"discount,omitempty"`
 	Currency    string             `json:"currency" bson:"currency"`
-	StartDate   primitive.DateTime `json:"start_date,omitempty" bson:"start_date,omitempty"`
-	EndDate     primitive.DateTime `json:"end_date,omitempty" bson:"end_date,omitempty"`
+	Start       primitive.DateTime `json:"start" bson:"start"`
+	End         primitive.DateTime `json:"end" bson:"end"`
 	Status      string             `json:"status" bson:"status"`
 }
 

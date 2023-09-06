@@ -337,14 +337,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Expense.Amount(childComplexity), true
 
-	case "Expense.created_at":
+	case "Expense.createdAt":
 		if e.complexity.Expense.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Expense.CreatedAt(childComplexity), true
 
-	case "Expense.created_by":
+	case "Expense.createdBy":
 		if e.complexity.Expense.CreatedBy == nil {
 			break
 		}
@@ -421,14 +421,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Expense.UID(childComplexity), true
 
-	case "Expense.updated_at":
+	case "Expense.updatedAt":
 		if e.complexity.Expense.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Expense.UpdatedAt(childComplexity), true
 
-	case "Expense.updated_by":
+	case "Expense.updatedBy":
 		if e.complexity.Expense.UpdatedBy == nil {
 			break
 		}
@@ -470,14 +470,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Invoice.Contact(childComplexity), true
 
-	case "Invoice.created_at":
+	case "Invoice.createdAt":
 		if e.complexity.Invoice.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Invoice.CreatedAt(childComplexity), true
 
-	case "Invoice.created_by":
+	case "Invoice.createdBy":
 		if e.complexity.Invoice.CreatedBy == nil {
 			break
 		}
@@ -491,7 +491,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Invoice.Currency(childComplexity), true
 
-	case "Invoice.due_date":
+	case "Invoice.dueDate":
 		if e.complexity.Invoice.DueDate == nil {
 			break
 		}
@@ -547,14 +547,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Invoice.UID(childComplexity), true
 
-	case "Invoice.updated_at":
+	case "Invoice.updatedAt":
 		if e.complexity.Invoice.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Invoice.UpdatedAt(childComplexity), true
 
-	case "Invoice.updated_by":
+	case "Invoice.updatedBy":
 		if e.complexity.Invoice.UpdatedBy == nil {
 			break
 		}
@@ -750,14 +750,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Payment.Amount(childComplexity), true
 
-	case "Payment.created_at":
+	case "Payment.createdAt":
 		if e.complexity.Payment.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Payment.CreatedAt(childComplexity), true
 
-	case "Payment.created_by":
+	case "Payment.createdBy":
 		if e.complexity.Payment.CreatedBy == nil {
 			break
 		}
@@ -813,14 +813,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Payment.UID(childComplexity), true
 
-	case "Payment.updated_at":
+	case "Payment.updatedAt":
 		if e.complexity.Payment.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Payment.UpdatedAt(childComplexity), true
 
-	case "Payment.updated_by":
+	case "Payment.updatedBy":
 		if e.complexity.Payment.UpdatedBy == nil {
 			break
 		}
@@ -951,14 +951,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Transaction.Amount(childComplexity), true
 
-	case "Transaction.created_at":
+	case "Transaction.createdAt":
 		if e.complexity.Transaction.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Transaction.CreatedAt(childComplexity), true
 
-	case "Transaction.created_by":
+	case "Transaction.createdBy":
 		if e.complexity.Transaction.CreatedBy == nil {
 			break
 		}
@@ -1021,14 +1021,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Transaction.UID(childComplexity), true
 
-	case "Transaction.updated_at":
+	case "Transaction.updatedAt":
 		if e.complexity.Transaction.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Transaction.UpdatedAt(childComplexity), true
 
-	case "Transaction.updated_by":
+	case "Transaction.updatedBy":
 		if e.complexity.Transaction.UpdatedBy == nil {
 			break
 		}
@@ -1861,26 +1861,26 @@ func (ec *executionContext) fieldContext_Entity_findInvoiceByID(ctx context.Cont
 				return ec.fieldContext_Invoice_currency(ctx, field)
 			case "billing":
 				return ec.fieldContext_Invoice_billing(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Invoice_due_date(ctx, field)
+			case "dueDate":
+				return ec.fieldContext_Invoice_dueDate(ctx, field)
 			case "notes":
 				return ec.fieldContext_Invoice_notes(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Invoice_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Invoice_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Invoice_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Invoice_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Invoice_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Invoice_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Invoice_uid(ctx, field)
 			case "contact":
 				return ec.fieldContext_Invoice_contact(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Invoice_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Invoice_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Invoice_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Invoice_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Invoice", field.Name)
 		},
@@ -2393,8 +2393,8 @@ func (ec *executionContext) fieldContext_Expense_notes(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Expense_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Expense_created_at(ctx, field)
+func (ec *executionContext) _Expense_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Expense_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2424,7 +2424,7 @@ func (ec *executionContext) _Expense_created_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Expense_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Expense_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Expense",
 		Field:      field,
@@ -2437,8 +2437,8 @@ func (ec *executionContext) fieldContext_Expense_created_at(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Expense_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Expense_updated_at(ctx, field)
+func (ec *executionContext) _Expense_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Expense_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2468,7 +2468,7 @@ func (ec *executionContext) _Expense_updated_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Expense_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Expense_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Expense",
 		Field:      field,
@@ -2525,8 +2525,8 @@ func (ec *executionContext) fieldContext_Expense_uid(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Expense_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Expense_created_by(ctx, field)
+func (ec *executionContext) _Expense_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Expense_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2553,7 +2553,7 @@ func (ec *executionContext) _Expense_created_by(ctx context.Context, field graph
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Expense_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Expense_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Expense",
 		Field:      field,
@@ -2566,8 +2566,8 @@ func (ec *executionContext) fieldContext_Expense_created_by(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Expense_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Expense_updated_by(ctx, field)
+func (ec *executionContext) _Expense_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Expense_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2594,7 +2594,7 @@ func (ec *executionContext) _Expense_updated_by(ctx context.Context, field graph
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Expense_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Expense_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Expense",
 		Field:      field,
@@ -2707,16 +2707,16 @@ func (ec *executionContext) fieldContext_Expenses_data(ctx context.Context, fiel
 				return ec.fieldContext_Expense_date(ctx, field)
 			case "notes":
 				return ec.fieldContext_Expense_notes(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Expense_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Expense_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Expense_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Expense_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Expense_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Expense_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Expense_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Expense_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Expense_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
@@ -2988,8 +2988,8 @@ func (ec *executionContext) fieldContext_Invoice_billing(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Invoice_due_date(ctx context.Context, field graphql.CollectedField, obj *model.Invoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Invoice_due_date(ctx, field)
+func (ec *executionContext) _Invoice_dueDate(ctx context.Context, field graphql.CollectedField, obj *model.Invoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Invoice_dueDate(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3019,7 +3019,7 @@ func (ec *executionContext) _Invoice_due_date(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Invoice_due_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Invoice_dueDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Invoice",
 		Field:      field,
@@ -3155,8 +3155,8 @@ func (ec *executionContext) fieldContext_Invoice_status(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Invoice_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Invoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Invoice_created_at(ctx, field)
+func (ec *executionContext) _Invoice_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Invoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Invoice_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3186,7 +3186,7 @@ func (ec *executionContext) _Invoice_created_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Invoice_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Invoice_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Invoice",
 		Field:      field,
@@ -3199,8 +3199,8 @@ func (ec *executionContext) fieldContext_Invoice_created_at(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Invoice_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Invoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Invoice_updated_at(ctx, field)
+func (ec *executionContext) _Invoice_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Invoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Invoice_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3230,7 +3230,7 @@ func (ec *executionContext) _Invoice_updated_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Invoice_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Invoice_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Invoice",
 		Field:      field,
@@ -3331,8 +3331,8 @@ func (ec *executionContext) fieldContext_Invoice_contact(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Invoice_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Invoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Invoice_created_by(ctx, field)
+func (ec *executionContext) _Invoice_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Invoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Invoice_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3359,7 +3359,7 @@ func (ec *executionContext) _Invoice_created_by(ctx context.Context, field graph
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Invoice_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Invoice_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Invoice",
 		Field:      field,
@@ -3372,8 +3372,8 @@ func (ec *executionContext) fieldContext_Invoice_created_by(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Invoice_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Invoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Invoice_updated_by(ctx, field)
+func (ec *executionContext) _Invoice_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Invoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Invoice_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3400,7 +3400,7 @@ func (ec *executionContext) _Invoice_updated_by(ctx context.Context, field graph
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Invoice_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Invoice_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Invoice",
 		Field:      field,
@@ -3461,26 +3461,26 @@ func (ec *executionContext) fieldContext_Invoices_data(ctx context.Context, fiel
 				return ec.fieldContext_Invoice_currency(ctx, field)
 			case "billing":
 				return ec.fieldContext_Invoice_billing(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Invoice_due_date(ctx, field)
+			case "dueDate":
+				return ec.fieldContext_Invoice_dueDate(ctx, field)
 			case "notes":
 				return ec.fieldContext_Invoice_notes(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Invoice_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Invoice_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Invoice_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Invoice_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Invoice_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Invoice_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Invoice_uid(ctx, field)
 			case "contact":
 				return ec.fieldContext_Invoice_contact(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Invoice_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Invoice_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Invoice_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Invoice_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Invoice", field.Name)
 		},
@@ -3608,16 +3608,16 @@ func (ec *executionContext) fieldContext_Mutation_createExpense(ctx context.Cont
 				return ec.fieldContext_Expense_date(ctx, field)
 			case "notes":
 				return ec.fieldContext_Expense_notes(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Expense_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Expense_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Expense_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Expense_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Expense_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Expense_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Expense_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Expense_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Expense_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
@@ -3712,16 +3712,16 @@ func (ec *executionContext) fieldContext_Mutation_updateExpense(ctx context.Cont
 				return ec.fieldContext_Expense_date(ctx, field)
 			case "notes":
 				return ec.fieldContext_Expense_notes(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Expense_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Expense_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Expense_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Expense_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Expense_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Expense_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Expense_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Expense_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Expense_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
@@ -3958,26 +3958,26 @@ func (ec *executionContext) fieldContext_Mutation_createInvoice(ctx context.Cont
 				return ec.fieldContext_Invoice_currency(ctx, field)
 			case "billing":
 				return ec.fieldContext_Invoice_billing(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Invoice_due_date(ctx, field)
+			case "dueDate":
+				return ec.fieldContext_Invoice_dueDate(ctx, field)
 			case "notes":
 				return ec.fieldContext_Invoice_notes(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Invoice_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Invoice_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Invoice_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Invoice_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Invoice_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Invoice_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Invoice_uid(ctx, field)
 			case "contact":
 				return ec.fieldContext_Invoice_contact(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Invoice_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Invoice_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Invoice_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Invoice_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Invoice", field.Name)
 		},
@@ -4064,26 +4064,26 @@ func (ec *executionContext) fieldContext_Mutation_updateInvoice(ctx context.Cont
 				return ec.fieldContext_Invoice_currency(ctx, field)
 			case "billing":
 				return ec.fieldContext_Invoice_billing(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Invoice_due_date(ctx, field)
+			case "dueDate":
+				return ec.fieldContext_Invoice_dueDate(ctx, field)
 			case "notes":
 				return ec.fieldContext_Invoice_notes(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Invoice_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Invoice_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Invoice_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Invoice_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Invoice_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Invoice_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Invoice_uid(ctx, field)
 			case "contact":
 				return ec.fieldContext_Invoice_contact(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Invoice_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Invoice_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Invoice_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Invoice_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Invoice", field.Name)
 		},
@@ -4222,18 +4222,18 @@ func (ec *executionContext) fieldContext_Mutation_createPayment(ctx context.Cont
 				return ec.fieldContext_Payment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Payment_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Payment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Payment_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Payment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Payment_updatedAt(ctx, field)
 			case "invoice":
 				return ec.fieldContext_Payment_invoice(ctx, field)
 			case "uid":
 				return ec.fieldContext_Payment_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Payment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Payment_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Payment_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Payment_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Payment", field.Name)
 		},
@@ -4300,18 +4300,18 @@ func (ec *executionContext) fieldContext_Mutation_updatePayment(ctx context.Cont
 				return ec.fieldContext_Payment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Payment_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Payment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Payment_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Payment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Payment_updatedAt(ctx, field)
 			case "invoice":
 				return ec.fieldContext_Payment_invoice(ctx, field)
 			case "uid":
 				return ec.fieldContext_Payment_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Payment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Payment_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Payment_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Payment_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Payment", field.Name)
 		},
@@ -4457,16 +4457,16 @@ func (ec *executionContext) fieldContext_Mutation_createTransaction(ctx context.
 				return ec.fieldContext_Transaction_date(ctx, field)
 			case "description":
 				return ec.fieldContext_Transaction_description(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Transaction_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Transaction_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Transaction_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Transaction_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Transaction_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Transaction_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Transaction_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Transaction_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
 		},
@@ -4560,16 +4560,16 @@ func (ec *executionContext) fieldContext_Mutation_updateTransaction(ctx context.
 				return ec.fieldContext_Transaction_date(ctx, field)
 			case "description":
 				return ec.fieldContext_Transaction_description(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Transaction_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Transaction_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Transaction_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Transaction_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Transaction_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Transaction_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Transaction_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Transaction_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
 		},
@@ -4993,8 +4993,8 @@ func (ec *executionContext) fieldContext_Payment_metadata(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Payment_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Payment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Payment_created_at(ctx, field)
+func (ec *executionContext) _Payment_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Payment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Payment_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5024,7 +5024,7 @@ func (ec *executionContext) _Payment_created_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Payment_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Payment_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Payment",
 		Field:      field,
@@ -5037,8 +5037,8 @@ func (ec *executionContext) fieldContext_Payment_created_at(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Payment_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Payment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Payment_updated_at(ctx, field)
+func (ec *executionContext) _Payment_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Payment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Payment_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5068,7 +5068,7 @@ func (ec *executionContext) _Payment_updated_at(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Payment_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Payment_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Payment",
 		Field:      field,
@@ -5169,8 +5169,8 @@ func (ec *executionContext) fieldContext_Payment_uid(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Payment_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Payment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Payment_created_by(ctx, field)
+func (ec *executionContext) _Payment_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Payment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Payment_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5197,7 +5197,7 @@ func (ec *executionContext) _Payment_created_by(ctx context.Context, field graph
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Payment_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Payment_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Payment",
 		Field:      field,
@@ -5210,8 +5210,8 @@ func (ec *executionContext) fieldContext_Payment_created_by(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Payment_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Payment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Payment_updated_by(ctx, field)
+func (ec *executionContext) _Payment_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Payment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Payment_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5238,7 +5238,7 @@ func (ec *executionContext) _Payment_updated_by(ctx context.Context, field graph
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Payment_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Payment_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Payment",
 		Field:      field,
@@ -5405,16 +5405,16 @@ func (ec *executionContext) fieldContext_Query_expense(ctx context.Context, fiel
 				return ec.fieldContext_Expense_date(ctx, field)
 			case "notes":
 				return ec.fieldContext_Expense_notes(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Expense_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Expense_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Expense_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Expense_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Expense_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Expense_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Expense_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Expense_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Expense_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
@@ -5501,26 +5501,26 @@ func (ec *executionContext) fieldContext_Query_invoice(ctx context.Context, fiel
 				return ec.fieldContext_Invoice_currency(ctx, field)
 			case "billing":
 				return ec.fieldContext_Invoice_billing(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Invoice_due_date(ctx, field)
+			case "dueDate":
+				return ec.fieldContext_Invoice_dueDate(ctx, field)
 			case "notes":
 				return ec.fieldContext_Invoice_notes(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Invoice_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Invoice_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Invoice_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Invoice_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Invoice_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Invoice_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Invoice_uid(ctx, field)
 			case "contact":
 				return ec.fieldContext_Invoice_contact(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Invoice_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Invoice_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Invoice_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Invoice_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Invoice", field.Name)
 		},
@@ -5665,18 +5665,18 @@ func (ec *executionContext) fieldContext_Query_payment(ctx context.Context, fiel
 				return ec.fieldContext_Payment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Payment_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Payment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Payment_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Payment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Payment_updatedAt(ctx, field)
 			case "invoice":
 				return ec.fieldContext_Payment_invoice(ctx, field)
 			case "uid":
 				return ec.fieldContext_Payment_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Payment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Payment_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Payment_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Payment_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Payment", field.Name)
 		},
@@ -5743,18 +5743,18 @@ func (ec *executionContext) fieldContext_Query_payments(ctx context.Context, fie
 				return ec.fieldContext_Payment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Payment_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Payment_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Payment_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Payment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Payment_updatedAt(ctx, field)
 			case "invoice":
 				return ec.fieldContext_Payment_invoice(ctx, field)
 			case "uid":
 				return ec.fieldContext_Payment_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Payment_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Payment_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Payment_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Payment_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Payment", field.Name)
 		},
@@ -5912,16 +5912,16 @@ func (ec *executionContext) fieldContext_Query_transaction(ctx context.Context, 
 				return ec.fieldContext_Transaction_date(ctx, field)
 			case "description":
 				return ec.fieldContext_Transaction_description(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Transaction_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Transaction_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Transaction_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Transaction_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Transaction_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Transaction_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Transaction_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Transaction_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
 		},
@@ -6565,8 +6565,8 @@ func (ec *executionContext) fieldContext_Transaction_description(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _Transaction_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Transaction_created_at(ctx, field)
+func (ec *executionContext) _Transaction_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6596,7 +6596,7 @@ func (ec *executionContext) _Transaction_created_at(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Transaction_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Transaction",
 		Field:      field,
@@ -6609,8 +6609,8 @@ func (ec *executionContext) fieldContext_Transaction_created_at(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Transaction_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Transaction_updated_at(ctx, field)
+func (ec *executionContext) _Transaction_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6640,7 +6640,7 @@ func (ec *executionContext) _Transaction_updated_at(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Transaction_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Transaction",
 		Field:      field,
@@ -6697,8 +6697,8 @@ func (ec *executionContext) fieldContext_Transaction_uid(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Transaction_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Transaction_created_by(ctx, field)
+func (ec *executionContext) _Transaction_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6725,7 +6725,7 @@ func (ec *executionContext) _Transaction_created_by(ctx context.Context, field g
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Transaction_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Transaction",
 		Field:      field,
@@ -6738,8 +6738,8 @@ func (ec *executionContext) fieldContext_Transaction_created_by(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Transaction_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Transaction_updated_by(ctx, field)
+func (ec *executionContext) _Transaction_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Transaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Transaction_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6766,7 +6766,7 @@ func (ec *executionContext) _Transaction_updated_by(ctx context.Context, field g
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Transaction_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Transaction_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Transaction",
 		Field:      field,
@@ -6831,16 +6831,16 @@ func (ec *executionContext) fieldContext_Transactions_data(ctx context.Context, 
 				return ec.fieldContext_Transaction_date(ctx, field)
 			case "description":
 				return ec.fieldContext_Transaction_description(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Transaction_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Transaction_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Transaction_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Transaction_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Transaction_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Transaction_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Transaction_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Transaction_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
 		},
@@ -6992,16 +6992,16 @@ func (ec *executionContext) fieldContext_User_expenses(ctx context.Context, fiel
 				return ec.fieldContext_Expense_date(ctx, field)
 			case "notes":
 				return ec.fieldContext_Expense_notes(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Expense_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Expense_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Expense_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Expense_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Expense_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Expense_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Expense_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Expense_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Expense_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
@@ -7057,26 +7057,26 @@ func (ec *executionContext) fieldContext_User_invoices(ctx context.Context, fiel
 				return ec.fieldContext_Invoice_currency(ctx, field)
 			case "billing":
 				return ec.fieldContext_Invoice_billing(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Invoice_due_date(ctx, field)
+			case "dueDate":
+				return ec.fieldContext_Invoice_dueDate(ctx, field)
 			case "notes":
 				return ec.fieldContext_Invoice_notes(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Invoice_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Invoice_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Invoice_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Invoice_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Invoice_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Invoice_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Invoice_uid(ctx, field)
 			case "contact":
 				return ec.fieldContext_Invoice_contact(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Invoice_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Invoice_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Invoice_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Invoice_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Invoice", field.Name)
 		},
@@ -9985,7 +9985,7 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "notes":
 			out.Values[i] = ec._Expense_notes(ctx, field, obj)
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9994,7 +9994,7 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Expense_created_at(ctx, field, obj)
+				res = ec._Expense_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10021,7 +10021,7 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10030,7 +10030,7 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Expense_updated_at(ctx, field, obj)
+				res = ec._Expense_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10093,7 +10093,7 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10102,7 +10102,7 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Expense_created_by(ctx, field, obj)
+				res = ec._Expense_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -10126,7 +10126,7 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10135,7 +10135,7 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Expense_updated_by(ctx, field, obj)
+				res = ec._Expense_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -10357,7 +10357,7 @@ func (ec *executionContext) _Invoice(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "due_date":
+		case "dueDate":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10366,7 +10366,7 @@ func (ec *executionContext) _Invoice(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Invoice_due_date(ctx, field, obj)
+				res = ec._Invoice_dueDate(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10430,7 +10430,7 @@ func (ec *executionContext) _Invoice(ctx context.Context, sel ast.SelectionSet, 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "status":
 			out.Values[i] = ec._Invoice_status(ctx, field, obj)
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10439,7 +10439,7 @@ func (ec *executionContext) _Invoice(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Invoice_created_at(ctx, field, obj)
+				res = ec._Invoice_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10466,7 +10466,7 @@ func (ec *executionContext) _Invoice(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10475,7 +10475,7 @@ func (ec *executionContext) _Invoice(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Invoice_updated_at(ctx, field, obj)
+				res = ec._Invoice_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10574,7 +10574,7 @@ func (ec *executionContext) _Invoice(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10583,7 +10583,7 @@ func (ec *executionContext) _Invoice(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Invoice_created_by(ctx, field, obj)
+				res = ec._Invoice_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -10607,7 +10607,7 @@ func (ec *executionContext) _Invoice(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10616,7 +10616,7 @@ func (ec *executionContext) _Invoice(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Invoice_updated_by(ctx, field, obj)
+				res = ec._Invoice_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -10945,7 +10945,7 @@ func (ec *executionContext) _Payment(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10954,7 +10954,7 @@ func (ec *executionContext) _Payment(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Payment_created_at(ctx, field, obj)
+				res = ec._Payment_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10981,7 +10981,7 @@ func (ec *executionContext) _Payment(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10990,7 +10990,7 @@ func (ec *executionContext) _Payment(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Payment_updated_at(ctx, field, obj)
+				res = ec._Payment_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -11089,7 +11089,7 @@ func (ec *executionContext) _Payment(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11098,7 +11098,7 @@ func (ec *executionContext) _Payment(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Payment_created_by(ctx, field, obj)
+				res = ec._Payment_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -11122,7 +11122,7 @@ func (ec *executionContext) _Payment(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11131,7 +11131,7 @@ func (ec *executionContext) _Payment(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Payment_updated_by(ctx, field, obj)
+				res = ec._Payment_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -11604,7 +11604,7 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11613,7 +11613,7 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Transaction_created_at(ctx, field, obj)
+				res = ec._Transaction_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -11640,7 +11640,7 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11649,7 +11649,7 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Transaction_updated_at(ctx, field, obj)
+				res = ec._Transaction_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -11712,7 +11712,7 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11721,7 +11721,7 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Transaction_created_by(ctx, field, obj)
+				res = ec._Transaction_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -11745,7 +11745,7 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -11754,7 +11754,7 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Transaction_updated_by(ctx, field, obj)
+				res = ec._Transaction_updatedBy(ctx, field, obj)
 				return res
 			}
 

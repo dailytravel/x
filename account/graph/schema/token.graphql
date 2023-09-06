@@ -5,10 +5,10 @@ type Token {
   token: String!
   abilities: [String]
   status: String!
-  last_used_at: String!
-  expires_at: String!
-  created_at: String!
-  updated_at: String!
+  lastUsed: String!
+  expiresAt: String!
+  createdAt: String!
+  updatedAt: String!
 }
 
 type Tokens {

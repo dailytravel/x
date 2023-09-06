@@ -61,22 +61,22 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 		item.List = &_id
 	}
 
-	if input.StartAt != nil {
-		startAt, err := time.Parse(time.RFC3339, *input.StartAt)
+	if input.Start != nil {
+		startAt, err := time.Parse(time.RFC3339, *input.Start)
 		if err != nil {
-			return nil, fmt.Errorf("invalid StartAt format: %v", err)
+			return nil, fmt.Errorf("invalid Start format: %v", err)
 		}
 		dt := primitive.NewDateTimeFromTime(startAt)
-		item.StartAt = &dt
+		item.Start = &dt
 	}
 
-	if input.EndAt != nil {
-		endAt, err := time.Parse(time.RFC3339, *input.EndAt)
+	if input.End != nil {
+		endAt, err := time.Parse(time.RFC3339, *input.End)
 		if err != nil {
-			return nil, fmt.Errorf("invalid EndAt format: %v", err)
+			return nil, fmt.Errorf("invalid End format: %v", err)
 		}
 		dt := primitive.NewDateTimeFromTime(endAt)
-		item.EndAt = &dt
+		item.End = &dt
 	}
 
 	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -152,22 +152,22 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 
 	item.UpdatedBy = uid
 
-	if input.StartAt != nil {
-		startAt, err := time.Parse(time.RFC3339, *input.StartAt)
+	if input.Start != nil {
+		startAt, err := time.Parse(time.RFC3339, *input.Start)
 		if err != nil {
-			return nil, fmt.Errorf("invalid StartAt format: %v", err)
+			return nil, fmt.Errorf("invalid Start format: %v", err)
 		}
 		dt := primitive.NewDateTimeFromTime(startAt)
-		item.StartAt = &dt
+		item.Start = &dt
 	}
 
-	if input.EndAt != nil {
-		endAt, err := time.Parse(time.RFC3339, *input.EndAt)
+	if input.End != nil {
+		endAt, err := time.Parse(time.RFC3339, *input.End)
 		if err != nil {
-			return nil, fmt.Errorf("invalid EndAt format: %v", err)
+			return nil, fmt.Errorf("invalid End format: %v", err)
 		}
 		dt := primitive.NewDateTimeFromTime(endAt)
-		item.EndAt = &dt
+		item.End = &dt
 	}
 
 	// Update the task in the database
@@ -380,30 +380,14 @@ func (r *taskResolver) List(ctx context.Context, obj *model.Task) (*model.List, 
 	return item, nil
 }
 
-// StartAt is the resolver for the start_at field.
-func (r *taskResolver) StartAt(ctx context.Context, obj *model.Task) (*string, error) {
-	if obj.StartAt == nil {
-		return nil, nil
-	}
-
-	// Assuming the DateTime from MongoDB is similar to time.Time. Convert it to a string.
-	t := obj.StartAt.Time()             // Convert primitive.DateTime to time.Time
-	formatted := t.Format(time.RFC3339) // Convert to string in RFC3339 format
-
-	return &formatted, nil
+// Start is the resolver for the start field.
+func (r *taskResolver) Start(ctx context.Context, obj *model.Task) (*string, error) {
+	panic(fmt.Errorf("not implemented: Start - start"))
 }
 
-// EndAt is the resolver for the end_at field.
-func (r *taskResolver) EndAt(ctx context.Context, obj *model.Task) (*string, error) {
-	if obj.EndAt == nil {
-		return nil, nil
-	}
-
-	// Assuming the DateTime from MongoDB is similar to time.Time. Convert it to a string.
-	t := obj.EndAt.Time()               // Convert primitive.DateTime to time.Time
-	formatted := t.Format(time.RFC3339) // Convert to string in RFC3339 format
-
-	return &formatted, nil
+// End is the resolver for the end field.
+func (r *taskResolver) End(ctx context.Context, obj *model.Task) (*string, error) {
+	panic(fmt.Errorf("not implemented: End - end"))
 }
 
 // Metadata is the resolver for the metadata field.

@@ -207,15 +207,14 @@ func (r *salaryResolver) ID(ctx context.Context, obj *model.Salary) (string, err
 	return obj.ID.Hex(), nil
 }
 
-// StartDate is the resolver for the start_date field.
-func (r *salaryResolver) StartDate(ctx context.Context, obj *model.Salary) (string, error) {
-	return obj.StartDate.Time().String(), nil
+// Start is the resolver for the start field.
+func (r *salaryResolver) Start(ctx context.Context, obj *model.Salary) (string, error) {
+	panic(fmt.Errorf("not implemented: Start - start"))
 }
 
-// EndDate is the resolver for the end_date field.
-func (r *salaryResolver) EndDate(ctx context.Context, obj *model.Salary) (*string, error) {
-	endDate := obj.EndDate.Time().String()
-	return &endDate, nil
+// End is the resolver for the end field.
+func (r *salaryResolver) End(ctx context.Context, obj *model.Salary) (*string, error) {
+	panic(fmt.Errorf("not implemented: End - end"))
 }
 
 // Metadata is the resolver for the metadata field.
@@ -260,3 +259,17 @@ func (r *salaryResolver) UpdatedBy(ctx context.Context, obj *model.Salary) (*str
 func (r *Resolver) Salary() SalaryResolver { return &salaryResolver{r} }
 
 type salaryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *salaryResolver) StartDate(ctx context.Context, obj *model.Salary) (string, error) {
+	return obj.StartDate.Time().String(), nil
+}
+func (r *salaryResolver) EndDate(ctx context.Context, obj *model.Salary) (*string, error) {
+	endDate := obj.EndDate.Time().String()
+	return &endDate, nil
+}

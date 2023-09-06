@@ -3,10 +3,10 @@ type Role {
   name: String!
   description: String
   permissions: [Permission!]
-  created_at: String!
-  updated_at: String!
-  created_by: User
-  updated_by: User
+  createdAt: String!
+  updatedAt: String!
+  createdBy: User
+  updatedBy: User
 }
 
 type Roles {

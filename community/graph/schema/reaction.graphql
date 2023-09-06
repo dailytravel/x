@@ -3,10 +3,10 @@ type Reaction @key(fields: "id") {
   uid: ID!
   reactable: Map!
   action: String!
-  created_at: String!
-  updated_at: String!
-  created_by: ID
-  updated_by: ID
+  createdAt: String!
+  updatedAt: String!
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Reactions {

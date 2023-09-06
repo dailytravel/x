@@ -53,7 +53,7 @@ type Memberships struct {
 type NewBalance struct {
 	UID      string                 `json:"uid"`
 	Type     string                 `json:"type"`
-	Points   int                    `json:"points"`
+	Credits  int                    `json:"credits"`
 	Notes    *string                `json:"notes,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	Status   string                 `json:"status"`
@@ -87,8 +87,8 @@ type NewCompany struct {
 type NewContact struct {
 	Company   *string                `json:"company,omitempty"`
 	UID       *string                `json:"uid,omitempty"`
-	FirstName *string                `json:"first_name,omitempty"`
-	LastName  *string                `json:"last_name,omitempty"`
+	FirstName *string                `json:"firstName,omitempty"`
+	LastName  *string                `json:"lastName,omitempty"`
 	Picture   *string                `json:"picture,omitempty"`
 	Email     string                 `json:"email"`
 	Phone     *string                `json:"phone,omitempty"`
@@ -99,7 +99,7 @@ type NewContact struct {
 	Country   *string                `json:"country,omitempty"`
 	Website   *string                `json:"website,omitempty"`
 	Birthday  *string                `json:"birthday,omitempty"`
-	JobTitle  *string                `json:"job_title,omitempty"`
+	JobTitle  *string                `json:"jobTitle,omitempty"`
 	Gender    *string                `json:"gender,omitempty"`
 	Timezone  *string                `json:"timezone,omitempty"`
 	Language  *string                `json:"language,omitempty"`
@@ -118,13 +118,13 @@ type NewCoupon struct {
 	Description string                 `json:"description"`
 	Type        string                 `json:"type"`
 	Amount      float64                `json:"amount"`
-	MaxDiscount *float64               `json:"max_discount,omitempty"`
+	MaxDiscount *float64               `json:"maxDiscount,omitempty"`
 	Currency    string                 `json:"currency"`
-	StartDate   string                 `json:"start_date"`
-	EndDate     string                 `json:"end_date"`
+	Start       string                 `json:"start"`
+	End         string                 `json:"end"`
 	Products    []string               `json:"products,omitempty"`
-	MaxUses     *int                   `json:"max_uses,omitempty"`
-	MinPurchase *float64               `json:"min_purchase,omitempty"`
+	MaxUses     *int                   `json:"maxUses,omitempty"`
+	MinPurchase *float64               `json:"minPurchase,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 }
@@ -138,8 +138,8 @@ type NewMembership struct {
 	Payment   map[string]interface{} `json:"payment,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	Status    string                 `json:"status"`
-	CreatedBy *string                `json:"created_by,omitempty"`
-	UpdatedBy *string                `json:"updated_by,omitempty"`
+	CreatedBy *string                `json:"createdBy,omitempty"`
+	UpdatedBy *string                `json:"updatedBy,omitempty"`
 }
 
 type NewOrder struct {
@@ -150,21 +150,12 @@ type NewOrder struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type NewPoint struct {
-	Points    int                    `json:"points"`
-	Type      string                 `json:"type"`
-	Target    map[string]interface{} `json:"target"`
-	ExpiresAt *string                `json:"expires_at,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    string                 `json:"status"`
-}
-
 type NewPromotion struct {
 	Type        string                 `json:"type"`
 	Locale      string                 `json:"locale"`
 	Name        string                 `json:"name"`
 	Description string                 `json:"description"`
-	Points      int                    `json:"points"`
+	Credits     int                    `json:"credits"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
@@ -179,7 +170,7 @@ type NewQuote struct {
 	Terms       *string                `json:"terms,omitempty"`
 	Notes       *string                `json:"notes,omitempty"`
 	Template    string                 `json:"template"`
-	ValidUntil  int                    `json:"valid_until"`
+	ValidUntil  int                    `json:"validUntil"`
 	Amount      float64                `json:"amount"`
 	Currency    string                 `json:"currency"`
 	Billing     map[string]interface{} `json:"billing"`
@@ -218,8 +209,8 @@ type NewVariant struct {
 	Discount    float64                `json:"discount"`
 	Quantity    int                    `json:"quantity"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	StartDate   string                 `json:"start_date"`
-	EndDate     string                 `json:"end_date"`
+	Start       string                 `json:"start"`
+	End         string                 `json:"end"`
 	Status      string                 `json:"status"`
 	Package     string                 `json:"package"`
 }
@@ -248,11 +239,6 @@ type PhoneInput struct {
 	Other  *string `json:"other,omitempty"`
 }
 
-type Points struct {
-	Count int      `json:"count"`
-	Data  []*Point `json:"data,omitempty"`
-}
-
 type Promotions struct {
 	Data  []*Promotion `json:"data,omitempty"`
 	Count int          `json:"count"`
@@ -275,7 +261,7 @@ type Tiers struct {
 
 type UpdateBalance struct {
 	Type     *string                `json:"type,omitempty"`
-	Points   *int                   `json:"points,omitempty"`
+	Credits  *int                   `json:"credits,omitempty"`
 	Notes    *string                `json:"notes,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	Status   *string                `json:"status,omitempty"`
@@ -309,8 +295,8 @@ type UpdateCompany struct {
 type UpdateContact struct {
 	Company   *string                `json:"company,omitempty"`
 	UID       *string                `json:"uid,omitempty"`
-	FirstName *string                `json:"first_name,omitempty"`
-	LastName  *string                `json:"last_name,omitempty"`
+	FirstName *string                `json:"firstName,omitempty"`
+	LastName  *string                `json:"lastName,omitempty"`
 	Picture   *string                `json:"picture,omitempty"`
 	Email     *string                `json:"email,omitempty"`
 	Phone     *string                `json:"phone,omitempty"`
@@ -321,7 +307,7 @@ type UpdateContact struct {
 	Country   *string                `json:"country,omitempty"`
 	Website   *string                `json:"website,omitempty"`
 	Birthday  *string                `json:"birthday,omitempty"`
-	JobTitle  *string                `json:"job_title,omitempty"`
+	JobTitle  *string                `json:"jobTitle,omitempty"`
 	Gender    *string                `json:"gender,omitempty"`
 	Timezone  *string                `json:"timezone,omitempty"`
 	Language  *string                `json:"language,omitempty"`
@@ -335,18 +321,18 @@ type UpdateContact struct {
 }
 
 type UpdateCoupon struct {
-	Locale      string                 `json:"locale"`
+	Locale      *string                `json:"locale,omitempty"`
 	Code        *string                `json:"code,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Type        *string                `json:"type,omitempty"`
 	Amount      *float64               `json:"amount,omitempty"`
-	MaxDiscount *float64               `json:"max_discount,omitempty"`
+	MaxDiscount *float64               `json:"maxDiscount,omitempty"`
 	Currency    *string                `json:"currency,omitempty"`
-	StartDate   *string                `json:"start_date,omitempty"`
-	EndDate     *string                `json:"end_date,omitempty"`
+	Start       *string                `json:"start,omitempty"`
+	End         *string                `json:"end,omitempty"`
 	Products    []string               `json:"products,omitempty"`
-	MaxUses     *int                   `json:"max_uses,omitempty"`
-	MinPurchase *float64               `json:"min_purchase,omitempty"`
+	MaxUses     *int                   `json:"maxUses,omitempty"`
+	MinPurchase *float64               `json:"minPurchase,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 }
@@ -360,8 +346,8 @@ type UpdateMembership struct {
 	Payment   map[string]interface{} `json:"payment,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	Status    *string                `json:"status,omitempty"`
-	CreatedBy *string                `json:"created_by,omitempty"`
-	UpdatedBy *string                `json:"updated_by,omitempty"`
+	CreatedBy *string                `json:"createdBy,omitempty"`
+	UpdatedBy *string                `json:"updatedBy,omitempty"`
 }
 
 type UpdateOrder struct {
@@ -372,20 +358,11 @@ type UpdateOrder struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type UpdatePoint struct {
-	Points    *int                   `json:"points,omitempty"`
-	Type      *string                `json:"type,omitempty"`
-	ExpiresAt *string                `json:"expires_at,omitempty"`
-	Target    map[string]interface{} `json:"target,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    *string                `json:"status,omitempty"`
-}
-
 type UpdatePromotion struct {
 	Locale      *string                `json:"locale,omitempty"`
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
-	Points      *int                   `json:"points,omitempty"`
+	Credits     *int                   `json:"credits,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
@@ -400,7 +377,7 @@ type UpdateQuote struct {
 	Terms       *string                `json:"terms,omitempty"`
 	Notes       *string                `json:"notes,omitempty"`
 	Template    *string                `json:"template,omitempty"`
-	ValidUntil  *int                   `json:"valid_until,omitempty"`
+	ValidUntil  *int                   `json:"validUntil,omitempty"`
 	Amount      *float64               `json:"amount,omitempty"`
 	Currency    *string                `json:"currency,omitempty"`
 	Billing     map[string]interface{} `json:"billing,omitempty"`
@@ -414,7 +391,7 @@ type UpdateReward struct {
 	Cost        *string                `json:"cost,omitempty"`
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
-	Points      *int                   `json:"points,omitempty"`
+	Credits     *int                   `json:"credits,omitempty"`
 	ExpiresAt   *string                `json:"expires_at,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
@@ -440,8 +417,8 @@ type UpdateVariant struct {
 	Discount    *float64               `json:"discount,omitempty"`
 	Quantity    *int                   `json:"quantity,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	StartDate   *string                `json:"start_date,omitempty"`
-	EndDate     *string                `json:"end_date,omitempty"`
+	Start       *string                `json:"start,omitempty"`
+	End         *string                `json:"end,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 	Package     *string                `json:"package,omitempty"`
 }
@@ -720,51 +697,6 @@ func (e *PhoneType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e PhoneType) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type PointType string
-
-const (
-	PointTypeEarn       PointType = "EARN"
-	PointTypeRedeem     PointType = "REDEEM"
-	PointTypeTransfer   PointType = "TRANSFER"
-	PointTypeAdjustment PointType = "ADJUSTMENT"
-)
-
-var AllPointType = []PointType{
-	PointTypeEarn,
-	PointTypeRedeem,
-	PointTypeTransfer,
-	PointTypeAdjustment,
-}
-
-func (e PointType) IsValid() bool {
-	switch e {
-	case PointTypeEarn, PointTypeRedeem, PointTypeTransfer, PointTypeAdjustment:
-		return true
-	}
-	return false
-}
-
-func (e PointType) String() string {
-	return string(e)
-}
-
-func (e *PointType) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = PointType(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid PointType", str)
-	}
-	return nil
-}
-
-func (e PointType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

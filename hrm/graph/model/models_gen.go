@@ -90,12 +90,11 @@ type NewApplication struct {
 }
 
 type NewAttendance struct {
-	UID      string                 `json:"uid"`
-	TimeIn   string                 `json:"time_in"`
-	TimeOut  string                 `json:"time_out"`
+	TimeIn   *string                `json:"timeIn,omitempty"`
+	TimeOut  *string                `json:"timeOut,omitempty"`
 	Notes    *string                `json:"notes,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
-	Status   string                 `json:"status"`
+	Status   *string                `json:"status,omitempty"`
 }
 
 type NewJob struct {
@@ -109,18 +108,17 @@ type NewJob struct {
 	Type         string                 `json:"type"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	Status       string                 `json:"status"`
-	CreatedBy    *string                `json:"created_by,omitempty"`
-	UpdatedBy    *string                `json:"updated_by,omitempty"`
+	CreatedBy    *string                `json:"createdBy,omitempty"`
+	UpdatedBy    *string                `json:"updatedBy,omitempty"`
 }
 
 type NewLeave struct {
-	UID       string                 `json:"uid"`
-	Type      string                 `json:"type"`
-	StartDate string                 `json:"start_date"`
-	EndDate   *string                `json:"end_date,omitempty"`
-	Reason    string                 `json:"reason"`
-	Status    string                 `json:"status"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Type     string                 `json:"type"`
+	Start    string                 `json:"start"`
+	End      *string                `json:"end,omitempty"`
+	Reason   string                 `json:"reason"`
+	Status   *string                `json:"status,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewOrganization struct {
@@ -135,7 +133,7 @@ type NewOrganization struct {
 
 type NewPayroll struct {
 	UID      string                 `json:"uid"`
-	PayDate  string                 `json:"pay_date"`
+	Date     string                 `json:"date"`
 	Amount   float64                `json:"amount"`
 	Currency string                 `json:"currency"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
@@ -154,12 +152,11 @@ type NewResume struct {
 }
 
 type NewSalary struct {
-	UID       string                 `json:"uid"`
-	Amount    float64                `json:"amount"`
-	Currency  string                 `json:"currency"`
-	StartDate string                 `json:"start_date"`
-	EndDate   *string                `json:"end_date,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Amount   float64                `json:"amount"`
+	Currency string                 `json:"currency"`
+	Start    string                 `json:"start"`
+	End      *string                `json:"end,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type Organizations struct {
@@ -216,8 +213,8 @@ type UpdateApplication struct {
 
 type UpdateAttendance struct {
 	UID      *string                `json:"uid,omitempty"`
-	TimeIn   *string                `json:"time_in,omitempty"`
-	TimeOut  *string                `json:"time_out,omitempty"`
+	TimeIn   *string                `json:"timeIn,omitempty"`
+	TimeOut  *string                `json:"timeOut,omitempty"`
 	Notes    *string                `json:"notes,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	Status   *string                `json:"status,omitempty"`
@@ -234,17 +231,17 @@ type UpdateJob struct {
 	Type         *string                `json:"type,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	Status       *string                `json:"status,omitempty"`
-	CreatedBy    *string                `json:"created_by,omitempty"`
-	UpdatedBy    *string                `json:"updated_by,omitempty"`
+	CreatedBy    *string                `json:"createdBy,omitempty"`
+	UpdatedBy    *string                `json:"updatedBy,omitempty"`
 }
 
 type UpdateLeave struct {
-	Type      *string                `json:"type,omitempty"`
-	StartDate *string                `json:"start_date,omitempty"`
-	EndDate   *string                `json:"end_date,omitempty"`
-	Reason    *string                `json:"reason,omitempty"`
-	Status    *string                `json:"status,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Type     *string                `json:"type,omitempty"`
+	Start    *string                `json:"start,omitempty"`
+	End      *string                `json:"end,omitempty"`
+	Reason   *string                `json:"reason,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateOrganization struct {
@@ -258,7 +255,7 @@ type UpdateOrganization struct {
 }
 
 type UpdatePayroll struct {
-	PayDate  *string                `json:"pay_date,omitempty"`
+	Date     *string                `json:"date,omitempty"`
 	Amount   *float64               `json:"amount,omitempty"`
 	Currency *string                `json:"currency,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
@@ -277,11 +274,11 @@ type UpdateResume struct {
 }
 
 type UpdateSalary struct {
-	Amount    *float64               `json:"amount,omitempty"`
-	Currency  *string                `json:"currency,omitempty"`
-	StartDate *string                `json:"start_date,omitempty"`
-	EndDate   *string                `json:"end_date,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Amount   *float64               `json:"amount,omitempty"`
+	Currency *string                `json:"currency,omitempty"`
+	Start    *string                `json:"start,omitempty"`
+	End      *string                `json:"end,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type AttendanceStatus string

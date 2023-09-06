@@ -41,14 +41,14 @@ func (r *couponResolver) Description(ctx context.Context, obj *model.Coupon) (st
 	return obj.Description[obj.Locale].(string), nil
 }
 
-// StartDate is the resolver for the start_date field.
-func (r *couponResolver) StartDate(ctx context.Context, obj *model.Coupon) (string, error) {
-	return obj.StartDate.Time().Format(time.RFC3339), nil
+// Start is the resolver for the start field.
+func (r *couponResolver) Start(ctx context.Context, obj *model.Coupon) (string, error) {
+	panic(fmt.Errorf("not implemented: Start - start"))
 }
 
-// EndDate is the resolver for the end_date field.
-func (r *couponResolver) EndDate(ctx context.Context, obj *model.Coupon) (string, error) {
-	return obj.EndDate.Time().Format(time.RFC3339), nil
+// End is the resolver for the end field.
+func (r *couponResolver) End(ctx context.Context, obj *model.Coupon) (string, error) {
+	panic(fmt.Errorf("not implemented: End - end"))
 }
 
 // Metadata is the resolver for the metadata field.
@@ -117,8 +117,8 @@ func (r *mutationResolver) CreateCoupon(ctx context.Context, input model.NewCoup
 		},
 	}
 
-	utils.Date(&input.StartDate, &item.StartDate)
-	utils.Date(&input.EndDate, &item.EndDate)
+	utils.Date(&input.Start, &item.Start)
+	utils.Date(&input.End, &item.End)
 
 	// Set the fields from the input
 	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -151,7 +151,7 @@ func (r *mutationResolver) UpdateCoupon(ctx context.Context, id string, input mo
 	}
 
 	if input.Description != nil {
-		item.Description[input.Locale] = *input.Description
+		item.Description[*input.Locale] = *input.Description
 	}
 
 	if input.Type != nil {

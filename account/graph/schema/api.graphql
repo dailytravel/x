@@ -7,10 +7,10 @@ type Api {
   expiration: Int!
   metadata: Map
   status: String!
-  created_at: String!
-  updated_at: String!
-  created_by: ID
-  updated_by: ID
+  createdAt: String!
+  updatedAt: String!
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Apis {

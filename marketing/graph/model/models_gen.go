@@ -32,11 +32,11 @@ type Link struct {
 	Destination string                 `json:"destination"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
+	CreatedAt   string                 `json:"createdAt"`
+	UpdatedAt   string                 `json:"updatedAt"`
 	UID         string                 `json:"uid"`
-	CreatedBy   *string                `json:"created_by,omitempty"`
-	UpdatedBy   *string                `json:"updated_by,omitempty"`
+	CreatedBy   *string                `json:"createdBy,omitempty"`
+	UpdatedBy   *string                `json:"updatedBy,omitempty"`
 }
 
 type Links struct {
@@ -78,8 +78,8 @@ type RuleInput struct {
 type Schedule struct {
 	ID        string                 `json:"id"`
 	Campaign  string                 `json:"campaign"`
-	StartDate string                 `json:"start_date"`
-	EndDate   string                 `json:"end_date"`
+	Start     string                 `json:"start"`
+	End       string                 `json:"end"`
 	Recurring bool                   `json:"recurring"`
 	Frequency *string                `json:"frequency,omitempty"`
 	Interval  *int                   `json:"interval,omitempty"`
@@ -87,8 +87,8 @@ type Schedule struct {
 	Time      string                 `json:"time"`
 	Timezone  string                 `json:"timezone"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
+	CreatedAt string                 `json:"createdAt"`
+	UpdatedAt string                 `json:"updatedAt"`
 }
 
 type Segment struct {
@@ -96,10 +96,10 @@ type Segment struct {
 	Name        string             `json:"name"`
 	Description *string            `json:"description,omitempty"`
 	Criteria    []*SegmentCriteria `json:"criteria"`
-	CreatedAt   string             `json:"created_at"`
-	UpdatedAt   string             `json:"updated_at"`
-	CreatedBy   *User              `json:"created_by,omitempty"`
-	UpdatedBy   *User              `json:"updated_by,omitempty"`
+	CreatedAt   string             `json:"createdAt"`
+	UpdatedAt   string             `json:"updatedAt"`
+	CreatedBy   *string            `json:"createdBy,omitempty"`
+	UpdatedBy   *string            `json:"updatedBy,omitempty"`
 }
 
 type SegmentCriteria struct {

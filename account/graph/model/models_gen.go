@@ -27,14 +27,14 @@ type Identity struct {
 	ID          string                 `json:"id"`
 	User        *User                  `json:"user"`
 	Provider    string                 `json:"provider"`
-	AccessToken string                 `json:"access_token"`
-	ExpiresIn   int                    `json:"expires_in"`
+	AccessToken string                 `json:"accessToken"`
+	ExpiresIn   int                    `json:"expiresIn"`
 	Connection  string                 `json:"connection"`
-	IsSocial    bool                   `json:"is_social"`
+	IsSocial    bool                   `json:"isSocial"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      string                 `json:"status"`
-	CreatedAt   string                 `json:"created_at"`
-	UpdatedAt   string                 `json:"updated_at"`
+	CreatedAt   string                 `json:"createdAt"`
+	UpdatedAt   string                 `json:"updatedAt"`
 }
 
 type Integrations struct {

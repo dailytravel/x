@@ -210,7 +210,7 @@ type ComplexityRoot struct {
 	Task struct {
 		CreatedAt func(childComplexity int) int
 		CreatedBy func(childComplexity int) int
-		EndAt     func(childComplexity int) int
+		End       func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Labels    func(childComplexity int) int
 		List      func(childComplexity int) int
@@ -220,7 +220,7 @@ type ComplexityRoot struct {
 		Order     func(childComplexity int) int
 		Parent    func(childComplexity int) int
 		Priority  func(childComplexity int) int
-		StartAt   func(childComplexity int) int
+		Start     func(childComplexity int) int
 		Status    func(childComplexity int) int
 		Subtasks  func(childComplexity int) int
 		UID       func(childComplexity int) int
@@ -237,12 +237,12 @@ type ComplexityRoot struct {
 		CreatedAt   func(childComplexity int) int
 		CreatedBy   func(childComplexity int) int
 		Description func(childComplexity int) int
-		EndDate     func(childComplexity int) int
+		End         func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Metadata    func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Parent      func(childComplexity int) int
-		StartDate   func(childComplexity int) int
+		Start       func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 		UpdatedBy   func(childComplexity int) int
 	}
@@ -371,8 +371,8 @@ type TaskResolver interface {
 	Subtasks(ctx context.Context, obj *model.Task) ([]*model.Task, error)
 	List(ctx context.Context, obj *model.Task) (*model.List, error)
 
-	StartAt(ctx context.Context, obj *model.Task) (*string, error)
-	EndAt(ctx context.Context, obj *model.Task) (*string, error)
+	Start(ctx context.Context, obj *model.Task) (*string, error)
+	End(ctx context.Context, obj *model.Task) (*string, error)
 
 	Metadata(ctx context.Context, obj *model.Task) (map[string]interface{}, error)
 	CreatedAt(ctx context.Context, obj *model.Task) (string, error)
@@ -385,8 +385,8 @@ type TimeResolver interface {
 	ID(ctx context.Context, obj *model.Time) (string, error)
 	Parent(ctx context.Context, obj *model.Time) (*model.Time, error)
 
-	StartDate(ctx context.Context, obj *model.Time) (string, error)
-	EndDate(ctx context.Context, obj *model.Time) (string, error)
+	Start(ctx context.Context, obj *model.Time) (string, error)
+	End(ctx context.Context, obj *model.Time) (string, error)
 	Metadata(ctx context.Context, obj *model.Time) (map[string]interface{}, error)
 	CreatedAt(ctx context.Context, obj *model.Time) (string, error)
 	UpdatedAt(ctx context.Context, obj *model.Time) (string, error)
@@ -423,14 +423,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Board.Background(childComplexity), true
 
-	case "Board.created_at":
+	case "Board.createdAt":
 		if e.complexity.Board.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Board.CreatedAt(childComplexity), true
 
-	case "Board.created_by":
+	case "Board.createdBy":
 		if e.complexity.Board.CreatedBy == nil {
 			break
 		}
@@ -528,14 +528,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Board.UID(childComplexity), true
 
-	case "Board.updated_at":
+	case "Board.updatedAt":
 		if e.complexity.Board.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Board.UpdatedAt(childComplexity), true
 
-	case "Board.updated_by":
+	case "Board.updatedBy":
 		if e.complexity.Board.UpdatedBy == nil {
 			break
 		}
@@ -587,14 +587,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.FindUserByID(childComplexity, args["id"].(string)), true
 
-	case "Goal.created_at":
+	case "Goal.createdAt":
 		if e.complexity.Goal.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Goal.CreatedAt(childComplexity), true
 
-	case "Goal.created_by":
+	case "Goal.createdBy":
 		if e.complexity.Goal.CreatedBy == nil {
 			break
 		}
@@ -664,14 +664,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Goal.UID(childComplexity), true
 
-	case "Goal.updated_at":
+	case "Goal.updatedAt":
 		if e.complexity.Goal.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Goal.UpdatedAt(childComplexity), true
 
-	case "Goal.updated_by":
+	case "Goal.updatedBy":
 		if e.complexity.Goal.UpdatedBy == nil {
 			break
 		}
@@ -699,14 +699,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.List.Board(childComplexity), true
 
-	case "List.created_at":
+	case "List.createdAt":
 		if e.complexity.List.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.List.CreatedAt(childComplexity), true
 
-	case "List.created_by":
+	case "List.createdBy":
 		if e.complexity.List.CreatedBy == nil {
 			break
 		}
@@ -755,14 +755,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.List.UID(childComplexity), true
 
-	case "List.updated_at":
+	case "List.updatedAt":
 		if e.complexity.List.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.List.UpdatedAt(childComplexity), true
 
-	case "List.updated_by":
+	case "List.updatedBy":
 		if e.complexity.List.UpdatedBy == nil {
 			break
 		}
@@ -1127,14 +1127,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Portfolio.Color(childComplexity), true
 
-	case "Portfolio.created_at":
+	case "Portfolio.createdAt":
 		if e.complexity.Portfolio.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Portfolio.CreatedAt(childComplexity), true
 
-	case "Portfolio.created_by":
+	case "Portfolio.createdBy":
 		if e.complexity.Portfolio.CreatedBy == nil {
 			break
 		}
@@ -1183,14 +1183,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Portfolio.UID(childComplexity), true
 
-	case "Portfolio.updated_at":
+	case "Portfolio.updatedAt":
 		if e.complexity.Portfolio.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Portfolio.UpdatedAt(childComplexity), true
 
-	case "Portfolio.updated_by":
+	case "Portfolio.updatedBy":
 		if e.complexity.Portfolio.UpdatedBy == nil {
 			break
 		}
@@ -1374,26 +1374,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.__resolve_entities(childComplexity, args["representations"].([]map[string]interface{})), true
 
-	case "Task.created_at":
+	case "Task.createdAt":
 		if e.complexity.Task.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Task.CreatedAt(childComplexity), true
 
-	case "Task.created_by":
+	case "Task.createdBy":
 		if e.complexity.Task.CreatedBy == nil {
 			break
 		}
 
 		return e.complexity.Task.CreatedBy(childComplexity), true
 
-	case "Task.end_at":
-		if e.complexity.Task.EndAt == nil {
+	case "Task.end":
+		if e.complexity.Task.End == nil {
 			break
 		}
 
-		return e.complexity.Task.EndAt(childComplexity), true
+		return e.complexity.Task.End(childComplexity), true
 
 	case "Task.id":
 		if e.complexity.Task.ID == nil {
@@ -1458,12 +1458,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.Priority(childComplexity), true
 
-	case "Task.start_at":
-		if e.complexity.Task.StartAt == nil {
+	case "Task.start":
+		if e.complexity.Task.Start == nil {
 			break
 		}
 
-		return e.complexity.Task.StartAt(childComplexity), true
+		return e.complexity.Task.Start(childComplexity), true
 
 	case "Task.status":
 		if e.complexity.Task.Status == nil {
@@ -1486,14 +1486,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.UID(childComplexity), true
 
-	case "Task.updated_at":
+	case "Task.updatedAt":
 		if e.complexity.Task.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Task.UpdatedAt(childComplexity), true
 
-	case "Task.updated_by":
+	case "Task.updatedBy":
 		if e.complexity.Task.UpdatedBy == nil {
 			break
 		}
@@ -1514,14 +1514,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tasks.Data(childComplexity), true
 
-	case "Time.created_at":
+	case "Time.createdAt":
 		if e.complexity.Time.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Time.CreatedAt(childComplexity), true
 
-	case "Time.created_by":
+	case "Time.createdBy":
 		if e.complexity.Time.CreatedBy == nil {
 			break
 		}
@@ -1535,12 +1535,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Time.Description(childComplexity), true
 
-	case "Time.end_date":
-		if e.complexity.Time.EndDate == nil {
+	case "Time.end":
+		if e.complexity.Time.End == nil {
 			break
 		}
 
-		return e.complexity.Time.EndDate(childComplexity), true
+		return e.complexity.Time.End(childComplexity), true
 
 	case "Time.id":
 		if e.complexity.Time.ID == nil {
@@ -1570,21 +1570,21 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Time.Parent(childComplexity), true
 
-	case "Time.start_date":
-		if e.complexity.Time.StartDate == nil {
+	case "Time.start":
+		if e.complexity.Time.Start == nil {
 			break
 		}
 
-		return e.complexity.Time.StartDate(childComplexity), true
+		return e.complexity.Time.Start(childComplexity), true
 
-	case "Time.updated_at":
+	case "Time.updatedAt":
 		if e.complexity.Time.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Time.UpdatedAt(childComplexity), true
 
-	case "Time.updated_by":
+	case "Time.updatedBy":
 		if e.complexity.Time.UpdatedBy == nil {
 			break
 		}
@@ -2685,16 +2685,16 @@ func (ec *executionContext) fieldContext_Board_portfolio(ctx context.Context, fi
 				return ec.fieldContext_Portfolio_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Portfolio_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Portfolio_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Portfolio_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Portfolio_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Portfolio_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Portfolio_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Portfolio_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Portfolio_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Portfolio_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Portfolio_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Portfolio", field.Name)
 		},
@@ -3130,8 +3130,8 @@ func (ec *executionContext) fieldContext_Board_status(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Board_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Board_created_at(ctx, field)
+func (ec *executionContext) _Board_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Board_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3161,7 +3161,7 @@ func (ec *executionContext) _Board_created_at(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Board_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Board_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Board",
 		Field:      field,
@@ -3174,8 +3174,8 @@ func (ec *executionContext) fieldContext_Board_created_at(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Board_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Board_updated_at(ctx, field)
+func (ec *executionContext) _Board_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Board_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3205,7 +3205,7 @@ func (ec *executionContext) _Board_updated_at(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Board_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Board_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Board",
 		Field:      field,
@@ -3264,18 +3264,18 @@ func (ec *executionContext) fieldContext_Board_lists(ctx context.Context, field 
 				return ec.fieldContext_List_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_List_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_List_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_List_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_List_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_List_updatedAt(ctx, field)
 			case "tasks":
 				return ec.fieldContext_List_tasks(ctx, field)
 			case "uid":
 				return ec.fieldContext_List_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_List_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_List_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_List_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_List_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type List", field.Name)
 		},
@@ -3327,8 +3327,8 @@ func (ec *executionContext) fieldContext_Board_uid(ctx context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Board_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Board_created_by(ctx, field)
+func (ec *executionContext) _Board_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Board_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3355,7 +3355,7 @@ func (ec *executionContext) _Board_created_by(ctx context.Context, field graphql
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Board_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Board_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Board",
 		Field:      field,
@@ -3368,8 +3368,8 @@ func (ec *executionContext) fieldContext_Board_created_by(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Board_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Board_updated_by(ctx, field)
+func (ec *executionContext) _Board_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Board_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3396,7 +3396,7 @@ func (ec *executionContext) _Board_updated_by(ctx context.Context, field graphql
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Board_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Board_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Board",
 		Field:      field,
@@ -3469,18 +3469,18 @@ func (ec *executionContext) fieldContext_Boards_data(ctx context.Context, field 
 				return ec.fieldContext_Board_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Board_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Board_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Board_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Board_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Board_updatedAt(ctx, field)
 			case "lists":
 				return ec.fieldContext_Board_lists(ctx, field)
 			case "uid":
 				return ec.fieldContext_Board_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Board_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Board_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Board_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Board_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -3639,18 +3639,18 @@ func (ec *executionContext) fieldContext_Entity_findBoardByID(ctx context.Contex
 				return ec.fieldContext_Board_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Board_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Board_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Board_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Board_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Board_updatedAt(ctx, field)
 			case "lists":
 				return ec.fieldContext_Board_lists(ctx, field)
 			case "uid":
 				return ec.fieldContext_Board_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Board_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Board_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Board_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Board_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -3949,8 +3949,8 @@ func (ec *executionContext) fieldContext_Goal_status(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Goal_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Goal) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Goal_created_at(ctx, field)
+func (ec *executionContext) _Goal_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Goal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Goal_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3980,7 +3980,7 @@ func (ec *executionContext) _Goal_created_at(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Goal_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Goal_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Goal",
 		Field:      field,
@@ -3993,8 +3993,8 @@ func (ec *executionContext) fieldContext_Goal_created_at(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Goal_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Goal) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Goal_updated_at(ctx, field)
+func (ec *executionContext) _Goal_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Goal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Goal_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4024,7 +4024,7 @@ func (ec *executionContext) _Goal_updated_at(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Goal_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Goal_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Goal",
 		Field:      field,
@@ -4083,10 +4083,10 @@ func (ec *executionContext) fieldContext_Goal_parent(ctx context.Context, field 
 				return ec.fieldContext_Goal_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Goal_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Goal_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Goal_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Goal_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Goal_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Goal_parent(ctx, field)
 			case "time":
@@ -4095,10 +4095,10 @@ func (ec *executionContext) fieldContext_Goal_parent(ctx context.Context, field 
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Goal_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Goal_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Goal_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Goal_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Goal", field.Name)
 		},
@@ -4153,20 +4153,20 @@ func (ec *executionContext) fieldContext_Goal_time(ctx context.Context, field gr
 				return ec.fieldContext_Time_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Time_description(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Time_start_date(ctx, field)
-			case "end_date":
-				return ec.fieldContext_Time_end_date(ctx, field)
+			case "start":
+				return ec.fieldContext_Time_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Time_end(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Time_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Time_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Time_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Time_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Time_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Time_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Time_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Time_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Time_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Time", field.Name)
 		},
@@ -4259,8 +4259,8 @@ func (ec *executionContext) fieldContext_Goal_organization(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Goal_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Goal) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Goal_created_by(ctx, field)
+func (ec *executionContext) _Goal_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Goal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Goal_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4287,7 +4287,7 @@ func (ec *executionContext) _Goal_created_by(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Goal_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Goal_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Goal",
 		Field:      field,
@@ -4300,8 +4300,8 @@ func (ec *executionContext) fieldContext_Goal_created_by(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Goal_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Goal) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Goal_updated_by(ctx, field)
+func (ec *executionContext) _Goal_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Goal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Goal_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4328,7 +4328,7 @@ func (ec *executionContext) _Goal_updated_by(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Goal_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Goal_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Goal",
 		Field:      field,
@@ -4431,10 +4431,10 @@ func (ec *executionContext) fieldContext_Goals_data(ctx context.Context, field g
 				return ec.fieldContext_Goal_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Goal_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Goal_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Goal_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Goal_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Goal_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Goal_parent(ctx, field)
 			case "time":
@@ -4443,10 +4443,10 @@ func (ec *executionContext) fieldContext_Goals_data(ctx context.Context, field g
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Goal_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Goal_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Goal_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Goal_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Goal", field.Name)
 		},
@@ -4605,18 +4605,18 @@ func (ec *executionContext) fieldContext_List_board(ctx context.Context, field g
 				return ec.fieldContext_Board_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Board_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Board_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Board_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Board_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Board_updatedAt(ctx, field)
 			case "lists":
 				return ec.fieldContext_Board_lists(ctx, field)
 			case "uid":
 				return ec.fieldContext_Board_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Board_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Board_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Board_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Board_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -4709,8 +4709,8 @@ func (ec *executionContext) fieldContext_List_metadata(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _List_created_at(ctx context.Context, field graphql.CollectedField, obj *model.List) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_List_created_at(ctx, field)
+func (ec *executionContext) _List_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.List) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_List_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4740,7 +4740,7 @@ func (ec *executionContext) _List_created_at(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_List_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_List_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "List",
 		Field:      field,
@@ -4753,8 +4753,8 @@ func (ec *executionContext) fieldContext_List_created_at(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _List_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.List) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_List_updated_at(ctx, field)
+func (ec *executionContext) _List_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.List) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_List_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4784,7 +4784,7 @@ func (ec *executionContext) _List_updated_at(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_List_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_List_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "List",
 		Field:      field,
@@ -4847,10 +4847,10 @@ func (ec *executionContext) fieldContext_List_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_at":
-				return ec.fieldContext_Task_start_at(ctx, field)
-			case "end_at":
-				return ec.fieldContext_Task_end_at(ctx, field)
+			case "start":
+				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -4859,16 +4859,16 @@ func (ec *executionContext) fieldContext_List_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Task_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Task_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Task_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Task_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Task_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Task_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Task_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
 		},
@@ -4920,8 +4920,8 @@ func (ec *executionContext) fieldContext_List_uid(ctx context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _List_created_by(ctx context.Context, field graphql.CollectedField, obj *model.List) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_List_created_by(ctx, field)
+func (ec *executionContext) _List_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.List) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_List_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4948,7 +4948,7 @@ func (ec *executionContext) _List_created_by(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_List_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_List_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "List",
 		Field:      field,
@@ -4961,8 +4961,8 @@ func (ec *executionContext) fieldContext_List_created_by(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _List_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.List) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_List_updated_by(ctx, field)
+func (ec *executionContext) _List_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.List) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_List_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4989,7 +4989,7 @@ func (ec *executionContext) _List_updated_by(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_List_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_List_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "List",
 		Field:      field,
@@ -5092,18 +5092,18 @@ func (ec *executionContext) fieldContext_Lists_data(ctx context.Context, field g
 				return ec.fieldContext_List_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_List_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_List_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_List_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_List_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_List_updatedAt(ctx, field)
 			case "tasks":
 				return ec.fieldContext_List_tasks(ctx, field)
 			case "uid":
 				return ec.fieldContext_List_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_List_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_List_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_List_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_List_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type List", field.Name)
 		},
@@ -5440,18 +5440,18 @@ func (ec *executionContext) fieldContext_Mutation_createBoard(ctx context.Contex
 				return ec.fieldContext_Board_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Board_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Board_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Board_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Board_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Board_updatedAt(ctx, field)
 			case "lists":
 				return ec.fieldContext_Board_lists(ctx, field)
 			case "uid":
 				return ec.fieldContext_Board_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Board_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Board_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Board_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Board_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -5553,18 +5553,18 @@ func (ec *executionContext) fieldContext_Mutation_updateBoard(ctx context.Contex
 				return ec.fieldContext_Board_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Board_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Board_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Board_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Board_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Board_updatedAt(ctx, field)
 			case "lists":
 				return ec.fieldContext_Board_lists(ctx, field)
 			case "uid":
 				return ec.fieldContext_Board_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Board_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Board_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Board_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Board_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -5799,10 +5799,10 @@ func (ec *executionContext) fieldContext_Mutation_createGoal(ctx context.Context
 				return ec.fieldContext_Goal_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Goal_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Goal_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Goal_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Goal_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Goal_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Goal_parent(ctx, field)
 			case "time":
@@ -5811,10 +5811,10 @@ func (ec *executionContext) fieldContext_Mutation_createGoal(ctx context.Context
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Goal_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Goal_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Goal_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Goal_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Goal", field.Name)
 		},
@@ -5899,10 +5899,10 @@ func (ec *executionContext) fieldContext_Mutation_updateGoal(ctx context.Context
 				return ec.fieldContext_Goal_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Goal_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Goal_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Goal_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Goal_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Goal_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Goal_parent(ctx, field)
 			case "time":
@@ -5911,10 +5911,10 @@ func (ec *executionContext) fieldContext_Mutation_updateGoal(ctx context.Context
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Goal_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Goal_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Goal_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Goal_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Goal", field.Name)
 		},
@@ -6143,18 +6143,18 @@ func (ec *executionContext) fieldContext_Mutation_createList(ctx context.Context
 				return ec.fieldContext_List_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_List_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_List_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_List_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_List_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_List_updatedAt(ctx, field)
 			case "tasks":
 				return ec.fieldContext_List_tasks(ctx, field)
 			case "uid":
 				return ec.fieldContext_List_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_List_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_List_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_List_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_List_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type List", field.Name)
 		},
@@ -6239,18 +6239,18 @@ func (ec *executionContext) fieldContext_Mutation_updateList(ctx context.Context
 				return ec.fieldContext_List_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_List_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_List_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_List_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_List_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_List_updatedAt(ctx, field)
 			case "tasks":
 				return ec.fieldContext_List_tasks(ctx, field)
 			case "uid":
 				return ec.fieldContext_List_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_List_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_List_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_List_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_List_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type List", field.Name)
 		},
@@ -6466,16 +6466,16 @@ func (ec *executionContext) fieldContext_Mutation_createPortfolio(ctx context.Co
 				return ec.fieldContext_Portfolio_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Portfolio_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Portfolio_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Portfolio_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Portfolio_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Portfolio_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Portfolio_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Portfolio_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Portfolio_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Portfolio_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Portfolio_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Portfolio", field.Name)
 		},
@@ -6547,16 +6547,16 @@ func (ec *executionContext) fieldContext_Mutation_updatePortfolio(ctx context.Co
 				return ec.fieldContext_Portfolio_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Portfolio_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Portfolio_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Portfolio_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Portfolio_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Portfolio_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Portfolio_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Portfolio_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Portfolio_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Portfolio_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Portfolio_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Portfolio", field.Name)
 		},
@@ -6749,10 +6749,10 @@ func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_at":
-				return ec.fieldContext_Task_start_at(ctx, field)
-			case "end_at":
-				return ec.fieldContext_Task_end_at(ctx, field)
+			case "start":
+				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -6761,16 +6761,16 @@ func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context
 				return ec.fieldContext_Task_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Task_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Task_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Task_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Task_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Task_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Task_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Task_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
 		},
@@ -6859,10 +6859,10 @@ func (ec *executionContext) fieldContext_Mutation_updateTask(ctx context.Context
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_at":
-				return ec.fieldContext_Task_start_at(ctx, field)
-			case "end_at":
-				return ec.fieldContext_Task_end_at(ctx, field)
+			case "start":
+				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -6871,16 +6871,16 @@ func (ec *executionContext) fieldContext_Mutation_updateTask(ctx context.Context
 				return ec.fieldContext_Task_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Task_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Task_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Task_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Task_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Task_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Task_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Task_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
 		},
@@ -7087,20 +7087,20 @@ func (ec *executionContext) fieldContext_Mutation_createTime(ctx context.Context
 				return ec.fieldContext_Time_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Time_description(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Time_start_date(ctx, field)
-			case "end_date":
-				return ec.fieldContext_Time_end_date(ctx, field)
+			case "start":
+				return ec.fieldContext_Time_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Time_end(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Time_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Time_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Time_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Time_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Time_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Time_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Time_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Time_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Time_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Time", field.Name)
 		},
@@ -7163,20 +7163,20 @@ func (ec *executionContext) fieldContext_Mutation_updateTime(ctx context.Context
 				return ec.fieldContext_Time_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Time_description(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Time_start_date(ctx, field)
-			case "end_date":
-				return ec.fieldContext_Time_end_date(ctx, field)
+			case "start":
+				return ec.fieldContext_Time_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Time_end(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Time_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Time_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Time_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Time_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Time_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Time_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Time_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Time_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Time_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Time", field.Name)
 		},
@@ -7535,18 +7535,18 @@ func (ec *executionContext) fieldContext_Portfolio_boards(ctx context.Context, f
 				return ec.fieldContext_Board_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Board_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Board_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Board_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Board_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Board_updatedAt(ctx, field)
 			case "lists":
 				return ec.fieldContext_Board_lists(ctx, field)
 			case "uid":
 				return ec.fieldContext_Board_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Board_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Board_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Board_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Board_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -7639,8 +7639,8 @@ func (ec *executionContext) fieldContext_Portfolio_status(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Portfolio_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Portfolio) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Portfolio_created_at(ctx, field)
+func (ec *executionContext) _Portfolio_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Portfolio) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Portfolio_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7670,7 +7670,7 @@ func (ec *executionContext) _Portfolio_created_at(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Portfolio_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Portfolio_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Portfolio",
 		Field:      field,
@@ -7683,8 +7683,8 @@ func (ec *executionContext) fieldContext_Portfolio_created_at(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Portfolio_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Portfolio) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Portfolio_updated_at(ctx, field)
+func (ec *executionContext) _Portfolio_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Portfolio) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Portfolio_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7714,7 +7714,7 @@ func (ec *executionContext) _Portfolio_updated_at(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Portfolio_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Portfolio_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Portfolio",
 		Field:      field,
@@ -7771,8 +7771,8 @@ func (ec *executionContext) fieldContext_Portfolio_uid(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Portfolio_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Portfolio) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Portfolio_created_by(ctx, field)
+func (ec *executionContext) _Portfolio_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Portfolio) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Portfolio_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7799,7 +7799,7 @@ func (ec *executionContext) _Portfolio_created_by(ctx context.Context, field gra
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Portfolio_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Portfolio_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Portfolio",
 		Field:      field,
@@ -7812,8 +7812,8 @@ func (ec *executionContext) fieldContext_Portfolio_created_by(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Portfolio_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Portfolio) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Portfolio_updated_by(ctx, field)
+func (ec *executionContext) _Portfolio_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Portfolio) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Portfolio_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7840,7 +7840,7 @@ func (ec *executionContext) _Portfolio_updated_by(ctx context.Context, field gra
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Portfolio_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Portfolio_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Portfolio",
 		Field:      field,
@@ -7903,16 +7903,16 @@ func (ec *executionContext) fieldContext_Portfolios_data(ctx context.Context, fi
 				return ec.fieldContext_Portfolio_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Portfolio_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Portfolio_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Portfolio_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Portfolio_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Portfolio_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Portfolio_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Portfolio_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Portfolio_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Portfolio_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Portfolio_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Portfolio", field.Name)
 		},
@@ -8024,18 +8024,18 @@ func (ec *executionContext) fieldContext_Query_board(ctx context.Context, field 
 				return ec.fieldContext_Board_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Board_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Board_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Board_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Board_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Board_updatedAt(ctx, field)
 			case "lists":
 				return ec.fieldContext_Board_lists(ctx, field)
 			case "uid":
 				return ec.fieldContext_Board_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Board_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Board_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Board_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Board_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -8198,10 +8198,10 @@ func (ec *executionContext) fieldContext_Query_goal(ctx context.Context, field g
 				return ec.fieldContext_Goal_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Goal_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Goal_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Goal_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Goal_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Goal_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Goal_parent(ctx, field)
 			case "time":
@@ -8210,10 +8210,10 @@ func (ec *executionContext) fieldContext_Query_goal(ctx context.Context, field g
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Goal_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Goal_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Goal_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Goal_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Goal", field.Name)
 		},
@@ -8376,18 +8376,18 @@ func (ec *executionContext) fieldContext_Query_list(ctx context.Context, field g
 				return ec.fieldContext_List_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_List_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_List_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_List_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_List_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_List_updatedAt(ctx, field)
 			case "tasks":
 				return ec.fieldContext_List_tasks(ctx, field)
 			case "uid":
 				return ec.fieldContext_List_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_List_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_List_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_List_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_List_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type List", field.Name)
 		},
@@ -8534,16 +8534,16 @@ func (ec *executionContext) fieldContext_Query_portfolio(ctx context.Context, fi
 				return ec.fieldContext_Portfolio_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Portfolio_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Portfolio_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Portfolio_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Portfolio_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Portfolio_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Portfolio_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Portfolio_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Portfolio_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Portfolio_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Portfolio_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Portfolio", field.Name)
 		},
@@ -8670,10 +8670,10 @@ func (ec *executionContext) fieldContext_Query_task(ctx context.Context, field g
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_at":
-				return ec.fieldContext_Task_start_at(ctx, field)
-			case "end_at":
-				return ec.fieldContext_Task_end_at(ctx, field)
+			case "start":
+				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -8682,16 +8682,16 @@ func (ec *executionContext) fieldContext_Query_task(ctx context.Context, field g
 				return ec.fieldContext_Task_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Task_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Task_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Task_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Task_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Task_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Task_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Task_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
 		},
@@ -8832,20 +8832,20 @@ func (ec *executionContext) fieldContext_Query_time(ctx context.Context, field g
 				return ec.fieldContext_Time_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Time_description(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Time_start_date(ctx, field)
-			case "end_date":
-				return ec.fieldContext_Time_end_date(ctx, field)
+			case "start":
+				return ec.fieldContext_Time_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Time_end(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Time_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Time_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Time_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Time_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Time_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Time_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Time_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Time_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Time_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Time", field.Name)
 		},
@@ -9292,10 +9292,10 @@ func (ec *executionContext) fieldContext_Task_parent(ctx context.Context, field 
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_at":
-				return ec.fieldContext_Task_start_at(ctx, field)
-			case "end_at":
-				return ec.fieldContext_Task_end_at(ctx, field)
+			case "start":
+				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -9304,16 +9304,16 @@ func (ec *executionContext) fieldContext_Task_parent(ctx context.Context, field 
 				return ec.fieldContext_Task_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Task_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Task_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Task_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Task_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Task_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Task_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Task_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
 		},
@@ -9371,10 +9371,10 @@ func (ec *executionContext) fieldContext_Task_subtasks(ctx context.Context, fiel
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_at":
-				return ec.fieldContext_Task_start_at(ctx, field)
-			case "end_at":
-				return ec.fieldContext_Task_end_at(ctx, field)
+			case "start":
+				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -9383,16 +9383,16 @@ func (ec *executionContext) fieldContext_Task_subtasks(ctx context.Context, fiel
 				return ec.fieldContext_Task_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Task_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Task_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Task_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Task_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Task_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Task_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Task_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
 		},
@@ -9449,18 +9449,18 @@ func (ec *executionContext) fieldContext_Task_list(ctx context.Context, field gr
 				return ec.fieldContext_List_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_List_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_List_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_List_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_List_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_List_updatedAt(ctx, field)
 			case "tasks":
 				return ec.fieldContext_List_tasks(ctx, field)
 			case "uid":
 				return ec.fieldContext_List_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_List_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_List_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_List_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_List_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type List", field.Name)
 		},
@@ -9553,8 +9553,8 @@ func (ec *executionContext) fieldContext_Task_priority(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_start_at(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_start_at(ctx, field)
+func (ec *executionContext) _Task_start(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_start(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9567,7 +9567,7 @@ func (ec *executionContext) _Task_start_at(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Task().StartAt(rctx, obj)
+		return ec.resolvers.Task().Start(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9581,7 +9581,7 @@ func (ec *executionContext) _Task_start_at(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_start_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_start(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -9594,8 +9594,8 @@ func (ec *executionContext) fieldContext_Task_start_at(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_end_at(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_end_at(ctx, field)
+func (ec *executionContext) _Task_end(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_end(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9608,7 +9608,7 @@ func (ec *executionContext) _Task_end_at(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Task().EndAt(rctx, obj)
+		return ec.resolvers.Task().End(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9622,7 +9622,7 @@ func (ec *executionContext) _Task_end_at(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_end_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_end(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -9802,8 +9802,8 @@ func (ec *executionContext) fieldContext_Task_metadata(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_created_at(ctx, field)
+func (ec *executionContext) _Task_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9833,7 +9833,7 @@ func (ec *executionContext) _Task_created_at(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -9846,8 +9846,8 @@ func (ec *executionContext) fieldContext_Task_created_at(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_updated_at(ctx, field)
+func (ec *executionContext) _Task_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9877,7 +9877,7 @@ func (ec *executionContext) _Task_updated_at(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -9934,8 +9934,8 @@ func (ec *executionContext) fieldContext_Task_uid(ctx context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_created_by(ctx, field)
+func (ec *executionContext) _Task_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9962,7 +9962,7 @@ func (ec *executionContext) _Task_created_by(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -9975,8 +9975,8 @@ func (ec *executionContext) fieldContext_Task_created_by(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_updated_by(ctx, field)
+func (ec *executionContext) _Task_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10003,7 +10003,7 @@ func (ec *executionContext) _Task_updated_by(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -10066,10 +10066,10 @@ func (ec *executionContext) fieldContext_Tasks_data(ctx context.Context, field g
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_at":
-				return ec.fieldContext_Task_start_at(ctx, field)
-			case "end_at":
-				return ec.fieldContext_Task_end_at(ctx, field)
+			case "start":
+				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -10078,16 +10078,16 @@ func (ec *executionContext) fieldContext_Tasks_data(ctx context.Context, field g
 				return ec.fieldContext_Task_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Task_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Task_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Task_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Task_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Task_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Task_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Task_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
 		},
@@ -10227,20 +10227,20 @@ func (ec *executionContext) fieldContext_Time_parent(ctx context.Context, field 
 				return ec.fieldContext_Time_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Time_description(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Time_start_date(ctx, field)
-			case "end_date":
-				return ec.fieldContext_Time_end_date(ctx, field)
+			case "start":
+				return ec.fieldContext_Time_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Time_end(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Time_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Time_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Time_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Time_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Time_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Time_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Time_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Time_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Time_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Time", field.Name)
 		},
@@ -10336,8 +10336,8 @@ func (ec *executionContext) fieldContext_Time_description(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Time_start_date(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Time_start_date(ctx, field)
+func (ec *executionContext) _Time_start(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Time_start(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10350,7 +10350,7 @@ func (ec *executionContext) _Time_start_date(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Time().StartDate(rctx, obj)
+		return ec.resolvers.Time().Start(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10367,7 +10367,7 @@ func (ec *executionContext) _Time_start_date(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Time_start_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Time_start(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Time",
 		Field:      field,
@@ -10380,8 +10380,8 @@ func (ec *executionContext) fieldContext_Time_start_date(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Time_end_date(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Time_end_date(ctx, field)
+func (ec *executionContext) _Time_end(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Time_end(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10394,7 +10394,7 @@ func (ec *executionContext) _Time_end_date(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Time().EndDate(rctx, obj)
+		return ec.resolvers.Time().End(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10411,7 +10411,7 @@ func (ec *executionContext) _Time_end_date(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Time_end_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Time_end(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Time",
 		Field:      field,
@@ -10465,8 +10465,8 @@ func (ec *executionContext) fieldContext_Time_metadata(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Time_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Time_created_at(ctx, field)
+func (ec *executionContext) _Time_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Time_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10496,7 +10496,7 @@ func (ec *executionContext) _Time_created_at(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Time_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Time_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Time",
 		Field:      field,
@@ -10509,8 +10509,8 @@ func (ec *executionContext) fieldContext_Time_created_at(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Time_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Time_updated_at(ctx, field)
+func (ec *executionContext) _Time_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Time_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10540,7 +10540,7 @@ func (ec *executionContext) _Time_updated_at(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Time_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Time_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Time",
 		Field:      field,
@@ -10553,8 +10553,8 @@ func (ec *executionContext) fieldContext_Time_updated_at(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Time_created_by(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Time_created_by(ctx, field)
+func (ec *executionContext) _Time_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Time_createdBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10581,7 +10581,7 @@ func (ec *executionContext) _Time_created_by(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Time_created_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Time_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Time",
 		Field:      field,
@@ -10594,8 +10594,8 @@ func (ec *executionContext) fieldContext_Time_created_by(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Time_updated_by(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Time_updated_by(ctx, field)
+func (ec *executionContext) _Time_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Time_updatedBy(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10622,7 +10622,7 @@ func (ec *executionContext) _Time_updated_by(ctx context.Context, field graphql.
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Time_updated_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Time_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Time",
 		Field:      field,
@@ -10679,20 +10679,20 @@ func (ec *executionContext) fieldContext_Times_data(ctx context.Context, field g
 				return ec.fieldContext_Time_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Time_description(ctx, field)
-			case "start_date":
-				return ec.fieldContext_Time_start_date(ctx, field)
-			case "end_date":
-				return ec.fieldContext_Time_end_date(ctx, field)
+			case "start":
+				return ec.fieldContext_Time_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Time_end(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Time_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Time_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Time_updated_at(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Time_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Time_updated_by(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Time_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Time_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Time_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Time_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Time", field.Name)
 		},
@@ -10834,10 +10834,10 @@ func (ec *executionContext) fieldContext_User_goals(ctx context.Context, field g
 				return ec.fieldContext_Goal_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Goal_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Goal_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Goal_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Goal_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Goal_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Goal_parent(ctx, field)
 			case "time":
@@ -10846,10 +10846,10 @@ func (ec *executionContext) fieldContext_User_goals(ctx context.Context, field g
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Goal_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Goal_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Goal_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Goal_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Goal", field.Name)
 		},
@@ -10907,16 +10907,16 @@ func (ec *executionContext) fieldContext_User_portfolios(ctx context.Context, fi
 				return ec.fieldContext_Portfolio_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Portfolio_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Portfolio_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Portfolio_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Portfolio_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Portfolio_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Portfolio_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Portfolio_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Portfolio_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Portfolio_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Portfolio_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Portfolio", field.Name)
 		},
@@ -10984,18 +10984,18 @@ func (ec *executionContext) fieldContext_User_boards(ctx context.Context, field 
 				return ec.fieldContext_Board_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Board_status(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Board_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Board_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Board_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Board_updatedAt(ctx, field)
 			case "lists":
 				return ec.fieldContext_Board_lists(ctx, field)
 			case "uid":
 				return ec.fieldContext_Board_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Board_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Board_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Board_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Board_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -11049,18 +11049,18 @@ func (ec *executionContext) fieldContext_User_lists(ctx context.Context, field g
 				return ec.fieldContext_List_order(ctx, field)
 			case "metadata":
 				return ec.fieldContext_List_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_List_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_List_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_List_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_List_updatedAt(ctx, field)
 			case "tasks":
 				return ec.fieldContext_List_tasks(ctx, field)
 			case "uid":
 				return ec.fieldContext_List_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_List_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_List_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_List_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_List_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type List", field.Name)
 		},
@@ -11118,10 +11118,10 @@ func (ec *executionContext) fieldContext_User_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_notes(ctx, field)
 			case "priority":
 				return ec.fieldContext_Task_priority(ctx, field)
-			case "start_at":
-				return ec.fieldContext_Task_start_at(ctx, field)
-			case "end_at":
-				return ec.fieldContext_Task_end_at(ctx, field)
+			case "start":
+				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "labels":
 				return ec.fieldContext_Task_labels(ctx, field)
 			case "order":
@@ -11130,16 +11130,16 @@ func (ec *executionContext) fieldContext_User_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Task_metadata(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Task_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Task_updated_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Task_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Task_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "created_by":
-				return ec.fieldContext_Task_created_by(ctx, field)
-			case "updated_by":
-				return ec.fieldContext_Task_updated_by(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Task_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Task_updatedBy(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
 		},
@@ -12968,7 +12968,7 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type", "user", "organization", "title", "description", "due_date", "is_template", "starred", "order", "background", "metadata", "status"}
+	fieldsInOrder := [...]string{"type", "user", "organization", "title", "description", "dueDate", "isTemplate", "starred", "order", "background", "metadata", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13020,19 +13020,19 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 				return it, err
 			}
 			it.Description = data
-		case "due_date":
+		case "dueDate":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("due_date"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dueDate"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.DueDate = data
-		case "is_template":
+		case "isTemplate":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_template"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isTemplate"))
 			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
@@ -13309,7 +13309,7 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "order", "start_at", "end_at", "labels", "status", "metadata"}
+	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "order", "start", "end", "labels", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13379,24 +13379,24 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Order = data
-		case "start_at":
+		case "start":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_at"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.StartAt = data
-		case "end_at":
+			it.Start = data
+		case "end":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end_at"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EndAt = data
+			it.End = data
 		case "labels":
 			var err error
 
@@ -13437,22 +13437,13 @@ func (ec *executionContext) unmarshalInputNewTime(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "name", "description", "start_date", "end_date", "metadata"}
+	fieldsInOrder := [...]string{"name", "description", "start_date", "end_date", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "parent":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parent"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Parent = data
 		case "name":
 			var err error
 
@@ -13511,13 +13502,22 @@ func (ec *executionContext) unmarshalInputUpdateBoard(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "organization", "title", "description", "due_date", "is_template", "starred", "order", "background", "metadata", "status"}
+	fieldsInOrder := [...]string{"type", "user", "organization", "title", "description", "dueDate", "isTemplate", "starred", "order", "background", "metadata", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
 		case "user":
 			var err error
 
@@ -13554,19 +13554,19 @@ func (ec *executionContext) unmarshalInputUpdateBoard(ctx context.Context, obj i
 				return it, err
 			}
 			it.Description = data
-		case "due_date":
+		case "dueDate":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("due_date"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dueDate"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.DueDate = data
-		case "is_template":
+		case "isTemplate":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_template"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isTemplate"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
@@ -13834,7 +13834,7 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "order", "start_at", "end_at", "labels", "status", "metadata"}
+	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "order", "start", "end", "labels", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13904,24 +13904,24 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 				return it, err
 			}
 			it.Order = data
-		case "start_at":
+		case "start":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start_at"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.StartAt = data
-		case "end_at":
+			it.Start = data
+		case "end":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end_at"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EndAt = data
+			it.End = data
 		case "labels":
 			var err error
 
@@ -14238,7 +14238,7 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14247,7 +14247,7 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Board_created_at(ctx, field, obj)
+				res = ec._Board_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -14274,7 +14274,7 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14283,7 +14283,7 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Board_updated_at(ctx, field, obj)
+				res = ec._Board_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -14379,7 +14379,7 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14388,7 +14388,7 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Board_created_by(ctx, field, obj)
+				res = ec._Board_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -14412,7 +14412,7 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14421,7 +14421,7 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Board_updated_by(ctx, field, obj)
+				res = ec._Board_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -14723,7 +14723,7 @@ func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "status":
 			out.Values[i] = ec._Goal_status(ctx, field, obj)
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14732,7 +14732,7 @@ func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Goal_created_at(ctx, field, obj)
+				res = ec._Goal_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -14759,7 +14759,7 @@ func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14768,7 +14768,7 @@ func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Goal_updated_at(ctx, field, obj)
+				res = ec._Goal_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -14933,7 +14933,7 @@ func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14942,7 +14942,7 @@ func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Goal_created_by(ctx, field, obj)
+				res = ec._Goal_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -14966,7 +14966,7 @@ func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -14975,7 +14975,7 @@ func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Goal_updated_by(ctx, field, obj)
+				res = ec._Goal_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -15189,7 +15189,7 @@ func (ec *executionContext) _List(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15198,7 +15198,7 @@ func (ec *executionContext) _List(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._List_created_at(ctx, field, obj)
+				res = ec._List_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15225,7 +15225,7 @@ func (ec *executionContext) _List(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15234,7 +15234,7 @@ func (ec *executionContext) _List(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._List_updated_at(ctx, field, obj)
+				res = ec._List_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15330,7 +15330,7 @@ func (ec *executionContext) _List(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15339,7 +15339,7 @@ func (ec *executionContext) _List(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._List_created_by(ctx, field, obj)
+				res = ec._List_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -15363,7 +15363,7 @@ func (ec *executionContext) _List(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15372,7 +15372,7 @@ func (ec *executionContext) _List(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._List_updated_by(ctx, field, obj)
+				res = ec._List_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -15795,7 +15795,7 @@ func (ec *executionContext) _Portfolio(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15804,7 +15804,7 @@ func (ec *executionContext) _Portfolio(ctx context.Context, sel ast.SelectionSet
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Portfolio_created_at(ctx, field, obj)
+				res = ec._Portfolio_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15831,7 +15831,7 @@ func (ec *executionContext) _Portfolio(ctx context.Context, sel ast.SelectionSet
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15840,7 +15840,7 @@ func (ec *executionContext) _Portfolio(ctx context.Context, sel ast.SelectionSet
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Portfolio_updated_at(ctx, field, obj)
+				res = ec._Portfolio_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -15903,7 +15903,7 @@ func (ec *executionContext) _Portfolio(ctx context.Context, sel ast.SelectionSet
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15912,7 +15912,7 @@ func (ec *executionContext) _Portfolio(ctx context.Context, sel ast.SelectionSet
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Portfolio_created_by(ctx, field, obj)
+				res = ec._Portfolio_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -15936,7 +15936,7 @@ func (ec *executionContext) _Portfolio(ctx context.Context, sel ast.SelectionSet
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15945,7 +15945,7 @@ func (ec *executionContext) _Portfolio(ctx context.Context, sel ast.SelectionSet
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Portfolio_updated_by(ctx, field, obj)
+				res = ec._Portfolio_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -16516,7 +16516,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "start_at":
+		case "start":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16525,7 +16525,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Task_start_at(ctx, field, obj)
+				res = ec._Task_start(ctx, field, obj)
 				return res
 			}
 
@@ -16549,7 +16549,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "end_at":
+		case "end":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16558,7 +16558,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Task_end_at(ctx, field, obj)
+				res = ec._Task_end(ctx, field, obj)
 				return res
 			}
 
@@ -16624,7 +16624,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16633,7 +16633,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Task_created_at(ctx, field, obj)
+				res = ec._Task_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -16660,7 +16660,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16669,7 +16669,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Task_updated_at(ctx, field, obj)
+				res = ec._Task_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -16732,7 +16732,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16741,7 +16741,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Task_created_by(ctx, field, obj)
+				res = ec._Task_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -16765,7 +16765,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16774,7 +16774,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Task_updated_by(ctx, field, obj)
+				res = ec._Task_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -16952,7 +16952,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "start_date":
+		case "start":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16961,7 +16961,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Time_start_date(ctx, field, obj)
+				res = ec._Time_start(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -16988,7 +16988,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "end_date":
+		case "end":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16997,7 +16997,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Time_end_date(ctx, field, obj)
+				res = ec._Time_end(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -17057,7 +17057,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -17066,7 +17066,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Time_created_at(ctx, field, obj)
+				res = ec._Time_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -17093,7 +17093,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_at":
+		case "updatedAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -17102,7 +17102,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Time_updated_at(ctx, field, obj)
+				res = ec._Time_updatedAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -17129,7 +17129,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_by":
+		case "createdBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -17138,7 +17138,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Time_created_by(ctx, field, obj)
+				res = ec._Time_createdBy(ctx, field, obj)
 				return res
 			}
 
@@ -17162,7 +17162,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated_by":
+		case "updatedBy":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -17171,7 +17171,7 @@ func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Time_updated_by(ctx, field, obj)
+				res = ec._Time_updatedBy(ctx, field, obj)
 				return res
 			}
 

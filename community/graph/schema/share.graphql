@@ -5,10 +5,10 @@ type Share @key(fields: "id") {
   permission: String!
   metadata: Map
   status: String!
-  created_at: String!
-  updated_at: String!
-  created_by: ID
-  updated_by: ID
+  createdAt: String!
+  updatedAt: String!
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Shares {
@@ -22,8 +22,8 @@ input ShareInput {
   permission: String!
   metadata: Map
   status: String!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 input ShareUpdateInput {
@@ -32,8 +32,8 @@ input ShareUpdateInput {
   permission: String
   metadata: Map
   status: String
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 extend type Query {

@@ -11,10 +11,10 @@ type File @key(fields: "id") {
   metadata: Map
   starred: Boolean!
   status: String!
-  created_at: String!
-  updated_at: String!
-  created_by: ID
-  updated_by: ID
+  createdAt: String!
+  updatedAt: String!
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Files {

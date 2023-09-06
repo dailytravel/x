@@ -7,9 +7,9 @@ type Key {
   fingerprint: String!
   thumbprint: String!
   status: String! #next, current, previous
-  expires_at: String
-  created_at: String!
-  updated_at: String!
+  expiresAt: String
+  createdAt: String!
+  updatedAt: String!
   user: User
 }
 

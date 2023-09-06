@@ -15,7 +15,7 @@ type Promotion struct {
 	Locale      string      `bson:"locale,omitempty" json:"locale,omitempty"`
 	Name        primitive.M `json:"name,omitempty" bson:"name,omitempty"`
 	Description primitive.M `bson:"description,omitempty" json:"description,omitempty"`
-	Points      int         `json:"points,omitempty" bson:"points,omitempty"`
+	Credits     int         `json:"credits,omitempty" bson:"credits,omitempty"`
 	Status      string      `json:"status,omitempty" bson:"status,omitempty"`
 }
 

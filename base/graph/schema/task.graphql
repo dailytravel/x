@@ -6,17 +6,17 @@ type Task {
   list: List!
   notes: String
   priority: String! # enum of low, medium, high
-  start_at: String
-  end_at: String
+  start: String
+  end: String
   labels: [String]
   order: Int
   status: String!
   metadata: Map
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Tasks {
@@ -38,8 +38,8 @@ input NewTask {
   notes: String
   priority: String
   order: Int
-  start_at: String
-  end_at: String
+  start: String
+  end: String
   labels: [String]
   status: String
   metadata: Map
@@ -53,8 +53,8 @@ input UpdateTask {
   notes: String
   priority: String
   order: Int
-  start_at: String
-  end_at: String
+  start: String
+  end: String
   labels: [String]
   status: String
   metadata: Map

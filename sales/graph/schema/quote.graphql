@@ -10,17 +10,17 @@ type Quote {
   payment: String
   notes: String
   template: String!
-  valid_until: Int!
+  validUntil: Int!
   amount: Float!
   currency: String!
   metadata: Map
   billing: Map!
   status: String
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 type Quotes {
@@ -39,7 +39,7 @@ input NewQuote {
   terms: String
   notes: String
   template: String!
-  valid_until: Int!
+  validUntil: Int!
   amount: Float!
   currency: String!
   billing: Map!
@@ -58,7 +58,7 @@ input UpdateQuote {
   terms: String
   notes: String
   template: String
-  valid_until: Int
+  validUntil: Int
   amount: Float
   currency: String
   billing: Map

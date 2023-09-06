@@ -7,11 +7,11 @@ type Transaction {
   metadata: Map #e.g., {"order_id": "1234", "shipping_id": "5678"}
   date: String!
   description: String!
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 enum TransactionMethod {

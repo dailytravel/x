@@ -6,13 +6,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Payroll struct {
 	Model    `bson:",inline"`
 	UID      primitive.ObjectID `bson:"uid" json:"uid"`
-	PayDate  primitive.DateTime `json:"pay_date" bson:"pay_date"`
+	Date     primitive.DateTime `json:"date" bson:"date"`
 	Amount   float64            `json:"amount" bson:"amount"`
 	Currency string             `json:"currency" bson:"currency"`
 	Metadata primitive.M        `json:"metadata,omitempty" bson:"metadata,omitempty"`
@@ -38,10 +37,10 @@ func (i *Payroll) Collection() string {
 
 func (i *Payroll) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "pay_date", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "deleted_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}},
+		{Keys: bson.D{{Key: "date", Value: 1}}},
+		{Keys: bson.D{{Key: "created_at", Value: 1}}},
+		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted_at", Value: 1}}},
 	}
 }

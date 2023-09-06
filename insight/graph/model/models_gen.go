@@ -20,8 +20,8 @@ type NewLog struct {
 	Utm       map[string]interface{} `json:"utm,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	Status    string                 `json:"status"`
-	ClientIP  *string                `json:"client_ip,omitempty"`
-	UserAgent *string                `json:"user_agent,omitempty"`
+	ClientIP  *string                `json:"clientIp,omitempty"`
+	UserAgent *string                `json:"userAgent,omitempty"`
 }
 
 type UpdateLog struct {
@@ -31,6 +31,6 @@ type UpdateLog struct {
 	Utm       map[string]interface{} `json:"utm,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	Status    *string                `json:"status,omitempty"`
-	ClientIP  *string                `json:"client_ip,omitempty"`
-	UserAgent *string                `json:"user_agent,omitempty"`
+	ClientIP  *string                `json:"clientIp,omitempty"`
+	UserAgent *string                `json:"userAgent,omitempty"`
 }

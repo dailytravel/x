@@ -192,7 +192,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Activity.Action(childComplexity), true
 
-	case "Activity.created_at":
+	case "Activity.createdAt":
 		if e.complexity.Activity.CreatedAt == nil {
 			break
 		}
@@ -239,14 +239,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.FindUserByID(childComplexity, args["id"].(string)), true
 
-	case "Log.client_ip":
+	case "Log.clientIp":
 		if e.complexity.Log.ClientIP == nil {
 			break
 		}
 
 		return e.complexity.Log.ClientIP(childComplexity), true
 
-	case "Log.created_at":
+	case "Log.createdAt":
 		if e.complexity.Log.CreatedAt == nil {
 			break
 		}
@@ -302,7 +302,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Log.URL(childComplexity), true
 
-	case "Log.user_agent":
+	case "Log.userAgent":
 		if e.complexity.Log.UserAgent == nil {
 			break
 		}
@@ -960,8 +960,8 @@ func (ec *executionContext) fieldContext_Activities_data(ctx context.Context, fi
 				return ec.fieldContext_Activity_uid(ctx, field)
 			case "target":
 				return ec.fieldContext_Activity_target(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Activity_created_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Activity_createdAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
 		},
@@ -1230,8 +1230,8 @@ func (ec *executionContext) fieldContext_Activity_target(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Activity_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Activity_created_at(ctx, field)
+func (ec *executionContext) _Activity_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Activity_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1261,7 +1261,7 @@ func (ec *executionContext) _Activity_created_at(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Activity_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Activity_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Activity",
 		Field:      field,
@@ -1674,8 +1674,8 @@ func (ec *executionContext) fieldContext_Log_status(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Log_client_ip(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Log_client_ip(ctx, field)
+func (ec *executionContext) _Log_clientIp(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Log_clientIp(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1702,7 +1702,7 @@ func (ec *executionContext) _Log_client_ip(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Log_client_ip(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Log_clientIp(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Log",
 		Field:      field,
@@ -1715,8 +1715,8 @@ func (ec *executionContext) fieldContext_Log_client_ip(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Log_user_agent(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Log_user_agent(ctx, field)
+func (ec *executionContext) _Log_userAgent(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Log_userAgent(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1743,7 +1743,7 @@ func (ec *executionContext) _Log_user_agent(ctx context.Context, field graphql.C
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Log_user_agent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Log_userAgent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Log",
 		Field:      field,
@@ -1756,8 +1756,8 @@ func (ec *executionContext) fieldContext_Log_user_agent(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Log_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Log_created_at(ctx, field)
+func (ec *executionContext) _Log_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Log) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Log_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1784,7 +1784,7 @@ func (ec *executionContext) _Log_created_at(ctx context.Context, field graphql.C
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Log_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Log_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Log",
 		Field:      field,
@@ -1849,12 +1849,12 @@ func (ec *executionContext) fieldContext_Logs_data(ctx context.Context, field gr
 				return ec.fieldContext_Log_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Log_status(ctx, field)
-			case "client_ip":
-				return ec.fieldContext_Log_client_ip(ctx, field)
-			case "user_agent":
-				return ec.fieldContext_Log_user_agent(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Log_created_at(ctx, field)
+			case "clientIp":
+				return ec.fieldContext_Log_clientIp(ctx, field)
+			case "userAgent":
+				return ec.fieldContext_Log_userAgent(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Log_createdAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Log", field.Name)
 		},
@@ -1958,12 +1958,12 @@ func (ec *executionContext) fieldContext_Mutation_createLog(ctx context.Context,
 				return ec.fieldContext_Log_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Log_status(ctx, field)
-			case "client_ip":
-				return ec.fieldContext_Log_client_ip(ctx, field)
-			case "user_agent":
-				return ec.fieldContext_Log_user_agent(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Log_created_at(ctx, field)
+			case "clientIp":
+				return ec.fieldContext_Log_clientIp(ctx, field)
+			case "userAgent":
+				return ec.fieldContext_Log_userAgent(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Log_createdAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Log", field.Name)
 		},
@@ -2034,12 +2034,12 @@ func (ec *executionContext) fieldContext_Mutation_updateLog(ctx context.Context,
 				return ec.fieldContext_Log_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Log_status(ctx, field)
-			case "client_ip":
-				return ec.fieldContext_Log_client_ip(ctx, field)
-			case "user_agent":
-				return ec.fieldContext_Log_user_agent(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Log_created_at(ctx, field)
+			case "clientIp":
+				return ec.fieldContext_Log_clientIp(ctx, field)
+			case "userAgent":
+				return ec.fieldContext_Log_userAgent(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Log_createdAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Log", field.Name)
 		},
@@ -2276,8 +2276,8 @@ func (ec *executionContext) fieldContext_Query_activity(ctx context.Context, fie
 				return ec.fieldContext_Activity_uid(ctx, field)
 			case "target":
 				return ec.fieldContext_Activity_target(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Activity_created_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Activity_createdAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
 		},
@@ -2450,12 +2450,12 @@ func (ec *executionContext) fieldContext_Query_log(ctx context.Context, field gr
 				return ec.fieldContext_Log_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Log_status(ctx, field)
-			case "client_ip":
-				return ec.fieldContext_Log_client_ip(ctx, field)
-			case "user_agent":
-				return ec.fieldContext_Log_user_agent(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Log_created_at(ctx, field)
+			case "clientIp":
+				return ec.fieldContext_Log_clientIp(ctx, field)
+			case "userAgent":
+				return ec.fieldContext_Log_userAgent(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Log_createdAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Log", field.Name)
 		},
@@ -2860,12 +2860,12 @@ func (ec *executionContext) fieldContext_User_logs(ctx context.Context, field gr
 				return ec.fieldContext_Log_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Log_status(ctx, field)
-			case "client_ip":
-				return ec.fieldContext_Log_client_ip(ctx, field)
-			case "user_agent":
-				return ec.fieldContext_Log_user_agent(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Log_created_at(ctx, field)
+			case "clientIp":
+				return ec.fieldContext_Log_clientIp(ctx, field)
+			case "userAgent":
+				return ec.fieldContext_Log_userAgent(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Log_createdAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Log", field.Name)
 		},
@@ -2919,8 +2919,8 @@ func (ec *executionContext) fieldContext_User_activities(ctx context.Context, fi
 				return ec.fieldContext_Activity_uid(ctx, field)
 			case "target":
 				return ec.fieldContext_Activity_target(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Activity_created_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Activity_createdAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
 		},
@@ -4749,7 +4749,7 @@ func (ec *executionContext) unmarshalInputNewLog(ctx context.Context, obj interf
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"uid", "url", "referrer", "title", "utm", "metadata", "status", "client_ip", "user_agent"}
+	fieldsInOrder := [...]string{"uid", "url", "referrer", "title", "utm", "metadata", "status", "clientIp", "userAgent"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4819,19 +4819,19 @@ func (ec *executionContext) unmarshalInputNewLog(ctx context.Context, obj interf
 				return it, err
 			}
 			it.Status = data
-		case "client_ip":
+		case "clientIp":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("client_ip"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clientIp"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ClientIP = data
-		case "user_agent":
+		case "userAgent":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_agent"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userAgent"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
@@ -4850,7 +4850,7 @@ func (ec *executionContext) unmarshalInputUpdateLog(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"url", "referrer", "title", "utm", "metadata", "status", "client_ip", "user_agent"}
+	fieldsInOrder := [...]string{"url", "referrer", "title", "utm", "metadata", "status", "clientIp", "userAgent"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4911,19 +4911,19 @@ func (ec *executionContext) unmarshalInputUpdateLog(ctx context.Context, obj int
 				return it, err
 			}
 			it.Status = data
-		case "client_ip":
+		case "clientIp":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("client_ip"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clientIp"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ClientIP = data
-		case "user_agent":
+		case "userAgent":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_agent"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userAgent"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
@@ -5157,7 +5157,7 @@ func (ec *executionContext) _Activity(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created_at":
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -5166,7 +5166,7 @@ func (ec *executionContext) _Activity(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Activity_created_at(ctx, field, obj)
+				res = ec._Activity_createdAt(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -5440,11 +5440,11 @@ func (ec *executionContext) _Log(ctx context.Context, sel ast.SelectionSet, obj 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "client_ip":
-			out.Values[i] = ec._Log_client_ip(ctx, field, obj)
-		case "user_agent":
-			out.Values[i] = ec._Log_user_agent(ctx, field, obj)
-		case "created_at":
+		case "clientIp":
+			out.Values[i] = ec._Log_clientIp(ctx, field, obj)
+		case "userAgent":
+			out.Values[i] = ec._Log_userAgent(ctx, field, obj)
+		case "createdAt":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -5453,7 +5453,7 @@ func (ec *executionContext) _Log(ctx context.Context, sel ast.SelectionSet, obj 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Log_created_at(ctx, field, obj)
+				res = ec._Log_createdAt(ctx, field, obj)
 				return res
 			}
 

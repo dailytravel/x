@@ -11,12 +11,12 @@ type Board @key(fields: "id") {
   starred: Boolean!
   order: Int!
   status: String!
-  created_at: String!
-  updated_at: String!
+  createdAt: String!
+  updatedAt: String!
   lists: [List]
   uid: ID!
-  created_by: ID
-  updated_by: ID
+  createdBy: ID
+  updatedBy: ID
 }
 
 enum BoardType {
@@ -37,8 +37,8 @@ input NewBoard {
   organization: ID
   title: String!
   description: String
-  due_date: String
-  is_template: Boolean!
+  dueDate: String
+  isTemplate: Boolean!
   starred: Boolean!
   order: Int!
   background: String
@@ -47,12 +47,13 @@ input NewBoard {
 }
 
 input UpdateBoard {
+  type: String
   user: ID
   organization: ID
   title: String
   description: String
-  due_date: String
-  is_template: Boolean
+  dueDate: String
+  isTemplate: Boolean
   starred: Boolean
   order: Int
   background: String

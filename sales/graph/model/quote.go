@@ -19,7 +19,7 @@ type Quote struct {
 	Name        string              `json:"name" bson:"name"`
 	Description *string             `json:"description,omitempty" bson:"description,omitempty"`
 	Template    string              `json:"template" bson:"template"`
-	ValidUntil  primitive.Timestamp `json:"valid_until" bson:"valid_until"`
+	ValidUntil  primitive.Timestamp `json:"validUntil" bson:"valid_until"`
 	Terms       string              `json:"terms" bson:"terms"`
 	Payment     string              `json:"payment" bson:"payment"`
 	Notes       string              `json:"notes,omitempty" bson:"notes,omitempty"`
