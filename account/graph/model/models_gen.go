@@ -105,7 +105,7 @@ type NewIntegration struct {
 
 type NewInvitation struct {
 	Email    string                 `json:"email"`
-	Roles    []string               `json:"roles"`
+	Roles    []*string              `json:"roles,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
@@ -122,11 +122,6 @@ type NewRole struct {
 	Name        string    `json:"name"`
 	Description *string   `json:"description,omitempty"`
 	Permissions []*string `json:"permissions,omitempty"`
-}
-
-type NewToken struct {
-	Name      string    `json:"name"`
-	Abilities []*string `json:"abilities,omitempty"`
 }
 
 type NewUser struct {
@@ -187,11 +182,6 @@ type Roles struct {
 	Count int     `json:"count"`
 }
 
-type Tokens struct {
-	Data  []*Token `json:"data,omitempty"`
-	Count int      `json:"count"`
-}
-
 type UpdateAPI struct {
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
@@ -238,11 +228,6 @@ type UpdateRole struct {
 	Name        *string   `json:"name,omitempty"`
 	Description *string   `json:"description,omitempty"`
 	Permissions []*string `json:"permissions,omitempty"`
-}
-
-type UpdateToken struct {
-	Name      *string   `json:"name,omitempty"`
-	Abilities []*string `json:"abilities,omitempty"`
 }
 
 type UpdateUser struct {

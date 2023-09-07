@@ -12,7 +12,7 @@ type Invitation struct {
 	Model     `bson:",inline"`
 	UID       primitive.ObjectID  `json:"uid" bson:"uid"`
 	Email     string              `json:"email" bson:"email"`
-	Roles     []string            `json:"roles" bson:"roles"`
+	Roles     []*string           `json:"roles,omitempty" bson:"roles,omitempty"`
 	Status    string              `json:"status" bson:"status"`
 	ExpiresAt primitive.Timestamp `json:"expiresAt" bson:"expires_at"`
 	Metadata  primitive.M         `json:"metadata,omitempty"`

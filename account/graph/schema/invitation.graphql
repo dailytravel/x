@@ -25,7 +25,7 @@ type Invitations {
 
 input NewInvitation {
   email: String!
-  roles: [String!]!
+  roles: [String]
   metadata: Map
 }
 

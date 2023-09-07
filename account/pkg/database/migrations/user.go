@@ -92,12 +92,9 @@ func (m *User) Migrate() error {
 				}
 
 				rolesSlice := email["roles"].([]string)
-				roles := make([]string, len(rolesSlice))
-				for i, role := range rolesSlice {
-					r := role // Create a copy of the string
-					roles[i] = r
+				for _, role := range rolesSlice {
+					item.Roles = append(item.Roles, &role)
 				}
-				item.Roles = roles
 				item.Password = string(hashedPassword)
 
 				if _, err := col.InsertOne(context.Background(), item); err != nil {

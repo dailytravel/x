@@ -157,13 +157,7 @@ func (r *mutationResolver) Accept(ctx context.Context, token string) (*model.Inv
 		return nil, err
 	}
 
-	// Check and add new roles to the user's existing roles
-	for _, role := range invitation.Roles {
-		if !utils.Contains(user.Roles, role) {
-			user.Roles = append(user.Roles, role)
-		}
-	}
-
+	user.Roles = invitation.Roles
 	user.UpdatedBy = uid
 	user.Metadata["invited_by"] = userID
 

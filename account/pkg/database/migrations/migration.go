@@ -15,7 +15,6 @@ func AutoMigrate() error {
 		&Key{Database: database.Database},
 		&Permission{Database: database.Database},
 		&Role{Database: database.Database},
-		&Token{Database: database.Database},
 		&User{Database: database.Database},
 	}
 

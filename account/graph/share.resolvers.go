@@ -9,11 +9,29 @@ import (
 	"fmt"
 
 	"github.com/dailytravel/x/account/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // User is the resolver for the user field.
 func (r *shareResolver) User(ctx context.Context, obj *model.Share) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	_id, err := primitive.ObjectIDFromHex(obj.UID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert UID to ObjectID: %w", err)
+	}
+
+	var item *model.User
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // Return nil if no user is found, rather than an error.
+		}
+		return nil, fmt.Errorf("failed to fetch user from database: %w", err)
+	}
+
+	return item, nil
 }
 
 // Share returns ShareResolver implementation.
