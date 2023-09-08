@@ -10,11 +10,10 @@ import (
 )
 
 type Activity struct {
-	Model    `bson:",inline"`
-	UID      primitive.ObjectID `json:"uid" bson:"uid"`
-	Target   primitive.ObjectID `json:"target" bson:"target"`
-	Action   string             `json:"action" bson:"action"`
-	Metadata primitive.M        `json:"metadata,omitempty" bson:"metadata,omitempty"`
+	Model  `bson:",inline"`
+	UID    primitive.ObjectID `json:"uid" bson:"uid"`
+	Target primitive.ObjectID `json:"target" bson:"target"`
+	Action string             `json:"action" bson:"action"`
 }
 
 type Activitable struct {
@@ -29,11 +28,9 @@ func (i *Activity) Collection() string {
 func (i *Activity) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Timestamp.IsZero() {
+		i.Timestamp = now
 	}
-
-	i.UpdatedAt = now
 
 	type t Activity
 	return bson.Marshal((*t)(i))
@@ -45,6 +42,6 @@ func (i *Activity) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "target", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "action", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "timestamp", Value: 1}}, Options: options.Index()},
 	}
 }

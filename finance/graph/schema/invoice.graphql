@@ -9,12 +9,11 @@ type Invoice @key(fields: "id") {
   notes: String
   metadata: Map
   status: String
-  createdAt: String!
-  updatedAt: String!
+
   uid: ID!
   contact: ID!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 type Invoices {

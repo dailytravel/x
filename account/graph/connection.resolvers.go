@@ -13,6 +13,7 @@ import (
 	"github.com/dailytravel/x/account/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ID is the resolver for the id field.
@@ -25,36 +26,14 @@ func (r *connectionResolver) Metadata(ctx context.Context, obj *model.Connection
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *connectionResolver) CreatedAt(ctx context.Context, obj *model.Connection) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *connectionResolver) Created(ctx context.Context, obj *model.Connection) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *connectionResolver) UpdatedAt(ctx context.Context, obj *model.Connection) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *connectionResolver) CreatedBy(ctx context.Context, obj *model.Connection) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": obj.CreatedBy}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *connectionResolver) UpdatedBy(ctx context.Context, obj *model.Connection) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": obj.UpdatedBy}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
+// Updated is the resolver for the updated field.
+func (r *connectionResolver) Updated(ctx context.Context, obj *model.Connection) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Client is the resolver for the client field.
@@ -70,19 +49,14 @@ func (r *connectionResolver) Client(ctx context.Context, obj *model.Connection) 
 
 // CreateConnection is the resolver for the createConnection field.
 func (r *mutationResolver) CreateConnection(ctx context.Context, input model.NewConnection) (*model.Connection, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	item := &model.Connection{
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
-	}
+	item := &model.Connection{}
 
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -92,10 +66,10 @@ func (r *mutationResolver) CreateConnection(ctx context.Context, input model.New
 
 // UpdateConnection is the resolver for the updateConnection field.
 func (r *mutationResolver) UpdateConnection(ctx context.Context, id string, input model.UpdateConnection) (*model.Connection, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -114,8 +88,6 @@ func (r *mutationResolver) UpdateConnection(ctx context.Context, id string, inpu
 	if input.Status != nil {
 		item.Status = *input.Status
 	}
-
-	item.UpdatedBy = uid
 
 	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {
 		return nil, err
@@ -172,24 +144,44 @@ func (r *mutationResolver) DeleteConnections(ctx context.Context, ids []string) 
 }
 
 // Connections is the resolver for the connections field.
-func (r *queryResolver) Connections(ctx context.Context, args map[string]interface{}) (*model.Connections, error) {
+func (r *queryResolver) Connections(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Connections, error) {
 	var items []*model.Connection
-	//find all items
-	cur, err := r.db.Collection(model.RoleCollection).Find(ctx, r.model.Query(args), r.model.Options(args))
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+
+	opts := options.Find()
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if sort != nil {
+		opts.SetSort(sort)
+	}
+	if collation != nil {
+		col := &options.Collation{
+			// you can set collation fields here...
+		}
+		opts.SetCollation(col)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("connections").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Connection
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection("connections").CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("connections").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}

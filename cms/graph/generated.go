@@ -59,8 +59,7 @@ type ComplexityRoot struct {
 	Content struct {
 		Body        func(childComplexity int) int
 		Commentable func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int) int
+		Created     func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Locale      func(childComplexity int) int
 		Metadata    func(childComplexity int) int
@@ -72,8 +71,7 @@ type ComplexityRoot struct {
 		Title       func(childComplexity int) int
 		Type        func(childComplexity int) int
 		UID         func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		UpdatedBy   func(childComplexity int) int
+		Updated     func(childComplexity int) int
 	}
 
 	Contents struct {
@@ -89,8 +87,7 @@ type ComplexityRoot struct {
 	}
 
 	File struct {
-		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int) int
+		Created     func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Locale      func(childComplexity int) int
@@ -103,8 +100,7 @@ type ComplexityRoot struct {
 		Type        func(childComplexity int) int
 		UID         func(childComplexity int) int
 		URL         func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		UpdatedBy   func(childComplexity int) int
+		Updated     func(childComplexity int) int
 	}
 
 	Files struct {
@@ -142,8 +138,7 @@ type ComplexityRoot struct {
 	Term struct {
 		Children    func(childComplexity int) int
 		Count       func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int) int
+		Created     func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Locale      func(childComplexity int) int
@@ -153,8 +148,7 @@ type ComplexityRoot struct {
 		Parent      func(childComplexity int) int
 		Slug        func(childComplexity int) int
 		Type        func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		UpdatedBy   func(childComplexity int) int
+		Updated     func(childComplexity int) int
 	}
 
 	Terms struct {
@@ -181,11 +175,9 @@ type ContentResolver interface {
 	Body(ctx context.Context, obj *model.Content) (string, error)
 
 	Metadata(ctx context.Context, obj *model.Content) (map[string]interface{}, error)
-	CreatedAt(ctx context.Context, obj *model.Content) (string, error)
-	UpdatedAt(ctx context.Context, obj *model.Content) (string, error)
 	UID(ctx context.Context, obj *model.Content) (string, error)
-	CreatedBy(ctx context.Context, obj *model.Content) (*string, error)
-	UpdatedBy(ctx context.Context, obj *model.Content) (*string, error)
+	Created(ctx context.Context, obj *model.Content) (string, error)
+	Updated(ctx context.Context, obj *model.Content) (string, error)
 	Terms(ctx context.Context, obj *model.Content) ([]*model.Term, error)
 	Parent(ctx context.Context, obj *model.Content) (*model.Content, error)
 }
@@ -204,10 +196,8 @@ type FileResolver interface {
 
 	Metadata(ctx context.Context, obj *model.File) (map[string]interface{}, error)
 
-	CreatedAt(ctx context.Context, obj *model.File) (string, error)
-	UpdatedAt(ctx context.Context, obj *model.File) (string, error)
-	CreatedBy(ctx context.Context, obj *model.File) (*string, error)
-	UpdatedBy(ctx context.Context, obj *model.File) (*string, error)
+	Created(ctx context.Context, obj *model.File) (string, error)
+	Updated(ctx context.Context, obj *model.File) (string, error)
 }
 type MutationResolver interface {
 	CreateContent(ctx context.Context, input model.NewContent) (*model.Content, error)
@@ -241,10 +231,8 @@ type TermResolver interface {
 	Description(ctx context.Context, obj *model.Term) (*string, error)
 
 	Metadata(ctx context.Context, obj *model.Term) (map[string]interface{}, error)
-	CreatedAt(ctx context.Context, obj *model.Term) (string, error)
-	UpdatedAt(ctx context.Context, obj *model.Term) (string, error)
-	CreatedBy(ctx context.Context, obj *model.Term) (*string, error)
-	UpdatedBy(ctx context.Context, obj *model.Term) (*string, error)
+	Created(ctx context.Context, obj *model.Term) (string, error)
+	Updated(ctx context.Context, obj *model.Term) (string, error)
 }
 type UserResolver interface {
 	Contents(ctx context.Context, obj *model.User) ([]*model.Content, error)
@@ -280,19 +268,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Content.Commentable(childComplexity), true
 
-	case "Content.createdAt":
-		if e.complexity.Content.CreatedAt == nil {
+	case "Content.created":
+		if e.complexity.Content.Created == nil {
 			break
 		}
 
-		return e.complexity.Content.CreatedAt(childComplexity), true
-
-	case "Content.createdBy":
-		if e.complexity.Content.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.Content.CreatedBy(childComplexity), true
+		return e.complexity.Content.Created(childComplexity), true
 
 	case "Content.id":
 		if e.complexity.Content.ID == nil {
@@ -371,19 +352,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Content.UID(childComplexity), true
 
-	case "Content.updatedAt":
-		if e.complexity.Content.UpdatedAt == nil {
+	case "Content.updated":
+		if e.complexity.Content.Updated == nil {
 			break
 		}
 
-		return e.complexity.Content.UpdatedAt(childComplexity), true
-
-	case "Content.updatedBy":
-		if e.complexity.Content.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.Content.UpdatedBy(childComplexity), true
+		return e.complexity.Content.Updated(childComplexity), true
 
 	case "Contents.count":
 		if e.complexity.Contents.Count == nil {
@@ -447,19 +421,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.FindUserByID(childComplexity, args["id"].(string)), true
 
-	case "File.createdAt":
-		if e.complexity.File.CreatedAt == nil {
+	case "File.created":
+		if e.complexity.File.Created == nil {
 			break
 		}
 
-		return e.complexity.File.CreatedAt(childComplexity), true
-
-	case "File.createdBy":
-		if e.complexity.File.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.File.CreatedBy(childComplexity), true
+		return e.complexity.File.Created(childComplexity), true
 
 	case "File.description":
 		if e.complexity.File.Description == nil {
@@ -545,19 +512,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.File.URL(childComplexity), true
 
-	case "File.updatedAt":
-		if e.complexity.File.UpdatedAt == nil {
+	case "File.updated":
+		if e.complexity.File.Updated == nil {
 			break
 		}
 
-		return e.complexity.File.UpdatedAt(childComplexity), true
-
-	case "File.updatedBy":
-		if e.complexity.File.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.File.UpdatedBy(childComplexity), true
+		return e.complexity.File.Updated(childComplexity), true
 
 	case "Files.count":
 		if e.complexity.Files.Count == nil {
@@ -834,19 +794,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Term.Count(childComplexity), true
 
-	case "Term.createdAt":
-		if e.complexity.Term.CreatedAt == nil {
+	case "Term.created":
+		if e.complexity.Term.Created == nil {
 			break
 		}
 
-		return e.complexity.Term.CreatedAt(childComplexity), true
-
-	case "Term.createdBy":
-		if e.complexity.Term.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.Term.CreatedBy(childComplexity), true
+		return e.complexity.Term.Created(childComplexity), true
 
 	case "Term.description":
 		if e.complexity.Term.Description == nil {
@@ -911,19 +864,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Term.Type(childComplexity), true
 
-	case "Term.updatedAt":
-		if e.complexity.Term.UpdatedAt == nil {
+	case "Term.updated":
+		if e.complexity.Term.Updated == nil {
 			break
 		}
 
-		return e.complexity.Term.UpdatedAt(childComplexity), true
-
-	case "Term.updatedBy":
-		if e.complexity.Term.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.Term.UpdatedBy(childComplexity), true
+		return e.complexity.Term.Updated(childComplexity), true
 
 	case "Terms.count":
 		if e.complexity.Terms.Count == nil {
@@ -2081,94 +2027,6 @@ func (ec *executionContext) fieldContext_Content_metadata(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Content_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Content_createdAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Content().CreatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Content_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Content",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Content_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Content_updatedAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Content().UpdatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Content_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Content",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Content_uid(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Content_uid(ctx, field)
 	if err != nil {
@@ -2213,8 +2071,8 @@ func (ec *executionContext) fieldContext_Content_uid(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Content_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Content_createdBy(ctx, field)
+func (ec *executionContext) _Content_created(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Content_created(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2227,35 +2085,38 @@ func (ec *executionContext) _Content_createdBy(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Content().CreatedBy(rctx, obj)
+		return ec.resolvers.Content().Created(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Content_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Content_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Content",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Content_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Content_updatedBy(ctx, field)
+func (ec *executionContext) _Content_updated(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Content_updated(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2268,28 +2129,31 @@ func (ec *executionContext) _Content_updatedBy(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Content().UpdatedBy(rctx, obj)
+		return ec.resolvers.Content().Updated(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Content_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Content_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Content",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2353,14 +2217,10 @@ func (ec *executionContext) fieldContext_Content_terms(ctx context.Context, fiel
 				return ec.fieldContext_Term_count(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Term_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Term_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Term_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Term_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Term_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Term_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Term_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -2424,16 +2284,12 @@ func (ec *executionContext) fieldContext_Content_parent(ctx context.Context, fie
 				return ec.fieldContext_Content_commentable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Content_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Content_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Content_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Content_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Content_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Content_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Content_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Content_updated(ctx, field)
 			case "terms":
 				return ec.fieldContext_Content_terms(ctx, field)
 			case "parent":
@@ -2545,16 +2401,12 @@ func (ec *executionContext) fieldContext_Contents_data(ctx context.Context, fiel
 				return ec.fieldContext_Content_commentable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Content_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Content_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Content_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Content_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Content_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Content_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Content_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Content_updated(ctx, field)
 			case "terms":
 				return ec.fieldContext_Content_terms(ctx, field)
 			case "parent":
@@ -2625,16 +2477,12 @@ func (ec *executionContext) fieldContext_Entity_findContentByID(ctx context.Cont
 				return ec.fieldContext_Content_commentable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Content_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Content_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Content_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Content_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Content_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Content_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Content_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Content_updated(ctx, field)
 			case "terms":
 				return ec.fieldContext_Content_terms(ctx, field)
 			case "parent":
@@ -2720,14 +2568,10 @@ func (ec *executionContext) fieldContext_Entity_findFileByID(ctx context.Context
 				return ec.fieldContext_File_starred(ctx, field)
 			case "status":
 				return ec.fieldContext_File_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_File_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_File_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_File_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_File_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_File_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_File_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -2807,14 +2651,10 @@ func (ec *executionContext) fieldContext_Entity_findTermByID(ctx context.Context
 				return ec.fieldContext_Term_count(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Term_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Term_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Term_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Term_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Term_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Term_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Term_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -3418,8 +3258,8 @@ func (ec *executionContext) fieldContext_File_status(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _File_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_File_createdAt(ctx, field)
+func (ec *executionContext) _File_created(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_created(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3432,7 +3272,7 @@ func (ec *executionContext) _File_createdAt(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.File().CreatedAt(rctx, obj)
+		return ec.resolvers.File().Created(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3449,7 +3289,7 @@ func (ec *executionContext) _File_createdAt(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_File_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_File_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "File",
 		Field:      field,
@@ -3462,8 +3302,8 @@ func (ec *executionContext) fieldContext_File_createdAt(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _File_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_File_updatedAt(ctx, field)
+func (ec *executionContext) _File_updated(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_updated(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3476,7 +3316,7 @@ func (ec *executionContext) _File_updatedAt(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.File().UpdatedAt(rctx, obj)
+		return ec.resolvers.File().Updated(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3493,7 +3333,7 @@ func (ec *executionContext) _File_updatedAt(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_File_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_File_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "File",
 		Field:      field,
@@ -3501,88 +3341,6 @@ func (ec *executionContext) fieldContext_File_updatedAt(ctx context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _File_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_File_createdBy(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.File().CreatedBy(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_File_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "File",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _File_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_File_updatedBy(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.File().UpdatedBy(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_File_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "File",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3692,14 +3450,10 @@ func (ec *executionContext) fieldContext_Files_data(ctx context.Context, field g
 				return ec.fieldContext_File_starred(ctx, field)
 			case "status":
 				return ec.fieldContext_File_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_File_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_File_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_File_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_File_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_File_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_File_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -3783,16 +3537,12 @@ func (ec *executionContext) fieldContext_Mutation_createContent(ctx context.Cont
 				return ec.fieldContext_Content_commentable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Content_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Content_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Content_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Content_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Content_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Content_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Content_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Content_updated(ctx, field)
 			case "terms":
 				return ec.fieldContext_Content_terms(ctx, field)
 			case "parent":
@@ -3891,16 +3641,12 @@ func (ec *executionContext) fieldContext_Mutation_updateContent(ctx context.Cont
 				return ec.fieldContext_Content_commentable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Content_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Content_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Content_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Content_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Content_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Content_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Content_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Content_updated(ctx, field)
 			case "terms":
 				return ec.fieldContext_Content_terms(ctx, field)
 			case "parent":
@@ -4147,14 +3893,10 @@ func (ec *executionContext) fieldContext_Mutation_createFile(ctx context.Context
 				return ec.fieldContext_File_starred(ctx, field)
 			case "status":
 				return ec.fieldContext_File_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_File_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_File_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_File_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_File_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_File_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_File_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -4253,14 +3995,10 @@ func (ec *executionContext) fieldContext_Mutation_updateFile(ctx context.Context
 				return ec.fieldContext_File_starred(ctx, field)
 			case "status":
 				return ec.fieldContext_File_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_File_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_File_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_File_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_File_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_File_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_File_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -4501,14 +4239,10 @@ func (ec *executionContext) fieldContext_Mutation_createTerm(ctx context.Context
 				return ec.fieldContext_Term_count(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Term_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Term_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Term_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Term_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Term_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Term_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Term_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -4605,14 +4339,10 @@ func (ec *executionContext) fieldContext_Mutation_updateTerm(ctx context.Context
 				return ec.fieldContext_Term_count(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Term_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Term_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Term_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Term_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Term_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Term_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Term_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -4883,16 +4613,12 @@ func (ec *executionContext) fieldContext_Query_content(ctx context.Context, fiel
 				return ec.fieldContext_Content_commentable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Content_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Content_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Content_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Content_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Content_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Content_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Content_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Content_updated(ctx, field)
 			case "terms":
 				return ec.fieldContext_Content_terms(ctx, field)
 			case "parent":
@@ -5105,14 +4831,10 @@ func (ec *executionContext) fieldContext_Query_file(ctx context.Context, field g
 				return ec.fieldContext_File_starred(ctx, field)
 			case "status":
 				return ec.fieldContext_File_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_File_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_File_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_File_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_File_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_File_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_File_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -5189,14 +4911,10 @@ func (ec *executionContext) fieldContext_Query_term(ctx context.Context, field g
 				return ec.fieldContext_Term_count(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Term_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Term_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Term_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Term_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Term_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Term_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Term_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -5601,14 +5319,10 @@ func (ec *executionContext) fieldContext_Term_parent(ctx context.Context, field 
 				return ec.fieldContext_Term_count(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Term_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Term_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Term_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Term_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Term_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Term_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Term_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -5674,14 +5388,10 @@ func (ec *executionContext) fieldContext_Term_children(ctx context.Context, fiel
 				return ec.fieldContext_Term_count(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Term_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Term_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Term_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Term_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Term_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Term_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Term_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -6032,8 +5742,8 @@ func (ec *executionContext) fieldContext_Term_metadata(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Term_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_createdAt(ctx, field)
+func (ec *executionContext) _Term_created(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Term_created(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6046,7 +5756,7 @@ func (ec *executionContext) _Term_createdAt(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().CreatedAt(rctx, obj)
+		return ec.resolvers.Term().Created(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6063,7 +5773,7 @@ func (ec *executionContext) _Term_createdAt(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Term_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Term_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Term",
 		Field:      field,
@@ -6076,8 +5786,8 @@ func (ec *executionContext) fieldContext_Term_createdAt(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Term_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_updatedAt(ctx, field)
+func (ec *executionContext) _Term_updated(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Term_updated(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6090,7 +5800,7 @@ func (ec *executionContext) _Term_updatedAt(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().UpdatedAt(rctx, obj)
+		return ec.resolvers.Term().Updated(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6107,7 +5817,7 @@ func (ec *executionContext) _Term_updatedAt(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Term_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Term_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Term",
 		Field:      field,
@@ -6115,88 +5825,6 @@ func (ec *executionContext) fieldContext_Term_updatedAt(ctx context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_createdBy(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().CreatedBy(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_updatedBy(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().UpdatedBy(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -6304,14 +5932,10 @@ func (ec *executionContext) fieldContext_Terms_data(ctx context.Context, field g
 				return ec.fieldContext_Term_count(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Term_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Term_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Term_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Term_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Term_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Term_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Term_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -6419,16 +6043,12 @@ func (ec *executionContext) fieldContext_User_contents(ctx context.Context, fiel
 				return ec.fieldContext_Content_commentable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Content_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Content_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Content_updatedAt(ctx, field)
 			case "uid":
 				return ec.fieldContext_Content_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Content_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Content_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Content_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Content_updated(ctx, field)
 			case "terms":
 				return ec.fieldContext_Content_terms(ctx, field)
 			case "parent":
@@ -6500,14 +6120,10 @@ func (ec *executionContext) fieldContext_User_files(ctx context.Context, field g
 				return ec.fieldContext_File_starred(ctx, field)
 			case "status":
 				return ec.fieldContext_File_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_File_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_File_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_File_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_File_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_File_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_File_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -9256,78 +8872,6 @@ func (ec *executionContext) _Content(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Content_createdAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Content_updatedAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "uid":
 			field := field
 
@@ -9364,7 +8908,7 @@ func (ec *executionContext) _Content(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdBy":
+		case "created":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9373,7 +8917,10 @@ func (ec *executionContext) _Content(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Content_createdBy(ctx, field, obj)
+				res = ec._Content_created(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -9397,7 +8944,7 @@ func (ec *executionContext) _Content(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedBy":
+		case "updated":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9406,7 +8953,10 @@ func (ec *executionContext) _Content(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Content_updatedBy(ctx, field, obj)
+				res = ec._Content_updated(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -9910,7 +9460,7 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "createdAt":
+		case "created":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9919,7 +9469,7 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._File_createdAt(ctx, field, obj)
+				res = ec._File_created(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -9946,7 +9496,7 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedAt":
+		case "updated":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9955,76 +9505,10 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._File_updatedAt(ctx, field, obj)
+				res = ec._File_updated(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdBy":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._File_createdBy(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedBy":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._File_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -10666,7 +10150,7 @@ func (ec *executionContext) _Term(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdAt":
+		case "created":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10675,7 +10159,7 @@ func (ec *executionContext) _Term(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Term_createdAt(ctx, field, obj)
+				res = ec._Term_created(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10702,7 +10186,7 @@ func (ec *executionContext) _Term(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedAt":
+		case "updated":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -10711,76 +10195,10 @@ func (ec *executionContext) _Term(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Term_updatedAt(ctx, field, obj)
+				res = ec._Term_updated(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdBy":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_createdBy(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedBy":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_updatedBy(ctx, field, obj)
 				return res
 			}
 

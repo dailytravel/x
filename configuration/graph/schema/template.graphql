@@ -5,10 +5,8 @@ type Template {
   subject: String!
   body: String!
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 type Templates {
@@ -34,7 +32,14 @@ input UpdateTemplate {
 
 extend type Query {
   template(name: String!): Template
-  templates(args: Map): Templates
+  templates(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Templates
 }
 
 extend type Mutation {

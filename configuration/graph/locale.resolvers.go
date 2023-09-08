@@ -13,7 +13,6 @@ import (
 	"github.com/dailytravel/x/configuration/graph/model"
 	"github.com/dailytravel/x/configuration/internal/utils"
 	"github.com/dailytravel/x/configuration/pkg/auth"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -45,32 +44,14 @@ func (r *localeResolver) Metadata(ctx context.Context, obj *model.Locale) (map[s
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *localeResolver) CreatedAt(ctx context.Context, obj *model.Locale) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *localeResolver) Created(ctx context.Context, obj *model.Locale) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *localeResolver) UpdatedAt(ctx context.Context, obj *model.Locale) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *localeResolver) CreatedBy(ctx context.Context, obj *model.Locale) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *localeResolver) UpdatedBy(ctx context.Context, obj *model.Locale) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *localeResolver) Updated(ctx context.Context, obj *model.Locale) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateLocale is the resolver for the createLocale field.
@@ -160,25 +141,36 @@ func (r *mutationResolver) DeleteLocales(ctx context.Context, ids []string) (map
 	}, nil
 }
 
-// Locales is the resolver for the Locales field.
-func (r *queryResolver) Locales(ctx context.Context, args map[string]interface{}) (*model.Locales, error) {
+// Locales is the resolver for the locales field.
+func (r *queryResolver) Locales(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Locales, error) {
 	var items []*model.Locale
-	//find all items
-	cur, err := r.db.Collection("locales").Find(ctx, utils.Query(args), utils.Options(args))
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("locales").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Locale
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection("locales").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("locales").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -28,11 +28,11 @@ func (i *Connection) Santize(s string) string {
 func (i *Connection) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Connection
 	return bson.Marshal((*t)(i))
@@ -48,7 +48,7 @@ func (i *Connection) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "client", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
 	}
 }

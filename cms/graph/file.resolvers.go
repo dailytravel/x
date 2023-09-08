@@ -13,7 +13,6 @@ import (
 	"github.com/dailytravel/x/cms/graph/model"
 	"github.com/dailytravel/x/cms/internal/utils"
 	"github.com/dailytravel/x/cms/pkg/auth"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -66,32 +65,14 @@ func (r *fileResolver) Metadata(ctx context.Context, obj *model.File) (map[strin
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *fileResolver) CreatedAt(ctx context.Context, obj *model.File) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *fileResolver) Created(ctx context.Context, obj *model.File) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *fileResolver) UpdatedAt(ctx context.Context, obj *model.File) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *fileResolver) CreatedBy(ctx context.Context, obj *model.File) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *fileResolver) UpdatedBy(ctx context.Context, obj *model.File) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *fileResolver) Updated(ctx context.Context, obj *model.File) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateFile is the resolver for the createFile field.
@@ -110,10 +91,6 @@ func (r *mutationResolver) CreateFile(ctx context.Context, input model.NewFile) 
 		Size:        int64(input.Size),
 		Provider:    input.Provider,
 		URL:         input.URL,
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 
 	// Perform the insertion into the database
@@ -127,11 +104,6 @@ func (r *mutationResolver) CreateFile(ctx context.Context, input model.NewFile) 
 
 // UpdateFile is the resolver for the updateFile field.
 func (r *mutationResolver) UpdateFile(ctx context.Context, id string, input model.UpdateFile) (*model.File, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -152,7 +124,6 @@ func (r *mutationResolver) UpdateFile(ctx context.Context, id string, input mode
 	if input.Description != nil {
 		existingFile.Description[input.Locale] = *input.Description
 	}
-	existingFile.UpdatedBy = uid
 
 	// Perform the update in the database
 	update := bson.M{
@@ -226,7 +197,7 @@ func (r *mutationResolver) DeleteFiles(ctx context.Context, ids []string) (map[s
 func (r *queryResolver) Files(ctx context.Context, args map[string]interface{}) (*model.Files, error) {
 	var items []*model.File
 	//find all items
-	cur, err := r.db.Collection("files").Find(ctx, r.model.Query(args), r.model.Options(args))
+	cur, err := r.db.Collection("files").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +211,7 @@ func (r *queryResolver) Files(ctx context.Context, args map[string]interface{}) 
 	}
 
 	//get total count
-	count, err := r.db.Collection("files").CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("files").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

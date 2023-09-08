@@ -37,16 +37,6 @@ func (r *invoiceResolver) Metadata(ctx context.Context, obj *model.Invoice) (map
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *invoiceResolver) CreatedAt(ctx context.Context, obj *model.Invoice) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *invoiceResolver) UpdatedAt(ctx context.Context, obj *model.Invoice) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
 // UID is the resolver for the uid field.
 func (r *invoiceResolver) UID(ctx context.Context, obj *model.Invoice) (string, error) {
 	return obj.ID.Hex(), nil
@@ -57,14 +47,14 @@ func (r *invoiceResolver) Contact(ctx context.Context, obj *model.Invoice) (stri
 	panic(fmt.Errorf("not implemented: Contact - contact"))
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *invoiceResolver) CreatedBy(ctx context.Context, obj *model.Invoice) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+// Created is the resolver for the created field.
+func (r *invoiceResolver) Created(ctx context.Context, obj *model.Invoice) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *invoiceResolver) UpdatedBy(ctx context.Context, obj *model.Invoice) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+// Updated is the resolver for the updated field.
+func (r *invoiceResolver) Updated(ctx context.Context, obj *model.Invoice) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateInvoice is the resolver for the createInvoice field.

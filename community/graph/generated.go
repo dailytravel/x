@@ -64,8 +64,7 @@ type ComplexityRoot struct {
 		Body        func(childComplexity int) int
 		Children    func(childComplexity int) int
 		Commentable func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int) int
+		Created     func(childComplexity int) int
 		Email       func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Locale      func(childComplexity int) int
@@ -76,8 +75,7 @@ type ComplexityRoot struct {
 		Reactions   func(childComplexity int) int
 		Status      func(childComplexity int) int
 		UID         func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		UpdatedBy   func(childComplexity int) int
+		Updated     func(childComplexity int) int
 	}
 
 	Comments struct {
@@ -98,8 +96,7 @@ type ComplexityRoot struct {
 
 	Conversation struct {
 		Comments    func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int) int
+		Created     func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Labels      func(childComplexity int) int
@@ -111,8 +108,7 @@ type ComplexityRoot struct {
 		Status      func(childComplexity int) int
 		Type        func(childComplexity int) int
 		UID         func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		UpdatedBy   func(childComplexity int) int
+		Updated     func(childComplexity int) int
 	}
 
 	Conversations struct {
@@ -148,12 +144,10 @@ type ComplexityRoot struct {
 	Message struct {
 		Body         func(childComplexity int) int
 		Conversation func(childComplexity int) int
-		CreatedAt    func(childComplexity int) int
 		ID           func(childComplexity int) int
 		Recipients   func(childComplexity int) int
 		Status       func(childComplexity int) int
 		Subject      func(childComplexity int) int
-		UpdatedAt    func(childComplexity int) int
 	}
 
 	Messages struct {
@@ -191,15 +185,15 @@ type ComplexityRoot struct {
 	}
 
 	Notification struct {
-		CreatedAt  func(childComplexity int) int
+		Created    func(childComplexity int) int
 		ID         func(childComplexity int) int
 		Locale     func(childComplexity int) int
 		Metadata   func(childComplexity int) int
 		Notifiable func(childComplexity int) int
-		ReadAt     func(childComplexity int) int
+		Read       func(childComplexity int) int
 		Type       func(childComplexity int) int
 		UID        func(childComplexity int) int
-		UpdatedAt  func(childComplexity int) int
+		Updated    func(childComplexity int) int
 	}
 
 	Notifications struct {
@@ -234,13 +228,11 @@ type ComplexityRoot struct {
 
 	Reaction struct {
 		Action    func(childComplexity int) int
-		CreatedAt func(childComplexity int) int
-		CreatedBy func(childComplexity int) int
+		Created   func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Reactable func(childComplexity int) int
 		UID       func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
-		UpdatedBy func(childComplexity int) int
+		Updated   func(childComplexity int) int
 	}
 
 	Reactions struct {
@@ -249,12 +241,10 @@ type ComplexityRoot struct {
 	}
 
 	Recipient struct {
-		CreatedAt func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Message   func(childComplexity int) int
-		ReadAt    func(childComplexity int) int
-		UID       func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
+		ID      func(childComplexity int) int
+		Message func(childComplexity int) int
+		Read    func(childComplexity int) int
+		UID     func(childComplexity int) int
 	}
 
 	Recipients struct {
@@ -263,16 +253,14 @@ type ComplexityRoot struct {
 	}
 
 	Share struct {
-		CreatedAt  func(childComplexity int) int
-		CreatedBy  func(childComplexity int) int
+		Created    func(childComplexity int) int
 		ID         func(childComplexity int) int
 		Metadata   func(childComplexity int) int
 		Permission func(childComplexity int) int
 		Shareable  func(childComplexity int) int
 		Status     func(childComplexity int) int
 		UID        func(childComplexity int) int
-		UpdatedAt  func(childComplexity int) int
-		UpdatedBy  func(childComplexity int) int
+		Updated    func(childComplexity int) int
 	}
 
 	Shares struct {
@@ -307,26 +295,22 @@ type CommentResolver interface {
 	Body(ctx context.Context, obj *model.Comment) (string, error)
 
 	Metadata(ctx context.Context, obj *model.Comment) (map[string]interface{}, error)
-	CreatedAt(ctx context.Context, obj *model.Comment) (string, error)
-	UpdatedAt(ctx context.Context, obj *model.Comment) (string, error)
 	Parent(ctx context.Context, obj *model.Comment) (*model.Comment, error)
 	Children(ctx context.Context, obj *model.Comment) ([]*model.Comment, error)
 	Commentable(ctx context.Context, obj *model.Comment) (map[string]interface{}, error)
 	Reactions(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error)
-	CreatedBy(ctx context.Context, obj *model.Comment) (*string, error)
-	UpdatedBy(ctx context.Context, obj *model.Comment) (*string, error)
+	Created(ctx context.Context, obj *model.Comment) (string, error)
+	Updated(ctx context.Context, obj *model.Comment) (string, error)
 }
 type ConversationResolver interface {
 	ID(ctx context.Context, obj *model.Conversation) (string, error)
 
 	Metadata(ctx context.Context, obj *model.Conversation) (map[string]interface{}, error)
 	Message(ctx context.Context, obj *model.Conversation) (*model.Message, error)
-	CreatedAt(ctx context.Context, obj *model.Conversation) (string, error)
-	UpdatedAt(ctx context.Context, obj *model.Conversation) (string, error)
 	Messages(ctx context.Context, obj *model.Conversation) ([]*model.Message, error)
 	UID(ctx context.Context, obj *model.Conversation) (string, error)
-	CreatedBy(ctx context.Context, obj *model.Conversation) (*string, error)
-	UpdatedBy(ctx context.Context, obj *model.Conversation) (*string, error)
+	Created(ctx context.Context, obj *model.Conversation) (string, error)
+	Updated(ctx context.Context, obj *model.Conversation) (string, error)
 	Shares(ctx context.Context, obj *model.Conversation) ([]*model.Share, error)
 	Comments(ctx context.Context, obj *model.Conversation) ([]*model.Comment, error)
 }
@@ -346,8 +330,6 @@ type MessageResolver interface {
 	ID(ctx context.Context, obj *model.Message) (string, error)
 	Conversation(ctx context.Context, obj *model.Message) (*model.Conversation, error)
 
-	CreatedAt(ctx context.Context, obj *model.Message) (string, error)
-	UpdatedAt(ctx context.Context, obj *model.Message) (string, error)
 	Recipients(ctx context.Context, obj *model.Message) ([]*model.Recipient, error)
 }
 type MutationResolver interface {
@@ -382,11 +364,11 @@ type NotificationResolver interface {
 	ID(ctx context.Context, obj *model.Notification) (string, error)
 	UID(ctx context.Context, obj *model.Notification) (string, error)
 
-	ReadAt(ctx context.Context, obj *model.Notification) (*string, error)
-	CreatedAt(ctx context.Context, obj *model.Notification) (string, error)
-	UpdatedAt(ctx context.Context, obj *model.Notification) (string, error)
+	Read(ctx context.Context, obj *model.Notification) (*string, error)
 	Notifiable(ctx context.Context, obj *model.Notification) (map[string]interface{}, error)
 	Metadata(ctx context.Context, obj *model.Notification) (map[string]interface{}, error)
+	Created(ctx context.Context, obj *model.Notification) (string, error)
+	Updated(ctx context.Context, obj *model.Notification) (string, error)
 }
 type QueryResolver interface {
 	Comments(ctx context.Context, args map[string]interface{}) (*model.Comments, error)
@@ -409,18 +391,14 @@ type ReactionResolver interface {
 	UID(ctx context.Context, obj *model.Reaction) (string, error)
 	Reactable(ctx context.Context, obj *model.Reaction) (map[string]interface{}, error)
 
-	CreatedAt(ctx context.Context, obj *model.Reaction) (string, error)
-	UpdatedAt(ctx context.Context, obj *model.Reaction) (string, error)
-	CreatedBy(ctx context.Context, obj *model.Reaction) (*string, error)
-	UpdatedBy(ctx context.Context, obj *model.Reaction) (*string, error)
+	Created(ctx context.Context, obj *model.Reaction) (string, error)
+	Updated(ctx context.Context, obj *model.Reaction) (string, error)
 }
 type RecipientResolver interface {
 	ID(ctx context.Context, obj *model.Recipient) (string, error)
 	UID(ctx context.Context, obj *model.Recipient) (string, error)
 	Message(ctx context.Context, obj *model.Recipient) (*model.Message, error)
-	ReadAt(ctx context.Context, obj *model.Recipient) (*string, error)
-	CreatedAt(ctx context.Context, obj *model.Recipient) (string, error)
-	UpdatedAt(ctx context.Context, obj *model.Recipient) (string, error)
+	Read(ctx context.Context, obj *model.Recipient) (*string, error)
 }
 type ShareResolver interface {
 	ID(ctx context.Context, obj *model.Share) (string, error)
@@ -429,10 +407,8 @@ type ShareResolver interface {
 
 	Metadata(ctx context.Context, obj *model.Share) (map[string]interface{}, error)
 
-	CreatedAt(ctx context.Context, obj *model.Share) (string, error)
-	UpdatedAt(ctx context.Context, obj *model.Share) (string, error)
-	CreatedBy(ctx context.Context, obj *model.Share) (*string, error)
-	UpdatedBy(ctx context.Context, obj *model.Share) (*string, error)
+	Created(ctx context.Context, obj *model.Share) (string, error)
+	Updated(ctx context.Context, obj *model.Share) (string, error)
 }
 type UserResolver interface {
 	Notifications(ctx context.Context, obj *model.User) ([]*model.Notification, error)
@@ -478,19 +454,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.Commentable(childComplexity), true
 
-	case "Comment.createdAt":
-		if e.complexity.Comment.CreatedAt == nil {
+	case "Comment.created":
+		if e.complexity.Comment.Created == nil {
 			break
 		}
 
-		return e.complexity.Comment.CreatedAt(childComplexity), true
-
-	case "Comment.createdBy":
-		if e.complexity.Comment.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.Comment.CreatedBy(childComplexity), true
+		return e.complexity.Comment.Created(childComplexity), true
 
 	case "Comment.email":
 		if e.complexity.Comment.Email == nil {
@@ -562,19 +531,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.UID(childComplexity), true
 
-	case "Comment.updatedAt":
-		if e.complexity.Comment.UpdatedAt == nil {
+	case "Comment.updated":
+		if e.complexity.Comment.Updated == nil {
 			break
 		}
 
-		return e.complexity.Comment.UpdatedAt(childComplexity), true
-
-	case "Comment.updatedBy":
-		if e.complexity.Comment.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.Comment.UpdatedBy(childComplexity), true
+		return e.complexity.Comment.Updated(childComplexity), true
 
 	case "Comments.count":
 		if e.complexity.Comments.Count == nil {
@@ -632,19 +594,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Conversation.Comments(childComplexity), true
 
-	case "Conversation.createdAt":
-		if e.complexity.Conversation.CreatedAt == nil {
+	case "Conversation.created":
+		if e.complexity.Conversation.Created == nil {
 			break
 		}
 
-		return e.complexity.Conversation.CreatedAt(childComplexity), true
-
-	case "Conversation.createdBy":
-		if e.complexity.Conversation.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.Conversation.CreatedBy(childComplexity), true
+		return e.complexity.Conversation.Created(childComplexity), true
 
 	case "Conversation.description":
 		if e.complexity.Conversation.Description == nil {
@@ -723,19 +678,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Conversation.UID(childComplexity), true
 
-	case "Conversation.updatedAt":
-		if e.complexity.Conversation.UpdatedAt == nil {
+	case "Conversation.updated":
+		if e.complexity.Conversation.Updated == nil {
 			break
 		}
 
-		return e.complexity.Conversation.UpdatedAt(childComplexity), true
-
-	case "Conversation.updatedBy":
-		if e.complexity.Conversation.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.Conversation.UpdatedBy(childComplexity), true
+		return e.complexity.Conversation.Updated(childComplexity), true
 
 	case "Conversations.count":
 		if e.complexity.Conversations.Count == nil {
@@ -927,13 +875,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Message.Conversation(childComplexity), true
 
-	case "Message.createdAt":
-		if e.complexity.Message.CreatedAt == nil {
-			break
-		}
-
-		return e.complexity.Message.CreatedAt(childComplexity), true
-
 	case "Message.id":
 		if e.complexity.Message.ID == nil {
 			break
@@ -961,13 +902,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Message.Subject(childComplexity), true
-
-	case "Message.updatedAt":
-		if e.complexity.Message.UpdatedAt == nil {
-			break
-		}
-
-		return e.complexity.Message.UpdatedAt(childComplexity), true
 
 	case "Messages.count":
 		if e.complexity.Messages.Count == nil {
@@ -1295,12 +1229,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateShare(childComplexity, args["id"].(string), args["input"].(model.ShareUpdateInput)), true
 
-	case "Notification.createdAt":
-		if e.complexity.Notification.CreatedAt == nil {
+	case "Notification.created":
+		if e.complexity.Notification.Created == nil {
 			break
 		}
 
-		return e.complexity.Notification.CreatedAt(childComplexity), true
+		return e.complexity.Notification.Created(childComplexity), true
 
 	case "Notification.id":
 		if e.complexity.Notification.ID == nil {
@@ -1330,12 +1264,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Notification.Notifiable(childComplexity), true
 
-	case "Notification.readAt":
-		if e.complexity.Notification.ReadAt == nil {
+	case "Notification.read":
+		if e.complexity.Notification.Read == nil {
 			break
 		}
 
-		return e.complexity.Notification.ReadAt(childComplexity), true
+		return e.complexity.Notification.Read(childComplexity), true
 
 	case "Notification.type":
 		if e.complexity.Notification.Type == nil {
@@ -1351,12 +1285,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Notification.UID(childComplexity), true
 
-	case "Notification.updatedAt":
-		if e.complexity.Notification.UpdatedAt == nil {
+	case "Notification.updated":
+		if e.complexity.Notification.Updated == nil {
 			break
 		}
 
-		return e.complexity.Notification.UpdatedAt(childComplexity), true
+		return e.complexity.Notification.Updated(childComplexity), true
 
 	case "Notifications.count":
 		if e.complexity.Notifications.Count == nil {
@@ -1587,19 +1521,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Reaction.Action(childComplexity), true
 
-	case "Reaction.createdAt":
-		if e.complexity.Reaction.CreatedAt == nil {
+	case "Reaction.created":
+		if e.complexity.Reaction.Created == nil {
 			break
 		}
 
-		return e.complexity.Reaction.CreatedAt(childComplexity), true
-
-	case "Reaction.createdBy":
-		if e.complexity.Reaction.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.Reaction.CreatedBy(childComplexity), true
+		return e.complexity.Reaction.Created(childComplexity), true
 
 	case "Reaction.id":
 		if e.complexity.Reaction.ID == nil {
@@ -1622,19 +1549,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Reaction.UID(childComplexity), true
 
-	case "Reaction.updatedAt":
-		if e.complexity.Reaction.UpdatedAt == nil {
+	case "Reaction.updated":
+		if e.complexity.Reaction.Updated == nil {
 			break
 		}
 
-		return e.complexity.Reaction.UpdatedAt(childComplexity), true
-
-	case "Reaction.updatedBy":
-		if e.complexity.Reaction.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.Reaction.UpdatedBy(childComplexity), true
+		return e.complexity.Reaction.Updated(childComplexity), true
 
 	case "Reactions.count":
 		if e.complexity.Reactions.Count == nil {
@@ -1650,13 +1570,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Reactions.Data(childComplexity), true
 
-	case "Recipient.createdAt":
-		if e.complexity.Recipient.CreatedAt == nil {
-			break
-		}
-
-		return e.complexity.Recipient.CreatedAt(childComplexity), true
-
 	case "Recipient.id":
 		if e.complexity.Recipient.ID == nil {
 			break
@@ -1671,12 +1584,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Recipient.Message(childComplexity), true
 
-	case "Recipient.readAt":
-		if e.complexity.Recipient.ReadAt == nil {
+	case "Recipient.read":
+		if e.complexity.Recipient.Read == nil {
 			break
 		}
 
-		return e.complexity.Recipient.ReadAt(childComplexity), true
+		return e.complexity.Recipient.Read(childComplexity), true
 
 	case "Recipient.uid":
 		if e.complexity.Recipient.UID == nil {
@@ -1684,13 +1597,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Recipient.UID(childComplexity), true
-
-	case "Recipient.updatedAt":
-		if e.complexity.Recipient.UpdatedAt == nil {
-			break
-		}
-
-		return e.complexity.Recipient.UpdatedAt(childComplexity), true
 
 	case "Recipients.count":
 		if e.complexity.Recipients.Count == nil {
@@ -1706,19 +1612,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Recipients.Data(childComplexity), true
 
-	case "Share.createdAt":
-		if e.complexity.Share.CreatedAt == nil {
+	case "Share.created":
+		if e.complexity.Share.Created == nil {
 			break
 		}
 
-		return e.complexity.Share.CreatedAt(childComplexity), true
-
-	case "Share.createdBy":
-		if e.complexity.Share.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.Share.CreatedBy(childComplexity), true
+		return e.complexity.Share.Created(childComplexity), true
 
 	case "Share.id":
 		if e.complexity.Share.ID == nil {
@@ -1762,19 +1661,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Share.UID(childComplexity), true
 
-	case "Share.updatedAt":
-		if e.complexity.Share.UpdatedAt == nil {
+	case "Share.updated":
+		if e.complexity.Share.Updated == nil {
 			break
 		}
 
-		return e.complexity.Share.UpdatedAt(childComplexity), true
-
-	case "Share.updatedBy":
-		if e.complexity.Share.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.Share.UpdatedBy(childComplexity), true
+		return e.complexity.Share.Updated(childComplexity), true
 
 	case "Shares.count":
 		if e.complexity.Shares.Count == nil {
@@ -3372,94 +3264,6 @@ func (ec *executionContext) fieldContext_Comment_metadata(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Comment_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Comment_createdAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Comment().CreatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Comment_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Comment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Comment_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Comment_updatedAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Comment().UpdatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Comment_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Comment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Comment_parent(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comment_parent(ctx, field)
 	if err != nil {
@@ -3514,10 +3318,6 @@ func (ec *executionContext) fieldContext_Comment_parent(ctx context.Context, fie
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -3526,10 +3326,10 @@ func (ec *executionContext) fieldContext_Comment_parent(ctx context.Context, fie
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -3591,10 +3391,6 @@ func (ec *executionContext) fieldContext_Comment_children(ctx context.Context, f
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -3603,10 +3399,10 @@ func (ec *executionContext) fieldContext_Comment_children(ctx context.Context, f
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -3702,14 +3498,10 @@ func (ec *executionContext) fieldContext_Comment_reactions(ctx context.Context, 
 				return ec.fieldContext_Reaction_reactable(ctx, field)
 			case "action":
 				return ec.fieldContext_Reaction_action(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Reaction_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Reaction_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Reaction_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Reaction_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Reaction_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Reaction_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
 		},
@@ -3717,8 +3509,8 @@ func (ec *executionContext) fieldContext_Comment_reactions(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Comment_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Comment_createdBy(ctx, field)
+func (ec *executionContext) _Comment_created(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_created(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3731,35 +3523,38 @@ func (ec *executionContext) _Comment_createdBy(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Comment().CreatedBy(rctx, obj)
+		return ec.resolvers.Comment().Created(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Comment_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Comment",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Comment_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Comment_updatedBy(ctx, field)
+func (ec *executionContext) _Comment_updated(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_updated(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3772,28 +3567,31 @@ func (ec *executionContext) _Comment_updatedBy(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Comment().UpdatedBy(rctx, obj)
+		return ec.resolvers.Comment().Updated(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Comment_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Comment_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Comment",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3897,10 +3695,6 @@ func (ec *executionContext) fieldContext_Comments_data(ctx context.Context, fiel
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -3909,10 +3703,10 @@ func (ec *executionContext) fieldContext_Comments_data(ctx context.Context, fiel
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -4018,10 +3812,6 @@ func (ec *executionContext) fieldContext_Contact_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -4030,10 +3820,10 @@ func (ec *executionContext) fieldContext_Contact_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -4089,14 +3879,10 @@ func (ec *executionContext) fieldContext_Contact_shares(ctx context.Context, fie
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -4202,10 +3988,6 @@ func (ec *executionContext) fieldContext_Content_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -4214,10 +3996,10 @@ func (ec *executionContext) fieldContext_Content_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -4567,102 +4349,10 @@ func (ec *executionContext) fieldContext_Conversation_message(ctx context.Contex
 				return ec.fieldContext_Message_body(ctx, field)
 			case "status":
 				return ec.fieldContext_Message_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Message_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Message_updatedAt(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Conversation_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Conversation) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Conversation_createdAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Conversation().CreatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Conversation_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Conversation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Conversation_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Conversation) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Conversation_updatedAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Conversation().UpdatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Conversation_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Conversation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4714,10 +4404,6 @@ func (ec *executionContext) fieldContext_Conversation_messages(ctx context.Conte
 				return ec.fieldContext_Message_body(ctx, field)
 			case "status":
 				return ec.fieldContext_Message_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Message_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Message_updatedAt(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
 			}
@@ -4771,8 +4457,8 @@ func (ec *executionContext) fieldContext_Conversation_uid(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Conversation_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Conversation) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Conversation_createdBy(ctx, field)
+func (ec *executionContext) _Conversation_created(ctx context.Context, field graphql.CollectedField, obj *model.Conversation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Conversation_created(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4785,21 +4471,24 @@ func (ec *executionContext) _Conversation_createdBy(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Conversation().CreatedBy(rctx, obj)
+		return ec.resolvers.Conversation().Created(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Conversation_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Conversation_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Conversation",
 		Field:      field,
@@ -4812,8 +4501,8 @@ func (ec *executionContext) fieldContext_Conversation_createdBy(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Conversation_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Conversation) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Conversation_updatedBy(ctx, field)
+func (ec *executionContext) _Conversation_updated(ctx context.Context, field graphql.CollectedField, obj *model.Conversation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Conversation_updated(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4826,21 +4515,24 @@ func (ec *executionContext) _Conversation_updatedBy(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Conversation().UpdatedBy(rctx, obj)
+		return ec.resolvers.Conversation().Updated(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Conversation_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Conversation_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Conversation",
 		Field:      field,
@@ -4901,14 +4593,10 @@ func (ec *executionContext) fieldContext_Conversation_shares(ctx context.Context
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -4970,10 +4658,6 @@ func (ec *executionContext) fieldContext_Conversation_comments(ctx context.Conte
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -4982,10 +4666,10 @@ func (ec *executionContext) fieldContext_Conversation_comments(ctx context.Conte
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -5045,18 +4729,14 @@ func (ec *executionContext) fieldContext_Conversations_data(ctx context.Context,
 				return ec.fieldContext_Conversation_metadata(ctx, field)
 			case "message":
 				return ec.fieldContext_Conversation_message(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Conversation_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Conversation_updatedAt(ctx, field)
 			case "messages":
 				return ec.fieldContext_Conversation_messages(ctx, field)
 			case "uid":
 				return ec.fieldContext_Conversation_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Conversation_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Conversation_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Conversation_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Conversation_updated(ctx, field)
 			case "shares":
 				return ec.fieldContext_Conversation_shares(ctx, field)
 			case "comments":
@@ -5169,10 +4849,6 @@ func (ec *executionContext) fieldContext_Entity_findCommentByID(ctx context.Cont
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -5181,10 +4857,10 @@ func (ec *executionContext) fieldContext_Entity_findCommentByID(ctx context.Cont
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -5563,14 +5239,10 @@ func (ec *executionContext) fieldContext_Entity_findReactionByID(ctx context.Con
 				return ec.fieldContext_Reaction_reactable(ctx, field)
 			case "action":
 				return ec.fieldContext_Reaction_action(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Reaction_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Reaction_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Reaction_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Reaction_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Reaction_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Reaction_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
 		},
@@ -5640,14 +5312,10 @@ func (ec *executionContext) fieldContext_Entity_findShareByID(ctx context.Contex
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -5896,10 +5564,6 @@ func (ec *executionContext) fieldContext_Expense_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -5908,10 +5572,10 @@ func (ec *executionContext) fieldContext_Expense_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -5967,14 +5631,10 @@ func (ec *executionContext) fieldContext_Expense_shares(ctx context.Context, fie
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -6080,10 +5740,6 @@ func (ec *executionContext) fieldContext_File_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -6092,10 +5748,10 @@ func (ec *executionContext) fieldContext_File_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -6151,14 +5807,10 @@ func (ec *executionContext) fieldContext_File_shares(ctx context.Context, field 
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -6265,18 +5917,14 @@ func (ec *executionContext) fieldContext_Message_conversation(ctx context.Contex
 				return ec.fieldContext_Conversation_metadata(ctx, field)
 			case "message":
 				return ec.fieldContext_Conversation_message(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Conversation_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Conversation_updatedAt(ctx, field)
 			case "messages":
 				return ec.fieldContext_Conversation_messages(ctx, field)
 			case "uid":
 				return ec.fieldContext_Conversation_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Conversation_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Conversation_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Conversation_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Conversation_updated(ctx, field)
 			case "shares":
 				return ec.fieldContext_Conversation_shares(ctx, field)
 			case "comments":
@@ -6420,94 +6068,6 @@ func (ec *executionContext) fieldContext_Message_status(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Message_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Message_createdAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Message().CreatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Message_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Message",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Message_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Message_updatedAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Message().UpdatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Message_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Message",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Message_recipients(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Message_recipients(ctx, field)
 	if err != nil {
@@ -6553,12 +6113,8 @@ func (ec *executionContext) fieldContext_Message_recipients(ctx context.Context,
 				return ec.fieldContext_Recipient_uid(ctx, field)
 			case "message":
 				return ec.fieldContext_Recipient_message(ctx, field)
-			case "readAt":
-				return ec.fieldContext_Recipient_readAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Recipient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Recipient_updatedAt(ctx, field)
+			case "read":
+				return ec.fieldContext_Recipient_read(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Recipient", field.Name)
 		},
@@ -6612,10 +6168,6 @@ func (ec *executionContext) fieldContext_Messages_data(ctx context.Context, fiel
 				return ec.fieldContext_Message_body(ctx, field)
 			case "status":
 				return ec.fieldContext_Message_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Message_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Message_updatedAt(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
 			}
@@ -6743,10 +6295,6 @@ func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Cont
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -6755,10 +6303,10 @@ func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Cont
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -6851,10 +6399,6 @@ func (ec *executionContext) fieldContext_Mutation_updateComment(ctx context.Cont
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -6863,10 +6407,10 @@ func (ec *executionContext) fieldContext_Mutation_updateComment(ctx context.Cont
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -7081,18 +6625,14 @@ func (ec *executionContext) fieldContext_Mutation_createConversation(ctx context
 				return ec.fieldContext_Conversation_metadata(ctx, field)
 			case "message":
 				return ec.fieldContext_Conversation_message(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Conversation_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Conversation_updatedAt(ctx, field)
 			case "messages":
 				return ec.fieldContext_Conversation_messages(ctx, field)
 			case "uid":
 				return ec.fieldContext_Conversation_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Conversation_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Conversation_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Conversation_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Conversation_updated(ctx, field)
 			case "shares":
 				return ec.fieldContext_Conversation_shares(ctx, field)
 			case "comments":
@@ -7187,18 +6727,14 @@ func (ec *executionContext) fieldContext_Mutation_updateConversation(ctx context
 				return ec.fieldContext_Conversation_metadata(ctx, field)
 			case "message":
 				return ec.fieldContext_Conversation_message(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Conversation_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Conversation_updatedAt(ctx, field)
 			case "messages":
 				return ec.fieldContext_Conversation_messages(ctx, field)
 			case "uid":
 				return ec.fieldContext_Conversation_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Conversation_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Conversation_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Conversation_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Conversation_updated(ctx, field)
 			case "shares":
 				return ec.fieldContext_Conversation_shares(ctx, field)
 			case "comments":
@@ -7293,18 +6829,14 @@ func (ec *executionContext) fieldContext_Mutation_leaveConversation(ctx context.
 				return ec.fieldContext_Conversation_metadata(ctx, field)
 			case "message":
 				return ec.fieldContext_Conversation_message(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Conversation_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Conversation_updatedAt(ctx, field)
 			case "messages":
 				return ec.fieldContext_Conversation_messages(ctx, field)
 			case "uid":
 				return ec.fieldContext_Conversation_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Conversation_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Conversation_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Conversation_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Conversation_updated(ctx, field)
 			case "shares":
 				return ec.fieldContext_Conversation_shares(ctx, field)
 			case "comments":
@@ -7537,10 +7069,6 @@ func (ec *executionContext) fieldContext_Mutation_createMessage(ctx context.Cont
 				return ec.fieldContext_Message_body(ctx, field)
 			case "status":
 				return ec.fieldContext_Message_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Message_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Message_updatedAt(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
 			}
@@ -7627,10 +7155,6 @@ func (ec *executionContext) fieldContext_Mutation_updateMessage(ctx context.Cont
 				return ec.fieldContext_Message_body(ctx, field)
 			case "status":
 				return ec.fieldContext_Message_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Message_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Message_updatedAt(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
 			}
@@ -7859,16 +7383,16 @@ func (ec *executionContext) fieldContext_Mutation_updateNotification(ctx context
 				return ec.fieldContext_Notification_type(ctx, field)
 			case "locale":
 				return ec.fieldContext_Notification_locale(ctx, field)
-			case "readAt":
-				return ec.fieldContext_Notification_readAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Notification_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Notification_updatedAt(ctx, field)
+			case "read":
+				return ec.fieldContext_Notification_read(ctx, field)
 			case "notifiable":
 				return ec.fieldContext_Notification_notifiable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Notification_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Notification_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Notification_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Notification", field.Name)
 		},
@@ -8095,14 +7619,10 @@ func (ec *executionContext) fieldContext_Mutation_createReaction(ctx context.Con
 				return ec.fieldContext_Reaction_reactable(ctx, field)
 			case "action":
 				return ec.fieldContext_Reaction_action(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Reaction_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Reaction_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Reaction_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Reaction_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Reaction_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Reaction_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
 		},
@@ -8185,14 +7705,10 @@ func (ec *executionContext) fieldContext_Mutation_updateReaction(ctx context.Con
 				return ec.fieldContext_Reaction_reactable(ctx, field)
 			case "action":
 				return ec.fieldContext_Reaction_action(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Reaction_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Reaction_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Reaction_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Reaction_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Reaction_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Reaction_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
 		},
@@ -8273,12 +7789,8 @@ func (ec *executionContext) fieldContext_Mutation_createRecipient(ctx context.Co
 				return ec.fieldContext_Recipient_uid(ctx, field)
 			case "message":
 				return ec.fieldContext_Recipient_message(ctx, field)
-			case "readAt":
-				return ec.fieldContext_Recipient_readAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Recipient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Recipient_updatedAt(ctx, field)
+			case "read":
+				return ec.fieldContext_Recipient_read(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Recipient", field.Name)
 		},
@@ -8359,12 +7871,8 @@ func (ec *executionContext) fieldContext_Mutation_updateRecipient(ctx context.Co
 				return ec.fieldContext_Recipient_uid(ctx, field)
 			case "message":
 				return ec.fieldContext_Recipient_message(ctx, field)
-			case "readAt":
-				return ec.fieldContext_Recipient_readAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Recipient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Recipient_updatedAt(ctx, field)
+			case "read":
+				return ec.fieldContext_Recipient_read(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Recipient", field.Name)
 		},
@@ -8575,14 +8083,10 @@ func (ec *executionContext) fieldContext_Mutation_createShare(ctx context.Contex
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -8649,14 +8153,10 @@ func (ec *executionContext) fieldContext_Mutation_updateShare(ctx context.Contex
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -8961,8 +8461,8 @@ func (ec *executionContext) fieldContext_Notification_locale(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Notification_readAt(ctx context.Context, field graphql.CollectedField, obj *model.Notification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Notification_readAt(ctx, field)
+func (ec *executionContext) _Notification_read(ctx context.Context, field graphql.CollectedField, obj *model.Notification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Notification_read(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8975,7 +8475,7 @@ func (ec *executionContext) _Notification_readAt(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Notification().ReadAt(rctx, obj)
+		return ec.resolvers.Notification().Read(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8989,95 +8489,7 @@ func (ec *executionContext) _Notification_readAt(ctx context.Context, field grap
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Notification_readAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Notification",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Notification_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Notification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Notification_createdAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Notification().CreatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Notification_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Notification",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Notification_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Notification) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Notification_updatedAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Notification().UpdatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Notification_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Notification_read(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Notification",
 		Field:      field,
@@ -9175,6 +8587,94 @@ func (ec *executionContext) fieldContext_Notification_metadata(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Notification_created(ctx context.Context, field graphql.CollectedField, obj *model.Notification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Notification_created(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Notification().Created(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Notification_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Notification",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Notification_updated(ctx context.Context, field graphql.CollectedField, obj *model.Notification) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Notification_updated(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Notification().Updated(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Notification_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Notification",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Notifications_data(ctx context.Context, field graphql.CollectedField, obj *model.Notifications) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Notifications_data(ctx, field)
 	if err != nil {
@@ -9219,16 +8719,16 @@ func (ec *executionContext) fieldContext_Notifications_data(ctx context.Context,
 				return ec.fieldContext_Notification_type(ctx, field)
 			case "locale":
 				return ec.fieldContext_Notification_locale(ctx, field)
-			case "readAt":
-				return ec.fieldContext_Notification_readAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Notification_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Notification_updatedAt(ctx, field)
+			case "read":
+				return ec.fieldContext_Notification_read(ctx, field)
 			case "notifiable":
 				return ec.fieldContext_Notification_notifiable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Notification_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Notification_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Notification_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Notification", field.Name)
 		},
@@ -9392,10 +8892,6 @@ func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, fiel
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -9404,10 +8900,10 @@ func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, fiel
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -9498,18 +8994,14 @@ func (ec *executionContext) fieldContext_Query_conversation(ctx context.Context,
 				return ec.fieldContext_Conversation_metadata(ctx, field)
 			case "message":
 				return ec.fieldContext_Conversation_message(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Conversation_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Conversation_updatedAt(ctx, field)
 			case "messages":
 				return ec.fieldContext_Conversation_messages(ctx, field)
 			case "uid":
 				return ec.fieldContext_Conversation_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Conversation_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Conversation_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Conversation_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Conversation_updated(ctx, field)
 			case "shares":
 				return ec.fieldContext_Conversation_shares(ctx, field)
 			case "comments":
@@ -9676,10 +9168,6 @@ func (ec *executionContext) fieldContext_Query_message(ctx context.Context, fiel
 				return ec.fieldContext_Message_body(ctx, field)
 			case "status":
 				return ec.fieldContext_Message_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Message_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Message_updatedAt(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
 			}
@@ -9917,16 +9405,16 @@ func (ec *executionContext) fieldContext_Query_notification(ctx context.Context,
 				return ec.fieldContext_Notification_type(ctx, field)
 			case "locale":
 				return ec.fieldContext_Notification_locale(ctx, field)
-			case "readAt":
-				return ec.fieldContext_Notification_readAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Notification_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Notification_updatedAt(ctx, field)
+			case "read":
+				return ec.fieldContext_Notification_read(ctx, field)
 			case "notifiable":
 				return ec.fieldContext_Notification_notifiable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Notification_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Notification_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Notification_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Notification", field.Name)
 		},
@@ -9989,14 +9477,10 @@ func (ec *executionContext) fieldContext_Query_reaction(ctx context.Context, fie
 				return ec.fieldContext_Reaction_reactable(ctx, field)
 			case "action":
 				return ec.fieldContext_Reaction_action(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Reaction_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Reaction_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Reaction_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Reaction_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Reaction_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Reaction_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
 		},
@@ -10135,12 +9619,8 @@ func (ec *executionContext) fieldContext_Query_recipient(ctx context.Context, fi
 				return ec.fieldContext_Recipient_uid(ctx, field)
 			case "message":
 				return ec.fieldContext_Recipient_message(ctx, field)
-			case "readAt":
-				return ec.fieldContext_Recipient_readAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Recipient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Recipient_updatedAt(ctx, field)
+			case "read":
+				return ec.fieldContext_Recipient_read(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Recipient", field.Name)
 		},
@@ -10285,14 +9765,10 @@ func (ec *executionContext) fieldContext_Query_share(ctx context.Context, field 
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -10699,10 +10175,6 @@ func (ec *executionContext) fieldContext_Quote_comments(ctx context.Context, fie
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -10711,10 +10183,10 @@ func (ec *executionContext) fieldContext_Quote_comments(ctx context.Context, fie
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -10770,14 +10242,10 @@ func (ec *executionContext) fieldContext_Quote_shares(ctx context.Context, field
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -10961,8 +10429,8 @@ func (ec *executionContext) fieldContext_Reaction_action(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Reaction_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Reaction_createdAt(ctx, field)
+func (ec *executionContext) _Reaction_created(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Reaction_created(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10975,7 +10443,7 @@ func (ec *executionContext) _Reaction_createdAt(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Reaction().CreatedAt(rctx, obj)
+		return ec.resolvers.Reaction().Created(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10992,7 +10460,7 @@ func (ec *executionContext) _Reaction_createdAt(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Reaction_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Reaction_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Reaction",
 		Field:      field,
@@ -11005,8 +10473,8 @@ func (ec *executionContext) fieldContext_Reaction_createdAt(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Reaction_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Reaction_updatedAt(ctx, field)
+func (ec *executionContext) _Reaction_updated(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Reaction_updated(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11019,7 +10487,7 @@ func (ec *executionContext) _Reaction_updatedAt(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Reaction().UpdatedAt(rctx, obj)
+		return ec.resolvers.Reaction().Updated(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11036,7 +10504,7 @@ func (ec *executionContext) _Reaction_updatedAt(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Reaction_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Reaction_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Reaction",
 		Field:      field,
@@ -11044,88 +10512,6 @@ func (ec *executionContext) fieldContext_Reaction_updatedAt(ctx context.Context,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Reaction_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Reaction_createdBy(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Reaction().CreatedBy(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Reaction_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Reaction",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Reaction_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Reaction) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Reaction_updatedBy(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Reaction().UpdatedBy(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Reaction_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Reaction",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -11175,14 +10561,10 @@ func (ec *executionContext) fieldContext_Reactions_data(ctx context.Context, fie
 				return ec.fieldContext_Reaction_reactable(ctx, field)
 			case "action":
 				return ec.fieldContext_Reaction_action(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Reaction_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Reaction_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Reaction_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Reaction_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Reaction_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Reaction_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
 		},
@@ -11371,10 +10753,6 @@ func (ec *executionContext) fieldContext_Recipient_message(ctx context.Context, 
 				return ec.fieldContext_Message_body(ctx, field)
 			case "status":
 				return ec.fieldContext_Message_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Message_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Message_updatedAt(ctx, field)
 			case "recipients":
 				return ec.fieldContext_Message_recipients(ctx, field)
 			}
@@ -11384,8 +10762,8 @@ func (ec *executionContext) fieldContext_Recipient_message(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Recipient_readAt(ctx context.Context, field graphql.CollectedField, obj *model.Recipient) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Recipient_readAt(ctx, field)
+func (ec *executionContext) _Recipient_read(ctx context.Context, field graphql.CollectedField, obj *model.Recipient) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Recipient_read(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11398,7 +10776,7 @@ func (ec *executionContext) _Recipient_readAt(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Recipient().ReadAt(rctx, obj)
+		return ec.resolvers.Recipient().Read(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11412,95 +10790,7 @@ func (ec *executionContext) _Recipient_readAt(ctx context.Context, field graphql
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Recipient_readAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Recipient",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Recipient_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Recipient) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Recipient_createdAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Recipient().CreatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Recipient_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Recipient",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Recipient_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Recipient) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Recipient_updatedAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Recipient().UpdatedAt(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Recipient_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Recipient_read(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Recipient",
 		Field:      field,
@@ -11599,12 +10889,8 @@ func (ec *executionContext) fieldContext_Recipients_data(ctx context.Context, fi
 				return ec.fieldContext_Recipient_uid(ctx, field)
 			case "message":
 				return ec.fieldContext_Recipient_message(ctx, field)
-			case "readAt":
-				return ec.fieldContext_Recipient_readAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Recipient_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Recipient_updatedAt(ctx, field)
+			case "read":
+				return ec.fieldContext_Recipient_read(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Recipient", field.Name)
 		},
@@ -11873,8 +11159,8 @@ func (ec *executionContext) fieldContext_Share_status(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Share_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Share_createdAt(ctx, field)
+func (ec *executionContext) _Share_created(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Share_created(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11887,7 +11173,7 @@ func (ec *executionContext) _Share_createdAt(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Share().CreatedAt(rctx, obj)
+		return ec.resolvers.Share().Created(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11904,7 +11190,7 @@ func (ec *executionContext) _Share_createdAt(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Share_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Share_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Share",
 		Field:      field,
@@ -11917,8 +11203,8 @@ func (ec *executionContext) fieldContext_Share_createdAt(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Share_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Share_updatedAt(ctx, field)
+func (ec *executionContext) _Share_updated(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Share_updated(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11931,7 +11217,7 @@ func (ec *executionContext) _Share_updatedAt(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Share().UpdatedAt(rctx, obj)
+		return ec.resolvers.Share().Updated(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11948,7 +11234,7 @@ func (ec *executionContext) _Share_updatedAt(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Share_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Share_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Share",
 		Field:      field,
@@ -11956,88 +11242,6 @@ func (ec *executionContext) fieldContext_Share_updatedAt(ctx context.Context, fi
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Share_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Share_createdBy(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Share().CreatedBy(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Share_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Share",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Share_updatedBy(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Share_updatedBy(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Share().UpdatedBy(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Share_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Share",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -12091,14 +11295,10 @@ func (ec *executionContext) fieldContext_Shares_data(ctx context.Context, field 
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -12248,10 +11448,6 @@ func (ec *executionContext) fieldContext_Task_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -12260,10 +11456,10 @@ func (ec *executionContext) fieldContext_Task_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -12319,14 +11515,10 @@ func (ec *executionContext) fieldContext_Task_shares(ctx context.Context, field 
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -12422,16 +11614,16 @@ func (ec *executionContext) fieldContext_User_notifications(ctx context.Context,
 				return ec.fieldContext_Notification_type(ctx, field)
 			case "locale":
 				return ec.fieldContext_Notification_locale(ctx, field)
-			case "readAt":
-				return ec.fieldContext_Notification_readAt(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Notification_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Notification_updatedAt(ctx, field)
+			case "read":
+				return ec.fieldContext_Notification_read(ctx, field)
 			case "notifiable":
 				return ec.fieldContext_Notification_notifiable(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Notification_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Notification_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Notification_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Notification", field.Name)
 		},
@@ -12491,18 +11683,14 @@ func (ec *executionContext) fieldContext_User_conversations(ctx context.Context,
 				return ec.fieldContext_Conversation_metadata(ctx, field)
 			case "message":
 				return ec.fieldContext_Conversation_message(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Conversation_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Conversation_updatedAt(ctx, field)
 			case "messages":
 				return ec.fieldContext_Conversation_messages(ctx, field)
 			case "uid":
 				return ec.fieldContext_Conversation_uid(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Conversation_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Conversation_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Conversation_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Conversation_updated(ctx, field)
 			case "shares":
 				return ec.fieldContext_Conversation_shares(ctx, field)
 			case "comments":
@@ -12568,10 +11756,6 @@ func (ec *executionContext) fieldContext_User_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Comment_metadata(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
 			case "parent":
 				return ec.fieldContext_Comment_parent(ctx, field)
 			case "children":
@@ -12580,10 +11764,10 @@ func (ec *executionContext) fieldContext_User_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_commentable(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Comment_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -12635,14 +11819,10 @@ func (ec *executionContext) fieldContext_User_reactions(ctx context.Context, fie
 				return ec.fieldContext_Reaction_reactable(ctx, field)
 			case "action":
 				return ec.fieldContext_Reaction_action(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Reaction_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Reaction_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Reaction_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Reaction_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Reaction_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Reaction_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Reaction", field.Name)
 		},
@@ -12698,14 +11878,10 @@ func (ec *executionContext) fieldContext_User_shares(ctx context.Context, field 
 				return ec.fieldContext_Share_metadata(ctx, field)
 			case "status":
 				return ec.fieldContext_Share_status(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Share_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Share_updatedAt(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Share_createdBy(ctx, field)
-			case "updatedBy":
-				return ec.fieldContext_Share_updatedBy(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
 		},
@@ -14859,7 +14035,7 @@ func (ec *executionContext) unmarshalInputShareInput(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"uid", "shareable", "permission", "metadata", "status", "createdBy", "updatedBy"}
+	fieldsInOrder := [...]string{"uid", "shareable", "permission", "metadata", "status", "created", "updated"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14911,24 +14087,24 @@ func (ec *executionContext) unmarshalInputShareInput(ctx context.Context, obj in
 				return it, err
 			}
 			it.Status = data
-		case "createdBy":
+		case "created":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("created"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.CreatedBy = data
-		case "updatedBy":
+			it.Created = data
+		case "updated":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updated"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.UpdatedBy = data
+			it.Updated = data
 		}
 	}
 
@@ -14942,7 +14118,7 @@ func (ec *executionContext) unmarshalInputShareUpdateInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"uid", "shareable", "permission", "metadata", "status", "createdBy", "updatedBy"}
+	fieldsInOrder := [...]string{"uid", "shareable", "permission", "metadata", "status", "created", "updated"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14994,24 +14170,24 @@ func (ec *executionContext) unmarshalInputShareUpdateInput(ctx context.Context, 
 				return it, err
 			}
 			it.Status = data
-		case "createdBy":
+		case "created":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("created"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.CreatedBy = data
-		case "updatedBy":
+			it.Created = data
+		case "updated":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updated"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.UpdatedBy = data
+			it.Updated = data
 		}
 	}
 
@@ -15294,22 +14470,22 @@ func (ec *executionContext) unmarshalInputUpdateRecipient(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"readAt"}
+	fieldsInOrder := [...]string{"read"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "readAt":
+		case "read":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("readAt"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("read"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ReadAt = data
+			it.Read = data
 		}
 	}
 
@@ -15568,78 +14744,6 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Comment_createdAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Comment_updatedAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "parent":
 			field := field
 
@@ -15775,7 +14879,7 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdBy":
+		case "created":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15784,7 +14888,10 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Comment_createdBy(ctx, field, obj)
+				res = ec._Comment_created(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -15808,7 +14915,7 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedBy":
+		case "updated":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15817,7 +14924,10 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Comment_updatedBy(ctx, field, obj)
+				res = ec._Comment_updated(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -16118,78 +15228,6 @@ func (ec *executionContext) _Conversation(ctx context.Context, sel ast.Selection
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Conversation_createdAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Conversation_updatedAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "messages":
 			field := field
 
@@ -16259,7 +15297,7 @@ func (ec *executionContext) _Conversation(ctx context.Context, sel ast.Selection
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdBy":
+		case "created":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16268,7 +15306,10 @@ func (ec *executionContext) _Conversation(ctx context.Context, sel ast.Selection
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Conversation_createdBy(ctx, field, obj)
+				res = ec._Conversation_created(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -16292,7 +15333,7 @@ func (ec *executionContext) _Conversation(ctx context.Context, sel ast.Selection
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedBy":
+		case "updated":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16301,7 +15342,10 @@ func (ec *executionContext) _Conversation(ctx context.Context, sel ast.Selection
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Conversation_updatedBy(ctx, field, obj)
+				res = ec._Conversation_updated(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -16901,78 +15945,6 @@ func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "createdAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Message_createdAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Message_updatedAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "recipients":
 			field := field
 
@@ -17318,7 +16290,7 @@ func (ec *executionContext) _Notification(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "readAt":
+		case "read":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -17327,79 +16299,7 @@ func (ec *executionContext) _Notification(ctx context.Context, sel ast.Selection
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Notification_readAt(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Notification_createdAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Notification_updatedAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
+				res = ec._Notification_read(ctx, field, obj)
 				return res
 			}
 
@@ -17469,6 +16369,78 @@ func (ec *executionContext) _Notification(ctx context.Context, sel ast.Selection
 					}
 				}()
 				res = ec._Notification_metadata(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "created":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Notification_created(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "updated":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Notification_updated(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -18086,7 +17058,7 @@ func (ec *executionContext) _Reaction(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "createdAt":
+		case "created":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -18095,7 +17067,7 @@ func (ec *executionContext) _Reaction(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Reaction_createdAt(ctx, field, obj)
+				res = ec._Reaction_created(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -18122,7 +17094,7 @@ func (ec *executionContext) _Reaction(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedAt":
+		case "updated":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -18131,76 +17103,10 @@ func (ec *executionContext) _Reaction(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Reaction_updatedAt(ctx, field, obj)
+				res = ec._Reaction_updated(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdBy":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Reaction_createdBy(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedBy":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Reaction_updatedBy(ctx, field, obj)
 				return res
 			}
 
@@ -18407,7 +17313,7 @@ func (ec *executionContext) _Recipient(ctx context.Context, sel ast.SelectionSet
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "readAt":
+		case "read":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -18416,79 +17322,7 @@ func (ec *executionContext) _Recipient(ctx context.Context, sel ast.SelectionSet
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Recipient_readAt(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Recipient_createdAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedAt":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Recipient_updatedAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
+				res = ec._Recipient_read(ctx, field, obj)
 				return res
 			}
 
@@ -18738,7 +17572,7 @@ func (ec *executionContext) _Share(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "createdAt":
+		case "created":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -18747,7 +17581,7 @@ func (ec *executionContext) _Share(ctx context.Context, sel ast.SelectionSet, ob
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Share_createdAt(ctx, field, obj)
+				res = ec._Share_created(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -18774,7 +17608,7 @@ func (ec *executionContext) _Share(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedAt":
+		case "updated":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -18783,76 +17617,10 @@ func (ec *executionContext) _Share(ctx context.Context, sel ast.SelectionSet, ob
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Share_updatedAt(ctx, field, obj)
+				res = ec._Share_updated(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdBy":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Share_createdBy(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updatedBy":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Share_updatedBy(ctx, field, obj)
 				return res
 			}
 

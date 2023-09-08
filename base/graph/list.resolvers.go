@@ -10,7 +10,6 @@ import (
 
 	"github.com/dailytravel/x/base/graph/model"
 	"github.com/dailytravel/x/base/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -35,16 +34,6 @@ func (r *listResolver) Board(ctx context.Context, obj *model.List) (*model.Board
 // Metadata is the resolver for the metadata field.
 func (r *listResolver) Metadata(ctx context.Context, obj *model.List) (map[string]interface{}, error) {
 	return obj.Metadata, nil
-}
-
-// CreatedAt is the resolver for the created_at field.
-func (r *listResolver) CreatedAt(ctx context.Context, obj *model.List) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *listResolver) UpdatedAt(ctx context.Context, obj *model.List) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Tasks is the resolver for the tasks field.
@@ -72,24 +61,14 @@ func (r *listResolver) UID(ctx context.Context, obj *model.List) (string, error)
 	return obj.UID.Hex(), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *listResolver) CreatedBy(ctx context.Context, obj *model.List) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
+// Created is the resolver for the created field.
+func (r *listResolver) Created(ctx context.Context, obj *model.List) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *listResolver) UpdatedBy(ctx context.Context, obj *model.List) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	createdBy := obj.UpdatedBy.Hex()
-
-	return &createdBy, nil
+// Updated is the resolver for the updated field.
+func (r *listResolver) Updated(ctx context.Context, obj *model.List) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateList is the resolver for the createList field.
@@ -109,11 +88,6 @@ func (r *mutationResolver) CreateList(ctx context.Context, input model.NewList) 
 		Board: board,
 		Name:  input.Name,
 		Order: *input.Order,
-		Model: model.Model{
-			Metadata:  input.Metadata,
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 
 	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -128,11 +102,6 @@ func (r *mutationResolver) CreateList(ctx context.Context, input model.NewList) 
 
 // UpdateList is the resolver for the updateList field.
 func (r *mutationResolver) UpdateList(ctx context.Context, id string, input model.UpdateList) (*model.List, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -153,7 +122,6 @@ func (r *mutationResolver) UpdateList(ctx context.Context, id string, input mode
 	if input.Order != nil {
 		existingList.Order = *input.Order
 	}
-	existingList.UpdatedBy = uid
 
 	// Perform the update in the database
 	update := bson.M{
@@ -247,7 +215,7 @@ func (r *queryResolver) Lists(ctx context.Context, board string) (*model.Lists, 
 	}
 
 	opts := options.Find().SetSort(bson.M{"order": 1})
-	opts.SetSort(bson.M{"created_at": -1})
+	opts.SetSort(bson.M{"created": -1})
 	filter := bson.M{"board": _id}
 
 	//find all items

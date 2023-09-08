@@ -1,17 +1,17 @@
 type Goal {
   id: ID!
   name: String!
+  start: String
+  end: String
   notes: String
   metadata: Map
   status: String
-  createdAt: String!
-  updatedAt: String!
   parent: Goal
-  time: Time!
+  phase: Phase!
   uid: ID!
   organization: ID
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 enum GoalStatus {
@@ -37,25 +37,27 @@ type Metric {
 
 input NewGoal {
   name: String!
+  start: String
+  end: String
   notes: String
-  time: String!
-  is_company: Boolean
   metadata: Map
   status: String
-  user: ID!
   parent: ID
+  phase: ID!
+  uid: ID!
   organization: ID
 }
 
 input UpdateGoal {
   name: String
+  start: String
+  end: String
   notes: String
-  time: String
-  is_company: Boolean
   metadata: Map
   status: String
-  user: ID
   parent: ID
+  phase: ID
+  uid: ID
   organization: ID
 }
 

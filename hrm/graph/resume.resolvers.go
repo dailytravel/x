@@ -6,12 +6,10 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -35,10 +33,6 @@ func (r *mutationResolver) CreateResume(ctx context.Context, input model.NewResu
 		// Languages:      input.Languages,
 		// Projects:       input.Projects,
 		// References:     input.References,
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 
 	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -51,11 +45,6 @@ func (r *mutationResolver) CreateResume(ctx context.Context, input model.NewResu
 
 // UpdateResume is the resolver for the updateResume field.
 func (r *mutationResolver) UpdateResume(ctx context.Context, id string, input model.UpdateResume) (*model.Resume, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -74,9 +63,6 @@ func (r *mutationResolver) UpdateResume(ctx context.Context, id string, input mo
 	if input.Title != nil {
 		item.Title = *input.Title
 	}
-
-	// Update the "updated_by" field
-	item.UpdatedBy = uid
 
 	// Perform the update operation in the database
 	_, err = r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item})
@@ -190,7 +176,7 @@ func (r *queryResolver) Resume(ctx context.Context, id string) (*model.Resume, e
 func (r *queryResolver) Resumes(ctx context.Context, args map[string]interface{}) (*model.Resumes, error) {
 	var items []*model.Resume
 	//find all items
-	cur, err := r.db.Collection("resumes").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("resumes").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +190,7 @@ func (r *queryResolver) Resumes(ctx context.Context, args map[string]interface{}
 	}
 
 	//get total count
-	count, err := r.db.Collection("resumes").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("resumes").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -225,14 +211,14 @@ func (r *resumeResolver) Metadata(ctx context.Context, obj *model.Resume) (map[s
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *resumeResolver) CreatedAt(ctx context.Context, obj *model.Resume) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *resumeResolver) Created(ctx context.Context, obj *model.Resume) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *resumeResolver) UpdatedAt(ctx context.Context, obj *model.Resume) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *resumeResolver) Updated(ctx context.Context, obj *model.Resume) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
@@ -240,50 +226,7 @@ func (r *resumeResolver) UID(ctx context.Context, obj *model.Resume) (string, er
 	return obj.UID.Hex(), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *resumeResolver) CreatedBy(ctx context.Context, obj *model.Resume) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *resumeResolver) UpdatedBy(ctx context.Context, obj *model.Resume) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
-}
-
 // Resume returns ResumeResolver implementation.
 func (r *Resolver) Resume() ResumeResolver { return &resumeResolver{r} }
 
 type resumeResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *resumeResolver) Experience(ctx context.Context, obj *model.Resume) ([]*model.Experience, error) {
-	panic(fmt.Errorf("not implemented: Experience - experience"))
-}
-func (r *resumeResolver) Education(ctx context.Context, obj *model.Resume) ([]*model.Education, error) {
-	panic(fmt.Errorf("not implemented: Education - education"))
-}
-func (r *resumeResolver) Skills(ctx context.Context, obj *model.Resume) ([]*model.Skill, error) {
-	panic(fmt.Errorf("not implemented: Skills - skills"))
-}
-func (r *resumeResolver) Certifications(ctx context.Context, obj *model.Resume) ([]*model.Certification, error) {
-	panic(fmt.Errorf("not implemented: Certifications - certifications"))
-}
-func (r *resumeResolver) Languages(ctx context.Context, obj *model.Resume) ([]*model.Language, error) {
-	panic(fmt.Errorf("not implemented: Languages - languages"))
-}
-func (r *resumeResolver) References(ctx context.Context, obj *model.Resume) ([]*model.Reference, error) {
-	panic(fmt.Errorf("not implemented: References - references"))
-}

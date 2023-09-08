@@ -108,8 +108,6 @@ type NewJob struct {
 	Type         string                 `json:"type"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	Status       string                 `json:"status"`
-	CreatedBy    *string                `json:"createdBy,omitempty"`
-	UpdatedBy    *string                `json:"updatedBy,omitempty"`
 }
 
 type NewLeave struct {
@@ -231,8 +229,6 @@ type UpdateJob struct {
 	Type         *string                `json:"type,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	Status       *string                `json:"status,omitempty"`
-	CreatedBy    *string                `json:"createdBy,omitempty"`
-	UpdatedBy    *string                `json:"updatedBy,omitempty"`
 }
 
 type UpdateLeave struct {

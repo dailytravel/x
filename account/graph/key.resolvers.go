@@ -16,6 +16,7 @@ import (
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/internal/utils"
 	"github.com/dailytravel/x/account/pkg/auth"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -27,23 +28,23 @@ func (r *keyResolver) ID(ctx context.Context, obj *model.Key) (string, error) {
 	return obj.ID.Hex(), nil
 }
 
-// ExpiresAt is the resolver for the expires_at field.
-func (r *keyResolver) ExpiresAt(ctx context.Context, obj *model.Key) (*string, error) {
-	if obj.ExpiresAt != nil {
-		expiresAtStr := time.Unix(int64(obj.ExpiresAt.T), 0).Format(time.RFC3339)
-		return &expiresAtStr, nil
+// Expires is the resolver for the expires field.
+func (r *keyResolver) Expires(ctx context.Context, obj *model.Key) (*string, error) {
+	if obj.Expires == nil {
+		return nil, nil
 	}
-	return nil, nil
+
+	return pointer.String(time.Unix(int64(obj.Expires.T), 0).Format(time.RFC3339)), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *keyResolver) CreatedAt(ctx context.Context, obj *model.Key) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *keyResolver) Created(ctx context.Context, obj *model.Key) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *keyResolver) UpdatedAt(ctx context.Context, obj *model.Key) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *keyResolver) Updated(ctx context.Context, obj *model.Key) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Owner is the resolver for the owner field.
@@ -218,24 +219,34 @@ func (r *mutationResolver) RotateKey(ctx context.Context) (*model.Key, error) {
 }
 
 // Keys is the resolver for the keys field.
-func (r *queryResolver) Keys(ctx context.Context, args map[string]interface{}) (*model.Keys, error) {
+func (r *queryResolver) Keys(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Keys, error) {
 	var items []*model.Key
-	//find all items
-	cur, err := r.db.Collection(model.KeyCollection).Find(ctx, utils.Query(args), utils.Options(args))
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("keys").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Key
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection(model.KeyCollection).CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("keys").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -77,10 +77,11 @@ type NewTemplate struct {
 }
 
 type NewTimezone struct {
-	ID       *string                `json:"id,omitempty"`
-	Name     string                 `json:"name"`
-	Offset   int                    `json:"offset"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Locale      string                 `json:"locale"`
+	Name        string                 `json:"name"`
+	Offset      int                    `json:"offset"`
+	Description *string                `json:"description,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewWebhook struct {
@@ -158,6 +159,7 @@ type UpdateTemplate struct {
 }
 
 type UpdateTimezone struct {
+	Locale      *string                `json:"locale,omitempty"`
 	Name        *string                `json:"name,omitempty"`
 	Offset      *int                   `json:"offset,omitempty"`
 	Description *string                `json:"description,omitempty"`

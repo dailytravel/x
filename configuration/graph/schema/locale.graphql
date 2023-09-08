@@ -5,10 +5,8 @@ type Locale {
   code: String!
   order: Int!
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 type Locales {
@@ -42,7 +40,14 @@ input UpdateLocale {
 }
 
 extend type Query {
-  locales(args: Map): Locales
+  locales(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Locales
   locale(code: String!): Locale
 }
 

@@ -12,7 +12,6 @@ import (
 
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -31,9 +30,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.NewOrder
 		Cancellable: &input.Cancellable,
 		Status:      input.Status,
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
@@ -48,10 +45,10 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.NewOrder
 
 // UpdateOrder is the resolver for the updateOrder field.
 func (r *mutationResolver) UpdateOrder(ctx context.Context, id string, input model.UpdateOrder) (*model.Order, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -80,9 +77,6 @@ func (r *mutationResolver) UpdateOrder(ctx context.Context, id string, input mod
 			item.Metadata[k] = v
 		}
 	}
-
-	// Update the updated_by and updated_at fields
-	item.UpdatedBy = uid
 
 	// Perform the update in the database
 	res, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item)
@@ -117,11 +111,11 @@ func (r *mutationResolver) DeleteOrder(ctx context.Context, id string) (map[stri
 	// Define the update to mark the order as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 			"deleted_by": uid,
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -157,11 +151,11 @@ func (r *mutationResolver) DeleteOrders(ctx context.Context, ids []string) (map[
 	// Define the update to mark records as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 			"deleted_by": uid,
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -179,37 +173,19 @@ func (r *orderResolver) ID(ctx context.Context, obj *model.Order) (string, error
 	return obj.ID.Hex(), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *orderResolver) CreatedAt(ctx context.Context, obj *model.Order) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *orderResolver) Created(ctx context.Context, obj *model.Order) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *orderResolver) UpdatedAt(ctx context.Context, obj *model.Order) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *orderResolver) Updated(ctx context.Context, obj *model.Order) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
 func (r *orderResolver) UID(ctx context.Context, obj *model.Order) (string, error) {
 	return obj.ID.Hex(), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *orderResolver) CreatedBy(ctx context.Context, obj *model.Order) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *orderResolver) UpdatedBy(ctx context.Context, obj *model.Order) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // Order is the resolver for the order field.
@@ -236,7 +212,7 @@ func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, err
 func (r *queryResolver) Orders(ctx context.Context, args map[string]interface{}) (*model.Orders, error) {
 	var items []*model.Order
 	//find all items
-	cur, err := r.db.Collection("orders").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("orders").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -250,7 +226,7 @@ func (r *queryResolver) Orders(ctx context.Context, args map[string]interface{})
 	}
 
 	//get total count
-	count, err := r.db.Collection("orders").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("orders").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -265,13 +241,3 @@ func (r *queryResolver) Orders(ctx context.Context, args map[string]interface{})
 func (r *Resolver) Order() OrderResolver { return &orderResolver{r} }
 
 type orderResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *orderResolver) Total(ctx context.Context, obj *model.Order) (float64, error) {
-	panic(fmt.Errorf("not implemented: Total - total"))
-}

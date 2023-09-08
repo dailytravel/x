@@ -8,6 +8,4 @@ type Identity {
   isSocial: Boolean!
   metadata: Map
   status: String!
-  createdAt: String!
-  updatedAt: String!
 }

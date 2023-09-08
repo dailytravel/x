@@ -5,10 +5,8 @@ type Integration {
   type: String!
   status: String!
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
-  createdBy: User
-  updatedBy: User
+  created: String!
+  updated: String!
 }
 
 type Integrations {
@@ -33,7 +31,14 @@ input UpdateIntegration {
 }
 
 extend type Query {
-  integrations(args: Map): Integrations
+  integrations(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Integrations
   integration(id: ID!): Integration
 }
 

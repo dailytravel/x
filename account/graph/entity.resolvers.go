@@ -124,11 +124,10 @@ func (r *entityResolver) FindOrderByUID(ctx context.Context, uid string) (*model
 	}, nil
 }
 
-// FindOrganizationByCreatedByAndUpdatedBy is the resolver for the findOrganizationByCreatedByAndUpdatedBy field.
-func (r *entityResolver) FindOrganizationByCreatedByAndUpdatedBy(ctx context.Context, createdBy string, updatedBy string) (*model.Organization, error) {
+// FindOrganizationByUID is the resolver for the findOrganizationByUID field.
+func (r *entityResolver) FindOrganizationByUID(ctx context.Context, uid string) (*model.Organization, error) {
 	return &model.Organization{
-		CreatedBy: createdBy,
-		UpdatedBy: updatedBy,
+		UID: uid,
 	}, nil
 }
 

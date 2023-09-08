@@ -35,11 +35,11 @@ func (Content) IsEntity() {}
 func (i *Content) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Content
 	return bson.Marshal((*t)(i))
@@ -56,9 +56,9 @@ func (i *Content) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "deleted_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "created ", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "updated ", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "deleted ", Value: 1}}, Options: options.Index()},
 	}
 }
 
@@ -74,10 +74,10 @@ func (i *Content) Schema() interface{} {
 			{Name: "summary", Type: "object[]", Optional: pointer.True()},
 			{Name: "body", Type: "object[]", Optional: pointer.True()},
 			{Name: "status", Type: "string", Facet: pointer.True()},
-			{Name: "created_at", Type: "string"},
-			{Name: "updated_at", Type: "string"},
+			{Name: "created ", Type: "string"},
+			{Name: "updated ", Type: "string"},
 		},
-		DefaultSortingField: pointer.String("created_at"),
+		DefaultSortingField: pointer.String("created "),
 		EnableNestedFields:  pointer.True(),
 	}
 
@@ -86,16 +86,16 @@ func (i *Content) Schema() interface{} {
 
 func (i *Content) Document() map[string]interface{} {
 	document := map[string]interface{}{
-		"id":         i.ID,
-		"uid":        i.UID,
-		"locale":     i.Locale,
-		"type":       i.Type,
-		"title":      i.Title,
-		"summary":    i.Summary,
-		"body":       i.Body,
-		"slug":       i.Slug,
-		"created_at": time.Unix(int64(i.CreatedAt.T), 0).Format(time.RFC3339),
-		"updated_at": time.Unix(int64(i.UpdatedAt.T), 0).Format(time.RFC3339),
+		"id":       i.ID,
+		"uid":      i.UID,
+		"locale":   i.Locale,
+		"type":     i.Type,
+		"title":    i.Title,
+		"summary":  i.Summary,
+		"body":     i.Body,
+		"slug":     i.Slug,
+		"created ": time.Unix(int64(i.Created.T), 0).Format(time.RFC3339),
+		"updated ": time.Unix(int64(i.Updated.T), 0).Format(time.RFC3339),
 	}
 
 	if i.Parent != nil {
@@ -130,7 +130,7 @@ func (i *Content) Update(collection typesense.CollectionInterface, documentKey p
 
 	for field, value := range updatedFields {
 		switch field {
-		case "created_at", "updated_at", "last_activity":
+		case "created ", "updated ", "last_activity":
 			timestamp := value.(primitive.Timestamp)
 			updatePayload[field] = timestamp.T
 		default:

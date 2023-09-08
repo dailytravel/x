@@ -34,11 +34,11 @@ func (i *Term) Collection() string {
 func (i *Term) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Term
 	return bson.Marshal((*t)(i))
@@ -51,8 +51,8 @@ func (i *Term) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_by", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_by", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "created ", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "updated ", Value: 1}}, Options: options.Index()},
 	}
 }
 
@@ -68,10 +68,10 @@ func (i *Term) Schema() interface{} {
 			{Name: "description", Type: "object"},
 			{Name: "order", Type: "int32", Optional: pointer.True()},
 			{Name: "count", Type: "int32", Optional: pointer.True()},
-			{Name: "created_at", Type: "int32"},
-			{Name: "updated_at", Type: "int32"},
+			{Name: "created ", Type: "int32"},
+			{Name: "updated ", Type: "int32"},
 		},
-		DefaultSortingField: pointer.String("created_at"),
+		DefaultSortingField: pointer.String("created "),
 		EnableNestedFields:  pointer.True(),
 	}
 
@@ -89,8 +89,8 @@ func (i *Term) Document() map[string]interface{} {
 		"slug":        i.Slug,
 		"order":       i.Order,
 		"count":       i.Count,
-		"created_at":  i.CreatedAt.T,
-		"updated_at":  i.UpdatedAt.T,
+		"created ":    i.Created.T,
+		"updated ":    i.Updated.T,
 	}
 
 	return document
@@ -116,8 +116,8 @@ func (i *Term) Insert(collection typesense.CollectionInterface) error {
 func (i *Term) Update(collection typesense.CollectionInterface, documentKey primitive.M, updatedFields primitive.M, removedFields primitive.A) error {
 	documentID := documentKey["_id"].(primitive.ObjectID).Hex()
 
-	// Check if 'deleted_at' field is in updatedFields and its value is of type primitive.Timestamp
-	_, deletedAtExist := updatedFields["deleted_at"].(primitive.Timestamp)
+	// Check if 'deleted ' field is in updatedFields and its value is of type primitive.Timestamp
+	_, deletedAtExist := updatedFields["deleted "].(primitive.Timestamp)
 	if deletedAtExist {
 		if err := i.Delete(collection, documentKey); err != nil {
 			return err
@@ -140,7 +140,7 @@ func (i *Term) Update(collection typesense.CollectionInterface, documentKey prim
 	// Loop through updatedFields
 	for field, value := range updatedFields {
 		switch field {
-		case "created_at", "updated_at", "last_activity":
+		case "created ", "updated ", "last_activity":
 			if timestamp, ok := value.(primitive.Timestamp); ok {
 				updatePayload[field] = timestamp.T
 			}

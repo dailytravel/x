@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/dailytravel/x/community/graph/model"
 	"github.com/dailytravel/x/community/internal/utils"
@@ -37,16 +36,6 @@ func (r *messageResolver) Conversation(ctx context.Context, obj *model.Message) 
 	return item, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *messageResolver) CreatedAt(ctx context.Context, obj *model.Message) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *messageResolver) UpdatedAt(ctx context.Context, obj *model.Message) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
 // Recipients is the resolver for the recipients field.
 func (r *messageResolver) Recipients(ctx context.Context, obj *model.Message) ([]*model.Recipient, error) {
 	var items []*model.Recipient
@@ -71,17 +60,7 @@ func (r *messageResolver) Recipients(ctx context.Context, obj *model.Message) ([
 
 // CreateMessage is the resolver for the createMessage field.
 func (r *mutationResolver) CreateMessage(ctx context.Context, input model.NewMessage) (*model.Message, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	item := &model.Message{
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
-	}
+	item := &model.Message{}
 
 	// Insert the new organization
 	if _, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil); err != nil {
@@ -93,11 +72,6 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, input model.NewMes
 
 // UpdateMessage is the resolver for the updateMessage field.
 func (r *mutationResolver) UpdateMessage(ctx context.Context, id string, input model.UpdateMessage) (*model.Message, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -110,8 +84,6 @@ func (r *mutationResolver) UpdateMessage(ctx context.Context, id string, input m
 	if err != nil {
 		return nil, err
 	}
-
-	item.UpdatedBy = uid
 
 	// Update the contact
 	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item}, nil); err != nil {

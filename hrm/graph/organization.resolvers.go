@@ -12,7 +12,6 @@ import (
 
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,19 +20,10 @@ import (
 
 // CreateOrganization is the resolver for the createOrganization field.
 func (r *mutationResolver) CreateOrganization(ctx context.Context, input model.NewOrganization) (*model.Organization, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	item := &model.Organization{
 		Type:        input.Type,
 		Name:        input.Name,
 		Description: input.Description,
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 
 	if input.UID != nil {
@@ -196,14 +186,14 @@ func (r *organizationResolver) Metadata(ctx context.Context, obj *model.Organiza
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *organizationResolver) CreatedAt(ctx context.Context, obj *model.Organization) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *organizationResolver) Created(ctx context.Context, obj *model.Organization) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *organizationResolver) UpdatedAt(ctx context.Context, obj *model.Organization) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *organizationResolver) Updated(ctx context.Context, obj *model.Organization) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
@@ -211,29 +201,11 @@ func (r *organizationResolver) UID(ctx context.Context, obj *model.Organization)
 	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *organizationResolver) CreatedBy(ctx context.Context, obj *model.Organization) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *organizationResolver) UpdatedBy(ctx context.Context, obj *model.Organization) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
-}
-
 // Organizations is the resolver for the organizations field.
 func (r *queryResolver) Organizations(ctx context.Context, args map[string]interface{}) (*model.Organizations, error) {
 	var items []*model.Organization
 	//find all items
-	cur, err := r.db.Collection("organizations").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("organizations").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +219,7 @@ func (r *queryResolver) Organizations(ctx context.Context, args map[string]inter
 	}
 
 	//get total count
-	count, err := r.db.Collection("organizations").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("organizations").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

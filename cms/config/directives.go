@@ -36,25 +36,14 @@ func Directives(c *graph.Config) {
 			return nil, ErrNotAuthenticated
 		}
 
-		rolesClaim, ok := claims["roles"].(string)
+		userRolesInterface, ok := claims["roles"]
 		if !ok {
 			return nil, ErrMissingRole
 		}
 
-		if len(roles) == 0 {
+		// Check for the presence of a role without converting to a map
+		if len(roles) == 0 || hasRole(userRolesInterface, roles) {
 			return next(ctx)
-		}
-
-		requiredRoles := make(map[string]bool)
-		for _, role := range roles {
-			requiredRoles[strings.ToLower(role)] = true
-		}
-
-		roleArray := strings.Split(rolesClaim, " ")
-		for _, role := range roleArray {
-			if requiredRoles[strings.ToLower(role)] {
-				return next(ctx)
-			}
 		}
 
 		return nil, ErrMissingRole
@@ -89,4 +78,26 @@ func Directives(c *graph.Config) {
 
 		return nil, ErrMissingScope
 	}
+}
+
+// Helper function to check if userRoles contains any of the provided roles
+func hasRole(userRolesInterface interface{}, roles []string) bool {
+	userRoles, ok := userRolesInterface.([]interface{})
+	if !ok {
+		return false
+	}
+
+	for _, roleInterface := range userRoles {
+		role, ok := roleInterface.(string)
+		if !ok {
+			continue
+		}
+
+		for _, r := range roles {
+			if strings.EqualFold(role, r) {
+				return true
+			}
+		}
+	}
+	return false
 }

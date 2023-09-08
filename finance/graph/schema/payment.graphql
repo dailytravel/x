@@ -5,12 +5,11 @@ type Payment {
   date: String!
   status: String!
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
+
   invoice: ID!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 enum PaymentStatus {

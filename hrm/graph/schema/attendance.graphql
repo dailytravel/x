@@ -5,11 +5,9 @@ type Attendance {
   notes: String
   metadata: Map
   status: String # "present", "absent", "late", etc.
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
 }
 
 enum AttendanceStatus {

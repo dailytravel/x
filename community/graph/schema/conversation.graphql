@@ -7,12 +7,10 @@ type Conversation {
   status: String!
   metadata: Map
   message: Message #last message
-  createdAt: String!
-  updatedAt: String!
   messages: [Message!]
   uid: String!
-  createdBy: String
-  updatedBy: String
+  created: String!
+  updated: String!
   shares: [Share]
   comments: [Comment]
 }

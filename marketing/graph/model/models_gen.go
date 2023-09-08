@@ -32,11 +32,9 @@ type Link struct {
 	Destination string                 `json:"destination"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
-	CreatedAt   string                 `json:"createdAt"`
-	UpdatedAt   string                 `json:"updatedAt"`
+	Created     string                 `json:"created"`
+	Updated     string                 `json:"updated"`
 	UID         string                 `json:"uid"`
-	CreatedBy   *string                `json:"createdBy,omitempty"`
-	UpdatedBy   *string                `json:"updatedBy,omitempty"`
 }
 
 type Links struct {
@@ -87,8 +85,8 @@ type Schedule struct {
 	Time      string                 `json:"time"`
 	Timezone  string                 `json:"timezone"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt string                 `json:"createdAt"`
-	UpdatedAt string                 `json:"updatedAt"`
+	Created   string                 `json:"created"`
+	Updated   string                 `json:"updated"`
 }
 
 type Segment struct {
@@ -96,8 +94,8 @@ type Segment struct {
 	Name        string             `json:"name"`
 	Description *string            `json:"description,omitempty"`
 	Criteria    []*SegmentCriteria `json:"criteria"`
-	CreatedAt   string             `json:"createdAt"`
-	UpdatedAt   string             `json:"updatedAt"`
+	Created     string             `json:"created"`
+	Updated     string             `json:"updated"`
 	CreatedBy   *string            `json:"createdBy,omitempty"`
 	UpdatedBy   *string            `json:"updatedBy,omitempty"`
 }

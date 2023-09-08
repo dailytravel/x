@@ -6,13 +6,11 @@ package graph
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -28,59 +26,40 @@ func (r *clientResolver) Metadata(ctx context.Context, obj *model.Client) (map[s
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *clientResolver) CreatedAt(ctx context.Context, obj *model.Client) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *clientResolver) Created(ctx context.Context, obj *model.Client) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *clientResolver) UpdatedAt(ctx context.Context, obj *model.Client) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *clientResolver) Updated(ctx context.Context, obj *model.Client) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *clientResolver) CreatedBy(ctx context.Context, obj *model.Client) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
+// User is the resolver for the user field.
+func (r *clientResolver) User(ctx context.Context, obj *model.Client) (*model.User, error) {
+	var item *model.User
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": obj.UID}).Decode(item); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // Return nil if no user is found, rather than an error.
+		}
+		return nil, fmt.Errorf("failed to fetch user from database: %w", err)
 	}
 
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *clientResolver) UpdatedBy(ctx context.Context, obj *model.Client) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
-}
-
-// UID is the resolver for the uid field.
-func (r *clientResolver) UID(ctx context.Context, obj *model.Client) (*string, error) {
-	if obj.UID == nil {
-		return nil, nil
-	}
-
-	uid := obj.UID.Hex()
-
-	return &uid, nil
+	return item, nil
 }
 
 // CreateClient is the resolver for the createClient field.
 func (r *mutationResolver) CreateClient(ctx context.Context, input model.NewClient) (*model.Client, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	item := &model.Client{
 		Name:        input.Name,
 		Description: input.Description,
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 
 	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil)
@@ -119,8 +98,6 @@ func (r *mutationResolver) UpdateClient(ctx context.Context, id string, input mo
 	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item); err != nil {
 		return nil, err
 	}
-
-	item.Model.UpdatedBy = uid
 
 	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, bson.M{"_id": uid}, bson.M{"$set": item}); err != nil {
 		return nil, err
@@ -192,24 +169,35 @@ func (r *queryResolver) Client(ctx context.Context, id string) (*model.Client, e
 }
 
 // Clients is the resolver for the clients field.
-func (r *queryResolver) Clients(ctx context.Context, args map[string]interface{}) (*model.Clients, error) {
+func (r *queryResolver) Clients(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Clients, error) {
 	var items []*model.Client
-	//find all items
-	cur, err := r.db.Collection("clients").Find(ctx, r.model.Query(args), r.model.Options(args))
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("clients").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Client
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection("clients").CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("clients").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -224,22 +212,3 @@ func (r *queryResolver) Clients(ctx context.Context, args map[string]interface{}
 func (r *Resolver) Client() ClientResolver { return &clientResolver{r} }
 
 type clientResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *clientResolver) User(ctx context.Context, obj *model.Client) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": obj.UID}).Decode(&item); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("no document found for filter %v", bson.M{"_id": obj.UID})
-		}
-		return nil, err
-	}
-
-	return item, nil
-}

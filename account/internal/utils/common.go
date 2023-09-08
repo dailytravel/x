@@ -68,81 +68,6 @@ func StructToMap(obj interface{}) (map[string]interface{}, error) {
 	return result, nil
 }
 
-func Query(args map[string]interface{}) interface{} {
-	query := bson.M{"deleted_at": bson.M{"$exists": false}}
-	q := ""
-	if val, ok := args["q"].(string); ok && val != "" {
-		q = val
-	}
-
-	if q != "" {
-		orQuery := []bson.M{{"$text": bson.M{"$search": q}}}
-		query["$or"] = orQuery
-	}
-
-	if queryBy, ok := args["query"].(string); ok && queryBy != "" {
-		queryFields := strings.Split(queryBy, ",")
-		for _, field := range queryFields {
-			if field == "query" {
-				continue
-			}
-			val, ok := args[field].(string)
-			if ok && val != "" {
-				query[field] = bson.M{"$regex": primitive.Regex{Pattern: val, Options: "i"}}
-			}
-		}
-	}
-
-	if filter, ok := args["filter"].(map[string]interface{}); ok && filter != nil {
-		for k, v := range filter {
-			if k == "_id" || k == "object._id" {
-				_id, _ := primitive.ObjectIDFromHex(v.(string))
-				query[k] = _id
-			}
-			query[k] = v
-		}
-	}
-
-	return query
-}
-
-// Options returns a MongoDB options object with skip, limit, and sort applied.
-func Options(args map[string]interface{}) *options.FindOptions {
-	options := options.Find()
-
-	page := int64(1)
-	if p, ok := args["page"].(json.Number); ok {
-		page, _ = p.Int64()
-		if page < 1 {
-			page = 1 // handle negative or zero page values
-		}
-	}
-
-	limit := int64(0) // Set limit to 0 to indicate no limit
-	if l, ok := args["limit"].(json.Number); ok {
-		limit, _ = l.Int64()
-		if limit < 1 {
-			limit = 1 // handle negative or zero limit values
-		}
-	}
-
-	options.SetSkip((page - 1) * limit)
-	options.SetLimit(limit)
-
-	if sortBy, ok := args["sort"].(map[string]interface{}); ok {
-		for k, v := range sortBy {
-			// convert v to lowercase as "asc" or "desc" to 1 or -1
-			if strings.ToLower(v.(string)) == "asc" {
-				options.SetSort(bson.M{k: 1})
-			} else {
-				options.SetSort(bson.M{k: -1})
-			}
-		}
-	}
-
-	return options
-}
-
 func Params(args map[string]interface{}) *api.SearchCollectionParams {
 	searchParameters := &api.SearchCollectionParams{
 		Q:        getStringArg(args, "q"),
@@ -209,4 +134,57 @@ func DecodeFromBase64(s string) (string, error) {
 		return "", err
 	}
 	return string(decodedBytes), nil
+}
+
+func Filter(input interface{}) interface{} {
+	switch v := input.(type) {
+	case string:
+		// If string matches the length of ObjectID, try converting
+		if len(v) == 24 {
+			if objID, err := primitive.ObjectIDFromHex(v); err == nil {
+				return objID
+			}
+		}
+		return v
+	case []interface{}:
+		// Handle slice of interfaces, which could be slice of strings
+		for i, item := range v {
+			v[i] = Filter(item)
+		}
+		return v
+	case map[string]interface{}:
+		// Recursive call for nested maps
+		for key, value := range v {
+			v[key] = Filter(value)
+		}
+		return v
+	default:
+		// Return as it is if it's any other type
+		return v
+	}
+}
+
+// Sort converts a map of sort criteria into MongoDB-compatible sort options.
+func Sort(sortCriteria map[string]interface{}) *options.FindOptions {
+	sortMap := bson.D{}
+
+	for field, order := range sortCriteria {
+		orderStr, ok := order.(string)
+		if !ok {
+			continue
+		}
+
+		orderValue := 1 // default to ascending
+		if orderStr == "desc" {
+			orderValue = -1
+		}
+		sortMap = append(sortMap, bson.E{Key: field, Value: orderValue})
+	}
+
+	return options.Find().SetSort(sortMap)
+}
+
+// Project converts a map into MongoDB-compatible projection options.
+func Project(projection map[string]interface{}) *options.FindOptions {
+	return options.Find().SetProjection(projection)
 }

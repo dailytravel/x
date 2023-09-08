@@ -15,11 +15,9 @@ type Company @key(fields: "id") {
   website: String
   metadata: Map
   status: String!
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
 }
 
 type Companies {

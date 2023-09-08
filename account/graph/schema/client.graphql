@@ -9,11 +9,9 @@ type Client {
   redirect: String
   metadata: Map
   status: String!
-  createdAt: String!
-  updatedAt: String!
-  createdBy: ID
-  updatedBy: ID
-  uid: ID
+  created: String!
+  updated: String!
+  user: User
 }
 
 type Clients {
@@ -39,7 +37,14 @@ input UpdateClient {
 
 extend type Query {
   client(id: ID!): Client @auth(roles: [ADMIN])
-  clients(args: Map): Clients @auth(roles: [ADMIN])
+  clients(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Clients @auth(roles: [ADMIN])
 }
 
 extend type Mutation {

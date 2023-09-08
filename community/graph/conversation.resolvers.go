@@ -12,7 +12,6 @@ import (
 
 	"github.com/dailytravel/x/community/graph/model"
 	"github.com/dailytravel/x/community/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -44,16 +43,6 @@ func (r *conversationResolver) Message(ctx context.Context, obj *model.Conversat
 	return item, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *conversationResolver) CreatedAt(ctx context.Context, obj *model.Conversation) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *conversationResolver) UpdatedAt(ctx context.Context, obj *model.Conversation) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
 // Messages is the resolver for the messages field.
 func (r *conversationResolver) Messages(ctx context.Context, obj *model.Conversation) ([]*model.Message, error) {
 	var items []*model.Message
@@ -81,22 +70,14 @@ func (r *conversationResolver) UID(ctx context.Context, obj *model.Conversation)
 	return obj.UID.Hex(), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *conversationResolver) CreatedBy(ctx context.Context, obj *model.Conversation) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
+// Created is the resolver for the created field.
+func (r *conversationResolver) Created(ctx context.Context, obj *model.Conversation) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *conversationResolver) UpdatedBy(ctx context.Context, obj *model.Conversation) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *conversationResolver) Updated(ctx context.Context, obj *model.Conversation) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Shares is the resolver for the shares field.
@@ -128,17 +109,7 @@ func (r *conversationResolver) Comments(ctx context.Context, obj *model.Conversa
 
 // CreateConversation is the resolver for the createConversation field.
 func (r *mutationResolver) CreateConversation(ctx context.Context, input model.NewConversation) (*model.Conversation, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	item := &model.Conversation{
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
-	}
+	item := &model.Conversation{}
 
 	// Insert the new organization
 	if _, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil); err != nil {
@@ -150,11 +121,6 @@ func (r *mutationResolver) CreateConversation(ctx context.Context, input model.N
 
 // UpdateConversation is the resolver for the updateConversation field.
 func (r *mutationResolver) UpdateConversation(ctx context.Context, id string, input model.UpdateConversation) (*model.Conversation, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -167,8 +133,6 @@ func (r *mutationResolver) UpdateConversation(ctx context.Context, id string, in
 	if err != nil {
 		return nil, err
 	}
-
-	item.UpdatedBy = uid
 
 	// Update the contact
 	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item}, nil); err != nil {
@@ -311,7 +275,7 @@ func (r *queryResolver) Conversation(ctx context.Context, id string) (*model.Con
 func (r *queryResolver) Conversations(ctx context.Context, args map[string]interface{}) (*model.Conversations, error) {
 	var items []*model.Conversation
 	//find all items
-	cur, err := r.db.Collection("conversations").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("conversations").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -325,7 +289,7 @@ func (r *queryResolver) Conversations(ctx context.Context, args map[string]inter
 	}
 
 	//get total count
-	count, err := r.db.Collection("conversations").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("conversations").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

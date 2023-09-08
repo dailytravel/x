@@ -11,7 +11,6 @@ import (
 
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -26,49 +25,26 @@ func (r *apiResolver) Metadata(ctx context.Context, obj *model.Api) (map[string]
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *apiResolver) CreatedAt(ctx context.Context, obj *model.Api) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *apiResolver) Created(ctx context.Context, obj *model.Api) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *apiResolver) UpdatedAt(ctx context.Context, obj *model.Api) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *apiResolver) CreatedBy(ctx context.Context, obj *model.Api) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *apiResolver) UpdatedBy(ctx context.Context, obj *model.Api) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *apiResolver) Updated(ctx context.Context, obj *model.Api) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateAPI is the resolver for the createApi field.
 func (r *mutationResolver) CreateAPI(ctx context.Context, input model.NewAPI) (*model.Api, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	item := &model.Api{
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
-	}
+	item := &model.Api{}
 
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -78,10 +54,10 @@ func (r *mutationResolver) CreateAPI(ctx context.Context, input model.NewAPI) (*
 
 // UpdateAPI is the resolver for the updateApi field.
 func (r *mutationResolver) UpdateAPI(ctx context.Context, id string, input model.UpdateAPI) (*model.Api, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -96,8 +72,6 @@ func (r *mutationResolver) UpdateAPI(ctx context.Context, id string, input model
 	if err != nil {
 		return nil, err
 	}
-
-	item.UpdatedBy = uid
 
 	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {
 		return nil, err
@@ -169,24 +143,35 @@ func (r *queryResolver) API(ctx context.Context, id string) (*model.Api, error) 
 }
 
 // Apis is the resolver for the apis field.
-func (r *queryResolver) Apis(ctx context.Context, args map[string]interface{}) (*model.Apis, error) {
+func (r *queryResolver) Apis(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Apis, error) {
 	var items []*model.Api
-	//find all items
-	cur, err := r.db.Collection("apis").Find(ctx, r.model.Query(args), r.model.Options(args))
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("apis").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Api
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection("apis").CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("apis").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}

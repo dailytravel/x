@@ -25,6 +25,7 @@ import (
 func init() {
 	os.Setenv("GIN_MODE", "release")
 	os.Setenv("DEFAULT_LOCALE", "en")
+	os.Setenv("LOCALES", "en,vi")
 	os.Setenv("PORT", "4005")
 	os.Setenv("DB_HOST", "localhost")
 	os.Setenv("DB_NAME", "configuration")

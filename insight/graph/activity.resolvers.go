@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/dailytravel/x/insight/graph/model"
 )
@@ -32,9 +31,9 @@ func (r *activityResolver) Target(ctx context.Context, obj *model.Activity) (str
 	return obj.Target.Hex(), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *activityResolver) CreatedAt(ctx context.Context, obj *model.Activity) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Timestamp is the resolver for the timestamp field.
+func (r *activityResolver) Timestamp(ctx context.Context, obj *model.Activity) (string, error) {
+	panic(fmt.Errorf("not implemented: Timestamp - timestamp"))
 }
 
 // Activity is the resolver for the activity field.

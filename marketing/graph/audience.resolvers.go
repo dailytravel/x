@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/marketing/graph/model"
 )
@@ -26,14 +27,14 @@ func (r *audienceResolver) Metadata(ctx context.Context, obj *model.Audience) (m
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *audienceResolver) CreatedAt(ctx context.Context, obj *model.Audience) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+// Created is the resolver for the created field.
+func (r *audienceResolver) Created(ctx context.Context, obj *model.Audience) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *audienceResolver) UpdatedAt(ctx context.Context, obj *model.Audience) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+// Updated is the resolver for the updated field.
+func (r *audienceResolver) Updated(ctx context.Context, obj *model.Audience) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateAudience is the resolver for the createAudience field.

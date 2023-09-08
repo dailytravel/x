@@ -11,10 +11,10 @@ type User @key(fields: "id") {
   lastLogin: String
   emailVerified: Boolean
   phoneVerified: Boolean
-  createdAt: String!
-  updatedAt: String!
   metadata: Map
   status: String
+  created: String!
+  updated: String!
 }
 
 enum UserStatus {

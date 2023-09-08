@@ -32,7 +32,7 @@ func (r *mutationResolver) DeleteWebhooks(ctx context.Context, ids []string) (ma
 }
 
 // Webhooks is the resolver for the webhooks field.
-func (r *queryResolver) Webhooks(ctx context.Context, args map[string]interface{}) ([]*model.Webhook, error) {
+func (r *queryResolver) Webhooks(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) ([]*model.Webhook, error) {
 	panic(fmt.Errorf("not implemented: Webhooks - webhooks"))
 }
 
@@ -56,16 +56,6 @@ func (r *webhookResolver) Events(ctx context.Context, obj *model.Webhook) ([]*mo
 	panic(fmt.Errorf("not implemented: Events - events"))
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *webhookResolver) CreatedAt(ctx context.Context, obj *model.Webhook) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *webhookResolver) UpdatedAt(ctx context.Context, obj *model.Webhook) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
 // CreatedBy is the resolver for the created_by field.
 func (r *webhookResolver) CreatedBy(ctx context.Context, obj *model.Webhook) (*string, error) {
 	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
@@ -80,3 +70,16 @@ func (r *webhookResolver) UpdatedBy(ctx context.Context, obj *model.Webhook) (*s
 func (r *Resolver) Webhook() WebhookResolver { return &webhookResolver{r} }
 
 type webhookResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *webhookResolver) CreatedAt(ctx context.Context, obj *model.Webhook) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+func (r *webhookResolver) UpdatedAt(ctx context.Context, obj *model.Webhook) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}

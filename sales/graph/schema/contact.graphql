@@ -25,11 +25,9 @@ type Contact @key(fields: "id") {
   labels: [String]
   metadata: Map
   lastActivity: String
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
 }
 
 type Phone {

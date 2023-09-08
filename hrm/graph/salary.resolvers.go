@@ -12,7 +12,6 @@ import (
 
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,18 +19,9 @@ import (
 
 // CreateSalary is the resolver for the createSalary field.
 func (r *mutationResolver) CreateSalary(ctx context.Context, input model.NewSalary) (*model.Salary, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	item := &model.Salary{
 		Amount:   input.Amount,
 		Currency: input.Currency,
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 
 	// Insert the new organization
@@ -44,11 +34,6 @@ func (r *mutationResolver) CreateSalary(ctx context.Context, input model.NewSala
 
 // UpdateSalary is the resolver for the updateSalary field.
 func (r *mutationResolver) UpdateSalary(ctx context.Context, id string, input model.UpdateSalary) (*model.Salary, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -62,8 +47,6 @@ func (r *mutationResolver) UpdateSalary(ctx context.Context, id string, input mo
 	if err != nil {
 		return nil, err
 	}
-
-	item.UpdatedBy = uid
 
 	// Update the position in the database
 	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {
@@ -177,7 +160,7 @@ func (r *queryResolver) Salary(ctx context.Context, id string) (*model.Salary, e
 func (r *queryResolver) Salaries(ctx context.Context, args map[string]interface{}) (*model.Salaries, error) {
 	var items []*model.Salary
 	//find all items
-	cur, err := r.db.Collection("salaries").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("salaries").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +174,7 @@ func (r *queryResolver) Salaries(ctx context.Context, args map[string]interface{
 	}
 
 	//get total count
-	count, err := r.db.Collection("salaries").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("salaries").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -222,14 +205,14 @@ func (r *salaryResolver) Metadata(ctx context.Context, obj *model.Salary) (map[s
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *salaryResolver) CreatedAt(ctx context.Context, obj *model.Salary) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *salaryResolver) Created(ctx context.Context, obj *model.Salary) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *salaryResolver) UpdatedAt(ctx context.Context, obj *model.Salary) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *salaryResolver) Updated(ctx context.Context, obj *model.Salary) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
@@ -237,39 +220,7 @@ func (r *salaryResolver) UID(ctx context.Context, obj *model.Salary) (string, er
 	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *salaryResolver) CreatedBy(ctx context.Context, obj *model.Salary) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *salaryResolver) UpdatedBy(ctx context.Context, obj *model.Salary) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
-}
-
 // Salary returns SalaryResolver implementation.
 func (r *Resolver) Salary() SalaryResolver { return &salaryResolver{r} }
 
 type salaryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *salaryResolver) StartDate(ctx context.Context, obj *model.Salary) (string, error) {
-	return obj.StartDate.Time().String(), nil
-}
-func (r *salaryResolver) EndDate(ctx context.Context, obj *model.Salary) (*string, error) {
-	endDate := obj.EndDate.Time().String()
-	return &endDate, nil
-}

@@ -26,11 +26,11 @@ type Reactable struct {
 func (i *Reaction) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Reaction
 	return bson.Marshal((*t)(i))
@@ -43,7 +43,7 @@ func (i *Reaction) Collection() string {
 func (i *Reaction) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "uid", Value: 1}, {Key: "reactable._id", Value: 1}, {Key: "reactable.type", Value: 1}}, Options: options.Index().SetUnique(true)},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
 	}
 }

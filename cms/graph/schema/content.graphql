@@ -9,11 +9,9 @@ type Content @key(fields: "id") {
   status: String!
   commentable: Boolean!
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
   terms: [Term]
   parent: Content
 }

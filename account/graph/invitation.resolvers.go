@@ -39,37 +39,19 @@ func (r *invitationResolver) Metadata(ctx context.Context, obj *model.Invitation
 	return obj.Metadata, nil
 }
 
-// ExpiresAt is the resolver for the expiresAt field.
-func (r *invitationResolver) ExpiresAt(ctx context.Context, obj *model.Invitation) (string, error) {
-	return time.Unix(int64(obj.ExpiresAt.T), 0).Format(time.RFC3339), nil
+// Expires is the resolver for the expires field.
+func (r *invitationResolver) Expires(ctx context.Context, obj *model.Invitation) (string, error) {
+	panic(fmt.Errorf("not implemented: Expires - expires"))
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *invitationResolver) CreatedAt(ctx context.Context, obj *model.Invitation) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *invitationResolver) Created(ctx context.Context, obj *model.Invitation) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *invitationResolver) UpdatedAt(ctx context.Context, obj *model.Invitation) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the createdBy field.
-func (r *invitationResolver) CreatedBy(ctx context.Context, obj *model.Invitation) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updatedBy field.
-func (r *invitationResolver) UpdatedBy(ctx context.Context, obj *model.Invitation) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *invitationResolver) Updated(ctx context.Context, obj *model.Invitation) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Invite is the resolver for the invite field.
@@ -81,15 +63,11 @@ func (r *mutationResolver) Invite(ctx context.Context, input model.NewInvitation
 
 	// Create a new Invitation object using the input data
 	item := &model.Invitation{
-		UID:       *uid,
-		Email:     input.Email,
-		Roles:     input.Roles,
-		Status:    "PENDING",
-		ExpiresAt: primitive.Timestamp{T: uint32(time.Now().Add(time.Hour * 24 * 7).Unix())},
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
+		UID:     *uid,
+		Email:   input.Email,
+		Roles:   input.Roles,
+		Status:  "PENDING",
+		Expires: primitive.Timestamp{T: uint32(time.Now().Add(time.Hour * 24 * 7).Unix())},
 	}
 
 	// Save the new Invitation to the database
@@ -142,7 +120,7 @@ func (r *mutationResolver) Accept(ctx context.Context, token string) (*model.Inv
 
 	// Check if the invitation has expired
 	now := time.Now()
-	if now.After(time.Unix(int64(invitation.ExpiresAt.T), 0)) {
+	if now.After(time.Unix(int64(invitation.Expires.T), 0)) {
 		return nil, fmt.Errorf("invitation has expired")
 	}
 
@@ -158,7 +136,6 @@ func (r *mutationResolver) Accept(ctx context.Context, token string) (*model.Inv
 	}
 
 	user.Roles = invitation.Roles
-	user.UpdatedBy = uid
 	user.Metadata["invited_by"] = userID
 
 	_, err = r.db.Collection("users").UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": user})
@@ -237,34 +214,45 @@ func (r *mutationResolver) DeleteInvitations(ctx context.Context, ids []string) 
 }
 
 // Invitations is the resolver for the invitations field.
-func (r *queryResolver) Invitations(ctx context.Context, filter map[string]interface{}, limit *int, offset *int) (*model.Invitations, error) {
+func (r *queryResolver) Invitations(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Invitations, error) {
 	var items []*model.Invitation
 
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+
 	opts := options.Find()
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if sort != nil {
+		opts.SetSort(sort)
+	}
+	if collation != nil {
+		col := &options.Collation{
+			// you can set collation fields here...
+		}
+		opts.SetCollation(col)
+	}
 	if limit != nil {
 		opts.SetLimit(int64(*limit))
 	}
-
-	if offset != nil {
-		opts.SetSkip(int64(*offset))
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
 	}
 
-	//find all items
-	cur, err := r.db.Collection(model.RoleCollection).Find(ctx, r.model.Query(filter), opts)
+	cursor, err := r.db.Collection("invitations").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Invitation
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection(model.RoleCollection).CountDocuments(ctx, r.model.Query(filter), nil)
+	count, err := r.db.Collection("invitations").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -278,7 +266,7 @@ func (r *queryResolver) Invitations(ctx context.Context, filter map[string]inter
 // Invitation is the resolver for the invitation field.
 func (r *queryResolver) Invitation(ctx context.Context, id string) (*model.Invitation, error) {
 	item := &model.Invitation{}
-	col := r.db.Collection(model.InvitationCollection)
+	col := r.db.Collection("invitations")
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err

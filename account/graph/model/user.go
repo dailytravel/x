@@ -40,11 +40,11 @@ func (i *User) Santize(s string) string {
 func (i *User) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t User
 	return bson.Marshal((*t)(i))
@@ -59,10 +59,10 @@ func (i *User) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "email", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "phone", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
-		{Keys: bson.D{{Key: "verified_at", Value: 1}}},
-		{Keys: bson.D{{Key: "deleted_at", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
+		{Keys: bson.D{{Key: "verified", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 		{Keys: bson.D{{Key: "name", Value: "text"}, {Key: "email", Value: "text"}}, Options: options.Index().SetWeights(bson.M{"name": 2, "email": 1})},
 	}
 }
@@ -76,26 +76,26 @@ func (i *User) Schema() interface{} {
 			{Name: "email", Type: "string"},
 			{Name: "phone", Type: "string", Optional: pointer.True()},
 			{Name: "status", Type: "string", Facet: pointer.True()},
-			{Name: "created_at", Type: "int32"},
-			{Name: "updated_at", Type: "int32"},
+			{Name: "created", Type: "int32"},
+			{Name: "updated", Type: "int32"},
 			{Name: "roles", Type: "string[]"},
 		},
-		DefaultSortingField: pointer.String("created_at"),
+		DefaultSortingField: pointer.String("created"),
 		EnableNestedFields:  pointer.True(),
 	}
 }
 
 func (i *User) Document() map[string]interface{} {
 	document := map[string]interface{}{
-		"id":         i.ID.Hex(),
-		"name":       i.Name,
-		"email":      i.Email,
-		"phone":      i.Phone,
-		"picture":    i.Picture,
-		"status":     i.Status,
-		"roles":      i.Roles,
-		"created_at": i.CreatedAt.T,
-		"updated_at": i.UpdatedAt.T,
+		"id":      i.ID.Hex(),
+		"name":    i.Name,
+		"email":   i.Email,
+		"phone":   i.Phone,
+		"picture": i.Picture,
+		"status":  i.Status,
+		"roles":   i.Roles,
+		"created": i.Created.T,
+		"updated": i.Updated.T,
 	}
 
 	return document

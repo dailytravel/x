@@ -28,36 +28,30 @@ func (r *boardResolver) ID(ctx context.Context, obj *model.Board) (string, error
 func (r *boardResolver) Portfolio(ctx context.Context, obj *model.Board) (*model.Portfolio, error) {
 	var item *model.Portfolio
 
-	if err := r.db.Collection("portfolios").FindOne(ctx, bson.M{"_id": obj.Portfolio}).Decode(&item); err != nil {
+	filter := bson.M{"_id": obj.Portfolio}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
 	return item, nil
 }
 
-// DueDate is the resolver for the due_date field.
-func (r *boardResolver) DueDate(ctx context.Context, obj *model.Board) (*string, error) {
-	if obj.DueDate == nil {
+// End is the resolver for the end field.
+func (r *boardResolver) End(ctx context.Context, obj *model.Board) (*string, error) {
+	if obj.End == nil {
 		return nil, nil
 	}
 
-	dueDate := obj.DueDate.Time().Format(time.RFC3339)
-	return &dueDate, nil
+	return pointer.String(obj.End.Time().Format(time.RFC3339)), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *boardResolver) Metadata(ctx context.Context, obj *model.Board) (map[string]interface{}, error) {
 	return obj.Metadata, nil
-}
-
-// CreatedAt is the resolver for the created_at field.
-func (r *boardResolver) CreatedAt(ctx context.Context, obj *model.Board) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *boardResolver) UpdatedAt(ctx context.Context, obj *model.Board) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Lists is the resolver for the lists field.
@@ -85,22 +79,14 @@ func (r *boardResolver) UID(ctx context.Context, obj *model.Board) (string, erro
 	return obj.UID.Hex(), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *boardResolver) CreatedBy(ctx context.Context, obj *model.Board) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
+// Created is the resolver for the created field.
+func (r *boardResolver) Created(ctx context.Context, obj *model.Board) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *boardResolver) UpdatedBy(ctx context.Context, obj *model.Board) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *boardResolver) Updated(ctx context.Context, obj *model.Board) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateBoard is the resolver for the createBoard field.
@@ -118,11 +104,6 @@ func (r *mutationResolver) CreateBoard(ctx context.Context, input model.NewBoard
 		IsTemplate:  input.IsTemplate,
 		Order:       input.Order,
 		Starred:     input.Starred,
-		Model: model.Model{
-			Metadata:  input.Metadata,
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 
 	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -137,11 +118,6 @@ func (r *mutationResolver) CreateBoard(ctx context.Context, input model.NewBoard
 
 // UpdateBoard is the resolver for the updateBoard field.
 func (r *mutationResolver) UpdateBoard(ctx context.Context, id string, input model.UpdateBoard) (*model.Board, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -171,7 +147,6 @@ func (r *mutationResolver) UpdateBoard(ctx context.Context, id string, input mod
 	if input.Starred != nil {
 		item.Starred = *input.Starred
 	}
-	item.UpdatedBy = uid
 
 	// Perform the update in the database
 	update := bson.M{
@@ -267,9 +242,9 @@ func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, err
 func (r *queryResolver) Boards(ctx context.Context, args map[string]interface{}) (*model.Boards, error) {
 	var items []*model.Board
 
-	opts := utils.Options(args)
+	opts := options.Find()
 	opts.SetSort(bson.M{"order": 1})
-	opts.SetSort(bson.M{"created_at": -1})
+	opts.SetSort(bson.M{"created": -1})
 
 	// Build the filter based on the provided arguments
 	filter := bson.M{}
@@ -280,7 +255,7 @@ func (r *queryResolver) Boards(ctx context.Context, args map[string]interface{})
 	}
 
 	// Create a cursor for the query
-	cursor, err := r.db.Collection("boards").Find(ctx, utils.Query(args), opts)
+	cursor, err := r.db.Collection("boards").Find(ctx, nil, opts)
 	if err != nil {
 		return nil, err
 	}

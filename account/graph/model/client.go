@@ -25,11 +25,11 @@ type Client struct {
 func (i *Client) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Client
 	return bson.Marshal((*t)(i))
@@ -45,7 +45,7 @@ func (i *Client) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "secret", Value: 1}}},
 		{Keys: bson.D{{Key: "domain", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
 	}
 }

@@ -2,8 +2,8 @@ type Permission {
   id: ID!
   name: String!
   description: String
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
   api: Api
 }
 
@@ -23,7 +23,14 @@ input UpdatePermission {
 }
 
 extend type Query {
-  permissions(args: Map): Permissions @auth(roles: [ADMIN])
+  permissions(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Permissions @auth(roles: [ADMIN])
   permission(id: ID!): Permission! @auth(roles: [ADMIN])
 }
 

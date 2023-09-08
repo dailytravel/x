@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
-	"github.com/dailytravel/x/sales/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -28,14 +26,14 @@ func (r *companyResolver) Metadata(ctx context.Context, obj *model.Company) (map
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *companyResolver) CreatedAt(ctx context.Context, obj *model.Company) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *companyResolver) Created(ctx context.Context, obj *model.Company) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *companyResolver) UpdatedAt(ctx context.Context, obj *model.Company) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *companyResolver) Updated(ctx context.Context, obj *model.Company) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
@@ -43,30 +41,12 @@ func (r *companyResolver) UID(ctx context.Context, obj *model.Company) (string, 
 	return obj.ID.Hex(), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *companyResolver) CreatedBy(ctx context.Context, obj *model.Company) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *companyResolver) UpdatedBy(ctx context.Context, obj *model.Company) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
-}
-
 // CreateCompany is the resolver for the createCompany field.
 func (r *mutationResolver) CreateCompany(ctx context.Context, input model.NewCompany) (*model.Company, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	item := &model.Company{
 		Type:        input.Type,
@@ -84,14 +64,12 @@ func (r *mutationResolver) CreateCompany(ctx context.Context, input model.NewCom
 		Website:     input.Website,
 		Status:      input.Status,
 		Model: model.Model{
-			Metadata:  input.Metadata,
-			CreatedBy: uid,
-			UpdatedBy: uid,
+			Metadata: input.Metadata,
 		},
 	}
 
 	// Set the fields from the input
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -102,10 +80,10 @@ func (r *mutationResolver) CreateCompany(ctx context.Context, input model.NewCom
 // UpdateCompany is the resolver for the updateCompany field.
 func (r *mutationResolver) UpdateCompany(ctx context.Context, id string, input model.UpdateCompany) (*model.Company, error) {
 	// Get the authenticated user ID
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -175,9 +153,6 @@ func (r *mutationResolver) UpdateCompany(ctx context.Context, id string, input m
 		item.Status = *input.Status
 	}
 
-	// Update the "updated_by" field with the user ID
-	item.UpdatedBy = uid
-
 	// Perform the update operation in the database
 	updatedCompany := &model.Company{}
 	updateResult := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, bson.M{"$set": item})
@@ -246,7 +221,7 @@ func (r *mutationResolver) DeleteCompanies(ctx context.Context, ids []*string) (
 func (r *queryResolver) Companies(ctx context.Context, args map[string]interface{}) (*model.Companies, error) {
 	var items []*model.Company
 	//find all items
-	cur, err := r.db.Collection("companies").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("companies").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -260,7 +235,7 @@ func (r *queryResolver) Companies(ctx context.Context, args map[string]interface
 	}
 
 	//get total count
-	count, err := r.db.Collection("companies").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("companies").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

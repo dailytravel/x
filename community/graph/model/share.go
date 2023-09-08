@@ -27,11 +27,11 @@ type Shareable struct {
 func (i *Share) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Share
 	return bson.Marshal((*t)(i))
@@ -44,8 +44,8 @@ func (i *Share) Collection() string {
 func (i *Share) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "uid", Value: 1}, {Key: "shareable._id", Value: 1}, {Key: "shareable.type", Value: 1}}, Options: options.Index().SetUnique(true)},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "created_by", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "updated_by", Value: 1}}, Options: options.Index()},
 	}

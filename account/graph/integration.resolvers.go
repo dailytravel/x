@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/dailytravel/x/account/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -25,53 +24,26 @@ func (r *integrationResolver) Metadata(ctx context.Context, obj *model.Integrati
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *integrationResolver) CreatedAt(ctx context.Context, obj *model.Integration) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *integrationResolver) Created(ctx context.Context, obj *model.Integration) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *integrationResolver) UpdatedAt(ctx context.Context, obj *model.Integration) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *integrationResolver) CreatedBy(ctx context.Context, obj *model.Integration) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": obj.CreatedBy}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *integrationResolver) UpdatedBy(ctx context.Context, obj *model.Integration) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": obj.UpdatedBy}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
+// Updated is the resolver for the updated field.
+func (r *integrationResolver) Updated(ctx context.Context, obj *model.Integration) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateIntegration is the resolver for the createIntegration field.
 func (r *mutationResolver) CreateIntegration(ctx context.Context, input model.NewIntegration) (*model.Integration, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	item := &model.Integration{
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
-	}
+	item := &model.Integration{}
 
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -81,10 +53,10 @@ func (r *mutationResolver) CreateIntegration(ctx context.Context, input model.Ne
 
 // UpdateIntegration is the resolver for the updateIntegration field.
 func (r *mutationResolver) UpdateIntegration(ctx context.Context, id string, input model.UpdateIntegration) (*model.Integration, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -103,8 +75,6 @@ func (r *mutationResolver) UpdateIntegration(ctx context.Context, id string, inp
 	if input.Status != nil {
 		item.Status = *input.Status
 	}
-
-	item.UpdatedBy = uid
 
 	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {
 		return nil, err
@@ -161,10 +131,10 @@ func (r *mutationResolver) DeleteIntegrations(ctx context.Context, ids []string)
 }
 
 // Integrations is the resolver for the integrations field.
-func (r *queryResolver) Integrations(ctx context.Context, args map[string]interface{}) (*model.Integrations, error) {
+func (r *queryResolver) Integrations(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Integrations, error) {
 	var items []*model.Integration
 	//find all items
-	cur, err := r.db.Collection(model.RoleCollection).Find(ctx, r.model.Query(args), r.model.Options(args))
+	cur, err := r.db.Collection("integrations").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +148,7 @@ func (r *queryResolver) Integrations(ctx context.Context, args map[string]interf
 	}
 
 	//get total count
-	count, err := r.db.Collection("integrations").CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("integrations").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

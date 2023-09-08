@@ -14,6 +14,7 @@ import (
 	"github.com/dailytravel/x/sales/pkg/auth"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ID is the resolver for the id field.
@@ -43,22 +44,22 @@ func (r *benefitResolver) Metadata(ctx context.Context, obj *model.Benefit) (map
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *benefitResolver) CreatedAt(ctx context.Context, obj *model.Benefit) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *benefitResolver) Created(ctx context.Context, obj *model.Benefit) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *benefitResolver) UpdatedAt(ctx context.Context, obj *model.Benefit) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *benefitResolver) Updated(ctx context.Context, obj *model.Benefit) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateBenefit is the resolver for the createBenefit field.
 func (r *mutationResolver) CreateBenefit(ctx context.Context, input model.NewBenefit) (*model.Benefit, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Create a new benefit object
 	item := &model.Benefit{
@@ -67,14 +68,12 @@ func (r *mutationResolver) CreateBenefit(ctx context.Context, input model.NewBen
 			input.Locale: input.Description,
 		},
 		Model: model.Model{
-			Metadata:  input.Metadata,
-			CreatedBy: uid,
-			UpdatedBy: uid,
+			Metadata: input.Metadata,
 		},
 	}
 
 	// Set the fields from the input
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -84,10 +83,10 @@ func (r *mutationResolver) CreateBenefit(ctx context.Context, input model.NewBen
 
 // UpdateBenefit is the resolver for the updateBenefit field.
 func (r *mutationResolver) UpdateBenefit(ctx context.Context, id string, input model.UpdateBenefit) (*model.Benefit, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -113,8 +112,6 @@ func (r *mutationResolver) UpdateBenefit(ctx context.Context, id string, input m
 			item.Metadata[k] = v
 		}
 	}
-
-	item.UpdatedBy = uid
 
 	// Update the benefit in the database
 	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {
@@ -149,11 +146,11 @@ func (r *mutationResolver) DeleteBenefit(ctx context.Context, id string) (map[st
 	// Define the update to mark the benefit as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 			"deleted_by": uid,
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -197,11 +194,11 @@ func (r *mutationResolver) DeleteBenefits(ctx context.Context, ids []string) (ma
 	// Define the update to mark records as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 			"deleted_by": uid,
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -215,24 +212,49 @@ func (r *mutationResolver) DeleteBenefits(ctx context.Context, ids []string) (ma
 }
 
 // Benefits is the resolver for the benefits field.
-func (r *queryResolver) Benefits(ctx context.Context, args map[string]interface{}) (*model.Benefits, error) {
+func (r *queryResolver) Benefits(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Benefits, error) {
 	var items []*model.Benefit
-	//find all items
-	cur, err := r.db.Collection("benefits").Find(ctx, utils.Query(args), utils.Options(args))
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	filterBson := bson.M(filter)
+
+	opts := options.Find()
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+
+	if sort != nil {
+		opts.SetSort(sort)
+	}
+
+	if collation != nil {
+		col := &options.Collation{
+			// you can set collation fields here...
+		}
+		opts.SetCollation(col)
+	}
+
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("benefits").Find(ctx, filterBson, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Benefit
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection("benefits").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("benefits").CountDocuments(ctx, filterBson, nil)
 	if err != nil {
 		return nil, err
 	}

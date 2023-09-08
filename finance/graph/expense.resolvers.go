@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/finance/graph/model"
-	"github.com/dailytravel/x/finance/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -33,37 +31,19 @@ func (r *expenseResolver) Date(ctx context.Context, obj *model.Expense) (string,
 	return obj.Date.Time().Format(time.RFC3339), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *expenseResolver) CreatedAt(ctx context.Context, obj *model.Expense) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *expenseResolver) UpdatedAt(ctx context.Context, obj *model.Expense) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
 // UID is the resolver for the uid field.
 func (r *expenseResolver) UID(ctx context.Context, obj *model.Expense) (string, error) {
 	return obj.ID.Hex(), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *expenseResolver) CreatedBy(ctx context.Context, obj *model.Expense) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
+// Created is the resolver for the created field.
+func (r *expenseResolver) Created(ctx context.Context, obj *model.Expense) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *expenseResolver) UpdatedBy(ctx context.Context, obj *model.Expense) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *expenseResolver) Updated(ctx context.Context, obj *model.Expense) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateExpense is the resolver for the createExpense field.
@@ -130,7 +110,7 @@ func (r *mutationResolver) DeleteExpenses(ctx context.Context, ids []string) (bo
 func (r *queryResolver) Expenses(ctx context.Context, args map[string]interface{}) (*model.Expenses, error) {
 	var items []*model.Expense
 	//find all items
-	cur, err := r.db.Collection("expenses").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("expenses").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +124,7 @@ func (r *queryResolver) Expenses(ctx context.Context, args map[string]interface{
 	}
 
 	//get total count
-	count, err := r.db.Collection("expenses").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("expenses").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

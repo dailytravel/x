@@ -48,12 +48,12 @@ func (Contact) IsEntity() {}
 func (i *Contact) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	// If CreatedAt is zero, then set it to the current timestamp.
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	// If Created is zero, then set it to the current timestamp.
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Contact
 	return bson.Marshal((*t)(i))
@@ -84,9 +84,9 @@ func (i *Contact) Index() []mongo.IndexModel {
 			Options: options.Index().SetWeights(bson.M{"first_name": 2, "last_name": 1})},
 
 		// Timestamps indices
-		{Keys: bson.D{{Key: "created_at", Value: 1}}},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
-		{Keys: bson.D{{Key: "deleted_at", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 	}
 }
 
@@ -104,8 +104,8 @@ func (i *Contact) Schema() interface{} {
 			{Name: "source", Type: "string", Optional: pointer.True()},
 			{Name: "status", Type: "string", Facet: pointer.True()},
 			{Name: "rating", Type: "int32", Optional: pointer.True(), Facet: pointer.True()},
-			{Name: "created_at", Type: "string"},
-			{Name: "updated_at", Type: "string"},
+			{Name: "created", Type: "string"},
+			{Name: "updated", Type: "string"},
 			{Name: "birthday", Type: "string", Facet: pointer.True()},
 			{Name: "email", Type: "string", Optional: pointer.True()},
 			{Name: "phone", Type: "string", Optional: pointer.True()},
@@ -131,8 +131,8 @@ func (i *Contact) Document() map[string]interface{} {
 		"phone":      i.Phone,
 		"metadata":   i.Metadata,
 		"status":     i.Status,
-		"created_at": time.Unix(int64(i.CreatedAt.T), 0).Format(time.RFC3339),
-		"updated_at": time.Unix(int64(i.UpdatedAt.T), 0).Format(time.RFC3339),
+		"created":    time.Unix(int64(i.Created.T), 0).Format(time.RFC3339),
+		"updated":    time.Unix(int64(i.Updated.T), 0).Format(time.RFC3339),
 		"labels":     i.Labels,
 	}
 
@@ -168,8 +168,8 @@ func (i *Contact) Insert(collection typesense.CollectionInterface) error {
 func (i *Contact) Update(collection typesense.CollectionInterface, documentKey primitive.M, updatedFields primitive.M, removedFields primitive.A) error {
 	documentID := documentKey["_id"].(primitive.ObjectID).Hex()
 
-	// Check for 'deleted_at' field
-	if _, exists := updatedFields["deleted_at"].(primitive.Timestamp); exists {
+	// Check for 'deleted' field
+	if _, exists := updatedFields["deleted"].(primitive.Timestamp); exists {
 		return i.Delete(collection, documentKey)
 	}
 
@@ -179,7 +179,7 @@ func (i *Contact) Update(collection typesense.CollectionInterface, documentKey p
 	// Populate the update payload with updated fields
 	for field, value := range updatedFields {
 		switch field {
-		case "created_at", "updated_at":
+		case "created", "updated":
 			if timestamp, ok := value.(primitive.Timestamp); ok {
 				updatePayload[field] = time.Unix(int64(timestamp.T), 0).Format(time.RFC3339)
 			}
@@ -197,7 +197,6 @@ func (i *Contact) Update(collection typesense.CollectionInterface, documentKey p
 		updatePayload[field.(string)] = nil
 	}
 
-	// Attempt to update the document
 	_, err := collection.Document(documentID).Update(updatePayload)
 	if err != nil {
 		// If update fails, try to fetch the item from MongoDB and re-insert into Typesense

@@ -7,7 +7,7 @@ package graph
 import (
 	"context"
 	"errors"
-	"time"
+	"fmt"
 
 	"github.com/dailytravel/x/community/graph/model"
 	"github.com/dailytravel/x/community/internal/utils"
@@ -18,17 +18,7 @@ import (
 
 // CreateRecipient is the resolver for the createRecipient field.
 func (r *mutationResolver) CreateRecipient(ctx context.Context, input model.NewRecipient) (*model.Recipient, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	item := &model.Recipient{
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
-	}
+	item := &model.Recipient{}
 
 	// Insert the new organization
 	if _, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil); err != nil {
@@ -40,11 +30,6 @@ func (r *mutationResolver) CreateRecipient(ctx context.Context, input model.NewR
 
 // UpdateRecipient is the resolver for the updateRecipient field.
 func (r *mutationResolver) UpdateRecipient(ctx context.Context, id string, input model.UpdateRecipient) (*model.Recipient, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -57,8 +42,6 @@ func (r *mutationResolver) UpdateRecipient(ctx context.Context, id string, input
 	if err != nil {
 		return nil, err
 	}
-
-	item.UpdatedBy = uid
 
 	// Update the contact
 	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item}, nil); err != nil {
@@ -156,7 +139,7 @@ func (r *queryResolver) Recipient(ctx context.Context, id string) (*model.Recipi
 func (r *queryResolver) Recipients(ctx context.Context, args map[string]interface{}) (*model.Recipients, error) {
 	var items []*model.Recipient
 	//find all items
-	cur, err := r.db.Collection("recipients").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("recipients").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +153,7 @@ func (r *queryResolver) Recipients(ctx context.Context, args map[string]interfac
 	}
 
 	//get total count
-	count, err := r.db.Collection("recipients").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("recipients").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -207,24 +190,9 @@ func (r *recipientResolver) Message(ctx context.Context, obj *model.Recipient) (
 	return item, nil
 }
 
-// ReadAt is the resolver for the read_at field.
-func (r *recipientResolver) ReadAt(ctx context.Context, obj *model.Recipient) (*string, error) {
-	if obj.ReadAt == nil {
-		return nil, nil
-	}
-
-	readAt := time.Unix(int64(obj.ReadAt.T), 0).Format(time.RFC3339)
-	return &readAt, nil
-}
-
-// CreatedAt is the resolver for the created_at field.
-func (r *recipientResolver) CreatedAt(ctx context.Context, obj *model.Recipient) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *recipientResolver) UpdatedAt(ctx context.Context, obj *model.Recipient) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Read is the resolver for the read field.
+func (r *recipientResolver) Read(ctx context.Context, obj *model.Recipient) (*string, error) {
+	panic(fmt.Errorf("not implemented: Read - read"))
 }
 
 // Recipient returns RecipientResolver implementation.

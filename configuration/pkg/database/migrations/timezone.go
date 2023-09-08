@@ -99,7 +99,8 @@ func (m *Timezone) Migrate() error {
 
 				// Create a new Timezone object
 				timezone := &model.Timezone{
-					Name: row[3],
+					Locale: os.Getenv("DEFAULT_LOCALE"),
+					Name:   map[string]interface{}{os.Getenv("DEFAULT_LOCALE"): row[3]},
 				}
 
 				// Insert the timezone into the "timezones" collection

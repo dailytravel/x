@@ -12,7 +12,6 @@ import (
 
 	"github.com/dailytravel/x/finance/graph/model"
 	"github.com/dailytravel/x/finance/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,21 +19,14 @@ import (
 
 // CreateTransaction is the resolver for the createTransaction field.
 func (r *mutationResolver) CreateTransaction(ctx context.Context, input *model.NewTransaction) (*model.Transaction, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	item := &model.Transaction{
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
 	// Set the fields from the input
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -44,11 +36,6 @@ func (r *mutationResolver) CreateTransaction(ctx context.Context, input *model.N
 
 // UpdateTransaction is the resolver for the updateTransaction field.
 func (r *mutationResolver) UpdateTransaction(ctx context.Context, id string, input *model.UpdateTransaction) (*model.Transaction, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -68,9 +55,6 @@ func (r *mutationResolver) UpdateTransaction(ctx context.Context, id string, inp
 			item.Metadata[k] = v
 		}
 	}
-
-	// Update the updated_by and updated_at fields
-	item.UpdatedBy = uid
 
 	// Perform the update in the database
 	res, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item)
@@ -170,7 +154,7 @@ func (r *mutationResolver) DeleteTransactions(ctx context.Context, ids []string)
 func (r *queryResolver) Transactions(ctx context.Context, args map[string]interface{}) (*model.Transactions, error) {
 	var items []*model.Transaction
 	//find all items
-	cur, err := r.db.Collection("transactions").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("transactions").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +168,7 @@ func (r *queryResolver) Transactions(ctx context.Context, args map[string]interf
 	}
 
 	//get total count
-	count, err := r.db.Collection("transactions").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("transactions").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -230,37 +214,19 @@ func (r *transactionResolver) Date(ctx context.Context, obj *model.Transaction) 
 	return obj.Date.Time().String(), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *transactionResolver) CreatedAt(ctx context.Context, obj *model.Transaction) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *transactionResolver) UpdatedAt(ctx context.Context, obj *model.Transaction) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
 // UID is the resolver for the uid field.
 func (r *transactionResolver) UID(ctx context.Context, obj *model.Transaction) (string, error) {
 	return obj.UID.Hex(), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *transactionResolver) CreatedBy(ctx context.Context, obj *model.Transaction) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
+// Created is the resolver for the created field.
+func (r *transactionResolver) Created(ctx context.Context, obj *model.Transaction) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *transactionResolver) UpdatedBy(ctx context.Context, obj *model.Transaction) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *transactionResolver) Updated(ctx context.Context, obj *model.Transaction) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Transaction returns TransactionResolver implementation.

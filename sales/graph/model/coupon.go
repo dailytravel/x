@@ -31,11 +31,11 @@ type Coupon struct {
 func (i *Coupon) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Coupon
 	return bson.Marshal((*t)(i))
@@ -53,8 +53,8 @@ func (i *Coupon) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "start", Value: 1}}},
 		{Keys: bson.D{{Key: "end", Value: 1}}},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
-		{Keys: bson.D{{Key: "deleted_at", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 	}
 }

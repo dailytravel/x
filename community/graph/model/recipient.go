@@ -15,17 +15,17 @@ type Recipient struct {
 	Model   `bson:",inline"`
 	UID     primitive.ObjectID   `json:"uid" bson:"uid"`
 	Message primitive.ObjectID   `json:"message" bson:"message"`
-	ReadAt  *primitive.Timestamp `json:"read_at,omitempty" bson:"read_at,omitempty"`
+	Read    *primitive.Timestamp `json:"read,omitempty" bson:"read,omitempty"`
 }
 
 func (i *Recipient) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Recipient
 	return bson.Marshal((*t)(i))
@@ -39,8 +39,8 @@ func (i *Recipient) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "uid", Value: 1}, {Key: "message", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
 	}
 }
 
@@ -51,10 +51,10 @@ func (i *Recipient) Schema() interface{} {
 			{Name: "user", Type: "string", Facet: pointer.True()},
 			{Name: "message", Type: "string", Facet: pointer.True()},
 			{Name: "status", Type: "string", Facet: pointer.True()},
-			{Name: "read_at", Type: "int64", Facet: pointer.True()},
-			{Name: "created_at", Type: "int64", Facet: pointer.True()},
-			{Name: "updated_at", Type: "int64", Facet: pointer.True()},
+			{Name: "read", Type: "int64", Facet: pointer.True()},
+			{Name: "created", Type: "int64", Facet: pointer.True()},
+			{Name: "updated", Type: "int64", Facet: pointer.True()},
 		},
-		DefaultSortingField: pointer.String("created_at"),
+		DefaultSortingField: pointer.String("created"),
 	}
 }

@@ -10,10 +10,8 @@ type Job {
   type: String!
   metadata: Map
   status: String!
-  createdAt: String!
-  updatedAt: String!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 type Jobs {
@@ -45,8 +43,6 @@ input NewJob {
   type: String!
   metadata: Map
   status: String!
-  createdBy: ID
-  updatedBy: ID
 }
 
 input UpdateJob {
@@ -60,8 +56,6 @@ input UpdateJob {
   type: String
   metadata: Map
   status: String
-  createdBy: ID
-  updatedBy: ID
 }
 
 extend type Query {

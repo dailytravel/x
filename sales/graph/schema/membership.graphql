@@ -8,11 +8,9 @@ type Membership @key(fields: "id") {
   payment: Map
   metadata: Map
   status: String!
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
 }
 
 type Memberships {
@@ -29,8 +27,6 @@ input NewMembership {
   payment: Map
   metadata: Map
   status: String!
-  createdBy: ID
-  updatedBy: ID
 }
 
 input UpdateMembership {
@@ -42,8 +38,6 @@ input UpdateMembership {
   payment: Map
   metadata: Map
   status: String
-  createdBy: ID
-  updatedBy: ID
 }
 
 extend type Query {

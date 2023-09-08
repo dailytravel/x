@@ -12,7 +12,6 @@ import (
 
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,22 +19,20 @@ import (
 
 // CreateQuote is the resolver for the createQuote field.
 func (r *mutationResolver) CreateQuote(ctx context.Context, input *model.NewQuote) (*model.Quote, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	item := &model.Quote{
 		Locale: input.Locale,
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
 	// Set the fields from the input
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -45,21 +42,19 @@ func (r *mutationResolver) CreateQuote(ctx context.Context, input *model.NewQuot
 
 // UpdateQuote is the resolver for the updateQuote field.
 func (r *mutationResolver) UpdateQuote(ctx context.Context, id string, input model.UpdateQuote) (*model.Quote, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	item := &model.Quote{
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
 	// Set the fields from the input
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -86,11 +81,11 @@ func (r *mutationResolver) DeleteQuote(ctx context.Context, id string) (map[stri
 	// Define the update to mark the record as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 			"deleted_by": uid,
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -130,11 +125,11 @@ func (r *mutationResolver) DeleteQuotes(ctx context.Context, ids []string) (map[
 	// Define the update to mark records as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 			"deleted_by": uid,
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -151,7 +146,7 @@ func (r *mutationResolver) DeleteQuotes(ctx context.Context, ids []string) (map[
 func (r *queryResolver) Quotes(ctx context.Context, args map[string]interface{}) (*model.Quotes, error) {
 	var items []*model.Quote
 	//find all items
-	cur, err := r.db.Collection("quotes").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("quotes").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +160,7 @@ func (r *queryResolver) Quotes(ctx context.Context, args map[string]interface{})
 	}
 
 	//get total count
-	count, err := r.db.Collection("quotes").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("quotes").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -231,37 +226,19 @@ func (r *quoteResolver) Billing(ctx context.Context, obj *model.Quote) (map[stri
 	return obj.Billing, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *quoteResolver) CreatedAt(ctx context.Context, obj *model.Quote) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *quoteResolver) Created(ctx context.Context, obj *model.Quote) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *quoteResolver) UpdatedAt(ctx context.Context, obj *model.Quote) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *quoteResolver) Updated(ctx context.Context, obj *model.Quote) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
 func (r *quoteResolver) UID(ctx context.Context, obj *model.Quote) (string, error) {
 	return obj.ID.Hex(), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *quoteResolver) CreatedBy(ctx context.Context, obj *model.Quote) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *quoteResolver) UpdatedBy(ctx context.Context, obj *model.Quote) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // Quote returns QuoteResolver implementation.

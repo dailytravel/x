@@ -10,7 +10,6 @@ import (
 
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -37,37 +36,19 @@ func (r *applicationResolver) Metadata(ctx context.Context, obj *model.Applicati
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *applicationResolver) CreatedAt(ctx context.Context, obj *model.Application) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *applicationResolver) Created(ctx context.Context, obj *model.Application) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *applicationResolver) UpdatedAt(ctx context.Context, obj *model.Application) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *applicationResolver) Updated(ctx context.Context, obj *model.Application) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
 func (r *applicationResolver) UID(ctx context.Context, obj *model.Application) (string, error) {
 	return obj.UID.Hex(), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *applicationResolver) CreatedBy(ctx context.Context, obj *model.Application) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *applicationResolver) UpdatedBy(ctx context.Context, obj *model.Application) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // CreateApplication is the resolver for the createApplication field.
@@ -79,11 +60,6 @@ func (r *mutationResolver) CreateApplication(ctx context.Context, input model.Ne
 
 	item := &model.Application{
 		UID: *uid,
-
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 
 	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -96,11 +72,6 @@ func (r *mutationResolver) CreateApplication(ctx context.Context, input model.Ne
 
 // UpdateApplication is the resolver for the updateApplication field.
 func (r *mutationResolver) UpdateApplication(ctx context.Context, id string, input model.UpdateApplication) (*model.Application, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -118,8 +89,6 @@ func (r *mutationResolver) UpdateApplication(ctx context.Context, id string, inp
 	if input.Status != nil {
 		item.Status = *input.Status
 	}
-
-	item.UpdatedBy = uid
 
 	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {
 		return nil, err
@@ -228,7 +197,7 @@ func (r *queryResolver) Application(ctx context.Context, id string) (*model.Appl
 func (r *queryResolver) Applications(ctx context.Context, args map[string]interface{}) (*model.Applications, error) {
 	var items []*model.Application
 	//find all items
-	cur, err := r.db.Collection("applications").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("applications").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -242,7 +211,7 @@ func (r *queryResolver) Applications(ctx context.Context, args map[string]interf
 	}
 
 	//get total count
-	count, err := r.db.Collection("applications").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("applications").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -4,8 +4,7 @@ type Message {
   subject: String!
   body: String!
   status: String!
-  createdAt: String!
-  updatedAt: String!
+
   recipients: [Recipient!]!
 }
 

@@ -13,21 +13,19 @@ import (
 	"github.com/dailytravel/x/account/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreatePermission is the resolver for the createPermission field.
 func (r *mutationResolver) CreatePermission(ctx context.Context, input model.NewPermission) (*model.Permission, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	item := &model.Permission{
 		Name:        input.Name,
 		Description: input.Description,
-		Model: model.Model{
-			CreatedBy: uid,
-		},
 	}
 
 	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil)
@@ -42,10 +40,10 @@ func (r *mutationResolver) CreatePermission(ctx context.Context, input model.New
 
 // UpdatePermission is the resolver for the updatePermission field.
 func (r *mutationResolver) UpdatePermission(ctx context.Context, id string, input model.UpdatePermission) (*model.Permission, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -53,11 +51,7 @@ func (r *mutationResolver) UpdatePermission(ctx context.Context, id string, inpu
 	}
 
 	filter := bson.M{"_id": _id}
-	item := &model.Permission{
-		Model: model.Model{
-			UpdatedBy: uid,
-		},
-	}
+	item := &model.Permission{}
 
 	if input.Name != nil {
 		item.Name = *input.Name
@@ -81,7 +75,7 @@ func (r *mutationResolver) DeletePermission(ctx context.Context, id string) (map
 		return nil, err
 	}
 
-	res, err := r.db.Collection(model.PermissionCollection).DeleteOne(ctx, bson.M{"_id": _id})
+	res, err := r.db.Collection("permissions").DeleteOne(ctx, bson.M{"_id": _id})
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +101,7 @@ func (r *mutationResolver) DeletePermissions(ctx context.Context, ids []string) 
 	}
 	filter := bson.M{"_id": bson.M{"$in": ids}}
 
-	res, err := r.db.Collection(model.PermissionCollection).DeleteMany(ctx, filter)
+	res, err := r.db.Collection("permissions").DeleteMany(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -126,14 +120,14 @@ func (r *permissionResolver) ID(ctx context.Context, obj *model.Permission) (str
 	return obj.ID.Hex(), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *permissionResolver) CreatedAt(ctx context.Context, obj *model.Permission) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *permissionResolver) Created(ctx context.Context, obj *model.Permission) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *permissionResolver) UpdatedAt(ctx context.Context, obj *model.Permission) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *permissionResolver) Updated(ctx context.Context, obj *model.Permission) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // API is the resolver for the api field.
@@ -142,24 +136,44 @@ func (r *permissionResolver) API(ctx context.Context, obj *model.Permission) (*m
 }
 
 // Permissions is the resolver for the permissions field.
-func (r *queryResolver) Permissions(ctx context.Context, args map[string]interface{}) (*model.Permissions, error) {
+func (r *queryResolver) Permissions(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Permissions, error) {
 	var items []*model.Permission
-	//find all items
-	cur, err := r.db.Collection(model.PermissionCollection).Find(ctx, r.model.Query(args), r.model.Options(args))
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+
+	opts := options.Find()
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if sort != nil {
+		opts.SetSort(sort)
+	}
+	if collation != nil {
+		col := &options.Collation{
+			// you can set collation fields here...
+		}
+		opts.SetCollation(col)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("permissions").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Permission
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection(model.PermissionCollection).CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("permissions").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}

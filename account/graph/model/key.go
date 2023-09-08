@@ -17,25 +17,25 @@ type Key struct {
 	Certificate string               `json:"certificate" bson:"certificate"`
 	Fingerprint string               `json:"fingerprint" bson:"fingerprint"`
 	Thumbprint  string               `json:"thumbprint" bson:"thumbprint"`
-	ExpiresAt   *primitive.Timestamp `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
+	Expires     *primitive.Timestamp `json:"expires,omitempty" bson:"expires,omitempty"`
 	Status      string               `json:"status" bson:"status"`
 }
 
 func (i *Key) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Key
 	return bson.Marshal((*t)(i))
 }
 
 func (i *Key) Collection() string {
-	return KeyCollection
+	return "keys"
 }
 
 func (i *Key) Index() []mongo.IndexModel {
@@ -44,7 +44,7 @@ func (i *Key) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "provider", Value: 1}}},
 		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
 	}
 }

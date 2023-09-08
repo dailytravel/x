@@ -27,10 +27,10 @@ import (
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Check if a user with the same email already exists
 	var existingUser *model.User
@@ -50,10 +50,6 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 		Email:    input.Email,
 		Roles:    input.Roles,
 		Password: string(hashedPassword),
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 	_, err = r.db.Collection("users").InsertOne(ctx, newUser)
 	if err != nil {
@@ -67,11 +63,6 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUser) (*model.User, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -83,14 +74,12 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 	user := &model.User{}
 	pwd := &model.Password{}
 
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, filter).Decode(&user); err != nil {
+	if err := r.db.Collection("users").FindOne(ctx, filter).Decode(&user); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, fmt.Errorf("error fetching user: %s", err.Error())
 	}
-
-	user.UpdatedBy = uid
 
 	if input.Name != nil {
 		user.Name = *input.Name
@@ -161,7 +150,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 	}
 
 	// Update the user in the database
-	result, err := r.db.Collection(model.UserCollection).UpdateOne(ctx, filter, bson.M{"$set": user})
+	result, err := r.db.Collection("users").UpdateOne(ctx, filter, bson.M{"$set": user})
 	if err != nil || result.ModifiedCount == 0 {
 		return nil, fmt.Errorf("failed to update user: %v", err)
 	}
@@ -285,7 +274,7 @@ func (r *mutationResolver) VerifyPhone(ctx context.Context, token string) (map[s
 
 	// Find the user and ensure they exist
 	var user *model.User
-	err = r.db.Collection(model.UserCollection).FindOne(ctx, filter).Decode(&user)
+	err = r.db.Collection("users").FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, fmt.Errorf("user not found")
@@ -300,7 +289,7 @@ func (r *mutationResolver) VerifyPhone(ctx context.Context, token string) (map[s
 
 	// Update the user's PhoneVerified status
 	update := bson.M{"$set": bson.M{"phoneVerified": true}}
-	_, err = r.db.Collection(model.UserCollection).UpdateOne(ctx, filter, update)
+	_, err = r.db.Collection("users").UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, fmt.Errorf("error updating phone verification status: %s", err.Error())
 	}
@@ -342,7 +331,7 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 	}
 
 	//find user by email
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"email": email}, nil).Decode(&u); err != nil {
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": email}, nil).Decode(&u); err != nil {
 		return nil, fmt.Errorf("user not found")
 	}
 
@@ -352,7 +341,7 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 	}
 
 	//get rsa key
-	if err := r.db.Collection(model.KeyCollection).FindOne(ctx, bson.M{"status": "current"}, nil).Decode(&k); err != nil {
+	if err := r.db.Collection("keys").FindOne(ctx, bson.M{"status": "current"}, nil).Decode(&k); err != nil {
 		return nil, fmt.Errorf("key not found")
 	}
 
@@ -469,7 +458,7 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.Socia
 func (r *mutationResolver) ForgotPassword(ctx context.Context, email string) (map[string]interface{}, error) {
 	// Find user by email
 	var user model.User
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, fmt.Errorf("user not found")
 		}
@@ -510,7 +499,7 @@ func (r *mutationResolver) ResetPassword(ctx context.Context, token string, pass
 
 	// Retrieve user by ID
 	var user *model.User
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": id}).Decode(&user); err != nil {
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"_id": id}).Decode(&user); err != nil {
 		return nil, fmt.Errorf("failed to retrieve user: %v", err)
 	}
 
@@ -550,7 +539,7 @@ func (r *mutationResolver) ResetPassword(ctx context.Context, token string, pass
 	}
 
 	// Update the user's password in the database
-	result, err := r.db.Collection(model.UserCollection).UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": bson.M{"password": hash}})
+	result, err := r.db.Collection("users").UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": bson.M{"password": hash}})
 	if err != nil || result.ModifiedCount == 0 {
 		return nil, fmt.Errorf("failed to update user password: %v", err)
 	}
@@ -582,7 +571,7 @@ func (r *mutationResolver) Deactivate(ctx context.Context) (*model.User, error) 
 	// Find the user by ID and ensure they exist
 	filter := bson.M{"_id": uid}
 	var user *model.User
-	err = r.db.Collection(model.UserCollection).FindOne(ctx, filter).Decode(&user)
+	err = r.db.Collection("users").FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, fmt.Errorf("user not found")
@@ -597,7 +586,7 @@ func (r *mutationResolver) Deactivate(ctx context.Context) (*model.User, error) 
 
 	// Update user status to deactivated
 	update := bson.M{"$set": bson.M{"status": "DEACTIVATED"}}
-	_, err = r.db.Collection(model.UserCollection).UpdateOne(ctx, filter, update)
+	_, err = r.db.Collection("users").UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, fmt.Errorf("error deactivating user: %s", err.Error())
 	}
@@ -645,7 +634,7 @@ func (r *mutationResolver) DeleteUsers(ctx context.Context, ids []string) (*bool
 	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
 
 	// Delete users from the database
-	result, err := r.db.Collection(model.UserCollection).DeleteMany(ctx, filter)
+	result, err := r.db.Collection("users").DeleteMany(ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting users: %s", err.Error())
 	}
@@ -661,7 +650,7 @@ func (r *mutationResolver) DeleteUsers(ctx context.Context, ids []string) (*bool
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	res, err := r.ts.Collection(model.UserCollection).Documents().Search(utils.Params(args))
+	res, err := r.ts.Collection("users").Documents().Search(utils.Params(args))
 	if err != nil {
 		return nil, err
 	}
@@ -764,7 +753,7 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 
 	var item *model.User
 	//find user by id
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": uid}, nil).Decode(&item); err != nil {
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"_id": uid}, nil).Decode(&item); err != nil {
 		return nil, fmt.Errorf("user not found")
 	}
 
@@ -785,19 +774,19 @@ func (r *userResolver) LastLogin(ctx context.Context, obj *model.User) (*string,
 	return pointer.String(time.Unix(int64(obj.LastLogin.T), 0).Format(time.RFC3339)), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *userResolver) CreatedAt(ctx context.Context, obj *model.User) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *userResolver) UpdatedAt(ctx context.Context, obj *model.User) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
 // Metadata is the resolver for the metadata field.
 func (r *userResolver) Metadata(ctx context.Context, obj *model.User) (map[string]interface{}, error) {
 	return obj.Metadata, nil
+}
+
+// Created is the resolver for the created field.
+func (r *userResolver) Created(ctx context.Context, obj *model.User) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
+}
+
+// Updated is the resolver for the updated field.
+func (r *userResolver) Updated(ctx context.Context, obj *model.User) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // User returns UserResolver implementation.

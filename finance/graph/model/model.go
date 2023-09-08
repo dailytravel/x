@@ -16,10 +16,8 @@ const (
 type Model struct {
 	ID        primitive.ObjectID  `json:"id,omitempty" bson:"_id,omitempty"`
 	Metadata  primitive.M         `json:"metadata,omitempty" bson:"metadata,omitempty"`
-	CreatedAt primitive.Timestamp `json:"createdAt,omitempty" bson:"created_at,omitempty"`
-	UpdatedAt primitive.Timestamp `json:"updatedAt,omitempty" bson:"updated_at,omitempty"`
-	DeletedAt primitive.Timestamp `json:"deletedAt,omitempty" bson:"deleted_at,omitempty"`
-	CreatedBy *primitive.ObjectID `json:"createdBy,omitempty" bson:"created_by,omitempty"`
-	UpdatedBy *primitive.ObjectID `json:"updatedBy,omitempty" bson:"updated_by,omitempty"`
-	DeletedBy *primitive.ObjectID `json:"deletedBy,omitempty" bson:"deleted_by,omitempty"`
+	Created   primitive.Timestamp `json:"created,omitempty" bson:"created,omitempty"`
+	Updated   primitive.Timestamp `json:"updated,omitempty" bson:"updated,omitempty"`
+	Deleted   primitive.Timestamp `json:"deleted,omitempty" bson:"deleted,omitempty"`
+	Timestamp primitive.Timestamp `json:"timestamp,omitempty" bson:"timestamp,omitempty"`
 }

@@ -9,10 +9,8 @@ type Country {
   capital: String
   flag: String
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 type Countries {
@@ -48,7 +46,14 @@ input UpdateCountry {
 
 extend type Query {
   country(code: String!): Country
-  countries(args: Map): Countries
+  countries(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Countries
 }
 
 extend type Mutation {

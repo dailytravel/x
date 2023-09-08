@@ -4,7 +4,7 @@ type Activity {
   metadata: Map # The metadata for the activity, e.g., the post that was liked.
   uid: ID! # The user who performed the action
   target: ID! # ID of the target object, like a post or a comment
-  createdAt: String! # ISO 8601 representation of the date when the activity was created
+  timestamp: String! # The time the action was performed
 }
 
 type Activities {

@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Company struct {
@@ -38,11 +37,11 @@ func (Company) IsEntity() {}
 func (i *Company) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Company
 	return bson.Marshal((*t)(i))
@@ -58,12 +57,12 @@ func (i *Company) Sanitize(s string) string {
 
 func (i *Company) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "deleted_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}},
+		{Keys: bson.D{{Key: "type", Value: 1}}},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 	}
 }
 
@@ -75,12 +74,10 @@ func (i *Company) Schema() interface{} {
 			{Name: "name", Type: "string", Optional: pointer.True()},
 			{Name: "type", Type: "string", Optional: pointer.True()},
 			{Name: "status", Type: "string", Facet: pointer.True()},
-			{Name: "created_by", Type: "string", Optional: pointer.True()},
-			{Name: "updated_by", Type: "string", Optional: pointer.True()},
-			{Name: "created_at", Type: "int32"},
-			{Name: "updated_at", Type: "int32"},
+			{Name: "created", Type: "int32"},
+			{Name: "updated", Type: "int32"},
 		},
-		DefaultSortingField: pointer.String("created_at"),
+		DefaultSortingField: pointer.String("created"),
 		TokenSeparators:     &[]string{"(", ")", "-"},
 		EnableNestedFields:  pointer.True(),
 	}
@@ -120,9 +117,9 @@ func (i *Company) Update(collection typesense.CollectionInterface, documentKey p
 	// Create a map to hold the updated fields
 	updatePayload := make(map[string]interface{})
 
-	// Check if 'deleted_at' field is in updatedFields and its value is of type primitive.Timestamp
-	_, deletedAtExist := updatedFields["deleted_at"].(primitive.Timestamp)
-	if deletedAtExist {
+	// Check if 'deleted' field is in updatedFields and its value is of type primitive.Timestamp
+	_, deletedExist := updatedFields["deleted"].(primitive.Timestamp)
+	if deletedExist {
 		if err := i.Delete(collection, documentKey); err != nil {
 			return err
 		}
@@ -132,7 +129,7 @@ func (i *Company) Update(collection typesense.CollectionInterface, documentKey p
 	// Loop through updatedFields
 	for field, value := range updatedFields {
 		switch field {
-		case "created_at", "updated_at", "last_activity":
+		case "created", "updated", "last_activity":
 			if timestamp, ok := value.(primitive.Timestamp); ok {
 				updatePayload[field] = timestamp.T
 			}

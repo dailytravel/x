@@ -8,10 +8,8 @@ type Tier {
   rewards: [Reward!]!
   status: String!
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 type Tiers {

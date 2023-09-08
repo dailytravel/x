@@ -7,10 +7,8 @@ type Api {
   expiration: Int!
   metadata: Map
   status: String!
-  createdAt: String!
-  updatedAt: String!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 type Apis {
@@ -53,7 +51,14 @@ input UpdateApi {
 
 extend type Query {
   api(id: ID!): Api
-  apis(args: Map): Apis
+  apis(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Apis
 }
 
 extend type Mutation {

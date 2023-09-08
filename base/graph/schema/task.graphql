@@ -12,11 +12,10 @@ type Task {
   order: Int
   status: String!
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
+
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 type Tasks {

@@ -6,11 +6,9 @@ type Organization @key(fields: "id") {
   type: String
   status: String
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
   uid: ID
-  createdBy: ID
-  updatedBy: ID
 }
 
 type Organizations {

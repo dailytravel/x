@@ -9,7 +9,7 @@ type Log {
   status: String!
   clientIp: String
   userAgent: String
-  createdAt: String
+  timestamp: String!
 }
 
 type Logs {

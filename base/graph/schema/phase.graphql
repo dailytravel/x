@@ -1,0 +1,44 @@
+type Phase {
+  id: ID!
+  parent: Phase
+  name: String!
+  description: String!
+  start: String!
+  end: String!
+  metadata: Map
+  created: String!
+  updated: String!
+}
+
+type Times {
+  data: [Phase]
+  count: Int!
+}
+
+input NewTime {
+  name: String!
+  description: String!
+  start_date: String!
+  end_date: String!
+  metadata: Map
+}
+
+input UpdateTime {
+  name: String
+  description: String
+  start_date: String
+  end_date: String
+  metadata: Map
+}
+
+extend type Query {
+  time(id: ID!): Phase
+  times(args: Map): Times
+}
+
+extend type Mutation {
+  createTime(input: NewTime!): Phase
+  updateTime(id: ID!, input: UpdateTime!): Phase
+  deleteTime(id: ID!): Map
+  deleteTimes(ids: [ID!]!): Map
+}

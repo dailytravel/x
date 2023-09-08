@@ -5,11 +5,9 @@ type Invitation {
   roles: [String!]!
   status: String!
   metadata: Map
-  expiresAt: String!
-  createdAt: String!
-  updatedAt: String!
-  createdBy: String
-  updatedBy: String
+  expires: String!
+  created: String!
+  updated: String!
 }
 
 enum InvitationStatus {
@@ -35,7 +33,14 @@ input UpdateInvitation {
 }
 
 extend type Query {
-  invitations(filter: Map, limit: Int, offset: Int): Invitations @auth
+  invitations(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Invitations @auth
   invitation(id: ID!): Invitation
 }
 

@@ -2,9 +2,7 @@ type Recipient {
   id: ID!
   uid: ID!
   message: Message!
-  readAt: String
-  createdAt: String!
-  updatedAt: String!
+  read: String
 }
 
 type Recipients {
@@ -18,7 +16,7 @@ input NewRecipient {
 }
 
 input UpdateRecipient {
-  readAt: String
+  read: String
 }
 
 extend type Query {

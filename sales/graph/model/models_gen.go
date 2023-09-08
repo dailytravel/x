@@ -130,16 +130,14 @@ type NewCoupon struct {
 }
 
 type NewMembership struct {
-	Tier      string                 `json:"tier"`
-	Number    string                 `json:"number"`
-	Since     string                 `json:"since"`
-	Until     string                 `json:"until"`
-	Billing   map[string]interface{} `json:"billing,omitempty"`
-	Payment   map[string]interface{} `json:"payment,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    string                 `json:"status"`
-	CreatedBy *string                `json:"createdBy,omitempty"`
-	UpdatedBy *string                `json:"updatedBy,omitempty"`
+	Tier     string                 `json:"tier"`
+	Number   string                 `json:"number"`
+	Since    string                 `json:"since"`
+	Until    string                 `json:"until"`
+	Billing  map[string]interface{} `json:"billing,omitempty"`
+	Payment  map[string]interface{} `json:"payment,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   string                 `json:"status"`
 }
 
 type NewOrder struct {
@@ -184,7 +182,7 @@ type NewReward struct {
 	Name        string                 `json:"name"`
 	Description string                 `json:"description"`
 	Cost        int                    `json:"cost"`
-	ExpiresAt   *string                `json:"expires_at,omitempty"`
+	Expires     *string                `json:"expires,omitempty"`
 	Status      string                 `json:"status"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
@@ -338,16 +336,14 @@ type UpdateCoupon struct {
 }
 
 type UpdateMembership struct {
-	Tier      *string                `json:"tier,omitempty"`
-	Number    *string                `json:"number,omitempty"`
-	Since     *string                `json:"since,omitempty"`
-	Until     *string                `json:"until,omitempty"`
-	Billing   map[string]interface{} `json:"billing,omitempty"`
-	Payment   map[string]interface{} `json:"payment,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	Status    *string                `json:"status,omitempty"`
-	CreatedBy *string                `json:"createdBy,omitempty"`
-	UpdatedBy *string                `json:"updatedBy,omitempty"`
+	Tier     *string                `json:"tier,omitempty"`
+	Number   *string                `json:"number,omitempty"`
+	Since    *string                `json:"since,omitempty"`
+	Until    *string                `json:"until,omitempty"`
+	Billing  map[string]interface{} `json:"billing,omitempty"`
+	Payment  map[string]interface{} `json:"payment,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
 }
 
 type UpdateOrder struct {
@@ -392,7 +388,7 @@ type UpdateReward struct {
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Credits     *int                   `json:"credits,omitempty"`
-	ExpiresAt   *string                `json:"expires_at,omitempty"`
+	Expires     *string                `json:"expires,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }

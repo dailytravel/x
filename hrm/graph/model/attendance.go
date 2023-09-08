@@ -21,11 +21,11 @@ type Attendance struct {
 func (i *Attendance) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Attendance
 	return bson.Marshal((*t)(i))
@@ -42,7 +42,7 @@ func (i *Attendance) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "time_in", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "time_out", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
 	}
 }

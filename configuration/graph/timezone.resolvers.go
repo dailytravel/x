@@ -12,7 +12,7 @@ import (
 
 	"github.com/dailytravel/x/configuration/graph/model"
 	"github.com/dailytravel/x/configuration/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
+	"github.com/dailytravel/x/configuration/pkg/auth"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -24,12 +24,12 @@ func (r *mutationResolver) CreateTimezone(ctx context.Context, input model.NewTi
 }
 
 // UpdateTimezone is the resolver for the updateTimezone field.
-func (r *mutationResolver) UpdateTimezone(ctx context.Context, input model.UpdateTimezone) (*model.Timezone, error) {
+func (r *mutationResolver) UpdateTimezone(ctx context.Context, id string, input model.UpdateTimezone) (*model.Timezone, error) {
 	panic(fmt.Errorf("not implemented: UpdateTimezone - updateTimezone"))
 }
 
 // ImportTimezones is the resolver for the importTimezones field.
-func (r *mutationResolver) ImportTimezones(ctx context.Context, url string) ([]*model.Timezone, error) {
+func (r *mutationResolver) ImportTimezones(ctx context.Context, file string) ([]*model.Timezone, error) {
 	panic(fmt.Errorf("not implemented: ImportTimezones - importTimezones"))
 }
 
@@ -80,24 +80,37 @@ func (r *mutationResolver) DeleteTimezones(ctx context.Context, ids []string) (m
 }
 
 // Timezones is the resolver for the timezones field.
-func (r *queryResolver) Timezones(ctx context.Context, args map[string]interface{}) (*model.Timezones, error) {
+func (r *queryResolver) Timezones(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Timezones, error) {
 	var items []*model.Timezone
-	//find all items
-	cur, err := r.db.Collection("timezones").Find(ctx, utils.Query(args), utils.Options(args))
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+
+	opts := utils.Sort(sort)
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("timezones").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Timezone
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection("timezones").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("timezones").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -131,37 +144,35 @@ func (r *timezoneResolver) ID(ctx context.Context, obj *model.Timezone) (string,
 	return obj.ID.Hex(), nil
 }
 
+// Name is the resolver for the name field.
+func (r *timezoneResolver) Name(ctx context.Context, obj *model.Timezone) (string, error) {
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
+
+	// Try to retrieve the name for the requested locale
+	if name, ok := obj.Name[*locale].(string); ok {
+		return name, nil
+	}
+
+	return obj.Name[obj.Locale].(string), nil
+}
+
 // Metadata is the resolver for the metadata field.
 func (r *timezoneResolver) Metadata(ctx context.Context, obj *model.Timezone) (map[string]interface{}, error) {
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *timezoneResolver) CreatedAt(ctx context.Context, obj *model.Timezone) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *timezoneResolver) Created(ctx context.Context, obj *model.Timezone) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *timezoneResolver) UpdatedAt(ctx context.Context, obj *model.Timezone) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *timezoneResolver) CreatedBy(ctx context.Context, obj *model.Timezone) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *timezoneResolver) UpdatedBy(ctx context.Context, obj *model.Timezone) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *timezoneResolver) Updated(ctx context.Context, obj *model.Timezone) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Timezone returns TimezoneResolver implementation.

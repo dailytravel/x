@@ -6,11 +6,9 @@ type Portfolio {
   boards: [Board!]!
   metadata: Map
   status: String!
-  createdAt: String!
-  updatedAt: String!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 type Portfolios {

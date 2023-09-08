@@ -3,11 +3,9 @@ type Order {
   reference: String!
   cancellable: Boolean!
   status: String!
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
 }
 
 type Orders {

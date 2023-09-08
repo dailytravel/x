@@ -10,11 +10,9 @@ type Resume {
   references: [Reference!]!
   metadata: Map
   status: String!
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
 }
 
 type Experience {

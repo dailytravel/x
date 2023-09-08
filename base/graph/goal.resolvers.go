@@ -18,19 +18,19 @@ func (r *goalResolver) ID(ctx context.Context, obj *model.Goal) (string, error) 
 	return obj.ID.Hex(), nil
 }
 
+// Start is the resolver for the start field.
+func (r *goalResolver) Start(ctx context.Context, obj *model.Goal) (*string, error) {
+	panic(fmt.Errorf("not implemented: Start - start"))
+}
+
+// End is the resolver for the end field.
+func (r *goalResolver) End(ctx context.Context, obj *model.Goal) (*string, error) {
+	panic(fmt.Errorf("not implemented: End - end"))
+}
+
 // Metadata is the resolver for the metadata field.
 func (r *goalResolver) Metadata(ctx context.Context, obj *model.Goal) (map[string]interface{}, error) {
 	return obj.Metadata, nil
-}
-
-// CreatedAt is the resolver for the created_at field.
-func (r *goalResolver) CreatedAt(ctx context.Context, obj *model.Goal) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *goalResolver) UpdatedAt(ctx context.Context, obj *model.Goal) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Parent is the resolver for the parent field.
@@ -48,15 +48,9 @@ func (r *goalResolver) Parent(ctx context.Context, obj *model.Goal) (*model.Goal
 	return parent, nil
 }
 
-// Time is the resolver for the time field.
-func (r *goalResolver) Time(ctx context.Context, obj *model.Goal) (*model.Time, error) {
-	var time *model.Time
-
-	if err := r.db.Collection("times").FindOne(ctx, bson.M{"_id": obj.Time}).Decode(&time); err != nil {
-		return nil, err
-	}
-
-	return time, nil
+// Phase is the resolver for the phase field.
+func (r *goalResolver) Phase(ctx context.Context, obj *model.Goal) (*model.Phase, error) {
+	panic(fmt.Errorf("not implemented: Phase - phase"))
 }
 
 // UID is the resolver for the uid field.
@@ -74,24 +68,14 @@ func (r *goalResolver) Organization(ctx context.Context, obj *model.Goal) (*stri
 	return &org, nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *goalResolver) CreatedBy(ctx context.Context, obj *model.Goal) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	createdBy := obj.CreatedBy.Hex()
-	return &createdBy, nil
+// Created is the resolver for the created field.
+func (r *goalResolver) Created(ctx context.Context, obj *model.Goal) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *goalResolver) UpdatedBy(ctx context.Context, obj *model.Goal) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	updatedBy := obj.UpdatedBy.Hex()
-	return &updatedBy, nil
+// Updated is the resolver for the updated field.
+func (r *goalResolver) Updated(ctx context.Context, obj *model.Goal) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateGoal is the resolver for the createGoal field.

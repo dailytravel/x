@@ -24,17 +24,17 @@ type Message struct {
 	Subject      *string             `json:"subject,omitempty" bson:"subject,omitempty"`
 	Body         *string             `json:"body,omitempty" bson:"body,omitempty"`
 	Status       string              `json:"status" bson:"status"`
-	ScheduleAt   primitive.Timestamp `json:"schedule_at,omitempty" bson:"schedule_at,omitempty"`
+	Schedule     primitive.Timestamp `json:"schedule,omitempty" bson:"schedule,omitempty"`
 }
 
 func (i *Message) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Message
 	return bson.Marshal((*t)(i))
@@ -50,9 +50,9 @@ func (i *Message) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "parent", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "conversation", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "deleted_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "deleted", Value: 1}}, Options: options.Index()},
 	}
 }
 
@@ -68,11 +68,11 @@ func (i *Message) Schema() interface{} {
 			{Name: "subject", Type: "string"},
 			{Name: "body", Type: "object"},
 			{Name: "status", Type: "string", Facet: pointer.True()},
-			{Name: "created_at", Type: "int64", Facet: pointer.True()},
-			{Name: "updated_at", Type: "int64", Facet: pointer.True()},
+			{Name: "created", Type: "int64", Facet: pointer.True()},
+			{Name: "updated", Type: "int64", Facet: pointer.True()},
 			{Name: "recipients", Type: "object[]", Optional: pointer.True()},
 		},
-		DefaultSortingField: pointer.String("created_at"),
+		DefaultSortingField: pointer.String("created"),
 		EnableNestedFields:  pointer.True(),
 	}
 }
@@ -89,8 +89,8 @@ func (i *Message) Document() map[string]interface{} {
 		"body":         i.Body,
 		"status":       i.Status,
 		// "recipients":   i.Recipients,
-		"created_at": time.Unix(int64(i.CreatedAt.T), 0).Format(time.RFC3339),
-		"updated_at": time.Unix(int64(i.UpdatedAt.T), 0).Format(time.RFC3339),
+		"created": time.Unix(int64(i.Created.T), 0).Format(time.RFC3339),
+		"updated": time.Unix(int64(i.Updated.T), 0).Format(time.RFC3339),
 	}
 
 	return document
@@ -120,7 +120,7 @@ func (i *Message) Update(collection typesense.CollectionInterface, documentKey p
 
 	for field, value := range updatedFields {
 		switch field {
-		case "created_at", "updated_at", "schedule_at":
+		case "created", "updated", "schedule":
 			timestamp := value.(primitive.Timestamp)
 			updatePayload[field] = timestamp.T
 		default:

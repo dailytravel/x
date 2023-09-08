@@ -13,7 +13,6 @@ import (
 	"github.com/dailytravel/x/community/graph/model"
 	"github.com/dailytravel/x/community/internal/utils"
 	"github.com/dailytravel/x/community/pkg/auth"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -48,16 +47,6 @@ func (r *commentResolver) Body(ctx context.Context, obj *model.Comment) (string,
 // Metadata is the resolver for the metadata field.
 func (r *commentResolver) Metadata(ctx context.Context, obj *model.Comment) (map[string]interface{}, error) {
 	return obj.Metadata, nil
-}
-
-// CreatedAt is the resolver for the created_at field.
-func (r *commentResolver) CreatedAt(ctx context.Context, obj *model.Comment) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *commentResolver) UpdatedAt(ctx context.Context, obj *model.Comment) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
 }
 
 // Parent is the resolver for the parent field.
@@ -130,22 +119,14 @@ func (r *commentResolver) Reactions(ctx context.Context, obj *model.Comment) ([]
 	return items, nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *commentResolver) CreatedBy(ctx context.Context, obj *model.Comment) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
+// Created is the resolver for the created field.
+func (r *commentResolver) Created(ctx context.Context, obj *model.Comment) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *commentResolver) UpdatedBy(ctx context.Context, obj *model.Comment) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *commentResolver) Updated(ctx context.Context, obj *model.Comment) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateComment is the resolver for the createComment field.
@@ -168,10 +149,6 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 		Commentable: model.Commentable{
 			ID:   _id,
 			Type: input.Commentable["type"].(string),
-		},
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
 		},
 	}
 
@@ -200,11 +177,6 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 
 // UpdateComment is the resolver for the updateComment field.
 func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input model.UpdateComment) (*model.Comment, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -239,8 +211,6 @@ func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input m
 	if input.Status != nil {
 		item.Status = *input.Status
 	}
-
-	item.UpdatedBy = uid
 
 	// Update the contact
 	if _, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item}, nil); err != nil {
@@ -332,7 +302,7 @@ func (r *mutationResolver) DeleteComments(ctx context.Context, ids []string) (ma
 func (r *queryResolver) Comments(ctx context.Context, args map[string]interface{}) (*model.Comments, error) {
 	var items []*model.Comment
 	//find all items
-	cur, err := r.db.Collection("comments").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("comments").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -346,7 +316,7 @@ func (r *queryResolver) Comments(ctx context.Context, args map[string]interface{
 	}
 
 	//get total count
-	count, err := r.db.Collection("comments").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("comments").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

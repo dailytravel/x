@@ -19,11 +19,6 @@ import (
 
 // UpdateNotification is the resolver for the updateNotification field.
 func (r *mutationResolver) UpdateNotification(ctx context.Context, id string) (*model.Notification, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -32,10 +27,7 @@ func (r *mutationResolver) UpdateNotification(ctx context.Context, id string) (*
 	filter := bson.M{"_id": _id}
 
 	item := &model.Notification{
-		ReadAt: primitive.Timestamp{T: uint32(time.Now().Unix())},
-		Model: model.Model{
-			UpdatedBy: uid,
-		},
+		Read: primitive.Timestamp{T: uint32(time.Now().Unix())},
 	}
 
 	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
@@ -125,24 +117,9 @@ func (r *notificationResolver) UID(ctx context.Context, obj *model.Notification)
 	return obj.ID.Hex(), nil
 }
 
-// ReadAt is the resolver for the read_at field.
-func (r *notificationResolver) ReadAt(ctx context.Context, obj *model.Notification) (*string, error) {
-	if obj.ReadAt.IsZero() {
-		return nil, nil
-	}
-
-	readAt := time.Unix(int64(obj.ReadAt.T), 0).Format(time.RFC3339)
-	return &readAt, nil
-}
-
-// CreatedAt is the resolver for the created_at field.
-func (r *notificationResolver) CreatedAt(ctx context.Context, obj *model.Notification) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *notificationResolver) UpdatedAt(ctx context.Context, obj *model.Notification) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Read is the resolver for the read field.
+func (r *notificationResolver) Read(ctx context.Context, obj *model.Notification) (*string, error) {
+	panic(fmt.Errorf("not implemented: Read - read"))
 }
 
 // Notifiable is the resolver for the notifiable field.
@@ -165,11 +142,21 @@ func (r *notificationResolver) Metadata(ctx context.Context, obj *model.Notifica
 	return obj.Metadata, nil
 }
 
+// Created is the resolver for the created field.
+func (r *notificationResolver) Created(ctx context.Context, obj *model.Notification) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
+}
+
+// Updated is the resolver for the updated field.
+func (r *notificationResolver) Updated(ctx context.Context, obj *model.Notification) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
+}
+
 // Notifications is the resolver for the notifications field.
 func (r *queryResolver) Notifications(ctx context.Context, args map[string]interface{}) (*model.Notifications, error) {
 	var items []*model.Notification
 	//find all items
-	cur, err := r.db.Collection("notifications").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("notifications").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +170,7 @@ func (r *queryResolver) Notifications(ctx context.Context, args map[string]inter
 	}
 
 	//get total count
-	count, err := r.db.Collection("notifications").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("notifications").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -10,6 +10,6 @@ type Schedule {
   time: String!
   timezone: String!
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
 }

@@ -407,16 +407,12 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 			}
 			switch resolverName {
 
-			case "findOrganizationByCreatedByAndUpdatedBy":
-				id0, err := ec.unmarshalNID2string(ctx, rep["created_by"])
+			case "findOrganizationByUID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
 				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findOrganizationByCreatedByAndUpdatedBy(): %w`, err)
+					return fmt.Errorf(`unmarshalling param 0 for findOrganizationByUID(): %w`, err)
 				}
-				id1, err := ec.unmarshalNID2string(ctx, rep["updated_by"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 1 for findOrganizationByCreatedByAndUpdatedBy(): %w`, err)
-				}
-				entity, err := ec.resolvers.Entity().FindOrganizationByCreatedByAndUpdatedBy(ctx, id0, id1)
+				entity, err := ec.resolvers.Entity().FindOrganizationByUID(ctx, id0)
 				if err != nil {
 					return fmt.Errorf(`resolving Entity "Organization": %w`, err)
 				}
@@ -934,14 +930,10 @@ func entityResolverNameForOrganization(ctx context.Context, rep map[string]inter
 		)
 		_ = val
 		m = rep
-		if _, ok = m["created_by"]; !ok {
+		if _, ok = m["uid"]; !ok {
 			break
 		}
-		m = rep
-		if _, ok = m["updated_by"]; !ok {
-			break
-		}
-		return "findOrganizationByCreatedByAndUpdatedBy", nil
+		return "findOrganizationByUID", nil
 	}
 	return "", fmt.Errorf("%w for Organization", ErrTypeNotFound)
 }

@@ -5,8 +5,8 @@ type Audience {
   segments: [Segment]
   metadata: Map
   status: String!
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
 }
 
 type Audiences {

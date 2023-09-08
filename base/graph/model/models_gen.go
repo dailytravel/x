@@ -39,29 +39,31 @@ type Metric struct {
 }
 
 type NewBoard struct {
-	Type         string                 `json:"type"`
-	User         *string                `json:"user,omitempty"`
-	Organization *string                `json:"organization,omitempty"`
-	Title        string                 `json:"title"`
-	Description  *string                `json:"description,omitempty"`
-	DueDate      *string                `json:"dueDate,omitempty"`
-	IsTemplate   bool                   `json:"isTemplate"`
-	Starred      bool                   `json:"starred"`
-	Order        int                    `json:"order"`
-	Background   *string                `json:"background,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
-	Status       string                 `json:"status"`
+	Portfolio   string                 `json:"portfolio"`
+	Type        string                 `json:"type"`
+	Title       string                 `json:"title"`
+	Description *string                `json:"description,omitempty"`
+	End         *string                `json:"end,omitempty"`
+	IsTemplate  bool                   `json:"isTemplate"`
+	Background  *string                `json:"background,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Starred     bool                   `json:"starred"`
+	Order       int                    `json:"order"`
+	Status      string                 `json:"status"`
+	Lists       []string               `json:"lists,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
 }
 
 type NewGoal struct {
 	Name         string                 `json:"name"`
+	Start        *string                `json:"start,omitempty"`
+	End          *string                `json:"end,omitempty"`
 	Notes        *string                `json:"notes,omitempty"`
-	Time         string                 `json:"time"`
-	IsCompany    *bool                  `json:"is_company,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	Status       *string                `json:"status,omitempty"`
-	User         string                 `json:"user"`
 	Parent       *string                `json:"parent,omitempty"`
+	Phase        string                 `json:"phase"`
+	UID          string                 `json:"uid"`
 	Organization *string                `json:"organization,omitempty"`
 }
 
@@ -113,34 +115,36 @@ type Tasks struct {
 }
 
 type Times struct {
-	Data  []*Time `json:"data,omitempty"`
-	Count int     `json:"count"`
+	Data  []*Phase `json:"data,omitempty"`
+	Count int      `json:"count"`
 }
 
 type UpdateBoard struct {
-	Type         *string                `json:"type,omitempty"`
-	User         *string                `json:"user,omitempty"`
-	Organization *string                `json:"organization,omitempty"`
-	Title        *string                `json:"title,omitempty"`
-	Description  *string                `json:"description,omitempty"`
-	DueDate      *string                `json:"dueDate,omitempty"`
-	IsTemplate   *bool                  `json:"isTemplate,omitempty"`
-	Starred      *bool                  `json:"starred,omitempty"`
-	Order        *int                   `json:"order,omitempty"`
-	Background   *string                `json:"background,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
-	Status       *string                `json:"status,omitempty"`
+	Portfolio   *string                `json:"portfolio,omitempty"`
+	Type        *string                `json:"type,omitempty"`
+	Title       *string                `json:"title,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	End         *string                `json:"end,omitempty"`
+	IsTemplate  *bool                  `json:"isTemplate,omitempty"`
+	Background  *string                `json:"background,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Starred     *bool                  `json:"starred,omitempty"`
+	Order       *int                   `json:"order,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Lists       []string               `json:"lists,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
 }
 
 type UpdateGoal struct {
 	Name         *string                `json:"name,omitempty"`
+	Start        *string                `json:"start,omitempty"`
+	End          *string                `json:"end,omitempty"`
 	Notes        *string                `json:"notes,omitempty"`
-	Time         *string                `json:"time,omitempty"`
-	IsCompany    *bool                  `json:"is_company,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	Status       *string                `json:"status,omitempty"`
-	User         *string                `json:"user,omitempty"`
 	Parent       *string                `json:"parent,omitempty"`
+	Phase        *string                `json:"phase,omitempty"`
+	UID          *string                `json:"uid,omitempty"`
 	Organization *string                `json:"organization,omitempty"`
 }
 

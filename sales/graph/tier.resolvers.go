@@ -11,9 +11,7 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
-	"github.com/dailytravel/x/sales/internal/utils"
 	"github.com/dailytravel/x/sales/pkg/auth"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,24 +19,22 @@ import (
 
 // CreateTier is the resolver for the createTier field.
 func (r *mutationResolver) CreateTier(ctx context.Context, input model.NewTier) (*model.Tier, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	item := &model.Tier{
 		Locale:      input.Locale,
 		Name:        bson.M{input.Locale: input.Name},
 		Description: bson.M{input.Locale: input.Description},
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
 	// Set the fields from the input
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -48,10 +44,10 @@ func (r *mutationResolver) CreateTier(ctx context.Context, input model.NewTier) 
 
 // UpdateTier is the resolver for the updateTier field.
 func (r *mutationResolver) UpdateTier(ctx context.Context, id string, input model.UpdateTier) (*model.Tier, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -81,9 +77,6 @@ func (r *mutationResolver) UpdateTier(ctx context.Context, id string, input mode
 		}
 	}
 
-	// Update the updated_by and updated_at fields
-	item.UpdatedBy = uid
-
 	// Perform the update in the database
 	res, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item)
 	if err != nil {
@@ -100,10 +93,10 @@ func (r *mutationResolver) UpdateTier(ctx context.Context, id string, input mode
 
 // DeleteTier is the resolver for the deleteTier field.
 func (r *mutationResolver) DeleteTier(ctx context.Context, id string) (map[string]interface{}, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -117,11 +110,9 @@ func (r *mutationResolver) DeleteTier(ctx context.Context, id string) (map[strin
 	// Define the update to mark the record as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
-			"deleted_by": uid,
-			"status":     "deleted",
-			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"status":  "deleted",
+			"updated": primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -140,10 +131,10 @@ func (r *mutationResolver) DeleteTier(ctx context.Context, id string) (map[strin
 
 // DeleteTiers is the resolver for the deleteTiers field.
 func (r *mutationResolver) DeleteTiers(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the list of ID strings to ObjectIDs
 	var objectIDs []primitive.ObjectID
@@ -161,11 +152,9 @@ func (r *mutationResolver) DeleteTiers(ctx context.Context, ids []string) (map[s
 	// Define the update to mark records as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
-			"deleted_by": uid,
-			"status":     "deleted",
-			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"status":  "deleted",
+			"updated": primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -182,7 +171,7 @@ func (r *mutationResolver) DeleteTiers(ctx context.Context, ids []string) (map[s
 func (r *queryResolver) Tiers(ctx context.Context, args map[string]interface{}) (*model.Tiers, error) {
 	var items []*model.Tier
 	//find all items
-	cur, err := r.db.Collection("tiers").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("tiers").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +185,7 @@ func (r *queryResolver) Tiers(ctx context.Context, args map[string]interface{}) 
 	}
 
 	//get total count
-	count, err := r.db.Collection("tiers").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("tiers").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -305,32 +294,14 @@ func (r *tierResolver) Metadata(ctx context.Context, obj *model.Tier) (map[strin
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *tierResolver) CreatedAt(ctx context.Context, obj *model.Tier) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *tierResolver) Created(ctx context.Context, obj *model.Tier) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *tierResolver) UpdatedAt(ctx context.Context, obj *model.Tier) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *tierResolver) CreatedBy(ctx context.Context, obj *model.Tier) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *tierResolver) UpdatedBy(ctx context.Context, obj *model.Tier) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *tierResolver) Updated(ctx context.Context, obj *model.Tier) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Tier returns TierResolver implementation.

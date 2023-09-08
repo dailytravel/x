@@ -12,7 +12,6 @@ import (
 
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -44,37 +43,19 @@ func (r *attendanceResolver) Metadata(ctx context.Context, obj *model.Attendance
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *attendanceResolver) CreatedAt(ctx context.Context, obj *model.Attendance) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *attendanceResolver) Created(ctx context.Context, obj *model.Attendance) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *attendanceResolver) UpdatedAt(ctx context.Context, obj *model.Attendance) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *attendanceResolver) Updated(ctx context.Context, obj *model.Attendance) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
 func (r *attendanceResolver) UID(ctx context.Context, obj *model.Attendance) (string, error) {
 	return obj.UID.Hex(), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *attendanceResolver) CreatedBy(ctx context.Context, obj *model.Attendance) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *attendanceResolver) UpdatedBy(ctx context.Context, obj *model.Attendance) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // CheckIn is the resolver for the checkIn field.
@@ -158,23 +139,16 @@ func (r *mutationResolver) CheckOut(ctx context.Context) (*model.Attendance, err
 
 // CreateAttendance is the resolver for the createAttendance field.
 func (r *mutationResolver) CreateAttendance(ctx context.Context, input model.NewAttendance) (*model.Attendance, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Create a new attendance
 	item := &model.Attendance{
 		Status: *input.Status,
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
 	// Perform the insertion into the database
-	_, err = r.db.Collection("attendances").InsertOne(ctx, item)
+	_, err := r.db.Collection("attendances").InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -184,11 +158,6 @@ func (r *mutationResolver) CreateAttendance(ctx context.Context, input model.New
 
 // UpdateAttendance is the resolver for the updateAttendance field.
 func (r *mutationResolver) UpdateAttendance(ctx context.Context, id string, input model.UpdateAttendance) (*model.Attendance, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -214,9 +183,8 @@ func (r *mutationResolver) UpdateAttendance(ctx context.Context, id string, inpu
 	// Update the attendance record in the database
 	update := bson.M{
 		"$set": bson.M{
-			"status":     item.Status,
-			"notes":      item.Notes,
-			"updated_by": uid,
+			"status": item.Status,
+			"notes":  item.Notes,
 		},
 	}
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
@@ -331,9 +299,9 @@ func (r *queryResolver) Attendance(ctx context.Context, id string) (*model.Atten
 func (r *queryResolver) Attendances(ctx context.Context, args map[string]interface{}) (*model.Attendances, error) {
 	var items []*model.Attendance
 
-	filter := utils.Query(args).(bson.M)
+	filter := bson.M{}
 
-	opts := utils.Options(args)
+	opts := options.Find()
 	opts.SetSort(bson.M{"time_in": -1})
 
 	cur, err := r.db.Collection("attendances").Find(ctx, filter, opts)

@@ -23,11 +23,9 @@ type Log struct {
 func (i *Log) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Timestamp.IsZero() {
+		i.Timestamp = now
 	}
-
-	i.UpdatedAt = now
 
 	type t Log
 	return bson.Marshal((*t)(i))
@@ -41,6 +39,6 @@ func (i *Log) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "client_ip", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}},
+		{Keys: bson.D{{Key: "timestamp", Value: 1}}},
 	}
 }

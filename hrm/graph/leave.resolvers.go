@@ -11,7 +11,6 @@ import (
 
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -37,14 +36,14 @@ func (r *leaveResolver) Metadata(ctx context.Context, obj *model.Leave) (map[str
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *leaveResolver) CreatedAt(ctx context.Context, obj *model.Leave) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *leaveResolver) Created(ctx context.Context, obj *model.Leave) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *leaveResolver) UpdatedAt(ctx context.Context, obj *model.Leave) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *leaveResolver) Updated(ctx context.Context, obj *model.Leave) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
@@ -52,39 +51,12 @@ func (r *leaveResolver) UID(ctx context.Context, obj *model.Leave) (string, erro
 	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *leaveResolver) CreatedBy(ctx context.Context, obj *model.Leave) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *leaveResolver) UpdatedBy(ctx context.Context, obj *model.Leave) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
-}
-
 // CreateLeave is the resolver for the createLeave field.
 func (r *mutationResolver) CreateLeave(ctx context.Context, input model.NewLeave) (*model.Leave, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	item := &model.Leave{
 		Type:   input.Type,
 		Reason: input.Reason,
 		Status: *input.Status,
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 
 	//convert string to primitive.DateTime
@@ -115,11 +87,6 @@ func (r *mutationResolver) CreateLeave(ctx context.Context, input model.NewLeave
 
 // UpdateLeave is the resolver for the updateLeave field.
 func (r *mutationResolver) UpdateLeave(ctx context.Context, id string, input model.UpdateLeave) (*model.Leave, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -146,8 +113,6 @@ func (r *mutationResolver) UpdateLeave(ctx context.Context, id string, input mod
 	if input.Status != nil {
 		item.Status = *input.Status
 	}
-
-	item.UpdatedBy = uid
 
 	// Update the leave in the database
 	_, err = r.db.Collection(item.Collection()).UpdateOne(ctx, filter, bson.M{"$set": item})
@@ -246,7 +211,7 @@ func (r *mutationResolver) DeleteLeaves(ctx context.Context, ids []string) (map[
 func (r *queryResolver) Leaves(ctx context.Context, args map[string]interface{}) (*model.Leaves, error) {
 	var items []*model.Leave
 	//find all items
-	cur, err := r.db.Collection("leaves").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("leaves").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -260,7 +225,7 @@ func (r *queryResolver) Leaves(ctx context.Context, args map[string]interface{})
 	}
 
 	//get total count
-	count, err := r.db.Collection("leaves").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("leaves").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

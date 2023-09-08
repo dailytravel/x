@@ -12,10 +12,10 @@ import (
 
 	"github.com/dailytravel/x/base/graph/model"
 	"github.com/dailytravel/x/base/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreatePortfolio is the resolver for the createPortfolio field.
@@ -28,9 +28,7 @@ func (r *mutationResolver) CreatePortfolio(ctx context.Context, input model.NewP
 	item := &model.Portfolio{
 		UID: *uid,
 		Model: model.Model{
-			Metadata:  input.Metadata,
-			CreatedBy: uid,
-			UpdatedBy: uid,
+			Metadata: input.Metadata,
 		},
 	}
 
@@ -46,11 +44,6 @@ func (r *mutationResolver) CreatePortfolio(ctx context.Context, input model.NewP
 
 // UpdatePortfolio is the resolver for the updatePortfolio field.
 func (r *mutationResolver) UpdatePortfolio(ctx context.Context, id string, input model.UpdatePortfolio) (*model.Portfolio, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -63,10 +56,6 @@ func (r *mutationResolver) UpdatePortfolio(ctx context.Context, id string, input
 	if err != nil {
 		return nil, err
 	}
-
-	// Update fields based on input
-
-	item.UpdatedBy = uid
 
 	// Perform the update in the database
 	update := bson.M{
@@ -172,37 +161,19 @@ func (r *portfolioResolver) Metadata(ctx context.Context, obj *model.Portfolio) 
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *portfolioResolver) CreatedAt(ctx context.Context, obj *model.Portfolio) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *portfolioResolver) UpdatedAt(ctx context.Context, obj *model.Portfolio) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
 // UID is the resolver for the uid field.
 func (r *portfolioResolver) UID(ctx context.Context, obj *model.Portfolio) (string, error) {
 	return obj.UID.Hex(), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *portfolioResolver) CreatedBy(ctx context.Context, obj *model.Portfolio) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
+// Created is the resolver for the created field.
+func (r *portfolioResolver) Created(ctx context.Context, obj *model.Portfolio) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *portfolioResolver) UpdatedBy(ctx context.Context, obj *model.Portfolio) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *portfolioResolver) Updated(ctx context.Context, obj *model.Portfolio) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Portfolio is the resolver for the portfolio field.
@@ -231,9 +202,9 @@ func (r *queryResolver) Portfolio(ctx context.Context, id string) (*model.Portfo
 func (r *queryResolver) Portfolios(ctx context.Context, args map[string]interface{}) (*model.Portfolios, error) {
 	var items []*model.Portfolio
 
-	opts := utils.Options(args)
+	opts := options.Find()
 	opts.SetSort(bson.M{"order": 1})
-	opts.SetSort(bson.M{"created_at": -1})
+	opts.SetSort(bson.M{"created": -1})
 
 	// Build the filter based on the provided arguments
 	filter := bson.M{}
@@ -244,7 +215,7 @@ func (r *queryResolver) Portfolios(ctx context.Context, args map[string]interfac
 	}
 
 	// Create a cursor for the query
-	cursor, err := r.db.Collection("portfolios").Find(ctx, utils.Query(args), opts)
+	cursor, err := r.db.Collection("portfolios").Find(ctx, nil, opts)
 	if err != nil {
 		return nil, err
 	}

@@ -21,11 +21,6 @@ import (
 
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) (*model.Task, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Create a new task
 	item := &model.Task{
 		Name:     input.Name,
@@ -34,9 +29,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 		Order:    *input.Order,
 		Status:   *input.Status,
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
@@ -91,11 +84,6 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 
 // UpdateTask is the resolver for the updateTask field.
 func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input model.UpdateTask) (*model.Task, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -149,8 +137,6 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 		}
 		item.List = &_id
 	}
-
-	item.UpdatedBy = uid
 
 	if input.Start != nil {
 		startAt, err := time.Parse(time.RFC3339, *input.Start)
@@ -207,7 +193,7 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (map[strin
 	archiveFields := bson.M{
 		"status":     "archived",
 		"updated_by": uid,
-		"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 	}
 
 	update := bson.M{"$set": archiveFields}
@@ -242,7 +228,7 @@ func (r *mutationResolver) DeleteTasks(ctx context.Context, ids []string) (map[s
 	archiveFields := bson.M{
 		"status":     "archived",
 		"updated_by": uid,
-		"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+		"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 	}
 	update := bson.M{"$set": archiveFields}
 
@@ -277,9 +263,9 @@ func (r *queryResolver) Task(ctx context.Context, id string) (*model.Task, error
 func (r *queryResolver) Tasks(ctx context.Context, args map[string]interface{}) (*model.Tasks, error) {
 	var items []*model.Task
 
-	opts := utils.Options(args)
+	opts := options.Find()
 	opts.SetSort(bson.M{"order": 1})
-	opts.SetSort(bson.M{"created_at": -1})
+	opts.SetSort(bson.M{"created": -1})
 
 	// Build the filter based on the provided arguments
 	filter := bson.M{}
@@ -290,7 +276,7 @@ func (r *queryResolver) Tasks(ctx context.Context, args map[string]interface{}) 
 	}
 
 	// Create a cursor for the query
-	cursor, err := r.db.Collection("tasks").Find(ctx, utils.Query(args), opts)
+	cursor, err := r.db.Collection("tasks").Find(ctx, nil, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -382,12 +368,20 @@ func (r *taskResolver) List(ctx context.Context, obj *model.Task) (*model.List, 
 
 // Start is the resolver for the start field.
 func (r *taskResolver) Start(ctx context.Context, obj *model.Task) (*string, error) {
-	panic(fmt.Errorf("not implemented: Start - start"))
+	if obj.Start == nil {
+		return nil, nil
+	}
+
+	return pointer.String(obj.Start.Time().Format(time.RFC3339)), nil
 }
 
 // End is the resolver for the end field.
 func (r *taskResolver) End(ctx context.Context, obj *model.Task) (*string, error) {
-	panic(fmt.Errorf("not implemented: End - end"))
+	if obj.End == nil {
+		return nil, nil
+	}
+
+	return pointer.String(obj.End.Time().Format(time.RFC3339)), nil
 }
 
 // Metadata is the resolver for the metadata field.
@@ -395,37 +389,19 @@ func (r *taskResolver) Metadata(ctx context.Context, obj *model.Task) (map[strin
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *taskResolver) CreatedAt(ctx context.Context, obj *model.Task) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *taskResolver) UpdatedAt(ctx context.Context, obj *model.Task) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
 // UID is the resolver for the uid field.
 func (r *taskResolver) UID(ctx context.Context, obj *model.Task) (string, error) {
 	return obj.UID.Hex(), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *taskResolver) CreatedBy(ctx context.Context, obj *model.Task) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
+// Created is the resolver for the created field.
+func (r *taskResolver) Created(ctx context.Context, obj *model.Task) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *taskResolver) UpdatedBy(ctx context.Context, obj *model.Task) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *taskResolver) Updated(ctx context.Context, obj *model.Task) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Task returns TaskResolver implementation.

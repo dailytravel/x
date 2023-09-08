@@ -12,7 +12,6 @@ import (
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/internal/utils"
 	"github.com/dailytravel/x/hrm/pkg/auth"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -108,41 +107,18 @@ func (r *jobResolver) Metadata(ctx context.Context, obj *model.Job) (map[string]
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *jobResolver) CreatedAt(ctx context.Context, obj *model.Job) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *jobResolver) Created(ctx context.Context, obj *model.Job) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *jobResolver) UpdatedAt(ctx context.Context, obj *model.Job) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *jobResolver) CreatedBy(ctx context.Context, obj *model.Job) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *jobResolver) UpdatedBy(ctx context.Context, obj *model.Job) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *jobResolver) Updated(ctx context.Context, obj *model.Job) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateJob is the resolver for the createJob field.
 func (r *mutationResolver) CreateJob(ctx context.Context, input model.NewJob) (*model.Job, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	item := &model.Job{
 		Locale:       input.Locale,
 		Title:        bson.M{input.Locale: input.Title},
@@ -151,10 +127,6 @@ func (r *mutationResolver) CreateJob(ctx context.Context, input model.NewJob) (*
 		Skills:       bson.M{input.Locale: input.Skills},
 		Benefits:     bson.M{input.Locale: input.Benefits},
 		Status:       input.Status,
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
 	}
 
 	// Insert the new organization
@@ -167,11 +139,6 @@ func (r *mutationResolver) CreateJob(ctx context.Context, input model.NewJob) (*
 
 // UpdateJob is the resolver for the updateJob field.
 func (r *mutationResolver) UpdateJob(ctx context.Context, id string, input model.UpdateJob) (*model.Job, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -210,8 +177,6 @@ func (r *mutationResolver) UpdateJob(ctx context.Context, id string, input model
 	if input.Status != nil {
 		item.Status = *input.Status
 	}
-
-	item.UpdatedBy = uid
 
 	// Update the position in the database
 	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {

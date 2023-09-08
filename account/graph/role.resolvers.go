@@ -13,15 +13,11 @@ import (
 	"github.com/dailytravel/x/account/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreateRole is the resolver for the createRole field.
 func (r *mutationResolver) CreateRole(ctx context.Context, input model.NewRole) (*model.Role, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert permission names to primitive.ObjectID values
 	permissions := make([]*primitive.ObjectID, len(input.Permissions))
 	for i, permissionNamePtr := range input.Permissions {
@@ -37,10 +33,7 @@ func (r *mutationResolver) CreateRole(ctx context.Context, input model.NewRole) 
 		Name:        input.Name,
 		Description: input.Description,
 		Permissions: permissions, // Assign the converted permission IDs
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-		},
+
 	}
 
 	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil)
@@ -55,21 +48,12 @@ func (r *mutationResolver) CreateRole(ctx context.Context, input model.NewRole) 
 
 // UpdateRole is the resolver for the updateRole field.
 func (r *mutationResolver) UpdateRole(ctx context.Context, id string, input model.UpdateRole) (*model.Role, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 	filter := bson.M{"_id": _id}
-	item := &model.Role{
-		Model: model.Model{
-			UpdatedBy: uid,
-		},
-	}
+	item := &model.Role{}
 
 	if input.Name != nil {
 		item.Name = *input.Name
@@ -107,7 +91,7 @@ func (r *mutationResolver) DeleteRole(ctx context.Context, id string) (map[strin
 		return nil, err
 	}
 
-	res, err := r.db.Collection(model.RoleCollection).DeleteOne(ctx, bson.M{"_id": _id})
+	res, err := r.db.Collection("roles").DeleteOne(ctx, bson.M{"_id": _id})
 	if err != nil {
 		return nil, fmt.Errorf("error deleting role: %v", err)
 	}
@@ -133,7 +117,7 @@ func (r *mutationResolver) DeleteRoles(ctx context.Context, ids []string) (map[s
 	}
 	filter := bson.M{"_id": bson.M{"$in": _ids}}
 
-	res, err := r.db.Collection(model.RoleCollection).DeleteMany(ctx, filter)
+	res, err := r.db.Collection("roles").DeleteMany(ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting roles: %v", err)
 	}
@@ -163,26 +147,44 @@ func (r *queryResolver) Role(ctx context.Context, id string) (*model.Role, error
 }
 
 // Roles is the resolver for the roles field.
-func (r *queryResolver) Roles(ctx context.Context, args map[string]interface{}) (*model.Roles, error) {
+func (r *queryResolver) Roles(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Roles, error) {
 	var items []*model.Role
-	//find all items
-	cur, err := r.db.Collection(model.RoleCollection).Find(ctx, r.model.Query(args), r.model.Options(args))
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+
+	opts := options.Find()
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if sort != nil {
+		opts.SetSort(sort)
+	}
+	if collation != nil {
+		col := &options.Collation{
+			// you can set collation fields here...
+		}
+		opts.SetCollation(col)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("roles").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	defer cur.Close(ctx)
-
-	for cur.Next(ctx) {
-		var item *model.Role
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection(model.RoleCollection).CountDocuments(ctx, r.model.Query(args), nil)
+	count, err := r.db.Collection("roles").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +206,7 @@ func (r *roleResolver) Permissions(ctx context.Context, obj *model.Role) ([]*mod
 		return []*model.Permission{}, nil
 	}
 
-	cursor, err := r.db.Collection(model.PermissionCollection).Find(ctx, bson.M{"_id": bson.M{"$in": obj.Permissions}}, nil)
+	cursor, err := r.db.Collection("permissions").Find(ctx, bson.M{"_id": bson.M{"$in": obj.Permissions}}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -224,36 +226,14 @@ func (r *roleResolver) Permissions(ctx context.Context, obj *model.Role) ([]*mod
 	return items, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *roleResolver) CreatedAt(ctx context.Context, obj *model.Role) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *roleResolver) Created(ctx context.Context, obj *model.Role) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *roleResolver) UpdatedAt(ctx context.Context, obj *model.Role) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *roleResolver) CreatedBy(ctx context.Context, obj *model.Role) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": obj.CreatedBy}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *roleResolver) UpdatedBy(ctx context.Context, obj *model.Role) (*model.User, error) {
-	var item *model.User
-
-	if err := r.db.Collection(model.UserCollection).FindOne(ctx, bson.M{"_id": obj.UpdatedBy}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
+// Updated is the resolver for the updated field.
+func (r *roleResolver) Updated(ctx context.Context, obj *model.Role) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Role returns RoleResolver implementation.

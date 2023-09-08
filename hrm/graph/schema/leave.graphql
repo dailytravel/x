@@ -6,11 +6,9 @@ type Leave {
   reason: String!
   status: String! # "pending", "approved", "rejected", etc.
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
 }
 
 type Leaves {

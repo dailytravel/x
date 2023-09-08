@@ -12,10 +12,9 @@ type Variant {
   start: String!
   end: String!
   status: String!
-  createdAt: String!
-  updatedAt: String!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
+
   package: ID!
 }
 

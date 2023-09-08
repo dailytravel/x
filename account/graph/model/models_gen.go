@@ -33,8 +33,6 @@ type Identity struct {
 	IsSocial    bool                   `json:"isSocial"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      string                 `json:"status"`
-	CreatedAt   string                 `json:"createdAt"`
-	UpdatedAt   string                 `json:"updatedAt"`
 }
 
 type Integrations struct {
@@ -144,10 +142,8 @@ type Order struct {
 func (Order) IsEntity() {}
 
 type Organization struct {
-	CreatedBy string `json:"created_by"`
-	UpdatedBy string `json:"updated_by"`
-	Created   *User  `json:"created,omitempty"`
-	Updated   *User  `json:"updated,omitempty"`
+	UID  string `json:"uid"`
+	User *User  `json:"user,omitempty"`
 }
 
 func (Organization) IsEntity() {}
@@ -163,12 +159,6 @@ type Permissions struct {
 	Data  []*Permission `json:"data,omitempty"`
 	Count int           `json:"count"`
 }
-
-type Point struct {
-	ID string `json:"id"`
-}
-
-func (Point) IsEntity() {}
 
 type Quote struct {
 	UID  string `json:"uid"`

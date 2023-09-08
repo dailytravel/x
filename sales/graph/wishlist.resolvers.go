@@ -12,10 +12,10 @@ import (
 
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreateWishlist is the resolver for the createWishlist field.
@@ -34,9 +34,7 @@ func (r *mutationResolver) CreateWishlist(ctx context.Context, input model.NewWi
 		UID:     *uid,
 		Content: content,
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
@@ -68,11 +66,11 @@ func (r *mutationResolver) DeleteWishlist(ctx context.Context, id string) (map[s
 	// Define the update to mark the record as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 			"deleted_by": uid,
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -112,11 +110,11 @@ func (r *mutationResolver) DeleteWishlists(ctx context.Context, ids []string) (m
 	// Define the update to mark records as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 			"deleted_by": uid,
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -150,24 +148,45 @@ func (r *queryResolver) Wishlist(ctx context.Context, id string) (*model.Wishlis
 }
 
 // Wishlists is the resolver for the wishlists field.
-func (r *queryResolver) Wishlists(ctx context.Context, args map[string]interface{}) (*model.Wishlists, error) {
+func (r *queryResolver) Wishlists(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Wishlists, error) {
 	var items []*model.Wishlist
-	//find all items
-	cur, err := r.db.Collection("wishlists").Find(ctx, utils.Query(args), utils.Options(args))
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+
+	opts := options.Find()
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if sort != nil {
+		opts.SetSort(sort)
+	}
+	if collation != nil {
+		col := &options.Collation{
+			// you can set collation fields here...
+		}
+		opts.SetCollation(col)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("wishlist").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Wishlist
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection("wishlists").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("wishlists").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -188,14 +207,14 @@ func (r *wishlistResolver) Metadata(ctx context.Context, obj *model.Wishlist) (m
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *wishlistResolver) CreatedAt(ctx context.Context, obj *model.Wishlist) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *wishlistResolver) Created(ctx context.Context, obj *model.Wishlist) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *wishlistResolver) UpdatedAt(ctx context.Context, obj *model.Wishlist) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *wishlistResolver) Updated(ctx context.Context, obj *model.Wishlist) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Content is the resolver for the content field.
@@ -206,24 +225,6 @@ func (r *wishlistResolver) Content(ctx context.Context, obj *model.Wishlist) (st
 // UID is the resolver for the uid field.
 func (r *wishlistResolver) UID(ctx context.Context, obj *model.Wishlist) (string, error) {
 	return obj.ID.Hex(), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *wishlistResolver) CreatedBy(ctx context.Context, obj *model.Wishlist) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *wishlistResolver) UpdatedBy(ctx context.Context, obj *model.Wishlist) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // Wishlist returns WishlistResolver implementation.

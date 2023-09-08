@@ -4,8 +4,7 @@ type Webhook {
   url: String!
   headers: [WebhookHeader!]
   events: [WebhookEvent]
-  createdAt: String!
-  updatedAt: String!
+
   createdBy: String
   updatedBy: String
 }
@@ -60,7 +59,14 @@ input WebhookEventInput {
 }
 
 extend type Query {
-  webhooks(args: Map): [Webhook]
+  webhooks(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): [Webhook]
   webhook(id: ID!): Webhook
 }
 

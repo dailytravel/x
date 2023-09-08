@@ -1,13 +1,12 @@
 type Timezone {
   id: ID!
+  locale: String!
   name: String!
   offset: Int!
   description: String
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 type Timezones {
@@ -16,13 +15,15 @@ type Timezones {
 }
 
 input NewTimezone {
-  id: ID
+  locale: String!
   name: String!
   offset: Int!
+  description: String
   metadata: Map
 }
 
 input UpdateTimezone {
+  locale: String
   name: String
   offset: Int
   description: String
@@ -30,14 +31,21 @@ input UpdateTimezone {
 }
 
 extend type Query {
-  timezones(args: Map): Timezones @api
+  timezones(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Timezones @api
   timezone(id: ID!): Timezone! @api
 }
 
 extend type Mutation {
   createTimezone(input: NewTimezone!): Timezone @auth
-  updateTimezone(input: UpdateTimezone!): Timezone @auth
-  importTimezones(url: String!): [Timezone] @auth
+  updateTimezone(id: ID!, input: UpdateTimezone!): Timezone @auth
+  importTimezones(file: String!): [Timezone] @auth
   deleteTimezone(id: ID!): Map @auth
   deleteTimezones(ids: [ID!]!): Map @auth
 }

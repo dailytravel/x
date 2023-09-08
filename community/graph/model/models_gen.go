@@ -123,8 +123,8 @@ type ShareInput struct {
 	Permission string                 `json:"permission"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 	Status     string                 `json:"status"`
-	CreatedBy  *string                `json:"createdBy,omitempty"`
-	UpdatedBy  *string                `json:"updatedBy,omitempty"`
+	Created    string                 `json:"created"`
+	Updated    string                 `json:"updated"`
 }
 
 type ShareUpdateInput struct {
@@ -133,8 +133,8 @@ type ShareUpdateInput struct {
 	Permission *string                `json:"permission,omitempty"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 	Status     *string                `json:"status,omitempty"`
-	CreatedBy  *string                `json:"createdBy,omitempty"`
-	UpdatedBy  *string                `json:"updatedBy,omitempty"`
+	Created    string                 `json:"created"`
+	Updated    string                 `json:"updated"`
 }
 
 type Shares struct {
@@ -184,7 +184,7 @@ type UpdateReaction struct {
 }
 
 type UpdateRecipient struct {
-	ReadAt *string `json:"readAt,omitempty"`
+	Read *string `json:"read,omitempty"`
 }
 
 type ConversationStatus string

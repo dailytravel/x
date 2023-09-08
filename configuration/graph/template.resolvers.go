@@ -13,32 +13,22 @@ import (
 	"github.com/dailytravel/x/configuration/graph/model"
 	"github.com/dailytravel/x/configuration/internal/utils"
 	"github.com/dailytravel/x/configuration/pkg/auth"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreateTemplate is the resolver for the createTemplate field.
 func (r *mutationResolver) CreateTemplate(ctx context.Context, input model.NewTemplate) (*model.Template, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	item := &model.Template{
 		Locale:  input.Locale,
 		Subject: bson.M{input.Locale: input.Subject},
 		Body:    bson.M{input.Locale: input.Body},
-		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
-		},
 	}
 
 	// Set the fields from the input
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +38,6 @@ func (r *mutationResolver) CreateTemplate(ctx context.Context, input model.NewTe
 
 // UpdateTemplate is the resolver for the updateTemplate field.
 func (r *mutationResolver) UpdateTemplate(ctx context.Context, id string, input model.UpdateTemplate) (*model.Template, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -80,9 +65,6 @@ func (r *mutationResolver) UpdateTemplate(ctx context.Context, id string, input 
 			item.Metadata[k] = v
 		}
 	}
-
-	// Update the updated_by and updated_at fields
-	item.UpdatedBy = uid
 
 	// Perform the update in the database
 	res, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item)
@@ -193,24 +175,45 @@ func (r *queryResolver) Template(ctx context.Context, name string) (*model.Templ
 }
 
 // Templates is the resolver for the templates field.
-func (r *queryResolver) Templates(ctx context.Context, args map[string]interface{}) (*model.Templates, error) {
+func (r *queryResolver) Templates(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Templates, error) {
 	var items []*model.Template
-	//find all items
-	cur, err := r.db.Collection("templates").Find(ctx, utils.Query(args), utils.Options(args))
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+
+	opts := options.Find()
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if sort != nil {
+		opts.SetSort(sort)
+	}
+	if collation != nil {
+		col := &options.Collation{
+			// you can set collation fields here...
+		}
+		opts.SetCollation(col)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("templates").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Template
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection("templates").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("templates").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -267,32 +270,14 @@ func (r *templateResolver) Metadata(ctx context.Context, obj *model.Template) (m
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *templateResolver) CreatedAt(ctx context.Context, obj *model.Template) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *templateResolver) Created(ctx context.Context, obj *model.Template) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *templateResolver) UpdatedAt(ctx context.Context, obj *model.Template) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *templateResolver) CreatedBy(ctx context.Context, obj *model.Template) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *templateResolver) UpdatedBy(ctx context.Context, obj *model.Template) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *templateResolver) Updated(ctx context.Context, obj *model.Template) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Template returns TemplateResolver implementation.

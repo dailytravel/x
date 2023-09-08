@@ -8,10 +8,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/dailytravel/x/insight/graph/model"
-	"github.com/dailytravel/x/insight/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -42,14 +40,9 @@ func (r *logResolver) Metadata(ctx context.Context, obj *model.Log) (map[string]
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *logResolver) CreatedAt(ctx context.Context, obj *model.Log) (*string, error) {
-	if obj.CreatedAt.IsZero() {
-		return nil, nil
-	}
-
-	createdAt := time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339)
-	return &createdAt, nil
+// Timestamp is the resolver for the timestamp field.
+func (r *logResolver) Timestamp(ctx context.Context, obj *model.Log) (string, error) {
+	panic(fmt.Errorf("not implemented: Timestamp - timestamp"))
 }
 
 // CreateLog is the resolver for the createLog field.
@@ -132,7 +125,7 @@ func (r *queryResolver) Log(ctx context.Context, id string) (*model.Log, error) 
 func (r *queryResolver) Logs(ctx context.Context, args map[string]interface{}) (*model.Logs, error) {
 	var items []*model.Log
 	//find all items
-	cur, err := r.db.Collection("logs").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("logs").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +139,7 @@ func (r *queryResolver) Logs(ctx context.Context, args map[string]interface{}) (
 	}
 
 	//get total count
-	count, err := r.db.Collection("locales").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("locales").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

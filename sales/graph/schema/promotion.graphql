@@ -6,10 +6,8 @@ type Promotion {
   description: String!
   credits: Int!
   metadata: Map
-  createdAt: String!
-  updatedAt: String!
-  createdBy: ID
-  updatedBy: ID
+  created: String!
+  updated: String!
 }
 
 enum PromotionType {

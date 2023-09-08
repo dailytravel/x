@@ -7,9 +7,9 @@ type Key {
   fingerprint: String!
   thumbprint: String!
   status: String! #next, current, previous
-  expiresAt: String
-  createdAt: String!
-  updatedAt: String!
+  expires: String
+  created: String!
+  updated: String!
   user: User
 }
 
@@ -23,7 +23,14 @@ input NewKey {
 }
 
 extend type Query {
-  keys(args: Map): Keys @auth(roles: [admin])
+  keys(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Keys @auth(roles: [admin])
   key(id: ID!): Key @auth(roles: [admin])
 }
 

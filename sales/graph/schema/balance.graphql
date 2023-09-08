@@ -5,12 +5,10 @@ type Balance {
   notes: String
   metadata: Map
   status: String!
-  expiredAt: String
-  createdAt: String!
-  updatedAt: String!
+  expires: String
+  created: String!
+  updated: String!
   uid: ID!
-  createdBy: ID
-  updatedBy: ID
 }
 
 type Balances {
@@ -36,13 +34,20 @@ input UpdateBalance {
 }
 
 extend type Query {
-  balance(id: ID!): Balance
-  balances(args: Map): Balances
+  balance(id: ID!): Balance @auth
+  balances(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Balances @auth
 }
 
 extend type Mutation {
-  createBalance(input: NewBalance!): Balance
-  updateBalance(id: ID!, input: UpdateBalance!): Balance
-  deleteBalance(id: ID!): Map
-  deleteBalances(ids: [ID!]!): Map
+  createBalance(input: NewBalance!): Balance @auth(roles: [ADMIN])
+  updateBalance(id: ID!, input: UpdateBalance!): Balance @auth(roles: [ADMIN])
+  deleteBalance(id: ID!): Map @auth(roles: [ADMIN])
+  deleteBalances(ids: [ID!]!): Map @auth(roles: [ADMIN])
 }

@@ -33,11 +33,11 @@ func (File) IsEntity() {}
 func (i *File) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t File
 	return bson.Marshal((*t)(i))
@@ -54,8 +54,8 @@ func (i *File) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "locale", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
 		{Keys: bson.D{{Key: "starred", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "created ", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "updated ", Value: 1}}, Options: options.Index()},
 	}
 }
 
@@ -71,12 +71,12 @@ func (i *File) Schema() interface{} {
 			{Name: "size", Type: "int32"},
 			{Name: "starred", Type: "bool", Facet: pointer.True()},
 			{Name: "status", Type: "string", Facet: pointer.True()},
-			{Name: "created_at", Type: "int32"},
-			{Name: "updated_at", Type: "int32"},
+			{Name: "created ", Type: "int32"},
+			{Name: "updated ", Type: "int32"},
 			{Name: "taxonomies", Type: "string[]", Optional: pointer.True()},
 			{Name: "followers", Type: "string[]", Optional: pointer.True()},
 		},
-		DefaultSortingField: pointer.String("created_at"),
+		DefaultSortingField: pointer.String("created "),
 		EnableNestedFields:  pointer.True(),
 	}
 }
@@ -93,8 +93,8 @@ func (i *File) Document() map[string]interface{} {
 		"size":        i.Size,
 		"starred":     i.Starred,
 		"status":      i.Status,
-		"created_at":  i.CreatedAt.T,
-		"updated_at":  i.UpdatedAt.T,
+		"created ":    i.Created.T,
+		"updated ":    i.Updated.T,
 	}
 
 	// if i.Followers() != nil {
@@ -133,7 +133,7 @@ func (i *File) Update(collection typesense.CollectionInterface, documentKey prim
 
 	for field, value := range updatedFields {
 		switch field {
-		case "created_at", "updated_at", "last_activity":
+		case "created ", "updated ", "last_activity":
 			timestamp := value.(primitive.Timestamp)
 			updatePayload[field] = timestamp.T
 		default:

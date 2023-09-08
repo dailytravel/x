@@ -11,9 +11,9 @@ import (
 
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ID is the resolver for the id field.
@@ -26,68 +26,37 @@ func (r *balanceResolver) Metadata(ctx context.Context, obj *model.Balance) (map
 	return obj.Metadata, nil
 }
 
-// ExpiredAt is the resolver for the expired_at field.
-func (r *balanceResolver) ExpiredAt(ctx context.Context, obj *model.Balance) (*string, error) {
-	if obj.ExpiredAt == nil {
-		return nil, nil
-	}
-
-	expiredAt := time.Unix(int64(obj.ExpiredAt.T), 0).Format(time.RFC3339)
-
-	return &expiredAt, nil
+// Expires is the resolver for the expires field.
+func (r *balanceResolver) Expires(ctx context.Context, obj *model.Balance) (*string, error) {
+	panic(fmt.Errorf("not implemented: Expires - expires"))
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *balanceResolver) CreatedAt(ctx context.Context, obj *model.Balance) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *balanceResolver) Created(ctx context.Context, obj *model.Balance) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *balanceResolver) UpdatedAt(ctx context.Context, obj *model.Balance) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *balanceResolver) Updated(ctx context.Context, obj *model.Balance) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
 func (r *balanceResolver) UID(ctx context.Context, obj *model.Balance) (string, error) {
-	return obj.UID.Hex(), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *balanceResolver) CreatedBy(ctx context.Context, obj *model.Balance) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *balanceResolver) UpdatedBy(ctx context.Context, obj *model.Balance) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
 // CreateBalance is the resolver for the createBalance field.
 func (r *mutationResolver) CreateBalance(ctx context.Context, input model.NewBalance) (*model.Balance, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Create a new benefit object
 	item := &model.Balance{
 		Model: model.Model{
-			Metadata:  input.Metadata,
-			CreatedBy: uid,
-			UpdatedBy: uid,
+			Metadata: input.Metadata,
 		},
 	}
 
 	// Set the fields from the input
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -97,11 +66,6 @@ func (r *mutationResolver) CreateBalance(ctx context.Context, input model.NewBal
 
 // UpdateBalance is the resolver for the updateBalance field.
 func (r *mutationResolver) UpdateBalance(ctx context.Context, id string, input model.UpdateBalance) (*model.Balance, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -122,8 +86,6 @@ func (r *mutationResolver) UpdateBalance(ctx context.Context, id string, input m
 		}
 	}
 
-	item.UpdatedBy = uid
-
 	// Update the benefit in the database
 	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {
 		return nil, err
@@ -135,10 +97,10 @@ func (r *mutationResolver) UpdateBalance(ctx context.Context, id string, input m
 // DeleteBalance is the resolver for the deleteBalance field.
 func (r *mutationResolver) DeleteBalance(ctx context.Context, id string) (map[string]interface{}, error) {
 	// Get the authenticated user's ID
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -157,11 +119,9 @@ func (r *mutationResolver) DeleteBalance(ctx context.Context, id string) (map[st
 	// Define the update to mark the balance as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
-			"deleted_by": uid,
-			"status":     "deleted",
-			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"status":  "deleted",
+			"updated": primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -181,10 +141,10 @@ func (r *mutationResolver) DeleteBalance(ctx context.Context, id string) (map[st
 // DeleteBalances is the resolver for the deleteBalances field.
 func (r *mutationResolver) DeleteBalances(ctx context.Context, ids []string) (map[string]interface{}, error) {
 	// Get the authenticated user's ID
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the list of IDs to ObjectIDs
 	var objectIDs []primitive.ObjectID
@@ -202,11 +162,9 @@ func (r *mutationResolver) DeleteBalances(ctx context.Context, ids []string) (ma
 	// Define the update to mark the balances as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
-			"deleted_by": uid,
-			"status":     "deleted",
-			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"status":  "deleted",
+			"updated": primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -239,24 +197,45 @@ func (r *queryResolver) Balance(ctx context.Context, id string) (*model.Balance,
 }
 
 // Balances is the resolver for the balances field.
-func (r *queryResolver) Balances(ctx context.Context, args map[string]interface{}) (*model.Balances, error) {
+func (r *queryResolver) Balances(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Balances, error) {
 	var items []*model.Balance
-	//find all items
-	cur, err := r.db.Collection("balances").Find(ctx, utils.Query(args), utils.Options(args))
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+
+	opts := options.Find()
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if sort != nil {
+		opts.SetSort(sort)
+	}
+	if collation != nil {
+		col := &options.Collation{
+			// you can set collation fields here...
+		}
+		opts.SetCollation(col)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("balances").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Balance
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection("balances").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("balances").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}

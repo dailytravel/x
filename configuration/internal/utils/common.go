@@ -192,3 +192,56 @@ func UID(ctx context.Context) (*primitive.ObjectID, error) {
 
 	return &uid, nil
 }
+
+func Filter(input interface{}) interface{} {
+	switch v := input.(type) {
+	case string:
+		// If string matches the length of ObjectID, try converting
+		if len(v) == 24 {
+			if objID, err := primitive.ObjectIDFromHex(v); err == nil {
+				return objID
+			}
+		}
+		return v
+	case []interface{}:
+		// Handle slice of interfaces, which could be slice of strings
+		for i, item := range v {
+			v[i] = Filter(item)
+		}
+		return v
+	case map[string]interface{}:
+		// Recursive call for nested maps
+		for key, value := range v {
+			v[key] = Filter(value)
+		}
+		return v
+	default:
+		// Return as it is if it's any other type
+		return v
+	}
+}
+
+// Sort converts a map of sort criteria into MongoDB-compatible sort options.
+func Sort(sortCriteria map[string]interface{}) *options.FindOptions {
+	sortMap := bson.D{}
+
+	for field, order := range sortCriteria {
+		orderStr, ok := order.(string)
+		if !ok {
+			continue
+		}
+
+		orderValue := 1 // default to ascending
+		if orderStr == "desc" {
+			orderValue = -1
+		}
+		sortMap = append(sortMap, bson.E{Key: field, Value: orderValue})
+	}
+
+	return options.Find().SetSort(sortMap)
+}
+
+// Project converts a map into MongoDB-compatible projection options.
+func Project(projection map[string]interface{}) *options.FindOptions {
+	return options.Find().SetProjection(projection)
+}

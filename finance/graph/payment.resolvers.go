@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/finance/graph/model"
 )
@@ -41,16 +42,6 @@ func (r *paymentResolver) Metadata(ctx context.Context, obj *model.Payment) (map
 	panic(fmt.Errorf("not implemented: Metadata - metadata"))
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *paymentResolver) CreatedAt(ctx context.Context, obj *model.Payment) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *paymentResolver) UpdatedAt(ctx context.Context, obj *model.Payment) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
-}
-
 // Invoice is the resolver for the invoice field.
 func (r *paymentResolver) Invoice(ctx context.Context, obj *model.Payment) (string, error) {
 	panic(fmt.Errorf("not implemented: Invoice - invoice"))
@@ -61,14 +52,14 @@ func (r *paymentResolver) UID(ctx context.Context, obj *model.Payment) (string, 
 	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *paymentResolver) CreatedBy(ctx context.Context, obj *model.Payment) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+// Created is the resolver for the created field.
+func (r *paymentResolver) Created(ctx context.Context, obj *model.Payment) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *paymentResolver) UpdatedBy(ctx context.Context, obj *model.Payment) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+// Updated is the resolver for the updated field.
+func (r *paymentResolver) Updated(ctx context.Context, obj *model.Payment) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Payment is the resolver for the payment field.
@@ -85,3 +76,22 @@ func (r *queryResolver) Payments(ctx context.Context) ([]*model.Payment, error) 
 func (r *Resolver) Payment() PaymentResolver { return &paymentResolver{r} }
 
 type paymentResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *paymentResolver) CreatedAt(ctx context.Context, obj *model.Payment) (string, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
+func (r *paymentResolver) UpdatedAt(ctx context.Context, obj *model.Payment) (string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+}
+func (r *paymentResolver) CreatedBy(ctx context.Context, obj *model.Payment) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+func (r *paymentResolver) UpdatedBy(ctx context.Context, obj *model.Payment) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}

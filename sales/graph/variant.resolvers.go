@@ -13,7 +13,6 @@ import (
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/internal/utils"
 	"github.com/dailytravel/x/sales/pkg/auth"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,10 +20,10 @@ import (
 
 // CreateVariant is the resolver for the createVariant field.
 func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVariant) (*model.Variant, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	item := &model.Variant{
 		Locale: input.Locale,
@@ -32,9 +31,7 @@ func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVar
 			input.Locale: input.Description,
 		},
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
@@ -42,7 +39,7 @@ func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVar
 	utils.Date(&input.End, &item.End)
 
 	// Set the fields from the input
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -52,10 +49,10 @@ func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVar
 
 // UpdateVariant is the resolver for the updateVariant field.
 func (r *mutationResolver) UpdateVariant(ctx context.Context, id string, input model.UpdateVariant) (*model.Variant, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -84,9 +81,6 @@ func (r *mutationResolver) UpdateVariant(ctx context.Context, id string, input m
 			item.Metadata[k] = v
 		}
 	}
-
-	// Update the updated_by and updated_at fields
-	item.UpdatedBy = uid
 
 	// Perform the update in the database
 	res, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item)
@@ -123,7 +117,7 @@ func (r *mutationResolver) DeleteVariant(ctx context.Context, id string) (map[st
 		"$set": bson.M{
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -161,7 +155,7 @@ func (r *mutationResolver) DeleteVariants(ctx context.Context, ids []string) (ma
 		"$set": bson.M{
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -198,7 +192,7 @@ func (r *queryResolver) Variant(ctx context.Context, id string) (*model.Variant,
 func (r *queryResolver) Variants(ctx context.Context, args map[string]interface{}) (*model.Variants, error) {
 	var items []*model.Variant
 	//find all items
-	cur, err := r.db.Collection("variants").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("variants").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +206,7 @@ func (r *queryResolver) Variants(ctx context.Context, args map[string]interface{
 	}
 
 	//get total count
-	count, err := r.db.Collection("variants").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("variants").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -277,32 +271,14 @@ func (r *variantResolver) End(ctx context.Context, obj *model.Variant) (string, 
 	panic(fmt.Errorf("not implemented: End - end"))
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *variantResolver) CreatedAt(ctx context.Context, obj *model.Variant) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *variantResolver) Created(ctx context.Context, obj *model.Variant) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *variantResolver) UpdatedAt(ctx context.Context, obj *model.Variant) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *variantResolver) CreatedBy(ctx context.Context, obj *model.Variant) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *variantResolver) UpdatedBy(ctx context.Context, obj *model.Variant) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *variantResolver) Updated(ctx context.Context, obj *model.Variant) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Package is the resolver for the package field.

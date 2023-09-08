@@ -12,7 +12,6 @@ import (
 
 	"github.com/dailytravel/x/hrm/graph/model"
 	"github.com/dailytravel/x/hrm/internal/utils"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,19 +20,12 @@ import (
 
 // CreatePayroll is the resolver for the createPayroll field.
 func (r *mutationResolver) CreatePayroll(ctx context.Context, input model.NewPayroll) (*model.Payroll, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	item := &model.Payroll{
 		Amount:   input.Amount,
 		Currency: input.Currency,
 		Status:   input.Status,
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
@@ -64,11 +56,6 @@ func (r *mutationResolver) CreatePayroll(ctx context.Context, input model.NewPay
 
 // UpdatePayroll is the resolver for the updatePayroll field.
 func (r *mutationResolver) UpdatePayroll(ctx context.Context, id string, input model.UpdatePayroll) (*model.Payroll, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -109,8 +96,6 @@ func (r *mutationResolver) UpdatePayroll(ctx context.Context, id string, input m
 
 		item.Date = primitive.NewDateTimeFromTime(payDate)
 	}
-
-	item.UpdatedBy = uid
 
 	if err := r.db.Collection(item.Collection()).FindOneAndUpdate(ctx, filter, item).Decode(item); err != nil {
 		return nil, err
@@ -228,37 +213,19 @@ func (r *payrollResolver) Metadata(ctx context.Context, obj *model.Payroll) (map
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *payrollResolver) CreatedAt(ctx context.Context, obj *model.Payroll) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *payrollResolver) Created(ctx context.Context, obj *model.Payroll) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *payrollResolver) UpdatedAt(ctx context.Context, obj *model.Payroll) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *payrollResolver) Updated(ctx context.Context, obj *model.Payroll) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
 func (r *payrollResolver) UID(ctx context.Context, obj *model.Payroll) (string, error) {
 	return obj.UID.Hex(), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *payrollResolver) CreatedBy(ctx context.Context, obj *model.Payroll) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *payrollResolver) UpdatedBy(ctx context.Context, obj *model.Payroll) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
 }
 
 // Payroll is the resolver for the payroll field.
@@ -285,7 +252,7 @@ func (r *queryResolver) Payroll(ctx context.Context, id string) (*model.Payroll,
 func (r *queryResolver) Payrolls(ctx context.Context, args map[string]interface{}) (*model.Payrolls, error) {
 	var items []*model.Payroll
 	//find all items
-	cur, err := r.db.Collection("payrolls").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("payrolls").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -299,7 +266,7 @@ func (r *queryResolver) Payrolls(ctx context.Context, args map[string]interface{
 	}
 
 	//get total count
-	count, err := r.db.Collection("payrolls").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("payrolls").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -12,7 +12,6 @@ import (
 	"github.com/dailytravel/x/cms/graph/model"
 	"github.com/dailytravel/x/cms/internal/utils"
 	"github.com/dailytravel/x/cms/pkg/auth"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -72,37 +71,19 @@ func (r *contentResolver) Metadata(ctx context.Context, obj *model.Content) (map
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *contentResolver) CreatedAt(ctx context.Context, obj *model.Content) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// UpdatedAt is the resolver for the updated_at field.
-func (r *contentResolver) UpdatedAt(ctx context.Context, obj *model.Content) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
 // UID is the resolver for the uid field.
 func (r *contentResolver) UID(ctx context.Context, obj *model.Content) (string, error) {
 	return obj.ID.Hex(), nil
 }
 
-// CreatedBy is the resolver for the created_by field.
-func (r *contentResolver) CreatedBy(ctx context.Context, obj *model.Content) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
+// Created is the resolver for the created field.
+func (r *contentResolver) Created(ctx context.Context, obj *model.Content) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedBy is the resolver for the updated_by field.
-func (r *contentResolver) UpdatedBy(ctx context.Context, obj *model.Content) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *contentResolver) Updated(ctx context.Context, obj *model.Content) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Terms is the resolver for the terms field.
@@ -163,9 +144,7 @@ func (r *mutationResolver) CreateContent(ctx context.Context, input model.NewCon
 		Summary:     map[string]interface{}{input.Locale: input.Summary},
 		Body:        map[string]interface{}{input.Locale: input.Body},
 		Model: model.Model{
-			Metadata:  input.Metadata,
-			CreatedBy: uid,
-			UpdatedBy: uid,
+			Metadata: input.Metadata,
 		},
 	}
 
@@ -189,11 +168,6 @@ func (r *mutationResolver) CreateContent(ctx context.Context, input model.NewCon
 
 // UpdateContent is the resolver for the updateContent field.
 func (r *mutationResolver) UpdateContent(ctx context.Context, id string, input model.UpdateContent) (*model.Content, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -228,8 +202,6 @@ func (r *mutationResolver) UpdateContent(ctx context.Context, id string, input m
 	if input.Metadata != nil {
 		item.Metadata = input.Metadata
 	}
-
-	item.UpdatedBy = uid
 
 	// Perform the update in the database
 	update := bson.M{

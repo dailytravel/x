@@ -9,23 +9,23 @@ import (
 )
 
 type Invitation struct {
-	Model     `bson:",inline"`
-	UID       primitive.ObjectID  `json:"uid" bson:"uid"`
-	Email     string              `json:"email" bson:"email"`
-	Roles     []*string           `json:"roles,omitempty" bson:"roles,omitempty"`
-	Status    string              `json:"status" bson:"status"`
-	ExpiresAt primitive.Timestamp `json:"expiresAt" bson:"expires_at"`
-	Metadata  primitive.M         `json:"metadata,omitempty"`
+	Model    `bson:",inline"`
+	UID      primitive.ObjectID  `json:"uid" bson:"uid"`
+	Email    string              `json:"email" bson:"email"`
+	Roles    []*string           `json:"roles,omitempty" bson:"roles,omitempty"`
+	Status   string              `json:"status" bson:"status"`
+	Expires  primitive.Timestamp `json:"expiresAt" bson:"expires"`
+	Metadata primitive.M         `json:"metadata,omitempty"`
 }
 
 func (i *Invitation) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	if i.CreatedAt.IsZero() {
-		i.CreatedAt = now
+	if i.Created.IsZero() {
+		i.Created = now
 	}
 
-	i.UpdatedAt = now
+	i.Updated = now
 
 	type t Invitation
 	return bson.Marshal((*t)(i))
@@ -40,8 +40,8 @@ func (i *Invitation) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "uid", Value: 1}}},
 		{Keys: bson.D{{Key: "email", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
-		{Keys: bson.D{{Key: "expires_at", Value: 1}}},
-		{Keys: bson.D{{Key: "created_at", Value: 1}}},
-		{Keys: bson.D{{Key: "updated_at", Value: 1}}},
+		{Keys: bson.D{{Key: "expires", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
 	}
 }

@@ -12,6 +12,7 @@ func AutoMigrate() error {
 		&Board{Database: database.Database},
 		&List{Database: database.Database},
 		&Task{Database: database.Database},
+		&Phase{Database: database.Database},
 		&Portfolio{Database: database.Database},
 	}
 

@@ -137,14 +137,14 @@ func (r *optionResolver) ID(ctx context.Context, obj *model.Option) (string, err
 	return obj.ID.Hex(), nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *optionResolver) CreatedAt(ctx context.Context, obj *model.Option) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *optionResolver) Created(ctx context.Context, obj *model.Option) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *optionResolver) UpdatedAt(ctx context.Context, obj *model.Option) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
+// Updated is the resolver for the updated field.
+func (r *optionResolver) Updated(ctx context.Context, obj *model.Option) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Option is the resolver for the option field.
@@ -169,28 +169,35 @@ func (r *queryResolver) Option(ctx context.Context, name string) (*model.Option,
 }
 
 // Options is the resolver for the options field.
-func (r *queryResolver) Options(ctx context.Context, args map[string]interface{}) (*model.Options, error) {
+func (r *queryResolver) Options(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Options, error) {
 	var items []*model.Option
 
-	opts := utils.Options(args)
-	opts.SetSort(bson.M{"created_at": -1})
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
 
-	//find all items
-	cur, err := r.db.Collection("options").Find(ctx, utils.Query(args), opts)
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("options").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Option
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
 	}
 
 	//get total count
-	count, err := r.db.Collection("options").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("options").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}

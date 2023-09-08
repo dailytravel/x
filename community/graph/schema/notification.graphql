@@ -3,11 +3,11 @@ type Notification {
   uid: ID!
   type: String!
   locale: String!
-  readAt: String
-  createdAt: String!
-  updatedAt: String!
+  read: String
   notifiable: Map!
   metadata: Map
+  created: String!
+  updated: String!
 }
 
 type Notifications {

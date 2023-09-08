@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/marketing/graph/model"
 )
@@ -26,29 +27,19 @@ func (r *campaignResolver) Metadata(ctx context.Context, obj *model.Campaign) (m
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *campaignResolver) CreatedAt(ctx context.Context, obj *model.Campaign) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+// Created is the resolver for the created field.
+func (r *campaignResolver) Created(ctx context.Context, obj *model.Campaign) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *campaignResolver) UpdatedAt(ctx context.Context, obj *model.Campaign) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedAt - updated_at"))
+// Updated is the resolver for the updated field.
+func (r *campaignResolver) Updated(ctx context.Context, obj *model.Campaign) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // UID is the resolver for the uid field.
 func (r *campaignResolver) UID(ctx context.Context, obj *model.Campaign) (string, error) {
 	return obj.ID.Hex(), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *campaignResolver) CreatedBy(ctx context.Context, obj *model.Campaign) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *campaignResolver) UpdatedBy(ctx context.Context, obj *model.Campaign) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
 }
 
 // CreateCampaign is the resolver for the createCampaign field.
@@ -85,3 +76,16 @@ func (r *queryResolver) Campaign(ctx context.Context, id string) (*model.Campaig
 func (r *Resolver) Campaign() CampaignResolver { return &campaignResolver{r} }
 
 type campaignResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *campaignResolver) CreatedBy(ctx context.Context, obj *model.Campaign) (*string, error) {
+	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
+}
+func (r *campaignResolver) UpdatedBy(ctx context.Context, obj *model.Campaign) (*string, error) {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
+}

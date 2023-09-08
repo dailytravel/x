@@ -13,7 +13,6 @@ import (
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/internal/utils"
 	"github.com/dailytravel/x/sales/pkg/auth"
-	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,24 +20,22 @@ import (
 
 // CreatePromotion is the resolver for the createPromotion field.
 func (r *mutationResolver) CreatePromotion(ctx context.Context, input model.NewPromotion) (*model.Promotion, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	item := &model.Promotion{
 		Locale:      input.Locale,
 		Name:        bson.M{input.Locale: input.Name},
 		Description: bson.M{input.Locale: input.Description},
 		Model: model.Model{
-			CreatedBy: uid,
-			UpdatedBy: uid,
-			Metadata:  input.Metadata,
+			Metadata: input.Metadata,
 		},
 	}
 
 	// Set the fields from the input
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -48,10 +45,10 @@ func (r *mutationResolver) CreatePromotion(ctx context.Context, input model.NewP
 
 // UpdatePromotion is the resolver for the updatePromotion field.
 func (r *mutationResolver) UpdatePromotion(ctx context.Context, id string, input model.UpdatePromotion) (*model.Promotion, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// uid, err := utils.UID(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Convert the ID string to ObjectID
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -80,9 +77,6 @@ func (r *mutationResolver) UpdatePromotion(ctx context.Context, id string, input
 			item.Metadata[k] = v
 		}
 	}
-
-	// Update the updated_by and updated_at fields
-	item.UpdatedBy = uid
 
 	// Perform the update in the database
 	res, err := r.db.Collection(item.Collection()).UpdateOne(ctx, filter, item)
@@ -117,11 +111,11 @@ func (r *mutationResolver) DeletePromotion(ctx context.Context, id string) (*mod
 	// Define the update to mark the record as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 			"deleted_by": uid,
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -158,11 +152,11 @@ func (r *mutationResolver) DeletePromotions(ctx context.Context, ids []string) (
 	// Define the update to mark records as deleted
 	update := bson.M{
 		"$set": bson.M{
-			"deleted_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 			"deleted_by": uid,
 			"status":     "deleted",
 			"updated_by": uid,
-			"updated_at": primitive.Timestamp{T: uint32(time.Now().Unix())},
+			"updated":    primitive.Timestamp{T: uint32(time.Now().Unix())},
 		},
 	}
 
@@ -221,32 +215,14 @@ func (r *promotionResolver) Metadata(ctx context.Context, obj *model.Promotion) 
 	return obj.Metadata, nil
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *promotionResolver) CreatedAt(ctx context.Context, obj *model.Promotion) (string, error) {
-	return time.Unix(int64(obj.CreatedAt.T), 0).Format(time.RFC3339), nil
+// Created is the resolver for the created field.
+func (r *promotionResolver) Created(ctx context.Context, obj *model.Promotion) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
-// UpdatedAt is the resolver for the updated_at field.
-func (r *promotionResolver) UpdatedAt(ctx context.Context, obj *model.Promotion) (string, error) {
-	return time.Unix(int64(obj.UpdatedAt.T), 0).Format(time.RFC3339), nil
-}
-
-// CreatedBy is the resolver for the created_by field.
-func (r *promotionResolver) CreatedBy(ctx context.Context, obj *model.Promotion) (*string, error) {
-	if obj.CreatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.CreatedBy.Hex()), nil
-}
-
-// UpdatedBy is the resolver for the updated_by field.
-func (r *promotionResolver) UpdatedBy(ctx context.Context, obj *model.Promotion) (*string, error) {
-	if obj.UpdatedBy == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.UpdatedBy.Hex()), nil
+// Updated is the resolver for the updated field.
+func (r *promotionResolver) Updated(ctx context.Context, obj *model.Promotion) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Promotion is the resolver for the promotion field.
@@ -273,7 +249,7 @@ func (r *queryResolver) Promotion(ctx context.Context, id string) (*model.Promot
 func (r *queryResolver) Promotions(ctx context.Context, args map[string]interface{}) (*model.Promotions, error) {
 	var items []*model.Promotion
 	//find all items
-	cur, err := r.db.Collection("promotions").Find(ctx, utils.Query(args), utils.Options(args))
+	cur, err := r.db.Collection("promotions").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +263,7 @@ func (r *queryResolver) Promotions(ctx context.Context, args map[string]interfac
 	}
 
 	//get total count
-	count, err := r.db.Collection("promotions").CountDocuments(ctx, utils.Query(args), nil)
+	count, err := r.db.Collection("promotions").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

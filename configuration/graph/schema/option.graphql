@@ -2,8 +2,8 @@ type Option {
   id: ID!
   name: String!
   data: String!
-  createdAt: String!
-  updatedAt: String!
+  created: String!
+  updated: String!
 }
 
 type Options {
@@ -23,7 +23,14 @@ input UpdateOption {
 
 extend type Query {
   option(name: String!): Option @auth
-  options(args: Map): Options @auth
+  options(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Options @auth
 }
 
 extend type Mutation {
