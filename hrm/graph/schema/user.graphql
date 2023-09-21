@@ -1,8 +1,6 @@
 extend type User @key(fields: "id") {
   id: ID! @external
   resume: Resume
-  salaries: [Salary]
-  payrolls: [Payroll]
   leaves: [Leave]
   attendances: [Attendance]
 }

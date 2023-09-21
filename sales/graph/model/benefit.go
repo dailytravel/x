@@ -11,6 +11,7 @@ import (
 type Benefit struct {
 	Model       `bson:",inline"`
 	Locale      string      `json:"locale" bson:"locale"`
+	Name        primitive.M `json:"name" bson:"name"`
 	Description primitive.M `json:"description" bson:"description"`
 	Status      string      `json:"status" bson:"status"`
 }

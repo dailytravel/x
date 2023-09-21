@@ -1,0 +1,4 @@
+extend type Post @key(fields: "id") {
+  id: ID! @external
+  comments: [Comment]
+}

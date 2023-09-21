@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/community/graph/model"
-	"github.com/dailytravel/x/community/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -149,14 +148,9 @@ func (r *shareResolver) UID(ctx context.Context, obj *model.Share) (string, erro
 	return obj.UID.Hex(), nil
 }
 
-// Shareable is the resolver for the shareable field.
-func (r *shareResolver) Shareable(ctx context.Context, obj *model.Share) (map[string]interface{}, error) {
-	results, err := utils.StructToMap(obj.Shareable)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
+// Object is the resolver for the object field.
+func (r *shareResolver) Object(ctx context.Context, obj *model.Share) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Object - object"))
 }
 
 // Metadata is the resolver for the metadata field.

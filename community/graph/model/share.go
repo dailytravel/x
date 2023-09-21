@@ -12,16 +12,16 @@ import (
 type Share struct {
 	Model      `bson:",inline"`
 	UID        primitive.ObjectID `bson:"uid" json:"uid"`
-	Shareable  Shareable          `json:"shareable" bson:"shareable"`
+	Object     Object             `json:"object" bson:"object"`
 	Permission string             `json:"permission" bson:"permission"`
 	Status     string             `json:"status" bson:"status"`
 }
 
 func (Share) IsEntity() {}
 
-type Shareable struct {
-	ID   primitive.ObjectID `json:"id" bson:"_id"`
-	Type string             `json:"type" bson:"type"`
+type Object struct {
+	ID         primitive.ObjectID `json:"id" bson:"_id"`
+	Collection string             `json:"collection" bson:"collection"`
 }
 
 func (i *Share) MarshalBSON() ([]byte, error) {
@@ -43,10 +43,8 @@ func (i *Share) Collection() string {
 
 func (i *Share) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "uid", Value: 1}, {Key: "shareable._id", Value: 1}, {Key: "shareable.type", Value: 1}}, Options: options.Index().SetUnique(true)},
-		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_by", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_by", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}, {Key: "object._id", Value: 1}, {Key: "object.collection", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
 	}
 }

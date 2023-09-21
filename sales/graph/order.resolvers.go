@@ -26,7 +26,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.NewOrder
 
 	item := &model.Order{
 		UID:         *uid,
-		Reference:   utils.String(8),
+		Code:        utils.String(8),
 		Cancellable: &input.Cancellable,
 		Status:      input.Status,
 		Model: model.Model{

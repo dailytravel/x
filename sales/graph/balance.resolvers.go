@@ -26,11 +26,6 @@ func (r *balanceResolver) Metadata(ctx context.Context, obj *model.Balance) (map
 	return obj.Metadata, nil
 }
 
-// Expires is the resolver for the expires field.
-func (r *balanceResolver) Expires(ctx context.Context, obj *model.Balance) (*string, error) {
-	panic(fmt.Errorf("not implemented: Expires - expires"))
-}
-
 // Created is the resolver for the created field.
 func (r *balanceResolver) Created(ctx context.Context, obj *model.Balance) (string, error) {
 	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
@@ -250,3 +245,13 @@ func (r *queryResolver) Balances(ctx context.Context, filter map[string]interfac
 func (r *Resolver) Balance() BalanceResolver { return &balanceResolver{r} }
 
 type balanceResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *balanceResolver) Expires(ctx context.Context, obj *model.Balance) (*string, error) {
+	panic(fmt.Errorf("not implemented: Expires - expires"))
+}

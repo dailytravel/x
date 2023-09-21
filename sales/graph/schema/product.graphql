@@ -1,0 +1,96 @@
+type Product @key(fields: "id") {
+  id: ID!
+  uid: ID!
+  locale: String!
+  type: String!
+  name: String!
+  description: String!
+  notes: String!
+  tips: String!
+  highlights: String!
+  expectation: String!
+  faqs: String!
+  reviews: Int!
+  rating: Float!
+  booked: Int!
+  reviewable: Boolean!
+  price: Float!
+  discount: Float!
+  currency: String!
+  metadata: Map
+  status: String!
+  created: String!
+  updated: String!
+  location: ID!
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  ARCHIVED
+}
+
+type Products {
+  total: Int!
+  data: [Product]
+}
+
+input NewProduct {
+  uid: ID!
+  locale: String!
+  type: String!
+  name: String!
+  description: String!
+  notes: String!
+  images: [Map!]!
+  tips: String!
+  highlights: String!
+  expectation: String!
+  faqs: String!
+  reviews: Int!
+  rating: Float!
+  booked: Int!
+  reviewable: Boolean!
+  price: Float!
+  discount: Float!
+  currency: String!
+  metadata: Map
+  status: String!
+  location: ID!
+}
+
+input UpdateProduct {
+  uid: ID
+  locale: String
+  type: String
+  name: String
+  description: String
+  notes: String
+  images: [Map!]
+  tips: String
+  highlights: String
+  expectation: String
+  faqs: String
+  reviews: Int
+  rating: Float
+  booked: Int
+  price: Float
+  discount: Float
+  currency: String
+  reviewable: Boolean
+  metadata: Map
+  status: String
+  location: ID
+}
+
+extend type Query {
+  product(id: ID!): Product
+  products(args: Map): Products
+}
+
+extend type Mutation {
+  createProduct(input: NewProduct!): Product @auth
+  updateProduct(id: ID!, input: UpdateProduct!): Product @auth
+  deleteProduct(id: ID!): Boolean @auth
+}

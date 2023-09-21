@@ -37,7 +37,7 @@ func (i *Leave) Collection() string {
 
 func (i *Leave) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "uid", Value: 1}}},
+		{Keys: bson.D{{Key: "employee", Value: 1}}},
 		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "start", Value: 1}}},

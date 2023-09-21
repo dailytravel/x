@@ -1,0 +1,72 @@
+type Transaction {
+  id: ID!
+  type: String! #e.g., "purchase," "refund," "payment," etc.
+  status: String! #e.g., "completed," "pending," "failed," etc.
+  amount: Float!
+  currency: String!
+  metadata: Map #e.g., {"order_id": "1234", "shipping_id": "5678"}
+  date: String!
+  description: String!
+  created: String!
+  updated: String!
+  card: Card
+  uid: ID!
+  wallet: Wallet!
+}
+
+enum TransactionMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  STRIPE
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+type Transactions {
+  data: [Transaction]
+  count: Int!
+}
+
+input NewTransaction {
+  type: String! #e.g., "purchase," "refund," "payment," etc.
+  status: String! #e.g., "completed," "pending," "failed," etc.
+  amount: Float!
+  currency: String!
+  metadata: Map #e.g., {"order_id": "1234", "shipping_id": "5678"}
+  date: String!
+  description: String!
+  card: ID!
+  uid: ID!
+  wallet: ID!
+}
+
+input UpdateTransaction {
+  description: String
+  status: String #e.g., "completed," "pending," "failed," etc.
+  metadata: Map #e.g., {"order_id": "1234", "shipping_id": "5678"}
+}
+
+extend type Query {
+  transactions(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Transactions @auth
+  transaction(id: ID!): Transaction @auth
+}
+
+extend type Mutation {
+  createTransaction(input: NewTransaction): Transaction! @auth
+  updateTransaction(id: ID!, input: UpdateTransaction): Transaction! @auth
+  deleteTransaction(id: ID!): Map @auth
+  deleteTransactions(ids: [ID!]!): Map @auth
+}

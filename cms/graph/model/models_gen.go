@@ -8,30 +8,9 @@ import (
 	"strconv"
 )
 
-type Contents struct {
-	Count int        `json:"count"`
-	Data  []*Content `json:"data,omitempty"`
-}
-
 type Files struct {
 	Count int     `json:"count"`
 	Data  []*File `json:"data,omitempty"`
-}
-
-type NewContent struct {
-	Parent      *string                `json:"parent,omitempty"`
-	User        *string                `json:"user,omitempty"`
-	Locale      string                 `json:"locale"`
-	Type        string                 `json:"type"`
-	Title       *string                `json:"title,omitempty"`
-	Summary     *string                `json:"summary,omitempty"`
-	Body        *string                `json:"body,omitempty"`
-	Slug        *string                `json:"slug,omitempty"`
-	Categories  []string               `json:"categories,omitempty"`
-	Images      []*string              `json:"images,omitempty"`
-	Status      *string                `json:"status,omitempty"`
-	Commentable *bool                  `json:"commentable,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewFile struct {
@@ -48,6 +27,22 @@ type NewFile struct {
 	Categories  []string               `json:"categories,omitempty"`
 }
 
+type NewPost struct {
+	Parent      *string                `json:"parent,omitempty"`
+	User        *string                `json:"user,omitempty"`
+	Locale      string                 `json:"locale"`
+	Type        string                 `json:"type"`
+	Title       *string                `json:"title,omitempty"`
+	Summary     *string                `json:"summary,omitempty"`
+	Body        *string                `json:"body,omitempty"`
+	Slug        *string                `json:"slug,omitempty"`
+	Categories  []string               `json:"categories,omitempty"`
+	Images      []*string              `json:"images,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Commentable *bool                  `json:"commentable,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type NewTerm struct {
 	Locale      string                 `json:"locale"`
 	Name        string                 `json:"name"`
@@ -59,12 +54,27 @@ type NewTerm struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
+type Posts struct {
+	Count int     `json:"count"`
+	Data  []*Post `json:"data,omitempty"`
+}
+
 type Terms struct {
 	Count int     `json:"count"`
 	Data  []*Term `json:"data,omitempty"`
 }
 
-type UpdateContent struct {
+type UpdateFile struct {
+	Locale      string                 `json:"locale"`
+	Name        *string                `json:"name,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Starred     *bool                  `json:"starred,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Categories  []string               `json:"categories,omitempty"`
+}
+
+type UpdatePost struct {
 	Parent      *string                `json:"parent,omitempty"`
 	User        *string                `json:"user,omitempty"`
 	Locale      string                 `json:"locale"`
@@ -80,16 +90,6 @@ type UpdateContent struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type UpdateFile struct {
-	Locale      string                 `json:"locale"`
-	Name        *string                `json:"name,omitempty"`
-	Description *string                `json:"description,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Starred     *bool                  `json:"starred,omitempty"`
-	Status      *string                `json:"status,omitempty"`
-	Categories  []string               `json:"categories,omitempty"`
-}
-
 type UpdateTerm struct {
 	ID          *string                `json:"id,omitempty"`
 	Locale      string                 `json:"locale"`
@@ -102,94 +102,94 @@ type UpdateTerm struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type ContentStatus string
+type PostStatus string
 
 const (
-	ContentStatusDraft     ContentStatus = "DRAFT"
-	ContentStatusPublished ContentStatus = "PUBLISHED"
-	ContentStatusArchived  ContentStatus = "ARCHIVED"
+	PostStatusDraft     PostStatus = "DRAFT"
+	PostStatusPublished PostStatus = "PUBLISHED"
+	PostStatusArchived  PostStatus = "ARCHIVED"
 )
 
-var AllContentStatus = []ContentStatus{
-	ContentStatusDraft,
-	ContentStatusPublished,
-	ContentStatusArchived,
+var AllPostStatus = []PostStatus{
+	PostStatusDraft,
+	PostStatusPublished,
+	PostStatusArchived,
 }
 
-func (e ContentStatus) IsValid() bool {
+func (e PostStatus) IsValid() bool {
 	switch e {
-	case ContentStatusDraft, ContentStatusPublished, ContentStatusArchived:
+	case PostStatusDraft, PostStatusPublished, PostStatusArchived:
 		return true
 	}
 	return false
 }
 
-func (e ContentStatus) String() string {
+func (e PostStatus) String() string {
 	return string(e)
 }
 
-func (e *ContentStatus) UnmarshalGQL(v interface{}) error {
+func (e *PostStatus) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
 	}
 
-	*e = ContentStatus(str)
+	*e = PostStatus(str)
 	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid ContentStatus", str)
+		return fmt.Errorf("%s is not a valid PostStatus", str)
 	}
 	return nil
 }
 
-func (e ContentStatus) MarshalGQL(w io.Writer) {
+func (e PostStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type ContentType string
+type PostType string
 
 const (
-	ContentTypePost       ContentType = "POST"
-	ContentTypePage       ContentType = "PAGE"
-	ContentTypeProduct    ContentType = "PRODUCT"
-	ContentTypeHotel      ContentType = "HOTEL"
-	ContentTypeRestaurant ContentType = "RESTAURANT"
-	ContentTypePackage    ContentType = "PACKAGE"
+	PostTypePost       PostType = "POST"
+	PostTypePage       PostType = "PAGE"
+	PostTypeProduct    PostType = "PRODUCT"
+	PostTypeHotel      PostType = "HOTEL"
+	PostTypeRestaurant PostType = "RESTAURANT"
+	PostTypePackage    PostType = "PACKAGE"
 )
 
-var AllContentType = []ContentType{
-	ContentTypePost,
-	ContentTypePage,
-	ContentTypeProduct,
-	ContentTypeHotel,
-	ContentTypeRestaurant,
-	ContentTypePackage,
+var AllPostType = []PostType{
+	PostTypePost,
+	PostTypePage,
+	PostTypeProduct,
+	PostTypeHotel,
+	PostTypeRestaurant,
+	PostTypePackage,
 }
 
-func (e ContentType) IsValid() bool {
+func (e PostType) IsValid() bool {
 	switch e {
-	case ContentTypePost, ContentTypePage, ContentTypeProduct, ContentTypeHotel, ContentTypeRestaurant, ContentTypePackage:
+	case PostTypePost, PostTypePage, PostTypeProduct, PostTypeHotel, PostTypeRestaurant, PostTypePackage:
 		return true
 	}
 	return false
 }
 
-func (e ContentType) String() string {
+func (e PostType) String() string {
 	return string(e)
 }
 
-func (e *ContentType) UnmarshalGQL(v interface{}) error {
+func (e *PostType) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
 	}
 
-	*e = ContentType(str)
+	*e = PostType(str)
 	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid ContentType", str)
+		return fmt.Errorf("%s is not a valid PostType", str)
 	}
 	return nil
 }
 
-func (e ContentType) MarshalGQL(w io.Writer) {
+func (e PostType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

@@ -1,0 +1,78 @@
+type Card {
+  id: ID!
+  name: String!
+  number: String! # Caution: Storing the full card number is a security risk.
+  expMonth: Int!
+  expYear: Int!
+  cvv: String! # Caution: Storing the CVV is a security risk and against PCI DSS compliance.
+  last4: String
+  brand: String
+  country: String
+  funding: String! # credit, debit, prepaid, or unknown
+  fingerprint: String!
+  billing: Map
+  metadata: Map
+  status: String!
+  created: String!
+  updated: String!
+  uid: ID!
+  wallet: Wallet
+}
+
+type Cards {
+  count: Int!
+  data: [Card]
+}
+
+type Address {
+  street: String!
+  city: String!
+  state: String!
+  zip: String!
+  country: String!
+}
+
+input NewCardInput {
+  name: String!
+  number: String!
+  expMonth: Int!
+  expYear: Int!
+  cvv: String!
+  billing: Map!
+  metadata: Map
+}
+
+input UpdateCardInput {
+  name: String
+  expMonth: Int
+  expYear: Int
+  cvv: String
+  billing: Map
+  metadata: Map
+}
+
+input AddressInput {
+  street: String!
+  city: String!
+  state: String!
+  zip: String!
+  country: String!
+}
+
+extend type Query {
+  card(id: ID!): Card @auth
+  cards(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Cards @auth
+}
+
+extend type Mutation {
+  createCard(input: NewCardInput!): Card @auth
+  updateCard(id: ID!, input: UpdateCardInput!): Card @auth
+  deleteCard(id: ID!): Card @auth
+}

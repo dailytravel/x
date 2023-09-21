@@ -1,6 +1,6 @@
 type Invoice @key(fields: "id") {
   id: ID!
-  reference: String!
+  code: String!
   template: String!
   amount: Int!
   currency: String!
@@ -22,7 +22,7 @@ type Invoices {
 }
 
 input NewInvoice {
-  reference: String
+  code: String
   template: String
   amount: Int
   currency: String
@@ -33,7 +33,7 @@ input NewInvoice {
 }
 
 input UpdateInvoice {
-  reference: String
+  code: String
   template: String
   amount: Int
   currency: String

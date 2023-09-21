@@ -26,9 +26,9 @@ func (r *activityResolver) UID(ctx context.Context, obj *model.Activity) (string
 	return obj.ID.Hex(), nil
 }
 
-// Target is the resolver for the target field.
-func (r *activityResolver) Target(ctx context.Context, obj *model.Activity) (string, error) {
-	return obj.Target.Hex(), nil
+// Object is the resolver for the object field.
+func (r *activityResolver) Object(ctx context.Context, obj *model.Activity) (string, error) {
+	panic(fmt.Errorf("not implemented: Object - object"))
 }
 
 // Timestamp is the resolver for the timestamp field.

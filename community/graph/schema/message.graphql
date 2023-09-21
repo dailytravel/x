@@ -4,7 +4,7 @@ type Message {
   subject: String!
   body: String!
   status: String!
-
+  timestamp: String!
   recipients: [Recipient!]!
 }
 
@@ -29,16 +29,13 @@ input NewMessage {
   recipients: [ID!]!
   subject: String!
   body: Map!
-  categories: [ID!]
   metadata: Map
 }
 
 input UpdateMessage {
-  conversation: ID
-  recipients: [ID!]
   subject: String
   body: Map
-  categories: [ID!]
+  status: String
   metadata: Map
 }
 

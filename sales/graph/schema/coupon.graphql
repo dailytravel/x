@@ -6,26 +6,25 @@ type Coupon {
   type: String!
   amount: Float!
   maxDiscount: Float
-  currency: String!
-  start: String!
-  end: String!
-  maxUses: Int
   minPurchase: Float
+  currency: String!
+  expiration: String
+  maxUses: Int
   uses: Int
   metadata: Map
   created: String!
   updated: String!
-  uid: ID!
+  uid: ID
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FLAT_RATE
 }
 
 type Coupons {
   data: [Coupon]
   count: Int!
-}
-
-enum DiscountType {
-  PERCENTAGE_OFF
-  FIXED_AMOUNT_OFF
 }
 
 input NewCoupon {
@@ -36,8 +35,7 @@ input NewCoupon {
   amount: Float!
   maxDiscount: Float
   currency: String!
-  start: String!
-  end: String!
+  expiration: String
   products: [ID!]
   maxUses: Int
   minPurchase: Float
@@ -53,8 +51,7 @@ input UpdateCoupon {
   amount: Float
   maxDiscount: Float
   currency: String
-  start: String
-  end: String
+  expiration: String
   products: [ID!]
   maxUses: Int
   minPurchase: Float

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -14,12 +15,15 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/dailytravel/x/configuration/config"
 	"github.com/dailytravel/x/configuration/graph"
+	"github.com/dailytravel/x/configuration/internal/controllers"
 	"github.com/dailytravel/x/configuration/pkg/auth"
 	"github.com/dailytravel/x/configuration/pkg/database"
 	"github.com/dailytravel/x/configuration/pkg/database/migrations"
+	"github.com/dailytravel/x/configuration/scheduler"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func init() {
@@ -72,6 +76,7 @@ func graphqlHandler() gin.HandlerFunc {
 }
 
 func main() {
+	var waitGroup sync.WaitGroup
 	// connect MongoDB
 	client, err := database.ConnectDB()
 	if err != nil {
@@ -91,6 +96,23 @@ func main() {
 	if err := migrations.AutoMigrate(); err != nil {
 		log.Fatal("Error running migrations: ", err)
 	}
+
+	database.Client.Collection("places").Delete()
+
+	// need restart the server if drop or create a new collection in mongodb, else will not work
+	for _, name := range []string{
+		"places",
+	} {
+		stream, err := database.Database.Collection(name).Watch(context.Background(), mongo.Pipeline{})
+		if err != nil {
+			panic(err)
+		}
+		waitGroup.Add(1)
+		go controllers.IndexStream(&waitGroup, stream, name)
+	}
+
+	// start scheduler jobs
+	scheduler.SyncPlacesJob()
 
 	// setting up Gin
 	r := gin.New()
@@ -120,4 +142,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Error starting server: ", err)
 	}
+
+	waitGroup.Wait()
 }

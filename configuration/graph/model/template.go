@@ -15,6 +15,7 @@ type Template struct {
 	Locale  string      `json:"locale" bson:"locale"`
 	Subject primitive.M `json:"subject" bson:"subject"`
 	Body    primitive.M `json:"body" bson:"body"`
+	Status  string      `json:"status" bson:"status"`
 }
 
 func (i *Template) MarshalBSON() ([]byte, error) {

@@ -2,6 +2,12 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type Activities struct {
 	Data  []*Activity `json:"data,omitempty"`
 	Count int         `json:"count"`
@@ -33,4 +39,51 @@ type UpdateLog struct {
 	Status    *string                `json:"status,omitempty"`
 	ClientIP  *string                `json:"clientIp,omitempty"`
 	UserAgent *string                `json:"userAgent,omitempty"`
+}
+
+type MailStatus string
+
+const (
+	MailStatusSent      MailStatus = "SENT"
+	MailStatusFailed    MailStatus = "FAILED"
+	MailStatusDelivered MailStatus = "DELIVERED"
+	MailStatusOpened    MailStatus = "OPENED"
+	MailStatusClicked   MailStatus = "CLICKED"
+)
+
+var AllMailStatus = []MailStatus{
+	MailStatusSent,
+	MailStatusFailed,
+	MailStatusDelivered,
+	MailStatusOpened,
+	MailStatusClicked,
+}
+
+func (e MailStatus) IsValid() bool {
+	switch e {
+	case MailStatusSent, MailStatusFailed, MailStatusDelivered, MailStatusOpened, MailStatusClicked:
+		return true
+	}
+	return false
+}
+
+func (e MailStatus) String() string {
+	return string(e)
+}
+
+func (e *MailStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = MailStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid MailStatus", str)
+	}
+	return nil
+}
+
+func (e MailStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

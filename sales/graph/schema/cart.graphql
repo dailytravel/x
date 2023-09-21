@@ -1,0 +1,35 @@
+type Cart {
+  id: ID!
+  metadata: Map!
+  status: String!
+  expires: String!
+  created: String!
+  updated: String!
+  uid: ID!
+}
+
+type Carts {
+  data: [Cart]
+  count: Int!
+}
+
+input NewCart {
+  metadata: Map!
+  status: String!
+}
+
+input UpdateCart {
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  cart(id: ID!): Cart
+  carts: Carts
+}
+
+extend type Mutation {
+  createCart(input: NewCart!): Cart @auth
+  updateCart(id: ID!, input: UpdateCart!): Cart @auth
+  deleteCart(id: ID!): Cart @auth
+}

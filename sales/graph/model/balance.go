@@ -14,7 +14,6 @@ type Balance struct {
 	Type    string               `json:"type" bson:"type"`
 	Credits int                  `json:"credits" bson:"credits"`
 	Notes   *string              `json:"notes,omitempty" bson:"notes,omitempty"`
-	Expires *primitive.Timestamp `json:"expires,omitempty" bson:"expires,omitempty"`
 	Status  string               `json:"status" bson:"status"`
 }
 

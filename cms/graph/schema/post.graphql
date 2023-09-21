@@ -1,0 +1,82 @@
+type Post @key(fields: "id") {
+  id: ID!
+  locale: String!
+  type: String! #post, page, template, hotel, restaurant, product, etc.
+  title: String!
+  summary: String!
+  body: String!
+  slug: String!
+  status: String!
+  commentable: Boolean!
+  metadata: Map
+  uid: ID!
+  created: String!
+  updated: String!
+  terms: [Term]
+  parent: Post
+  images: [Image]
+}
+
+enum PostType {
+  POST
+  PAGE
+  PRODUCT
+  HOTEL
+  RESTAURANT
+  PACKAGE
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+type Posts {
+  count: Int!
+  data: [Post]
+}
+
+input NewPost {
+  parent: ID
+  user: ID
+  locale: String!
+  type: String!
+  title: String
+  summary: String
+  body: String
+  slug: String
+  categories: [ID!]
+  images: [String]
+  status: String
+  commentable: Boolean
+  metadata: Map
+}
+
+input UpdatePost {
+  parent: ID
+  user: ID
+  locale: String!
+  type: String
+  title: String
+  summary: String
+  body: String
+  slug: String
+  categories: [ID!]
+  images: [String]
+  status: String
+  commentable: Boolean
+  metadata: Map
+}
+
+extend type Query {
+  post(id: ID!): Post
+  posts(args: Map): Map
+}
+
+extend type Mutation {
+  createPost(input: NewPost!): Post @auth
+  updatePost(id: ID!, input: UpdatePost!): Post @auth
+  deletePost(id: ID!): Map @auth
+  deletePosts(ids: [ID!]!): Map @auth
+}

@@ -129,7 +129,6 @@ func (i *Contact) Document() map[string]interface{} {
 		"country":    i.Country,
 		"email":      i.Email,
 		"phone":      i.Phone,
-		"metadata":   i.Metadata,
 		"status":     i.Status,
 		"created":    time.Unix(int64(i.Created.T), 0).Format(time.RFC3339),
 		"updated":    time.Unix(int64(i.Updated.T), 0).Format(time.RFC3339),

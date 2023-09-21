@@ -12,11 +12,12 @@ import (
 type Order struct {
 	Model       `bson:",inline"`
 	UID         primitive.ObjectID `bson:"uid" json:"uid"`
+	Locale      string             `json:"locale" bson:"locale"`
 	Type        string             `json:"type" bson:"type"`
-	Order       string             `json:"locale" bson:"locale"`
-	Reference   string             `json:"reference" bson:"reference"`
+	Code        string             `json:"code" bson:"code"`
 	Coupon      *string            `json:"coupon,omitempty" bson:"coupon,omitempty"`
 	Cancellable *bool              `json:"cancellable" bson:"cancellable"`
+	Payment     string             `json:"payment" bson:"payment"`
 	Status      string             `json:"status" bson:"status"`
 }
 
@@ -39,8 +40,8 @@ func (i *Order) Collection() string {
 
 func (i *Order) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "reference", Value: 1}}, Options: options.Index().SetUnique(true)},
-		{Keys: bson.D{{Key: "user", Value: 1}}},
+		{Keys: bson.D{{Key: "code", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "uid", Value: 1}}},
 		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "locale", Value: 1}}},
 		{Keys: bson.D{{Key: "coupon", Value: 1}}},
@@ -48,7 +49,6 @@ func (i *Order) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "cancellable", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},
 		{Keys: bson.D{{Key: "updated", Value: 1}}},
-		{Keys: bson.D{{Key: "cancelled", Value: 1}}},
 		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 	}
 }

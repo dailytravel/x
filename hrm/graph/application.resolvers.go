@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/dailytravel/x/hrm/graph/model"
@@ -20,15 +21,9 @@ func (r *applicationResolver) ID(ctx context.Context, obj *model.Application) (s
 	return obj.ID.Hex(), nil
 }
 
-// Job is the resolver for the job field.
-func (r *applicationResolver) Job(ctx context.Context, obj *model.Application) (*model.Job, error) {
-	var item *model.Job
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": obj.Job}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
+// Interview is the resolver for the interview field.
+func (r *applicationResolver) Interview(ctx context.Context, obj *model.Application) (string, error) {
+	panic(fmt.Errorf("not implemented: Interview - interview"))
 }
 
 // Metadata is the resolver for the metadata field.
@@ -48,21 +43,14 @@ func (r *applicationResolver) Updated(ctx context.Context, obj *model.Applicatio
 
 // UID is the resolver for the uid field.
 func (r *applicationResolver) UID(ctx context.Context, obj *model.Application) (string, error) {
-	return obj.UID.Hex(), nil
+	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
 // CreateApplication is the resolver for the createApplication field.
 func (r *mutationResolver) CreateApplication(ctx context.Context, input model.NewApplication) (*model.Application, error) {
-	uid, err := utils.UID(ctx)
-	if err != nil {
-		return nil, err
-	}
+	item := &model.Application{}
 
-	item := &model.Application{
-		UID: *uid,
-	}
-
-	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
+	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
 	if err != nil {
 		return nil, err
 	}

@@ -13,7 +13,7 @@ type Expense struct {
 	Model       `bson:",inline"`
 	User        primitive.ObjectID `json:"user" bson:"user"`
 	Type        string             `json:"type" bson:"type"`
-	Reference   string             `json:"reference" bson:"reference"`
+	Code        string             `json:"code" bson:"code"`
 	Description string             `json:"description,omitempty" bson:"description,omitempty"`
 	Amount      float64            `json:"amount" bson:"amount"`
 	Currency    string             `json:"currency" bson:"currency"`
@@ -41,7 +41,7 @@ func (i *Expense) Collection() string {
 
 func (i *Expense) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "reference", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "code", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "user", Value: 1}}},
 		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},

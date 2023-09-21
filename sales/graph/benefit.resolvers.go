@@ -22,6 +22,11 @@ func (r *benefitResolver) ID(ctx context.Context, obj *model.Benefit) (string, e
 	return obj.ID.Hex(), nil
 }
 
+// Name is the resolver for the name field.
+func (r *benefitResolver) Name(ctx context.Context, obj *model.Benefit) (string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
+}
+
 // Description is the resolver for the description field.
 func (r *benefitResolver) Description(ctx context.Context, obj *model.Benefit) (string, error) {
 	// Get the locale from the context

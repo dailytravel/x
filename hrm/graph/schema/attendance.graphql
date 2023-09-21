@@ -1,5 +1,6 @@
 type Attendance {
   id: ID!
+  date: String!
   timeIn: String!
   timeOut: String
   notes: String

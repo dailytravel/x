@@ -26,7 +26,7 @@ type Invoices struct {
 
 type NewExpense struct {
 	Type        string                 `json:"type"`
-	Reference   *string                `json:"reference,omitempty"`
+	Code        *string                `json:"code,omitempty"`
 	Description string                 `json:"description"`
 	Amount      float64                `json:"amount"`
 	Currency    string                 `json:"currency"`
@@ -39,45 +39,19 @@ type NewExpense struct {
 }
 
 type NewInvoice struct {
-	Reference *string                `json:"reference,omitempty"`
-	Template  *string                `json:"template,omitempty"`
-	Amount    *int                   `json:"amount,omitempty"`
-	Currency  *string                `json:"currency,omitempty"`
-	Billing   map[string]interface{} `json:"billing,omitempty"`
-	DueDate   *string                `json:"due_date,omitempty"`
-	Notes     *string                `json:"notes,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type NewTransaction struct {
-	UID         string                 `json:"uid"`
-	Type        string                 `json:"type"`
-	Status      string                 `json:"status"`
-	Amount      float64                `json:"amount"`
-	Currency    string                 `json:"currency"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Date        string                 `json:"date"`
-	Description string                 `json:"description"`
-}
-
-type PaymentInput struct {
-	Amount   float64                `json:"amount"`
-	Currency string                 `json:"currency"`
-	Date     string                 `json:"date"`
-	Status   string                 `json:"status"`
-	User     string                 `json:"user"`
-	Invoice  string                 `json:"invoice"`
+	Code     *string                `json:"code,omitempty"`
+	Template *string                `json:"template,omitempty"`
+	Amount   *int                   `json:"amount,omitempty"`
+	Currency *string                `json:"currency,omitempty"`
+	Billing  map[string]interface{} `json:"billing,omitempty"`
+	DueDate  *string                `json:"due_date,omitempty"`
+	Notes    *string                `json:"notes,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type Transactions struct {
-	Data  []*Transaction `json:"data,omitempty"`
-	Count int            `json:"count"`
 }
 
 type UpdateExpense struct {
 	Type        *string                `json:"type,omitempty"`
-	Reference   *string                `json:"reference,omitempty"`
+	Code        *string                `json:"code,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
@@ -90,35 +64,14 @@ type UpdateExpense struct {
 }
 
 type UpdateInvoice struct {
-	Reference *string                `json:"reference,omitempty"`
-	Template  *string                `json:"template,omitempty"`
-	Amount    *int                   `json:"amount,omitempty"`
-	Currency  *string                `json:"currency,omitempty"`
-	Billing   map[string]interface{} `json:"billing,omitempty"`
-	DueDate   *string                `json:"due_date,omitempty"`
-	Notes     *string                `json:"notes,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdatePayment struct {
-	Amount   *float64               `json:"amount,omitempty"`
+	Code     *string                `json:"code,omitempty"`
+	Template *string                `json:"template,omitempty"`
+	Amount   *int                   `json:"amount,omitempty"`
 	Currency *string                `json:"currency,omitempty"`
-	Date     *string                `json:"date,omitempty"`
-	Status   *string                `json:"status,omitempty"`
-	User     *string                `json:"user,omitempty"`
-	Invoice  *string                `json:"invoice,omitempty"`
+	Billing  map[string]interface{} `json:"billing,omitempty"`
+	DueDate  *string                `json:"due_date,omitempty"`
+	Notes    *string                `json:"notes,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateTransaction struct {
-	UID         *string                `json:"uid,omitempty"`
-	Type        *string                `json:"type,omitempty"`
-	Status      *string                `json:"status,omitempty"`
-	Amount      *float64               `json:"amount,omitempty"`
-	Currency    *string                `json:"currency,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Date        *string                `json:"date,omitempty"`
-	Description *string                `json:"description,omitempty"`
 }
 
 type ExpenseStatus string
@@ -247,140 +200,5 @@ func (e *Payer) UnmarshalGQL(v interface{}) error {
 }
 
 func (e Payer) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type PaymentStatus string
-
-const (
-	PaymentStatusPending   PaymentStatus = "PENDING"
-	PaymentStatusCompleted PaymentStatus = "COMPLETED"
-	PaymentStatusCancelled PaymentStatus = "CANCELLED"
-	PaymentStatusRefunded  PaymentStatus = "REFUNDED"
-)
-
-var AllPaymentStatus = []PaymentStatus{
-	PaymentStatusPending,
-	PaymentStatusCompleted,
-	PaymentStatusCancelled,
-	PaymentStatusRefunded,
-}
-
-func (e PaymentStatus) IsValid() bool {
-	switch e {
-	case PaymentStatusPending, PaymentStatusCompleted, PaymentStatusCancelled, PaymentStatusRefunded:
-		return true
-	}
-	return false
-}
-
-func (e PaymentStatus) String() string {
-	return string(e)
-}
-
-func (e *PaymentStatus) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = PaymentStatus(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid PaymentStatus", str)
-	}
-	return nil
-}
-
-func (e PaymentStatus) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type TransactionMethod string
-
-const (
-	TransactionMethodCreditCard TransactionMethod = "CREDIT_CARD"
-	TransactionMethodDebitCard  TransactionMethod = "DEBIT_CARD"
-	TransactionMethodPaypal     TransactionMethod = "PAYPAL"
-	TransactionMethodStripe     TransactionMethod = "STRIPE"
-)
-
-var AllTransactionMethod = []TransactionMethod{
-	TransactionMethodCreditCard,
-	TransactionMethodDebitCard,
-	TransactionMethodPaypal,
-	TransactionMethodStripe,
-}
-
-func (e TransactionMethod) IsValid() bool {
-	switch e {
-	case TransactionMethodCreditCard, TransactionMethodDebitCard, TransactionMethodPaypal, TransactionMethodStripe:
-		return true
-	}
-	return false
-}
-
-func (e TransactionMethod) String() string {
-	return string(e)
-}
-
-func (e *TransactionMethod) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = TransactionMethod(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid TransactionMethod", str)
-	}
-	return nil
-}
-
-func (e TransactionMethod) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type TransactionStatus string
-
-const (
-	TransactionStatusPending   TransactionStatus = "PENDING"
-	TransactionStatusCompleted TransactionStatus = "COMPLETED"
-	TransactionStatusFailed    TransactionStatus = "FAILED"
-	TransactionStatusRefunded  TransactionStatus = "REFUNDED"
-)
-
-var AllTransactionStatus = []TransactionStatus{
-	TransactionStatusPending,
-	TransactionStatusCompleted,
-	TransactionStatusFailed,
-	TransactionStatusRefunded,
-}
-
-func (e TransactionStatus) IsValid() bool {
-	switch e {
-	case TransactionStatusPending, TransactionStatusCompleted, TransactionStatusFailed, TransactionStatusRefunded:
-		return true
-	}
-	return false
-}
-
-func (e TransactionStatus) String() string {
-	return string(e)
-}
-
-func (e *TransactionStatus) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = TransactionStatus(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid TransactionStatus", str)
-	}
-	return nil
-}
-
-func (e TransactionStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

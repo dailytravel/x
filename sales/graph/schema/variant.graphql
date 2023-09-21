@@ -5,16 +5,15 @@ type Variant {
   name: String!
   description: String!
   price: Float!
-  discount: Float!
-  quantity: Int!
+  discount: Float
   currency: String!
+  quantity: Int!
   metadata: Map
   start: String!
   end: String!
   status: String!
   created: String!
   updated: String!
-
   package: ID!
 }
 
@@ -29,8 +28,8 @@ input NewVariant {
   name: String!
   description: String!
   price: Float!
+  discount: Float
   currency: String!
-  discount: Float!
   quantity: Int!
   metadata: Map
   start: String!

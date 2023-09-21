@@ -12,9 +12,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// Contents is the resolver for the contents field.
-func (r *userResolver) Contents(ctx context.Context, obj *model.User) ([]*model.Content, error) {
-	var items []*model.Content
+// Posts is the resolver for the posts field.
+func (r *userResolver) Posts(ctx context.Context, obj *model.User) ([]*model.Post, error) {
+	var items []*model.Post
 
 	uid, err := primitive.ObjectIDFromHex(obj.ID)
 	if err != nil {
@@ -23,13 +23,13 @@ func (r *userResolver) Contents(ctx context.Context, obj *model.User) ([]*model.
 
 	filter := bson.M{"uid": uid}
 	//find all items
-	cur, err := r.db.Collection("contents").Find(ctx, filter)
+	cur, err := r.db.Collection("posts").Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
 	for cur.Next(ctx) {
-		var item *model.Content
+		var item *model.Post
 		if err := cur.Decode(&item); err != nil {
 			return nil, err
 		}

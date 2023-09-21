@@ -8,11 +8,6 @@ import (
 	"strconv"
 )
 
-type Countries struct {
-	Data  []*Country `json:"data,omitempty"`
-	Count int        `json:"count"`
-}
-
 type Currencies struct {
 	Data  []*Currency `json:"data,omitempty"`
 	Count int         `json:"count"`
@@ -23,17 +18,14 @@ type Locales struct {
 	Data  []*Locale `json:"data,omitempty"`
 }
 
-type NewCountry struct {
-	Code      string                 `json:"code"`
-	Locale    string                 `json:"locale"`
-	Name      string                 `json:"name"`
-	Native    string                 `json:"native"`
-	Continent string                 `json:"continent"`
-	Currency  *string                `json:"currency,omitempty"`
-	Languages []*string              `json:"languages,omitempty"`
-	Capital   *string                `json:"capital,omitempty"`
-	Flag      *string                `json:"flag,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+type Location struct {
+	Lat *float64 `json:"lat,omitempty"`
+	Lng *float64 `json:"lng,omitempty"`
+}
+
+type LocationInput struct {
+	Lat *float64 `json:"lat,omitempty"`
+	Lng *float64 `json:"lng,omitempty"`
 }
 
 type NewCurrency struct {
@@ -63,6 +55,18 @@ type NewLocale struct {
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
+type NewLocation struct {
+	Parent      *string                  `json:"parent,omitempty"`
+	Locale      string                   `json:"locale"`
+	Type        string                   `json:"type"`
+	Name        string                   `json:"name"`
+	Description *string                  `json:"description,omitempty"`
+	Location    *LocationInput           `json:"location,omitempty"`
+	Images      []map[string]interface{} `json:"images,omitempty"`
+	Status      *string                  `json:"status,omitempty"`
+	Metadata    map[string]interface{}   `json:"metadata,omitempty"`
+}
+
 type NewOption struct {
 	Name string `json:"name"`
 	Data string `json:"data"`
@@ -74,6 +78,7 @@ type NewTemplate struct {
 	Subject  string                 `json:"subject"`
 	Body     string                 `json:"body"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
 }
 
 type NewTimezone struct {
@@ -96,6 +101,11 @@ type Options struct {
 	Count int       `json:"count"`
 }
 
+type Places struct {
+	Data  []*Place `json:"data,omitempty"`
+	Count *int     `json:"count,omitempty"`
+}
+
 type Templates struct {
 	Count int         `json:"count"`
 	Data  []*Template `json:"data,omitempty"`
@@ -104,19 +114,6 @@ type Templates struct {
 type Timezones struct {
 	Count int         `json:"count"`
 	Data  []*Timezone `json:"data,omitempty"`
-}
-
-type UpdateCountry struct {
-	Locale    *string                `json:"locale,omitempty"`
-	Code      *string                `json:"code,omitempty"`
-	Name      *string                `json:"name,omitempty"`
-	Native    *string                `json:"native,omitempty"`
-	Continent *string                `json:"continent,omitempty"`
-	Currency  *string                `json:"currency,omitempty"`
-	Languages []*string              `json:"languages,omitempty"`
-	Capital   *string                `json:"capital,omitempty"`
-	Flag      *string                `json:"flag,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateCurrency struct {
@@ -145,6 +142,18 @@ type UpdateLocale struct {
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
+type UpdateLocation struct {
+	Parent      *string                  `json:"parent,omitempty"`
+	Locale      *string                  `json:"locale,omitempty"`
+	Type        *string                  `json:"type,omitempty"`
+	Name        *string                  `json:"name,omitempty"`
+	Description *string                  `json:"description,omitempty"`
+	Location    *LocationInput           `json:"location,omitempty"`
+	Images      []map[string]interface{} `json:"images,omitempty"`
+	Status      *string                  `json:"status,omitempty"`
+	Metadata    map[string]interface{}   `json:"metadata,omitempty"`
+}
+
 type UpdateOption struct {
 	Name *string `json:"name,omitempty"`
 	Data *string `json:"data,omitempty"`
@@ -156,6 +165,7 @@ type UpdateTemplate struct {
 	Subject  *string                `json:"subject,omitempty"`
 	Body     *string                `json:"body,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
 }
 
 type UpdateTimezone struct {
@@ -238,6 +248,94 @@ func (e *CurrencyStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e CurrencyStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type PlaceStatus string
+
+const (
+	PlaceStatusActive   PlaceStatus = "ACTIVE"
+	PlaceStatusInactive PlaceStatus = "INACTIVE"
+)
+
+var AllPlaceStatus = []PlaceStatus{
+	PlaceStatusActive,
+	PlaceStatusInactive,
+}
+
+func (e PlaceStatus) IsValid() bool {
+	switch e {
+	case PlaceStatusActive, PlaceStatusInactive:
+		return true
+	}
+	return false
+}
+
+func (e PlaceStatus) String() string {
+	return string(e)
+}
+
+func (e *PlaceStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PlaceStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PlaceStatus", str)
+	}
+	return nil
+}
+
+func (e PlaceStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type PlaceType string
+
+const (
+	PlaceTypeCountry  PlaceType = "COUNTRY"
+	PlaceTypeState    PlaceType = "STATE"
+	PlaceTypeCity     PlaceType = "CITY"
+	PlaceTypeDistrict PlaceType = "DISTRICT"
+	PlaceTypeStreet   PlaceType = "STREET"
+)
+
+var AllPlaceType = []PlaceType{
+	PlaceTypeCountry,
+	PlaceTypeState,
+	PlaceTypeCity,
+	PlaceTypeDistrict,
+	PlaceTypeStreet,
+}
+
+func (e PlaceType) IsValid() bool {
+	switch e {
+	case PlaceTypeCountry, PlaceTypeState, PlaceTypeCity, PlaceTypeDistrict, PlaceTypeStreet:
+		return true
+	}
+	return false
+}
+
+func (e PlaceType) String() string {
+	return string(e)
+}
+
+func (e *PlaceType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PlaceType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PlaceType", str)
+	}
+	return nil
+}
+
+func (e PlaceType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

@@ -6,11 +6,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Job struct {
 	Model        `bson:",inline"`
+	Code         string      `json:"code" bson:"code"`
 	Locale       string      `json:"locale" bson:"locale"`
 	Type         string      `json:"type" bson:"type"`
 	Location     string      `json:"location" bson:"location"`
@@ -41,11 +41,11 @@ func (i *Job) Collection() string {
 
 func (i *Job) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "locale", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "deleted", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "locale", Value: 1}}},
+		{Keys: bson.D{{Key: "type", Value: 1}}},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 	}
 }

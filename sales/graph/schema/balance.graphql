@@ -5,7 +5,6 @@ type Balance {
   notes: String
   metadata: Map
   status: String!
-  expires: String
   created: String!
   updated: String!
   uid: ID!

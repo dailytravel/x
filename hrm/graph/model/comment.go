@@ -6,7 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Comment struct {
@@ -47,11 +46,11 @@ func (i *Comment) Collection() string {
 
 func (i *Comment) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "object._id", Value: 1}, {Key: "object.type", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "parent", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "deleted", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "object._id", Value: 1}, {Key: "object.collection", Value: 1}}},
+		{Keys: bson.D{{Key: "parent", Value: 1}}},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 	}
 }

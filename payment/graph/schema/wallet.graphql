@@ -1,0 +1,47 @@
+type Wallet {
+  id: ID!
+  uid: ID!
+  balance: Float!
+  currency: String!
+  metadata: Map
+  status: String!
+  created: String!
+  updated: String!
+  cards: [Card]
+  transactions: [Transaction]
+}
+
+type Wallets {
+  data: [Wallet]
+  count: Int!
+}
+
+input NewWallet {
+  balance: Float!
+  currency: String!
+  metadata: Map
+}
+
+input UpdateWallet {
+  balance: Float
+  currency: String
+  metadata: Map
+}
+
+extend type Query {
+  wallet(id: ID!): Wallet @auth
+  wallets(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Wallets @auth
+}
+
+extend type Mutation {
+  createWallet(input: NewWallet!): Wallet @auth
+  updateWallet(id: ID!, input: UpdateWallet!): Wallet @auth
+  deleteWallet(id: ID!): Wallet @auth
+}

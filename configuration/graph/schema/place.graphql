@@ -1,0 +1,75 @@
+type Place @key(fields: "id") {
+  id: ID!
+  parent: Place
+  locale: String!
+  type: String!
+  name: String!
+  description: String
+  location: Location
+  status: String
+  metadata: Map
+}
+
+enum PlaceType {
+  COUNTRY
+  STATE
+  CITY
+  DISTRICT
+  STREET
+}
+
+enum PlaceStatus {
+  ACTIVE
+  INACTIVE
+}
+
+type Location {
+  lat: Float
+  lng: Float
+}
+
+type Places {
+  data: [Place]
+  count: Int
+}
+
+input LocationInput {
+  lat: Float
+  lng: Float
+}
+
+input NewLocation {
+  parent: ID
+  locale: String!
+  type: String!
+  name: String!
+  description: String
+  location: LocationInput
+  images: [Map]
+  status: String
+  metadata: Map
+}
+
+input UpdateLocation {
+  parent: ID
+  locale: String
+  type: String
+  name: String
+  description: String
+  location: LocationInput
+  images: [Map]
+  status: String
+  metadata: Map
+}
+
+extend type Query {
+  place(id: ID!): Place
+  places(args: Map): Map
+}
+
+extend type Mutation {
+  createLocation(input: NewLocation!): Place @auth
+  updateLocation(id: ID!, input: UpdateLocation!): Place @auth
+  deleteLocation(id: ID!): Boolean @auth
+  deleteLocations(ids: [ID!]!): Boolean @auth
+}

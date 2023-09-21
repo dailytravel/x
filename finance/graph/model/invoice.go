@@ -10,16 +10,16 @@ import (
 )
 
 type Invoice struct {
-	Model     `bson:",inline"`
-	User      primitive.ObjectID  `json:"user" bson:"user"`
-	Reference string              `json:"reference" bson:"reference"`
-	Template  string              `json:"template" bson:"template"`
-	Amount    float64             `json:"amount" bson:"amount"`
-	Currency  string              `json:"currency" bson:"currency"`
-	DueDate   primitive.Timestamp `json:"dueDate" bson:"due_date"`
-	Billing   primitive.M         `json:"billing" bson:"billing"`
-	Notes     string              `json:"notes,omitempty" bson:"notes,omitempty"`
-	Status    string              `json:"status" bson:"status"`
+	Model    `bson:",inline"`
+	User     primitive.ObjectID  `json:"user" bson:"user"`
+	Code     string              `json:"code" bson:"code"`
+	Template string              `json:"template" bson:"template"`
+	Amount   float64             `json:"amount" bson:"amount"`
+	Currency string              `json:"currency" bson:"currency"`
+	DueDate  primitive.Timestamp `json:"dueDate" bson:"due_date"`
+	Billing  primitive.M         `json:"billing" bson:"billing"`
+	Notes    string              `json:"notes,omitempty" bson:"notes,omitempty"`
+	Status   string              `json:"status" bson:"status"`
 }
 
 func (Invoice) IsEntity() {}
@@ -43,7 +43,7 @@ func (i *Invoice) Collection() string {
 
 func (i *Invoice) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "reference", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "code", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "due_date", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},

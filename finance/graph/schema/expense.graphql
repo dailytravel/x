@@ -1,6 +1,6 @@
 type Expense {
   id: ID!
-  reference: String!
+  code: String!
   type: String! #debit or credit
   description: String!
   amount: Float!
@@ -39,7 +39,7 @@ type Expenses {
 
 input NewExpense {
   type: String!
-  reference: String
+  code: String
   description: String!
   amount: Float!
   currency: String!
@@ -53,7 +53,7 @@ input NewExpense {
 
 input UpdateExpense {
   type: String
-  reference: String
+  code: String
   description: String
   metadata: Map
   status: String

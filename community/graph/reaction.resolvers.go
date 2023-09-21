@@ -24,20 +24,20 @@ func (r *mutationResolver) CreateReaction(ctx context.Context, input model.NewRe
 		return nil, err
 	}
 
-	// Convert reactable ID to primitive.ObjectID
-	reactableID, ok := input.Reactable["id"].(string)
+	// Convert object ID to primitive.ObjectID
+	objectID, ok := input.Object["id"].(string)
 	if !ok {
-		return nil, fmt.Errorf("invalid reactable ID")
+		return nil, fmt.Errorf("invalid object ID")
 	}
-	_id, err := primitive.ObjectIDFromHex(reactableID)
+	_id, err := primitive.ObjectIDFromHex(objectID)
 	if err != nil {
 		return nil, err
 	}
 
 	reaction := &model.Reaction{
-		UID:       *uid,
-		Action:    input.Action,
-		Reactable: model.Reactable{ID: _id, Type: input.Reactable["type"].(string)},
+		UID:    *uid,
+		Action: input.Action,
+		Object: model.Object{ID: _id, Collection: input.Object["collection"].(string)},
 	}
 
 	// Perform the insertion into the database
@@ -84,24 +84,24 @@ func (r *mutationResolver) UpdateReaction(ctx context.Context, id string, input 
 }
 
 // Reaction is the resolver for the reaction field.
-func (r *queryResolver) Reaction(ctx context.Context, reactable map[string]interface{}) (*model.Reaction, error) {
+func (r *queryResolver) Reaction(ctx context.Context, object map[string]interface{}) (*model.Reaction, error) {
 	var item *model.Reaction
 	col := r.db.Collection(item.Collection())
 
-	// Convert reactable to primitive.ObjectID and set it to reactable.ID
-	reactableID, err := primitive.ObjectIDFromHex(reactable["id"].(string))
+	// Convert object to primitive.ObjectID and set it to object.ID
+	objectID, err := primitive.ObjectIDFromHex(object["id"].(string))
 	if err != nil {
 		return nil, err
 	}
 
-	reactableType, ok := reactable["type"].(string)
+	objectType, ok := object["type"].(string)
 	if !ok {
-		return nil, fmt.Errorf("reactable type assertion failed")
+		return nil, fmt.Errorf("object type assertion failed")
 	}
 
-	filter := bson.M{"reactable": bson.M{
-		"_id":  reactableID,
-		"type": reactableType,
+	filter := bson.M{"object": bson.M{
+		"_id":  objectID,
+		"type": objectType,
 	}}
 
 	err = col.FindOne(ctx, filter).Decode(&item)
@@ -123,16 +123,16 @@ func (r *queryResolver) Reactions(ctx context.Context, args map[string]interface
 	// Build the filter based on the provided arguments
 	filter := bson.M{}
 
-	if reactableID, ok := args["reactableID"].(string); ok {
-		reactableObjID, err := primitive.ObjectIDFromHex(reactableID)
+	if objectID, ok := args["objectID"].(string); ok {
+		objectObjID, err := primitive.ObjectIDFromHex(objectID)
 		if err != nil {
-			return nil, fmt.Errorf("invalid reactableID: %v", err)
+			return nil, fmt.Errorf("invalid objectID: %v", err)
 		}
-		filter["reactable._id"] = reactableObjID
+		filter["object._id"] = objectObjID
 	}
 
-	if reactableType, ok := args["reactableType"].(string); ok {
-		filter["reactable.type"] = reactableType
+	if objectType, ok := args["objectType"].(string); ok {
+		filter["object.collection"] = objectType
 	}
 
 	cursor, err := col.Find(ctx, filter)
@@ -172,19 +172,9 @@ func (r *reactionResolver) UID(ctx context.Context, obj *model.Reaction) (string
 	return obj.UID.Hex(), nil
 }
 
-// Reactable is the resolver for the reactable field.
-func (r *reactionResolver) Reactable(ctx context.Context, obj *model.Reaction) (map[string]interface{}, error) {
-	var item map[string]interface{}
-
-	err := r.db.Collection(obj.Reactable.Type).FindOne(ctx, bson.M{"_id": obj.Reactable.ID}).Decode(&item)
-	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	return item, nil
+// Object is the resolver for the object field.
+func (r *reactionResolver) Object(ctx context.Context, obj *model.Reaction) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Object - object"))
 }
 
 // Created is the resolver for the created field.

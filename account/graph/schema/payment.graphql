@@ -1,4 +1,0 @@
-extend type Payment @key(fields: "uid") {
-  uid: ID! @external
-  user: User
-}

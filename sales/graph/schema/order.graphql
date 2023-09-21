@@ -1,7 +1,8 @@
 type Order {
   id: ID!
-  reference: String!
+  code: String!
   cancellable: Boolean!
+  payment: String!
   status: String!
   created: String!
   updated: String!
@@ -14,7 +15,7 @@ type Orders {
 }
 
 input NewOrder {
-  reference: String!
+  code: String!
   data: [ID!]
   cancellable: Boolean!
   status: String!
@@ -22,7 +23,7 @@ input NewOrder {
 }
 
 input UpdateOrder {
-  reference: String
+  code: String
   data: [ID!]
   cancellable: Boolean
   status: String

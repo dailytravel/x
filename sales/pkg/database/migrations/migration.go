@@ -13,6 +13,8 @@ func AutoMigrate() error {
 		&Company{Database: database.Database},
 		&Contact{Database: database.Database},
 		&Coupon{Database: database.Database},
+		&Product{Database: database.Database},
+		&Package{Database: database.Database},
 		&Membership{Database: database.Database},
 		&Order{Database: database.Database},
 		&Variant{Database: database.Database},

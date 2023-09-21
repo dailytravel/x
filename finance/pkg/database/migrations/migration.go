@@ -10,8 +10,6 @@ func AutoMigrate() error {
 	migrators := []Migrator{
 		&Expense{Database: database.Database},
 		&Invoice{Database: database.Database},
-		&Payment{Database: database.Database},
-		&Transaction{Database: database.Database},
 	}
 
 	for _, migration := range migrators {

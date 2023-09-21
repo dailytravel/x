@@ -8,10 +8,10 @@ type Migrator interface {
 
 func AutoMigrate() error {
 	migrators := []Migrator{
-		&Country{Database: database.Database},
 		&Currency{Database: database.Database},
 		&Locale{Database: database.Database},
 		&Option{Database: database.Database},
+		&Place{Database: database.Database},
 		&Template{Database: database.Database},
 		&Timezone{Database: database.Database},
 		&Webhook{Database: database.Database},

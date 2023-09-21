@@ -13,7 +13,7 @@ type Quote struct {
 	Model
 	UID         primitive.ObjectID  `json:"uid" bson:"uid"`
 	Contact     primitive.ObjectID  `json:"contacts" bson:"contacts"`
-	Reference   string              `json:"reference" bson:"reference"`
+	Code        string              `json:"code" bson:"code"`
 	Purchase    *string             `json:"purchase,omitempty" bson:"purchase,omitempty"`
 	Locale      string              `json:"locale" bson:"locale"`
 	Name        string              `json:"name" bson:"name"`
@@ -49,7 +49,7 @@ func (i *Quote) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "uid", Value: 1}}},
 		{Keys: bson.D{{Key: "contact", Value: 1}}},
 		{Keys: bson.D{{Key: "locale", Value: 1}}},
-		{Keys: bson.D{{Key: "reference", Value: 1}}, Options: options.Index().SetUnique(true)},
+		{Keys: bson.D{{Key: "code", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "purchase", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},

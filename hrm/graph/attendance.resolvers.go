@@ -23,6 +23,11 @@ func (r *attendanceResolver) ID(ctx context.Context, obj *model.Attendance) (str
 	return obj.ID.Hex(), nil
 }
 
+// Date is the resolver for the date field.
+func (r *attendanceResolver) Date(ctx context.Context, obj *model.Attendance) (string, error) {
+	panic(fmt.Errorf("not implemented: Date - date"))
+}
+
 // TimeIn is the resolver for the time_in field.
 func (r *attendanceResolver) TimeIn(ctx context.Context, obj *model.Attendance) (string, error) {
 	return time.Unix(int64(obj.TimeIn.T), 0).Format(time.RFC3339), nil
@@ -80,9 +85,10 @@ func (r *mutationResolver) CheckIn(ctx context.Context) (*model.Attendance, erro
 	err = r.db.Collection(item.Collection()).FindOne(ctx, filter, options.FindOne().SetSort(bson.D{{Key: "time_in", Value: -1}})).Decode(&item)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
+			in := primitive.Timestamp{T: uint32(time.Now().Unix())}
 			item = &model.Attendance{
 				UID:    *uid,
-				TimeIn: primitive.Timestamp{T: uint32(time.Now().Unix())},
+				TimeIn: &in,
 			}
 
 			res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item, nil)

@@ -1,0 +1,4 @@
+extend type Post @key(fields: "uid") {
+  uid: ID! @external
+  user: User
+}

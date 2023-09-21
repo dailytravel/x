@@ -1,0 +1,11 @@
+type Image @key(fields: "id") {
+  id: ID!
+  type: String! #featured, gallery, etc
+  locale: String!
+  object: Map!
+  url: String!
+  title: String
+  caption: String
+  order: Int
+  metadata: Map
+}

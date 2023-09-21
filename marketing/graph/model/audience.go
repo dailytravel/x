@@ -6,7 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Audience struct {
@@ -37,8 +36,8 @@ func (i *Audience) Collection() string {
 
 func (i *Audience) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
 	}
 }

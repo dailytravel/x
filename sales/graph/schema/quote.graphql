@@ -2,7 +2,7 @@ type Quote {
   id: ID!
   locale: String!
   contact: Contact
-  reference: String!
+  code: String!
   purchase: String!
   name: String!
   description: String
@@ -30,7 +30,7 @@ input NewQuote {
   uid: ID!
   contact: String
   locale: String!
-  reference: String!
+  code: String!
   purchase: String!
   name: String!
   description: String
@@ -49,7 +49,7 @@ input UpdateQuote {
   uid: ID
   contact: String
   locale: String
-  reference: String
+  code: String
   purchase: String
   name: String
   description: String

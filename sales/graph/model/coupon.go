@@ -23,8 +23,7 @@ type Coupon struct {
 	Currency    string                `json:"currency" bson:"currency"`
 	Products    []*primitive.ObjectID `json:"products,omitempty" bson:"products,omitempty"`
 	Uses        *int                  `json:"uses,omitempty" bson:"uses,omitempty"`
-	Start       primitive.DateTime    `json:"start" bson:"start"`
-	End         primitive.DateTime    `json:"end" bson:"end"`
+	Expiration  *primitive.DateTime   `json:"expiration" bson:"expiration"`
 	Status      string                `json:"status" bson:"status"`
 }
 
@@ -51,8 +50,7 @@ func (i *Coupon) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "uid", Value: 1}}},
 		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
-		{Keys: bson.D{{Key: "start", Value: 1}}},
-		{Keys: bson.D{{Key: "end", Value: 1}}},
+		{Keys: bson.D{{Key: "expiration", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},
 		{Keys: bson.D{{Key: "updated", Value: 1}}},
 		{Keys: bson.D{{Key: "deleted", Value: 1}}},

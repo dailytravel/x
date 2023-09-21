@@ -1,0 +1,4 @@
+extend type Package @key(fields: "id") {
+  id: ID! @external
+  images: [Image]
+}

@@ -1,7 +1,7 @@
 type Link {
   id: ID!
   domain: String!
-  reference: String!
+  code: String!
   title: String
   destination: String!
   metadata: Map
@@ -20,7 +20,7 @@ input NewLink {
   user: ID
   title: String
   domain: String!
-  reference: String!
+  code: String!
   destination: String!
   terms: [ID!]
   metadata: Map
@@ -30,7 +30,7 @@ input UpdateLink {
   user: ID
   title: String
   domain: String
-  reference: String
+  code: String
   terms: [ID!]
   metadata: Map
 }

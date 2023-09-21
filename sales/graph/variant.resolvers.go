@@ -35,8 +35,8 @@ func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVar
 		},
 	}
 
-	utils.Date(&input.Start, &item.Start)
-	utils.Date(&input.End, &item.End)
+	utils.Date(&input.Start, item.Start)
+	utils.Date(&input.End, item.End)
 
 	// Set the fields from the input
 	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)

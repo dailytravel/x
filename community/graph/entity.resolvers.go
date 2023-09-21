@@ -43,13 +43,6 @@ func (r *entityResolver) FindContactByID(ctx context.Context, id string) (*model
 	}, nil
 }
 
-// FindContentByID is the resolver for the findContentByID field.
-func (r *entityResolver) FindContentByID(ctx context.Context, id string) (*model.Content, error) {
-	return &model.Content{
-		ID: id,
-	}, nil
-}
-
 // FindExpenseByID is the resolver for the findExpenseByID field.
 func (r *entityResolver) FindExpenseByID(ctx context.Context, id string) (*model.Expense, error) {
 	return &model.Expense{
@@ -62,6 +55,11 @@ func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.Fi
 	return &model.File{
 		ID: id,
 	}, nil
+}
+
+// FindPostByID is the resolver for the findPostByID field.
+func (r *entityResolver) FindPostByID(ctx context.Context, id string) (*model.Post, error) {
+	panic(fmt.Errorf("not implemented: FindPostByID - findPostByID"))
 }
 
 // FindQuoteByID is the resolver for the findQuoteByID field.

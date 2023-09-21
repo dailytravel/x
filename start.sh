@@ -13,6 +13,7 @@ function cleanup {
   kill "$HRM_PID"
   kill "$INSIGHT_PID"
   kill "$MARKETING_PID"
+  kill "$PAYMENT_PID"
   kill "$SALES_PID"
 }
 
@@ -26,6 +27,7 @@ function cleanup {
 (cd hrm && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd insight && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd marketing && GOOS=linux GOARCH=amd64 go build -v -o app .)
+(cd payment && GOOS=linux GOARCH=amd64 go build -v -o app .)
 (cd sales && GOOS=linux GOARCH=amd64 go build -v -o app .)
 
 # Start each Go service
@@ -38,6 +40,7 @@ function cleanup {
 ./hrm/app & HRM_PID=$!
 ./insight/app & INSIGHT_PID=$!
 ./marketing/app & MARKETING_PID=$!
+./payment/app & PAYMENT_PID=$!
 ./sales/app & SALES_PID=$!
 
 trap cleanup EXIT
@@ -46,7 +49,7 @@ trap cleanup EXIT
 timeout=30
 interval=1
 elapsed=0
-all_pids=($ACCOUNT_PID $BASE_PID $CMS_PID $COMMUNITY_PID $CONFIG_PID $FINANCE_PID $HRM_PID $INSIGHT_PID $MARKETING_PID $SALES_PID)
+all_pids=($ACCOUNT_PID $BASE_PID $CMS_PID $COMMUNITY_PID $CONFIG_PID $FINANCE_PID $HRM_PID $INSIGHT_PID $MARKETING_PID $PAYMENT_PID $SALES_PID)
 
 # Loop until all servers are running or timeout occurs
 while true; do

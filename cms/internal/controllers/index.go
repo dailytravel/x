@@ -84,7 +84,7 @@ func IndexStream(waitGroup *sync.WaitGroup, stream *mongo.ChangeStream, collecti
 
 	indexers := map[string]Indexer{
 		"terms":    &model.Term{},
-		"contents": &model.Content{},
+		"contents": &model.Post{},
 		"files":    &model.File{},
 	}
 

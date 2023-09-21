@@ -43,9 +43,9 @@ func (i *Resume) Collection() string {
 func (i *Resume) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index().SetUnique(true)},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "deleted", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 	}
 }

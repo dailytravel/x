@@ -40,14 +40,9 @@ func (r *couponResolver) Description(ctx context.Context, obj *model.Coupon) (st
 	return obj.Description[obj.Locale].(string), nil
 }
 
-// Start is the resolver for the start field.
-func (r *couponResolver) Start(ctx context.Context, obj *model.Coupon) (string, error) {
-	panic(fmt.Errorf("not implemented: Start - start"))
-}
-
-// End is the resolver for the end field.
-func (r *couponResolver) End(ctx context.Context, obj *model.Coupon) (string, error) {
-	panic(fmt.Errorf("not implemented: End - end"))
+// Expiration is the resolver for the expiration field.
+func (r *couponResolver) Expiration(ctx context.Context, obj *model.Coupon) (*string, error) {
+	panic(fmt.Errorf("not implemented: Expiration - expiration"))
 }
 
 // Metadata is the resolver for the metadata field.
@@ -66,7 +61,7 @@ func (r *couponResolver) Updated(ctx context.Context, obj *model.Coupon) (string
 }
 
 // UID is the resolver for the uid field.
-func (r *couponResolver) UID(ctx context.Context, obj *model.Coupon) (string, error) {
+func (r *couponResolver) UID(ctx context.Context, obj *model.Coupon) (*string, error) {
 	panic(fmt.Errorf("not implemented: UID - uid"))
 }
 
@@ -96,8 +91,8 @@ func (r *mutationResolver) CreateCoupon(ctx context.Context, input model.NewCoup
 		},
 	}
 
-	utils.Date(&input.Start, &item.Start)
-	utils.Date(&input.End, &item.End)
+	// utils.Date(&input.Start, &item.Start)
+	// utils.Date(&input.End, &item.End)
 
 	// Set the fields from the input
 	_, err = r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -314,3 +309,16 @@ func (r *queryResolver) Coupons(ctx context.Context, args map[string]interface{}
 func (r *Resolver) Coupon() CouponResolver { return &couponResolver{r} }
 
 type couponResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *couponResolver) Start(ctx context.Context, obj *model.Coupon) (string, error) {
+	panic(fmt.Errorf("not implemented: Start - start"))
+}
+func (r *couponResolver) End(ctx context.Context, obj *model.Coupon) (string, error) {
+	panic(fmt.Errorf("not implemented: End - end"))
+}

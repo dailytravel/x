@@ -8,7 +8,6 @@ type Conversation {
   metadata: Map
   message: Message #last message
   messages: [Message!]
-  uid: String!
   created: String!
   updated: String!
   shares: [Share]

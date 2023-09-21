@@ -33,46 +33,6 @@ func (r *userResolver) Resume(ctx context.Context, obj *model.User) (*model.Resu
 	return item, nil
 }
 
-// Salaries is the resolver for the salaries field.
-func (r *userResolver) Salaries(ctx context.Context, obj *model.User) ([]*model.Salary, error) {
-	var items []*model.Salary
-	//find all items
-	cur, err := r.db.Collection("salaries").Find(ctx, bson.M{"uid": obj.ID})
-	if err != nil {
-		return nil, err
-	}
-
-	for cur.Next(ctx) {
-		var item *model.Salary
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
-
-	return items, nil
-}
-
-// Payrolls is the resolver for the payrolls field.
-func (r *userResolver) Payrolls(ctx context.Context, obj *model.User) ([]*model.Payroll, error) {
-	var items []*model.Payroll
-	//find all items
-	cur, err := r.db.Collection("payrolls").Find(ctx, bson.M{"uid": obj.ID})
-	if err != nil {
-		return nil, err
-	}
-
-	for cur.Next(ctx) {
-		var item *model.Payroll
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
-
-	return items, nil
-}
-
 // Leaves is the resolver for the leaves field.
 func (r *userResolver) Leaves(ctx context.Context, obj *model.User) ([]*model.Leave, error) {
 	var items []*model.Leave

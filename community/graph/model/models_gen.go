@@ -21,13 +21,6 @@ type Contact struct {
 
 func (Contact) IsEntity() {}
 
-type Content struct {
-	ID       string     `json:"id"`
-	Comments []*Comment `json:"comments,omitempty"`
-}
-
-func (Content) IsEntity() {}
-
 type Conversations struct {
 	Data  []*Conversation `json:"data,omitempty"`
 	Count int             `json:"count"`
@@ -56,7 +49,7 @@ type Messages struct {
 
 type NewComment struct {
 	Parent      *string                `json:"parent,omitempty"`
-	Commentable map[string]interface{} `json:"commentable"`
+	Object      map[string]interface{} `json:"object"`
 	Locale      string                 `json:"locale"`
 	UID         *string                `json:"uid,omitempty"`
 	Name        *string                `json:"name,omitempty"`
@@ -80,13 +73,12 @@ type NewMessage struct {
 	Recipients   []string               `json:"recipients"`
 	Subject      string                 `json:"subject"`
 	Body         map[string]interface{} `json:"body"`
-	Categories   []string               `json:"categories,omitempty"`
 	Metadata     map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewReaction struct {
-	Reactable map[string]interface{} `json:"reactable"`
-	Action    string                 `json:"action"`
+	Object map[string]interface{} `json:"object"`
+	Action string                 `json:"action"`
 }
 
 type NewRecipient struct {
@@ -119,7 +111,7 @@ type Recipients struct {
 
 type ShareInput struct {
 	UID        string                 `json:"uid"`
-	Shareable  map[string]interface{} `json:"shareable"`
+	Object     map[string]interface{} `json:"object"`
 	Permission string                 `json:"permission"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 	Status     string                 `json:"status"`
@@ -129,7 +121,7 @@ type ShareInput struct {
 
 type ShareUpdateInput struct {
 	UID        *string                `json:"uid,omitempty"`
-	Shareable  map[string]interface{} `json:"shareable,omitempty"`
+	Object     map[string]interface{} `json:"object,omitempty"`
 	Permission *string                `json:"permission,omitempty"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 	Status     *string                `json:"status,omitempty"`
@@ -171,12 +163,10 @@ type UpdateConversation struct {
 }
 
 type UpdateMessage struct {
-	Conversation *string                `json:"conversation,omitempty"`
-	Recipients   []string               `json:"recipients,omitempty"`
-	Subject      *string                `json:"subject,omitempty"`
-	Body         map[string]interface{} `json:"body,omitempty"`
-	Categories   []string               `json:"categories,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Subject  *string                `json:"subject,omitempty"`
+	Body     map[string]interface{} `json:"body,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateReaction struct {

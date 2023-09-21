@@ -27,7 +27,7 @@ func (Comment) IsEntity() {}
 type Link struct {
 	ID          string                 `json:"id"`
 	Domain      string                 `json:"domain"`
-	Reference   string                 `json:"reference"`
+	Code        string                 `json:"code"`
 	Title       *string                `json:"title,omitempty"`
 	Destination string                 `json:"destination"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
@@ -61,7 +61,7 @@ type NewLink struct {
 	User        *string                `json:"user,omitempty"`
 	Title       *string                `json:"title,omitempty"`
 	Domain      string                 `json:"domain"`
-	Reference   string                 `json:"reference"`
+	Code        string                 `json:"code"`
 	Destination string                 `json:"destination"`
 	Terms       []string               `json:"terms,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
@@ -135,12 +135,12 @@ type UpdateCampaign struct {
 }
 
 type UpdateLink struct {
-	User      *string                `json:"user,omitempty"`
-	Title     *string                `json:"title,omitempty"`
-	Domain    *string                `json:"domain,omitempty"`
-	Reference *string                `json:"reference,omitempty"`
-	Terms     []string               `json:"terms,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	User     *string                `json:"user,omitempty"`
+	Title    *string                `json:"title,omitempty"`
+	Domain   *string                `json:"domain,omitempty"`
+	Code     *string                `json:"code,omitempty"`
+	Terms    []string               `json:"terms,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type CampaignStatus string

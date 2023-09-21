@@ -6,12 +6,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Conversation struct {
 	Model       `bson:",inline"`
-	UID         primitive.ObjectID  `json:"uid" bson:"uid"`
 	Type        string              `json:"type" bson:"type"`
 	Name        *string             `json:"name,omitempty" bson:"name,omitempty"`
 	Description *string             `json:"description,omitempty" bson:"description,omitempty"`
@@ -39,12 +37,11 @@ func (i *Conversation) Collection() string {
 
 func (i *Conversation) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "user", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "message", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "deleted", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "type", Value: 1}}},
+		{Keys: bson.D{{Key: "message", Value: 1}}},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 	}
 }

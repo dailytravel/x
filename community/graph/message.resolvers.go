@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/dailytravel/x/community/graph/model"
 	"github.com/dailytravel/x/community/internal/utils"
@@ -34,6 +35,11 @@ func (r *messageResolver) Conversation(ctx context.Context, obj *model.Message) 
 	}
 
 	return item, nil
+}
+
+// Timestamp is the resolver for the timestamp field.
+func (r *messageResolver) Timestamp(ctx context.Context, obj *model.Message) (string, error) {
+	panic(fmt.Errorf("not implemented: Timestamp - timestamp"))
 }
 
 // Recipients is the resolver for the recipients field.

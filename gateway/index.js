@@ -68,7 +68,8 @@ const gateway = new ApolloGateway({
       { name: "hrm", url: "http://localhost:4007/query" },
       { name: "insight", url: "http://localhost:4008/query" },
       { name: "marketing", url: "http://localhost:4009/query" },
-      { name: "sales", url: "http://localhost:4010/query" },
+      { name: "payment", url: "http://localhost:4010/query" },
+      { name: "sales", url: "http://localhost:4011/query" },
     ],
   }),
 });
@@ -86,11 +87,13 @@ async function startApolloServer() {
     cors({
       origin: [
         "http://localhost:3000",
+        "http://localhost:5000",
         "https://api.trip.express",
         "https://app.trip.express",
         "https://trip.express",
         "https://www.trip.express",
       ],
+      credentials: true,
     })
   );
   app.use(bodyParser.json({ limit: "50mb" }));

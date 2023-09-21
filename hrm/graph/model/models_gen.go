@@ -83,10 +83,13 @@ type Leaves struct {
 }
 
 type NewApplication struct {
-	Job      string                 `json:"job"`
-	Notes    *string                `json:"notes,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-	Status   *string                `json:"status,omitempty"`
+	Position  string                 `json:"position"`
+	Resume    string                 `json:"resume"`
+	Interview string                 `json:"interview"`
+	Feedback  *string                `json:"feedback,omitempty"`
+	Notes     *string                `json:"notes,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Status    *string                `json:"status,omitempty"`
 }
 
 type NewAttendance struct {
@@ -129,15 +132,6 @@ type NewOrganization struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type NewPayroll struct {
-	UID      string                 `json:"uid"`
-	Date     string                 `json:"date"`
-	Amount   float64                `json:"amount"`
-	Currency string                 `json:"currency"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-	Status   string                 `json:"status"`
-}
-
 type NewResume struct {
 	Title          string                `json:"title"`
 	Summary        string                `json:"summary"`
@@ -149,22 +143,9 @@ type NewResume struct {
 	References     []*ReferenceInput     `json:"references"`
 }
 
-type NewSalary struct {
-	Amount   float64                `json:"amount"`
-	Currency string                 `json:"currency"`
-	Start    string                 `json:"start"`
-	End      *string                `json:"end,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-}
-
 type Organizations struct {
 	Data  []*Organization `json:"data,omitempty"`
 	Count int             `json:"count"`
-}
-
-type Payrolls struct {
-	Data  []*Payroll `json:"data,omitempty"`
-	Count int        `json:"count"`
 }
 
 type Reference struct {
@@ -186,11 +167,6 @@ type Resumes struct {
 	Count int       `json:"count"`
 }
 
-type Salaries struct {
-	Data  []*Salary `json:"data,omitempty"`
-	Count int       `json:"count"`
-}
-
 type Skill struct {
 	Name        string      `json:"name"`
 	Proficiency Proficiency `json:"proficiency"`
@@ -204,9 +180,13 @@ type SkillInput struct {
 }
 
 type UpdateApplication struct {
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-	Notes    *string                `json:"notes,omitempty"`
-	Status   *string                `json:"status,omitempty"`
+	Position  *string                `json:"position,omitempty"`
+	Resume    *string                `json:"resume,omitempty"`
+	Interview *string                `json:"interview,omitempty"`
+	Feedback  *string                `json:"feedback,omitempty"`
+	Notes     *string                `json:"notes,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Status    *string                `json:"status,omitempty"`
 }
 
 type UpdateAttendance struct {
@@ -250,14 +230,6 @@ type UpdateOrganization struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type UpdatePayroll struct {
-	Date     *string                `json:"date,omitempty"`
-	Amount   *float64               `json:"amount,omitempty"`
-	Currency *string                `json:"currency,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-	Status   *string                `json:"status,omitempty"`
-}
-
 type UpdateResume struct {
 	Title          *string               `json:"title,omitempty"`
 	Summary        *string               `json:"summary,omitempty"`
@@ -267,14 +239,6 @@ type UpdateResume struct {
 	Certifications []*CertificationInput `json:"certifications,omitempty"`
 	Languages      []*LanguageInput      `json:"languages,omitempty"`
 	References     []*ReferenceInput     `json:"references,omitempty"`
-}
-
-type UpdateSalary struct {
-	Amount   *float64               `json:"amount,omitempty"`
-	Currency *string                `json:"currency,omitempty"`
-	Start    *string                `json:"start,omitempty"`
-	End      *string                `json:"end,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type AttendanceStatus string

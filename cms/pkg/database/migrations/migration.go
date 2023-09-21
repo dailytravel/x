@@ -8,8 +8,9 @@ type Migrator interface {
 
 func AutoMigrate() error {
 	migrators := []Migrator{
-		&Term{Database: database.Database},
-		&Content{Database: database.Database},
+		&File{Database: database.Database},
+		&Image{Database: database.Database},
+		&Post{Database: database.Database},
 		&Term{Database: database.Database},
 	}
 

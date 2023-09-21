@@ -1,7 +1,7 @@
 type Reaction @key(fields: "id") {
   id: ID!
   uid: ID!
-  reactable: Map!
+  object: Map!
   action: String!
   created: String!
   updated: String!
@@ -23,7 +23,7 @@ enum ReactionType {
 }
 
 input NewReaction {
-  reactable: Map!
+  object: Map!
   action: String!
 }
 
@@ -32,7 +32,7 @@ input UpdateReaction {
 }
 
 extend type Query {
-  reaction(reactable: Map!): Reaction
+  reaction(object: Map!): Reaction
   reactions(args: Map): Reactions
 }
 

@@ -1,6 +1,10 @@
 type Application {
   id: ID!
-  job: Job!
+  position: String!
+  resume: String!
+  interview: String!
+  feedback: String
+  referredBy: String
   notes: String
   metadata: Map
   status: String
@@ -15,15 +19,22 @@ type Applications {
 }
 
 input NewApplication {
-  job: ID!
+  position: String!
+  resume: String!
+  interview: String!
+  feedback: String
   notes: String
   metadata: Map
   status: String
 }
 
 input UpdateApplication {
-  metadata: Map
+  position: String
+  resume: String
+  interview: String
+  feedback: String
   notes: String
+  metadata: Map
   status: String
 }
 

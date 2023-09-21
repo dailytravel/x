@@ -47,12 +47,12 @@ func (i *Term) MarshalBSON() ([]byte, error) {
 func (i *Term) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
-		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created_by", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated_by", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created ", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated ", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "type", Value: 1}}},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created_by", Value: 1}}},
+		{Keys: bson.D{{Key: "updated_by", Value: 1}}},
+		{Keys: bson.D{{Key: "created ", Value: 1}}},
+		{Keys: bson.D{{Key: "updated ", Value: 1}}},
 	}
 }
 

@@ -6,28 +6,11 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/cms/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-// FindContentByID is the resolver for the findContentByID field.
-func (r *entityResolver) FindContentByID(ctx context.Context, id string) (*model.Content, error) {
-	var item *model.Content
-
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
-		return nil, err
-	}
-
-	return item, nil
-}
 
 // FindFileByID is the resolver for the findFileByID field.
 func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.File, error) {
@@ -45,30 +28,54 @@ func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.Fi
 	return item, nil
 }
 
-// FindTermByID is the resolver for the findTermByID field.
-func (r *entityResolver) FindTermByID(ctx context.Context, id string) (*model.Term, error) {
-	panic(fmt.Errorf("not implemented: FindTermByID - findTermByID"))
+// FindImageByID is the resolver for the findImageByID field.
+func (r *entityResolver) FindImageByID(ctx context.Context, id string) (*model.Image, error) {
+	var item *model.Image
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
-// FindUserByID is the resolver for the findUserByID field.
-func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
-	return &model.User{
+// FindPackageByID is the resolver for the findPackageByID field.
+func (r *entityResolver) FindPackageByID(ctx context.Context, id string) (*model.Package, error) {
+	return &model.Package{
 		ID: id,
 	}, nil
 }
 
-// Entity returns EntityResolver implementation.
-func (r *Resolver) Entity() EntityResolver { return &entityResolver{r} }
+// FindPostByID is the resolver for the findPostByID field.
+func (r *entityResolver) FindPostByID(ctx context.Context, id string) (*model.Post, error) {
+	var item *model.Post
 
-type entityResolver struct{ *Resolver }
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
 
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *entityResolver) FindCategoryByID(ctx context.Context, id string) (*model.Term, error) {
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}
+
+// FindProductByID is the resolver for the findProductByID field.
+func (r *entityResolver) FindProductByID(ctx context.Context, id string) (*model.Product, error) {
+	return &model.Product{
+		ID: id,
+	}, nil
+}
+
+// FindTermByID is the resolver for the findTermByID field.
+func (r *entityResolver) FindTermByID(ctx context.Context, id string) (*model.Term, error) {
 	var item *model.Term
 
 	_id, err := primitive.ObjectIDFromHex(id)
@@ -82,3 +89,15 @@ func (r *entityResolver) FindCategoryByID(ctx context.Context, id string) (*mode
 
 	return item, nil
 }
+
+// FindUserByID is the resolver for the findUserByID field.
+func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
+	return &model.User{
+		ID: id,
+	}, nil
+}
+
+// Entity returns EntityResolver implementation.
+func (r *Resolver) Entity() EntityResolver { return &entityResolver{r} }
+
+type entityResolver struct{ *Resolver }

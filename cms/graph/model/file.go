@@ -50,12 +50,12 @@ func (i *File) Collection() string {
 func (i *File) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "name", Value: "text"}}, Options: options.Index().SetWeights(bson.D{{Key: "name", Value: 1}})},
-		{Keys: bson.D{{Key: "type", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "locale", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "starred", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created ", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated ", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "type", Value: 1}}},
+		{Keys: bson.D{{Key: "locale", Value: 1}}},
+		{Keys: bson.D{{Key: "uid", Value: 1}}},
+		{Keys: bson.D{{Key: "starred", Value: 1}}},
+		{Keys: bson.D{{Key: "created ", Value: 1}}},
+		{Keys: bson.D{{Key: "updated ", Value: 1}}},
 	}
 }
 

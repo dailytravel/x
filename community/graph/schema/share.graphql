@@ -1,7 +1,7 @@
 type Share @key(fields: "id") {
   id: ID!
   uid: ID!
-  shareable: Map!
+  object: Map!
   permission: String!
   metadata: Map
   status: String!
@@ -16,7 +16,7 @@ type Shares {
 
 input ShareInput {
   uid: ID!
-  shareable: Map!
+  object: Map!
   permission: String!
   metadata: Map
   status: String!
@@ -26,7 +26,7 @@ input ShareInput {
 
 input ShareUpdateInput {
   uid: ID
-  shareable: Map
+  object: Map
   permission: String
   metadata: Map
   status: String

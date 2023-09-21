@@ -10,7 +10,7 @@ type Comment @key(fields: "id") {
   metadata: Map
   parent: Comment
   children: [Comment]
-  commentable: Map!
+  object: Map!
   reactions: [Reaction]
   created: String!
   updated: String!
@@ -23,7 +23,7 @@ type Comments {
 
 input NewComment {
   parent: ID
-  commentable: Map!
+  object: Map!
   locale: String!
   uid: ID
   name: String

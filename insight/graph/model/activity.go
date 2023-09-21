@@ -6,19 +6,20 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Activity struct {
-	Model  `bson:",inline"`
-	UID    primitive.ObjectID `json:"uid" bson:"uid"`
-	Target primitive.ObjectID `json:"target" bson:"target"`
-	Action string             `json:"action" bson:"action"`
+	Model     `bson:",inline"`
+	UID       primitive.ObjectID `json:"uid" bson:"uid"`
+	Object    Object             `json:"object" bson:"object"`
+	Action    string             `json:"action" bson:"action"`
+	ClientIP  *string            `json:"clientIp,omitempty" bson:"client_ip,omitempty"`
+	UserAgent *string            `json:"userAgent,omitempty" bson:"user_agent,omitempty"`
 }
 
-type Activitable struct {
-	ID   primitive.ObjectID `json:"id" bson:"id"`
-	Type string             `json:"type" bson:"type"`
+type Object struct {
+	ID         primitive.ObjectID `json:"id" bson:"id"`
+	Collection string             `json:"collection" bson:"collection"`
 }
 
 func (i *Activity) Collection() string {
@@ -38,10 +39,10 @@ func (i *Activity) MarshalBSON() ([]byte, error) {
 
 func (i *Activity) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "target", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "action", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "timestamp", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}},
+		{Keys: bson.D{{Key: "object._id", Value: 1}, {Key: "object.collection", Value: 1}}},
+		{Keys: bson.D{{Key: "action", Value: 1}}},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "timestamp", Value: 1}}},
 	}
 }

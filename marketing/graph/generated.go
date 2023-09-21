@@ -98,12 +98,12 @@ type ComplexityRoot struct {
 	}
 
 	Link struct {
+		Code        func(childComplexity int) int
 		Created     func(childComplexity int) int
 		Destination func(childComplexity int) int
 		Domain      func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Metadata    func(childComplexity int) int
-		Reference   func(childComplexity int) int
 		Status      func(childComplexity int) int
 		Title       func(childComplexity int) int
 		UID         func(childComplexity int) int
@@ -453,6 +453,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.FindUserByID(childComplexity, args["id"].(string)), true
 
+	case "Link.code":
+		if e.complexity.Link.Code == nil {
+			break
+		}
+
+		return e.complexity.Link.Code(childComplexity), true
+
 	case "Link.created":
 		if e.complexity.Link.Created == nil {
 			break
@@ -487,13 +494,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Link.Metadata(childComplexity), true
-
-	case "Link.reference":
-		if e.complexity.Link.Reference == nil {
-			break
-		}
-
-		return e.complexity.Link.Reference(childComplexity), true
 
 	case "Link.status":
 		if e.complexity.Link.Status == nil {
@@ -3057,8 +3057,8 @@ func (ec *executionContext) fieldContext_Link_domain(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Link_reference(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Link_reference(ctx, field)
+func (ec *executionContext) _Link_code(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_code(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3071,7 +3071,7 @@ func (ec *executionContext) _Link_reference(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Reference, nil
+		return obj.Code, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3088,7 +3088,7 @@ func (ec *executionContext) _Link_reference(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Link_reference(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Link_code(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Link",
 		Field:      field,
@@ -3440,8 +3440,8 @@ func (ec *executionContext) fieldContext_Links_data(ctx context.Context, field g
 				return ec.fieldContext_Link_id(ctx, field)
 			case "domain":
 				return ec.fieldContext_Link_domain(ctx, field)
-			case "reference":
-				return ec.fieldContext_Link_reference(ctx, field)
+			case "code":
+				return ec.fieldContext_Link_code(ctx, field)
 			case "title":
 				return ec.fieldContext_Link_title(ctx, field)
 			case "destination":
@@ -4235,8 +4235,8 @@ func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context
 				return ec.fieldContext_Link_id(ctx, field)
 			case "domain":
 				return ec.fieldContext_Link_domain(ctx, field)
-			case "reference":
-				return ec.fieldContext_Link_reference(ctx, field)
+			case "code":
+				return ec.fieldContext_Link_code(ctx, field)
 			case "title":
 				return ec.fieldContext_Link_title(ctx, field)
 			case "destination":
@@ -4329,8 +4329,8 @@ func (ec *executionContext) fieldContext_Mutation_updateLink(ctx context.Context
 				return ec.fieldContext_Link_id(ctx, field)
 			case "domain":
 				return ec.fieldContext_Link_domain(ctx, field)
-			case "reference":
-				return ec.fieldContext_Link_reference(ctx, field)
+			case "code":
+				return ec.fieldContext_Link_code(ctx, field)
 			case "title":
 				return ec.fieldContext_Link_title(ctx, field)
 			case "destination":
@@ -5357,8 +5357,8 @@ func (ec *executionContext) fieldContext_Query_link(ctx context.Context, field g
 				return ec.fieldContext_Link_id(ctx, field)
 			case "domain":
 				return ec.fieldContext_Link_domain(ctx, field)
-			case "reference":
-				return ec.fieldContext_Link_reference(ctx, field)
+			case "code":
+				return ec.fieldContext_Link_code(ctx, field)
 			case "title":
 				return ec.fieldContext_Link_title(ctx, field)
 			case "destination":
@@ -7178,8 +7178,8 @@ func (ec *executionContext) fieldContext_User_links(ctx context.Context, field g
 				return ec.fieldContext_Link_id(ctx, field)
 			case "domain":
 				return ec.fieldContext_Link_domain(ctx, field)
-			case "reference":
-				return ec.fieldContext_Link_reference(ctx, field)
+			case "code":
+				return ec.fieldContext_Link_code(ctx, field)
 			case "title":
 				return ec.fieldContext_Link_title(ctx, field)
 			case "destination":
@@ -9143,7 +9143,7 @@ func (ec *executionContext) unmarshalInputNewLink(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "title", "domain", "reference", "destination", "terms", "metadata"}
+	fieldsInOrder := [...]string{"user", "title", "domain", "code", "destination", "terms", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9177,15 +9177,15 @@ func (ec *executionContext) unmarshalInputNewLink(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Domain = data
-		case "reference":
+		case "code":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reference"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Reference = data
+			it.Code = data
 		case "destination":
 			var err error
 
@@ -9459,7 +9459,7 @@ func (ec *executionContext) unmarshalInputUpdateLink(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "title", "domain", "reference", "terms", "metadata"}
+	fieldsInOrder := [...]string{"user", "title", "domain", "code", "terms", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9493,15 +9493,15 @@ func (ec *executionContext) unmarshalInputUpdateLink(ctx context.Context, obj in
 				return it, err
 			}
 			it.Domain = data
-		case "reference":
+		case "code":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reference"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Reference = data
+			it.Code = data
 		case "terms":
 			var err error
 
@@ -10291,8 +10291,8 @@ func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "reference":
-			out.Values[i] = ec._Link_reference(ctx, field, obj)
+		case "code":
+			out.Values[i] = ec._Link_code(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

@@ -54,13 +54,6 @@ func (r *entityResolver) FindContactByUID(ctx context.Context, uid string) (*mod
 	}, nil
 }
 
-// FindContentByUID is the resolver for the findContentByUID field.
-func (r *entityResolver) FindContentByUID(ctx context.Context, uid string) (*model.Content, error) {
-	return &model.Content{
-		UID: uid,
-	}, nil
-}
-
 // FindCouponByUID is the resolver for the findCouponByUID field.
 func (r *entityResolver) FindCouponByUID(ctx context.Context, uid string) (*model.Coupon, error) {
 	return &model.Coupon{
@@ -131,16 +124,16 @@ func (r *entityResolver) FindOrganizationByUID(ctx context.Context, uid string) 
 	}, nil
 }
 
-// FindPaymentByUID is the resolver for the findPaymentByUID field.
-func (r *entityResolver) FindPaymentByUID(ctx context.Context, uid string) (*model.Payment, error) {
-	return &model.Payment{
+// FindPortfolioByUID is the resolver for the findPortfolioByUID field.
+func (r *entityResolver) FindPortfolioByUID(ctx context.Context, uid string) (*model.Portfolio, error) {
+	return &model.Portfolio{
 		UID: uid,
 	}, nil
 }
 
-// FindPortfolioByUID is the resolver for the findPortfolioByUID field.
-func (r *entityResolver) FindPortfolioByUID(ctx context.Context, uid string) (*model.Portfolio, error) {
-	return &model.Portfolio{
+// FindPostByUID is the resolver for the findPostByUID field.
+func (r *entityResolver) FindPostByUID(ctx context.Context, uid string) (*model.Post, error) {
+	return &model.Post{
 		UID: uid,
 	}, nil
 }

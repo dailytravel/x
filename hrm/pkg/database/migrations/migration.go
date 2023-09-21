@@ -13,9 +13,7 @@ func AutoMigrate() error {
 		&Job{Database: database.Database},
 		&Leave{Database: database.Database},
 		&Organization{Database: database.Database},
-		&Payroll{Database: database.Database},
 		&Resume{Database: database.Database},
-		&Salary{Database: database.Database},
 	}
 
 	for _, migration := range migrators {

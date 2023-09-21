@@ -6,15 +6,18 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Application struct {
-	Model  `bson:",inline"`
-	UID    primitive.ObjectID `json:"uid" bson:"uid"`
-	Job    primitive.ObjectID `json:"job" bson:"job"`
-	Notes  string             `json:"notes" bson:"notes"`
-	Status string             `json:"status" bson:"status"`
+	Model      `bson:",inline"`
+	UID        primitive.ObjectID `json:"uid" bson:"uid"`
+	Position   string             `json:"position" bson:"position"`
+	Resume     string             `json:"resume" bson:"resume"`
+	Interview  primitive.DateTime `json:"interview" bson:"interview"`
+	Feedback   *string            `json:"feedback" bson:"feedback"`
+	ReferredBy *string            `json:"referredBy" bson:"referred_by"`
+	Notes      string             `json:"notes" bson:"notes"`
+	Status     string             `json:"status" bson:"status"`
 }
 
 func (i *Application) MarshalBSON() ([]byte, error) {
@@ -36,11 +39,11 @@ func (i *Application) Collection() string {
 
 func (i *Application) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
-		{Keys: bson.D{{Key: "uid", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "job", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "status", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "created", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "updated", Value: 1}}, Options: options.Index()},
-		{Keys: bson.D{{Key: "deleted", Value: 1}}, Options: options.Index()},
+		{Keys: bson.D{{Key: "uid", Value: 1}}},
+		{Keys: bson.D{{Key: "job", Value: 1}}},
+		{Keys: bson.D{{Key: "status", Value: 1}}},
+		{Keys: bson.D{{Key: "created", Value: 1}}},
+		{Keys: bson.D{{Key: "updated", Value: 1}}},
+		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 	}
 }

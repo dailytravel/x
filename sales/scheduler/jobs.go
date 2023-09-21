@@ -51,9 +51,9 @@ func syncContactsToTypesense() {
 	collection := database.Client.Collection("contacts")
 
 	// Helper function for upserting document
-	upsertDocument := func(document map[string]interface{}, documentID string) {
+	upsertDocument := func(document map[string]interface{}) {
 		if _, err := collection.Documents().Upsert(document); err != nil {
-			log.Printf("Error upserting document %s: %v\n", documentID, err)
+			log.Printf("Error upserting document %s: %v\n", document["id"], err)
 		}
 	}
 
@@ -66,14 +66,13 @@ func syncContactsToTypesense() {
 		}
 
 		document := contact.Document() // Assuming you have a Document method as before
-		documentID := contact.ID.Hex()
 
 		// 2. Check if contact exists in Typesense
-		tsDocument, err := collection.Document(documentID).Retrieve()
+		tsDocument, err := collection.Document(contact.ID.Hex()).Retrieve()
 
 		// If there's an error (like document doesn't exist) or the update timestamps differ, upsert
-		if err != nil || tsDocument["updated_at"].(string) != document["updated_at"].(string) {
-			upsertDocument(document, documentID)
+		if err != nil || tsDocument["updated"].(string) != document["updated"].(string) {
+			upsertDocument(document)
 		}
 	}
 

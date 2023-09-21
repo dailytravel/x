@@ -200,26 +200,6 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				list[idx[i]] = entity
 				return nil
 			}
-		case "Content":
-			resolverName, err := entityResolverNameForContent(ctx, rep)
-			if err != nil {
-				return fmt.Errorf(`finding resolver for Entity "Content": %w`, err)
-			}
-			switch resolverName {
-
-			case "findContentByUID":
-				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findContentByUID(): %w`, err)
-				}
-				entity, err := ec.resolvers.Entity().FindContentByUID(ctx, id0)
-				if err != nil {
-					return fmt.Errorf(`resolving Entity "Content": %w`, err)
-				}
-
-				list[idx[i]] = entity
-				return nil
-			}
 		case "Coupon":
 			resolverName, err := entityResolverNameForCoupon(ctx, rep)
 			if err != nil {
@@ -420,26 +400,6 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				list[idx[i]] = entity
 				return nil
 			}
-		case "Payment":
-			resolverName, err := entityResolverNameForPayment(ctx, rep)
-			if err != nil {
-				return fmt.Errorf(`finding resolver for Entity "Payment": %w`, err)
-			}
-			switch resolverName {
-
-			case "findPaymentByUID":
-				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findPaymentByUID(): %w`, err)
-				}
-				entity, err := ec.resolvers.Entity().FindPaymentByUID(ctx, id0)
-				if err != nil {
-					return fmt.Errorf(`resolving Entity "Payment": %w`, err)
-				}
-
-				list[idx[i]] = entity
-				return nil
-			}
 		case "Portfolio":
 			resolverName, err := entityResolverNameForPortfolio(ctx, rep)
 			if err != nil {
@@ -455,6 +415,26 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				entity, err := ec.resolvers.Entity().FindPortfolioByUID(ctx, id0)
 				if err != nil {
 					return fmt.Errorf(`resolving Entity "Portfolio": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
+		case "Post":
+			resolverName, err := entityResolverNameForPost(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Post": %w`, err)
+			}
+			switch resolverName {
+
+			case "findPostByUID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findPostByUID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindPostByUID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Post": %w`, err)
 				}
 
 				list[idx[i]] = entity
@@ -751,23 +731,6 @@ func entityResolverNameForContact(ctx context.Context, rep map[string]interface{
 	return "", fmt.Errorf("%w for Contact", ErrTypeNotFound)
 }
 
-func entityResolverNameForContent(ctx context.Context, rep map[string]interface{}) (string, error) {
-	for {
-		var (
-			m   map[string]interface{}
-			val interface{}
-			ok  bool
-		)
-		_ = val
-		m = rep
-		if _, ok = m["uid"]; !ok {
-			break
-		}
-		return "findContentByUID", nil
-	}
-	return "", fmt.Errorf("%w for Content", ErrTypeNotFound)
-}
-
 func entityResolverNameForCoupon(ctx context.Context, rep map[string]interface{}) (string, error) {
 	for {
 		var (
@@ -938,23 +901,6 @@ func entityResolverNameForOrganization(ctx context.Context, rep map[string]inter
 	return "", fmt.Errorf("%w for Organization", ErrTypeNotFound)
 }
 
-func entityResolverNameForPayment(ctx context.Context, rep map[string]interface{}) (string, error) {
-	for {
-		var (
-			m   map[string]interface{}
-			val interface{}
-			ok  bool
-		)
-		_ = val
-		m = rep
-		if _, ok = m["uid"]; !ok {
-			break
-		}
-		return "findPaymentByUID", nil
-	}
-	return "", fmt.Errorf("%w for Payment", ErrTypeNotFound)
-}
-
 func entityResolverNameForPortfolio(ctx context.Context, rep map[string]interface{}) (string, error) {
 	for {
 		var (
@@ -970,6 +916,23 @@ func entityResolverNameForPortfolio(ctx context.Context, rep map[string]interfac
 		return "findPortfolioByUID", nil
 	}
 	return "", fmt.Errorf("%w for Portfolio", ErrTypeNotFound)
+}
+
+func entityResolverNameForPost(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		return "findPostByUID", nil
+	}
+	return "", fmt.Errorf("%w for Post", ErrTypeNotFound)
 }
 
 func entityResolverNameForQuote(ctx context.Context, rep map[string]interface{}) (string, error) {

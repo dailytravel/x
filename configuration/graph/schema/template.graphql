@@ -5,6 +5,7 @@ type Template {
   subject: String!
   body: String!
   metadata: Map
+  status: String!
   created: String!
   updated: String!
 }
@@ -20,6 +21,7 @@ input NewTemplate {
   subject: String!
   body: String!
   metadata: Map
+  status: String
 }
 
 input UpdateTemplate {
@@ -28,6 +30,7 @@ input UpdateTemplate {
   subject: String
   body: String
   metadata: Map
+  status: String
 }
 
 extend type Query {

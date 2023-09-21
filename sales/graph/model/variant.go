@@ -11,18 +11,18 @@ import (
 
 type Variant struct {
 	Model       `bson:",inline"`
-	Package     primitive.ObjectID `json:"package" bson:"package"`
-	Locale      string             `json:"locale" bson:"locale"`
-	Sku         string             `json:"sku,omitempty" bson:"sku,omitempty"`
-	Name        primitive.M        `json:"name" bson:"name"`
-	Description primitive.M        `json:"description,omitempty" bson:"description,omitempty"`
-	Quantity    int                `json:"quantity" bson:"quantity"`
-	Price       float64            `json:"price" bson:"price"`
-	Discount    float64            `json:"discount,omitempty" bson:"discount,omitempty"`
-	Currency    string             `json:"currency" bson:"currency"`
-	Start       primitive.DateTime `json:"start" bson:"start"`
-	End         primitive.DateTime `json:"end" bson:"end"`
-	Status      string             `json:"status" bson:"status"`
+	Package     primitive.ObjectID  `json:"package" bson:"package"`
+	Locale      string              `json:"locale" bson:"locale"`
+	Sku         string              `json:"sku,omitempty" bson:"sku,omitempty"`
+	Name        primitive.M         `json:"name" bson:"name"`
+	Description primitive.M         `json:"description,omitempty" bson:"description,omitempty"`
+	Quantity    int                 `json:"quantity" bson:"quantity"`
+	Price       float64             `json:"price" bson:"price"`
+	Discount    float64             `json:"discount,omitempty" bson:"discount,omitempty"`
+	Currency    string              `json:"currency" bson:"currency"`
+	Start       *primitive.DateTime `json:"start,omitempty" bson:"start,omitempty"`
+	End         *primitive.DateTime `json:"end,omitempty" bson:"end,omitempty"`
+	Status      string              `json:"status" bson:"status"`
 }
 
 func (i *Variant) MarshalBSON() ([]byte, error) {
@@ -45,7 +45,7 @@ func (i *Variant) Collection() string {
 func (i *Variant) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "sku", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
-		{Keys: bson.D{{Key: "content", Value: 1}}},
+		{Keys: bson.D{{Key: "package", Value: 1}}},
 		{Keys: bson.D{{Key: "locale", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},

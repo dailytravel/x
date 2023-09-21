@@ -1,4 +1,0 @@
-extend type Content @key(fields: "uid") {
-  uid: ID! @external
-  user: User
-}

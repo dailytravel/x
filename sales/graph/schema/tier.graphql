@@ -1,7 +1,7 @@
 type Tier {
   id: ID!
   locale: String!
-  name: String!
+  name: String! #Silver, Platinum, Diamond
   description: String!
   benefits: [Benefit!]!
   cost: Int!

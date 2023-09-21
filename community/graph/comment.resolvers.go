@@ -85,19 +85,9 @@ func (r *commentResolver) Children(ctx context.Context, obj *model.Comment) ([]*
 	return items, nil
 }
 
-// Commentable is the resolver for the commentable field.
-func (r *commentResolver) Commentable(ctx context.Context, obj *model.Comment) (map[string]interface{}, error) {
-	var item map[string]interface{}
-
-	err := r.db.Collection(obj.Commentable.Type).FindOne(ctx, bson.M{"_id": obj.Commentable.ID}).Decode(&item)
-	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	return item, nil
+// Object is the resolver for the object field.
+func (r *commentResolver) Object(ctx context.Context, obj *model.Comment) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Object - object"))
 }
 
 // Reactions is the resolver for the reactions field.
@@ -136,7 +126,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 		return nil, err
 	}
 
-	_id, err := primitive.ObjectIDFromHex(input.Commentable["id"].(string))
+	_id, err := primitive.ObjectIDFromHex(input.Object["id"].(string))
 	if err != nil {
 		return nil, err
 	}
@@ -146,9 +136,9 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 		Name:   input.Name,
 		Email:  input.Email,
 		Locale: input.Locale,
-		Commentable: model.Commentable{
-			ID:   _id,
-			Type: input.Commentable["type"].(string),
+		Object: model.Object{
+			ID:         _id,
+			Collection: input.Object["collection"].(string),
 		},
 	}
 

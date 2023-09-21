@@ -1,5 +1,5 @@
 extend type User @key(fields: "id") {
   id: ID! @external
-  contents: [Content]
+  posts: [Post]
   files: [File]
 }

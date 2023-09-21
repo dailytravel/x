@@ -65,11 +65,6 @@ func (r *conversationResolver) Messages(ctx context.Context, obj *model.Conversa
 	return items, nil
 }
 
-// UID is the resolver for the uid field.
-func (r *conversationResolver) UID(ctx context.Context, obj *model.Conversation) (string, error) {
-	return obj.UID.Hex(), nil
-}
-
 // Created is the resolver for the created field.
 func (r *conversationResolver) Created(ctx context.Context, obj *model.Conversation) (string, error) {
 	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
