@@ -91,6 +91,13 @@ type Notifications struct {
 	Count int             `json:"count"`
 }
 
+type Place struct {
+	ID      string     `json:"id"`
+	Reviews []*Comment `json:"reviews,omitempty"`
+}
+
+func (Place) IsEntity() {}
+
 type Quote struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`

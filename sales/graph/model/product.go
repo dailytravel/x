@@ -20,14 +20,15 @@ type Product struct {
 	Type        string                `json:"type" bson:"type"`
 	Name        primitive.M           `json:"name" bson:"name"`
 	Description primitive.M           `json:"description" bson:"description"`
+	Duration    int32                 `json:"duration" bson:"duration"`
 	Notes       primitive.M           `json:"notes" bson:"notes"`
 	Location    primitive.ObjectID    `json:"location" bson:"location"`
 	Tips        primitive.M           `json:"tips" bson:"tips"`
 	Highlights  primitive.M           `json:"highlights" bson:"highlights"`
 	Expectation primitive.M           `json:"expectation" bson:"expectation"`
 	Faqs        primitive.M           `json:"faqs" bson:"faqs"`
-	Reviews     int                   `json:"reviews" bson:"reviews"`
-	Booked      int                   `json:"booked" bson:"booked"`
+	Reviews     int32                 `json:"reviews" bson:"reviews"`
+	Booked      int32                 `json:"booked" bson:"booked"`
 	Rating      float32               `json:"rating" bson:"rating"`
 	Reviewable  bool                  `json:"reviewable" bson:"reviewable"`
 	Price       float64               `json:"price" bson:"price"`
@@ -60,6 +61,7 @@ func (i *Product) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "uid", Value: 1}}},
 		{Keys: bson.D{{Key: "type", Value: 1}}},
+		{Keys: bson.D{{Key: "duration", Value: 1}}},
 		{Keys: bson.D{{Key: "rating", Value: 1}}},
 		{Keys: bson.D{{Key: "booked", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
@@ -74,6 +76,7 @@ func (i *Product) Schema() interface{} {
 		Fields: []api.Field{
 			{Name: "type", Type: "string", Facet: pointer.True()},
 			{Name: "locale", Type: "string", Facet: pointer.True()},
+			{Name: "duration", Type: "int32", Facet: pointer.True()},
 			{Name: "name", Type: "object[]"},
 			{Name: "description", Type: "object[]", Optional: pointer.True()},
 			{Name: "images", Type: "object[]", Optional: pointer.True()},

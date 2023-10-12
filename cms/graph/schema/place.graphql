@@ -1,0 +1,4 @@
+extend type Place @key(fields: "id") {
+  id: ID! @external
+  images: [Image]
+}

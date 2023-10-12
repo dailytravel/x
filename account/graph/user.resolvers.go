@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -27,38 +28,49 @@ import (
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	// uid, err := utils.UID(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	// Check if a user with the same email already exists
-	var existingUser *model.User
-	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingUser); err != nil && err != mongo.ErrNoDocuments {
-		return nil, fmt.Errorf("error checking for existing user: %v", err)
+	var existingUser model.User
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingUser); err != nil {
+		if err != mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("error checking for existing user: %v", err)
+		}
 	}
 
-	// 3. Hash the password
+	// Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
 
-	// 4. Create the user
-	newUser := &model.User{
-		Name:     input.Name,
-		Email:    input.Email,
-		Roles:    input.Roles,
-		Password: string(hashedPassword),
+	// Create the user
+	item := &model.User{
+		Name:   input.Name,
+		Email:  input.Email,
+		Status: pointer.String("PENDING"), // Use a constant or enum for status
 	}
-	_, err = r.db.Collection("users").InsertOne(ctx, newUser)
+
+	// Insert the user
+	res, err := r.db.Collection("users").InsertOne(ctx, item)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert user: %v", err)
 	}
 
-	// 5. Return the created user (excluding the hashed password for security reasons)
-	newUser.Password = ""
-	return newUser, nil
+	// Create the password credential
+	credential := &model.Credential{
+		UID:     item.ID,
+		Type:    "PASSWORD", // Use a constant or enum for type
+		Secret:  string(hashedPassword),
+		Expires: primitive.Timestamp{T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix())},
+		Status:  "ACTIVE", // Use a constant or enum for status
+	}
+
+	// Insert the credential
+	if _, err := r.db.Collection("credentials").InsertOne(ctx, credential); err != nil {
+		return nil, fmt.Errorf("failed to insert credential: %v", err)
+	}
+
+	item.ID = res.InsertedID.(primitive.ObjectID)
+	return item, nil
 }
 
 // UpdateUser is the resolver for the updateUser field.
@@ -72,7 +84,6 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 
 	// Find the user and ensure they exist
 	user := &model.User{}
-	pwd := &model.Password{}
 
 	if err := r.db.Collection("users").FindOne(ctx, filter).Decode(&user); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -115,63 +126,23 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 		}
 	}
 
-	if input.Password != nil {
-		//check new password is not same current password
-		if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(*input.Password)); err == nil {
-			return nil, fmt.Errorf("new password cannot be the same as the old password")
-		}
-
-		//check new password is the same as old passwords
-		cursor, err := r.db.Collection("passwords").Find(ctx, bson.M{"uid": user.ID})
-		if err != nil {
-			return nil, fmt.Errorf("failed to retrieve old passwords: %v", err)
-		}
-
-		var oldPasswords []*model.Password
-		if err = cursor.All(ctx, &oldPasswords); err != nil {
-			return nil, fmt.Errorf("failed to decode old passwords: %v", err)
-		}
-
-		for _, oldPwd := range oldPasswords {
-			if err := bcrypt.CompareHashAndPassword([]byte(oldPwd.Hash), []byte(*input.Password)); err == nil {
-				return nil, fmt.Errorf("new password cannot be the same as the old password")
-			}
-		}
-
-		// Hash the password
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*input.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return nil, fmt.Errorf("failed to hash password: %v", err)
-		}
-
-		pwd.UID = user.ID
-		pwd.Hash = user.Password
-		user.Password = string(hashedPassword)
-	}
-
 	// Update the user in the database
 	result, err := r.db.Collection("users").UpdateOne(ctx, filter, bson.M{"$set": user})
 	if err != nil || result.ModifiedCount == 0 {
 		return nil, fmt.Errorf("failed to update user: %v", err)
 	}
 
-	// Add the old password to the user's password history
-	if input.Password != nil {
-		if _, err := r.db.Collection("passwords").InsertOne(ctx, pwd); err != nil {
-			return nil, fmt.Errorf("failed to insert old password: %v", err)
-		}
-	}
-
 	return user, nil
 }
 
 // Register is the resolver for the register field.
-func (r *mutationResolver) Register(ctx context.Context, input model.NewUser) (*model.User, error) {
+func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.User, error) {
 	// Check if a user with the same email already exists
 	var existingUser model.User
-	err := r.db.Collection("users").FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingUser)
-	if err != nil && err != mongo.ErrNoDocuments {
-		return nil, fmt.Errorf("error checking for existing user: %v", err)
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingUser); err != nil {
+		if err != mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("error checking for existing user: %v", err)
+		}
 	}
 
 	// Hash the password
@@ -181,20 +152,34 @@ func (r *mutationResolver) Register(ctx context.Context, input model.NewUser) (*
 	}
 
 	// Create the user
-	newUser := &model.User{
-		Name:     input.Name,
-		Email:    input.Email,
-		Password: string(hashedPassword),
-		Status:   pointer.String("PENDING"),
+	item := &model.User{
+		Name:   input.Name,
+		Email:  input.Email,
+		Status: pointer.String("PENDING"), // Use a constant or enum for status
 	}
-	_, err = r.db.Collection("users").InsertOne(ctx, newUser)
+
+	// Insert the user
+	res, err := r.db.Collection("users").InsertOne(ctx, item)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert user: %v", err)
 	}
 
-	// 5. Return the created user (excluding the hashed password for security reasons)
-	newUser.Password = ""
-	return newUser, nil
+	// Create the password credential
+	credential := &model.Credential{
+		UID:     item.ID,
+		Type:    "PASSWORD", // Use a constant or enum for type
+		Secret:  string(hashedPassword),
+		Expires: primitive.Timestamp{T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix())},
+		Status:  "ACTIVE", // Use a constant or enum for status
+	}
+
+	// Insert the credential
+	if _, err := r.db.Collection("credentials").InsertOne(ctx, credential); err != nil {
+		return nil, fmt.Errorf("failed to insert credential: %v", err)
+	}
+
+	item.ID = res.InsertedID.(primitive.ObjectID)
+	return item, nil
 }
 
 // VerifyEmail is the resolver for the verifyEmail field.
@@ -309,19 +294,20 @@ func (r *mutationResolver) VerifyPhone(ctx context.Context, token string) (map[s
 }
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*model.Payload, error) {
+func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error) {
 	var u *model.User
 	var k *model.Key
 	var a *model.Api
 	var c *model.Client
+	var credential *model.Credential
 
-	client := auth.APIKey(ctx)
-	if client == nil {
-		return nil, fmt.Errorf("client not found")
+	clientID, err := primitive.ObjectIDFromHex(*input.ClientID)
+	if err != nil {
+		return nil, err
 	}
 
 	//check client
-	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"secret": client}, nil).Decode(&c); err != nil {
+	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"_id": clientID}, nil).Decode(&c); err != nil {
 		return nil, fmt.Errorf("client not found")
 	}
 
@@ -331,12 +317,17 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 	}
 
 	//find user by email
-	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": email}, nil).Decode(&u); err != nil {
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"$or": []bson.M{bson.M{"email": input.Username}, bson.M{"phone": input.Username}}}, nil).Decode(&u); err != nil {
 		return nil, fmt.Errorf("user not found")
 	}
 
+	//find credential by uid
+	if err := r.db.Collection("credentials").FindOne(ctx, bson.M{"uid": u.ID, "type": "PASSWORD"}, nil).Decode(&credential); err != nil {
+		return nil, fmt.Errorf("credential not found")
+	}
+
 	//check password
-	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(credential.Secret), []byte(input.Password)); err != nil {
 		return nil, fmt.Errorf("password not match")
 	}
 
@@ -378,38 +369,50 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 		return nil, err
 	}
 
-	return &model.Payload{
-		AccessToken:  *access_token,
-		RefreshToken: *refresh_token,
-		TokenType:    "Bearer",
-		ExpiresIn:    3600,
+	return &model.AuthPayload{
+		AccessToken:  access_token,
+		RefreshToken: refresh_token,
+		TokenType:    pointer.String("Bearer"),
+		ExpiresIn:    pointer.Int(3600),
 	}, nil
 }
 
 // SocialLogin is the resolver for the socialLogin field.
-func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.SocialProvider, accessToken string) (*model.Payload, error) {
+func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLoginInput) (*model.AuthPayload, error) {
 	var u *model.User
 	var k *model.Key
 	var a *model.Api
 	var c *model.Client
+	var i *model.Identity
 
-	client := auth.APIKey(ctx)
-	if client == nil {
-		return nil, fmt.Errorf("client not found")
-	}
-
-	//check client
-	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"secret": client}, nil).Decode(&c); err != nil {
-		return nil, fmt.Errorf("client not found")
-	}
-	// verify token from provider by google oauth
-	email, err := auth.GoogleLogin(ctx, accessToken)
+	clientID, err := primitive.ObjectIDFromHex(*input.ClientID)
 	if err != nil {
 		return nil, err
 	}
 
+	//check client
+	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"_id": clientID}, nil).Decode(&c); err != nil {
+		return nil, fmt.Errorf("client not found")
+	}
+
+	userInfo, err := utils.FetchUserInfo(input.Provider, input.Token)
+	if err != nil {
+		return nil, err
+	}
+
+	var user map[string]string
+	if err := json.Unmarshal([]byte(userInfo), &user); err != nil {
+		return nil, err
+	}
+
+	//check identity if exits and status is active then return token
+
+	if err := r.db.Collection("identities").FindOne(ctx, bson.M{"provider": input.Provider, "user_id": user["user_id"]}, nil).Decode(&i); err != nil {
+		return nil, fmt.Errorf("identity not found")
+	}
+
 	// Check if the user already exists in the system
-	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": email}, nil).Decode(&u); err != nil {
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"_id": i.UID}, nil).Decode(&u); err != nil {
 		return nil, fmt.Errorf("user not found")
 	}
 
@@ -446,12 +449,17 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, provider model.Socia
 		return nil, err
 	}
 
-	return &model.Payload{
-		AccessToken:  *access_token,
-		RefreshToken: *refresh_token,
-		TokenType:    "Bearer",
-		ExpiresIn:    3600,
+	return &model.AuthPayload{
+		AccessToken:  access_token,
+		RefreshToken: refresh_token,
+		TokenType:    pointer.String("Bearer"),
+		ExpiresIn:    pointer.Int(3600),
 	}, nil
+}
+
+// RefreshToken is the resolver for the refreshToken field.
+func (r *mutationResolver) RefreshToken(ctx context.Context, refreshToken string) (*model.RefreshTokenPayload, error) {
+	panic(fmt.Errorf("not implemented: RefreshToken - refreshToken"))
 }
 
 // ForgotPassword is the resolver for the forgotPassword field.
@@ -481,14 +489,19 @@ func (r *mutationResolver) ForgotPassword(ctx context.Context, email string) (ma
 }
 
 // ResetPassword is the resolver for the resetPassword field.
-func (r *mutationResolver) ResetPassword(ctx context.Context, token string, password string) (map[string]interface{}, error) {
+func (r *mutationResolver) ResetPassword(ctx context.Context, input model.ResetPasswordInput) (map[string]interface{}, error) {
+	var credentials []*model.Credential
 	// Retrieve userId from Redis
-	userId, err := r.redis.Get(ctx, token).Result()
+	userId, err := r.redis.Get(ctx, input.Token).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return nil, fmt.Errorf("invalid token")
 		}
 		return nil, fmt.Errorf("failed to retrieve token from Redis: %v", err)
+	}
+
+	if input.Password != input.PasswordConfirmation {
+		return nil, errors.New("passwords do not match")
 	}
 
 	// Convert userID to ObjectID
@@ -503,60 +516,125 @@ func (r *mutationResolver) ResetPassword(ctx context.Context, token string, pass
 		return nil, fmt.Errorf("failed to retrieve user: %v", err)
 	}
 
-	// Check if the user's password is the same as the new password
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err == nil {
-		return nil, fmt.Errorf("new password cannot be the same as the old password")
+	// Retrieve all credentials for the user
+	cursor, err := r.db.Collection("credentials").Find(ctx, bson.M{"uid": user.ID, "type": "PASSWORD"})
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve credentials: %v", err)
+	}
+
+	// Check if the user has any credentials
+	if err := cursor.All(ctx, &credentials); err != nil {
+		return nil, fmt.Errorf("failed to retrieve credentials: %v", err)
+	}
+
+	// Check if the user has any credentials
+	if len(credentials) == 0 {
+		return nil, fmt.Errorf("user has no credentials")
+	}
+
+	for _, credential := range credentials {
+		//check existing password
+		if err := bcrypt.CompareHashAndPassword([]byte(credential.Secret), []byte(input.Password)); err == nil {
+			return nil, fmt.Errorf("new password cannot be the same as the previous passwords")
+		}
 	}
 
 	// Hash the new password
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
 
-	// Check if the new password is the same as the old password
-	cursor, err := r.db.Collection("passwords").Find(ctx, bson.M{"uid": user.ID})
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve old passwords: %v", err)
-	}
-	defer cursor.Close(ctx)
-
-	var oldPasswords []*model.Password
-	if err = cursor.All(ctx, &oldPasswords); err != nil {
-		return nil, fmt.Errorf("failed to decode old passwords: %v", err)
-	}
-
-	for _, oldPwd := range oldPasswords {
-		if err := bcrypt.CompareHashAndPassword([]byte(oldPwd.Hash), []byte(password)); err == nil {
-			return nil, fmt.Errorf("new password cannot be the same as the old password")
-		}
-	}
-
 	// Create a new password struct
-	pwd := &model.Password{
-		UID:  user.ID,
-		Hash: user.Password,
+	credential := &model.Credential{
+		UID:     user.ID,
+		Type:    "PASSWORD", // Use a constant or enum for type
+		Secret:  string(hash),
+		Expires: primitive.Timestamp{T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix())},
+		Status:  "ACTIVE", // Use a constant or enum for status
 	}
 
-	// Update the user's password in the database
-	result, err := r.db.Collection("users").UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": bson.M{"password": hash}})
-	if err != nil || result.ModifiedCount == 0 {
-		return nil, fmt.Errorf("failed to update user password: %v", err)
-	}
-
-	// Add the old password to the user's password history
-	if _, err := r.db.Collection("passwords").InsertOne(ctx, pwd); err != nil {
-		return nil, fmt.Errorf("failed to insert old password: %v", err)
+	// Insert the credential
+	if _, err := r.db.Collection("credentials").InsertOne(ctx, credential); err != nil {
+		return nil, fmt.Errorf("failed to insert credential: %v", err)
 	}
 
 	// Delete the token from Redis
-	if _, err := r.redis.Del(ctx, token).Result(); err != nil {
+	if _, err := r.redis.Del(ctx, input.Token).Result(); err != nil {
 		return nil, fmt.Errorf("failed to delete token from Redis: %v", err)
 	}
 
 	return map[string]interface{}{
 		"message": "Password updated successfully.",
 		"email":   user.Email,
+	}, nil
+}
+
+// UpdatePassword is the resolver for the UpdatePassword field.
+func (r *mutationResolver) UpdatePassword(ctx context.Context, input model.UpdatePassword) (map[string]interface{}, error) {
+	uid, err := utils.UID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	//check password and password confirmation
+	if input.Password != input.PasswordConfirmation {
+		return nil, errors.New("passwords do not match")
+	}
+
+	var credentials []*model.Credential
+
+	// Retrieve all credentials for the user
+	cursor, err := r.db.Collection("credentials").Find(ctx, bson.M{"uid": uid, "type": "PASSWORD"})
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve credentials: %v", err)
+	}
+
+	// Check if the user has any credentials
+	if err := cursor.All(ctx, &credentials); err != nil {
+		return nil, fmt.Errorf("failed to retrieve credentials: %v", err)
+	}
+
+	// Check if the user has any credentials
+	if len(credentials) == 0 {
+		return nil, fmt.Errorf("user has no credentials")
+	}
+
+	//check old password
+	for _, credential := range credentials {
+		//check existing password
+		if err := bcrypt.CompareHashAndPassword([]byte(credential.Secret), []byte(input.OldPassword)); err != nil {
+			return nil, fmt.Errorf("old password is not correct")
+		}
+
+		//check new password
+		if err := bcrypt.CompareHashAndPassword([]byte(credential.Secret), []byte(input.Password)); err == nil {
+			return nil, fmt.Errorf("new password cannot be the same as the previous passwords")
+		}
+	}
+
+	// Hash the new password
+	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash password: %v", err)
+	}
+
+	// Create a new password struct
+	credential := &model.Credential{
+		UID:     *uid,
+		Type:    "PASSWORD", // Use a constant or enum for type
+		Secret:  string(hash),
+		Expires: primitive.Timestamp{T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix())},
+		Status:  "ACTIVE", // Use a constant or enum for status
+	}
+
+	// Insert the credential
+	if _, err := r.db.Collection("credentials").InsertOne(ctx, credential); err != nil {
+		return nil, fmt.Errorf("failed to insert credential: %v", err)
+	}
+
+	return map[string]interface{}{
+		"message": "Password updated successfully.",
 	}, nil
 }
 
@@ -787,6 +865,11 @@ func (r *userResolver) Created(ctx context.Context, obj *model.User) (string, er
 // Updated is the resolver for the updated field.
 func (r *userResolver) Updated(ctx context.Context, obj *model.User) (string, error) {
 	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
+}
+
+// Identities is the resolver for the identities field.
+func (r *userResolver) Identities(ctx context.Context, obj *model.User) ([]*model.Identity, error) {
+	panic(fmt.Errorf("not implemented: Identities - identities"))
 }
 
 // User returns UserResolver implementation.

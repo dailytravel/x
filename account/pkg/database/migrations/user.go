@@ -5,6 +5,7 @@ import (
 
 	"github.com/dailytravel/x/account/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -95,10 +96,20 @@ func (m *User) Migrate() error {
 				for _, role := range rolesSlice {
 					item.Roles = append(item.Roles, &role)
 				}
-				item.Password = string(hashedPassword)
 
 				if _, err := col.InsertOne(context.Background(), item); err != nil {
 					return err
+				} else {
+					credential := &model.Credential{
+						UID:     item.ID,
+						Type:    "password",
+						Secret:  string(hashedPassword),
+						Expires: primitive.Timestamp{T: uint32(90 * 24 * 60 * 60)},
+					}
+
+					if _, err := m.Database.Collection(credential.Collection()).InsertOne(context.Background(), credential); err != nil {
+						return err
+					}
 				}
 			}
 		}

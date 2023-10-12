@@ -1,6 +1,8 @@
 type User @key(fields: "id") {
   id: ID!
   name: String!
+  given_name: String
+  family_name: String
   email: String!
   phone: String
   roles: [String]
@@ -8,13 +10,14 @@ type User @key(fields: "id") {
   timezone: String
   locale: String
   picture: String
-  lastLogin: String
-  emailVerified: Boolean
-  phoneVerified: Boolean
+  last_login: String
+  email_verified: Boolean
+  phone_verified: Boolean
   metadata: Map
   status: String
   created: String!
   updated: String!
+  identities: [Identity]
 }
 
 enum UserStatus {
@@ -42,10 +45,11 @@ type MFA {
 }
 
 type Payload {
-  accessToken: String!
-  refreshToken: String!
-  tokenType: String!
-  expiresIn: Int!
+  access_token: String!
+  expires_in: Int!
+  refresh_token: String!
+  token_type: String!
+  user: User!
 }
 
 # Input Types
@@ -56,6 +60,8 @@ input MFAInput {
 
 input NewUser {
   name: String!
+  given_name: String
+  family_name: String
   email: String!
   phone: String
   password: String!
@@ -68,6 +74,8 @@ input NewUser {
 
 input UpdateUser {
   name: String
+  given_name: String
+  family_name: String
   password: String
   roles: [String]
   timezone: String
@@ -75,6 +83,72 @@ input UpdateUser {
   picture: String
   status: String
   metadata: Map
+}
+
+input LoginInput {
+  # User credentials
+  username: String!
+  password: String!
+
+  # OAuth 2.0 authentication parameters
+  grant_type: String
+  scope: String
+
+  # Client credentials (for OAuth 2.0 client authentication)
+  client_id: String
+  client_secret: String
+}
+
+input SocialLoginInput {
+  # User credentials
+  username: String!
+  password: String!
+
+  # OAuth 2.0 authentication parameters
+  grant_type: String
+  scope: String
+
+  # Client credentials (for OAuth 2.0 client authentication)
+  client_id: String
+  client_secret: String
+
+  # Social provider
+  provider: String!
+  token: String!
+}
+
+input RegisterInput {
+  name: String!
+  email: String!
+  password: String!
+  password_confirmation: String!
+}
+
+input UpdatePassword {
+  old_password: String!
+  password: String!
+  password_confirmation: String!
+}
+
+input ResetPasswordInput {
+  token: String!
+  password: String!
+  password_confirmation: String!
+}
+
+type AuthPayload {
+  access_token: String
+  refresh_token: String
+  expires_in: Int
+  token_type: String
+  user: User
+}
+
+type RefreshTokenPayload {
+  access_token: String!
+  refresh_token: String!
+  expires_in: Int!
+  token_type: String!
 }
 
 extend type Query {
@@ -87,13 +161,15 @@ extend type Query {
 extend type Mutation {
   createUser(input: NewUser!): User @auth(roles: [ADMIN])
   updateUser(id: ID!, input: UpdateUser!): User
-  register(input: NewUser!): User
+  register(input: RegisterInput!): User
   verifyEmail(token: String!): Map
   verifyPhone(token: String!): Map
-  login(email: String!, password: String!): Payload
-  socialLogin(provider: SocialProvider!, accessToken: String!): Payload
+  login(input: LoginInput!): AuthPayload
+  socialLogin(input: SocialLoginInput!): AuthPayload
+  refreshToken(refresh_token: String!): RefreshTokenPayload
   forgotPassword(email: String!): Map
-  resetPassword(token: String!, password: String!): Map
+  resetPassword(input: ResetPasswordInput!): Map
+  UpdatePassword(input: UpdatePassword!): Map @auth
   deactivate: User @auth
   deleteUser(id: ID!): Boolean
   deleteUsers(ids: [ID!]!): Boolean

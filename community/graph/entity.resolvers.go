@@ -57,6 +57,11 @@ func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.Fi
 	}, nil
 }
 
+// FindPlaceByID is the resolver for the findPlaceByID field.
+func (r *entityResolver) FindPlaceByID(ctx context.Context, id string) (*model.Place, error) {
+	panic(fmt.Errorf("not implemented: FindPlaceByID - findPlaceByID"))
+}
+
 // FindPostByID is the resolver for the findPostByID field.
 func (r *entityResolver) FindPostByID(ctx context.Context, id string) (*model.Post, error) {
 	panic(fmt.Errorf("not implemented: FindPostByID - findPostByID"))

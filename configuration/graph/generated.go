@@ -160,7 +160,11 @@ type ComplexityRoot struct {
 		Location    func(childComplexity int) int
 		Metadata    func(childComplexity int) int
 		Name        func(childComplexity int) int
+		Order       func(childComplexity int) int
 		Parent      func(childComplexity int) int
+		Popular     func(childComplexity int) int
+		Reviewable  func(childComplexity int) int
+		Slug        func(childComplexity int) int
 		Status      func(childComplexity int) int
 		Type        func(childComplexity int) int
 	}
@@ -1052,12 +1056,40 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Place.Name(childComplexity), true
 
+	case "Place.order":
+		if e.complexity.Place.Order == nil {
+			break
+		}
+
+		return e.complexity.Place.Order(childComplexity), true
+
 	case "Place.parent":
 		if e.complexity.Place.Parent == nil {
 			break
 		}
 
 		return e.complexity.Place.Parent(childComplexity), true
+
+	case "Place.popular":
+		if e.complexity.Place.Popular == nil {
+			break
+		}
+
+		return e.complexity.Place.Popular(childComplexity), true
+
+	case "Place.reviewable":
+		if e.complexity.Place.Reviewable == nil {
+			break
+		}
+
+		return e.complexity.Place.Reviewable(childComplexity), true
+
+	case "Place.slug":
+		if e.complexity.Place.Slug == nil {
+			break
+		}
+
+		return e.complexity.Place.Slug(childComplexity), true
 
 	case "Place.status":
 		if e.complexity.Place.Status == nil {
@@ -3619,12 +3651,20 @@ func (ec *executionContext) fieldContext_Entity_findPlaceByID(ctx context.Contex
 				return ec.fieldContext_Place_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Place_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Place_slug(ctx, field)
 			case "name":
 				return ec.fieldContext_Place_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Place_description(ctx, field)
 			case "location":
 				return ec.fieldContext_Place_location(ctx, field)
+			case "reviewable":
+				return ec.fieldContext_Place_reviewable(ctx, field)
+			case "popular":
+				return ec.fieldContext_Place_popular(ctx, field)
+			case "order":
+				return ec.fieldContext_Place_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
@@ -5386,12 +5426,20 @@ func (ec *executionContext) fieldContext_Mutation_createLocation(ctx context.Con
 				return ec.fieldContext_Place_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Place_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Place_slug(ctx, field)
 			case "name":
 				return ec.fieldContext_Place_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Place_description(ctx, field)
 			case "location":
 				return ec.fieldContext_Place_location(ctx, field)
+			case "reviewable":
+				return ec.fieldContext_Place_reviewable(ctx, field)
+			case "popular":
+				return ec.fieldContext_Place_popular(ctx, field)
+			case "order":
+				return ec.fieldContext_Place_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
@@ -5478,12 +5526,20 @@ func (ec *executionContext) fieldContext_Mutation_updateLocation(ctx context.Con
 				return ec.fieldContext_Place_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Place_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Place_slug(ctx, field)
 			case "name":
 				return ec.fieldContext_Place_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Place_description(ctx, field)
 			case "location":
 				return ec.fieldContext_Place_location(ctx, field)
+			case "reviewable":
+				return ec.fieldContext_Place_reviewable(ctx, field)
+			case "popular":
+				return ec.fieldContext_Place_popular(ctx, field)
+			case "order":
+				return ec.fieldContext_Place_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
@@ -7003,12 +7059,20 @@ func (ec *executionContext) fieldContext_Place_parent(ctx context.Context, field
 				return ec.fieldContext_Place_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Place_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Place_slug(ctx, field)
 			case "name":
 				return ec.fieldContext_Place_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Place_description(ctx, field)
 			case "location":
 				return ec.fieldContext_Place_location(ctx, field)
+			case "reviewable":
+				return ec.fieldContext_Place_reviewable(ctx, field)
+			case "popular":
+				return ec.fieldContext_Place_popular(ctx, field)
+			case "order":
+				return ec.fieldContext_Place_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
@@ -7096,6 +7160,50 @@ func (ec *executionContext) _Place_type(ctx context.Context, field graphql.Colle
 }
 
 func (ec *executionContext) fieldContext_Place_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Place_slug(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Place_slug(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Slug, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Place_slug(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Place",
 		Field:      field,
@@ -7240,6 +7348,129 @@ func (ec *executionContext) fieldContext_Place_location(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Place_reviewable(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Place_reviewable(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Reviewable, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Place_reviewable(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Place_popular(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Place_popular(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Popular, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Place_popular(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Place_order(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Place_order(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Order, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Place_order(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Place_status(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Place_status(ctx, field)
 	if err != nil {
@@ -7366,12 +7597,20 @@ func (ec *executionContext) fieldContext_Places_data(ctx context.Context, field 
 				return ec.fieldContext_Place_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Place_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Place_slug(ctx, field)
 			case "name":
 				return ec.fieldContext_Place_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Place_description(ctx, field)
 			case "location":
 				return ec.fieldContext_Place_location(ctx, field)
+			case "reviewable":
+				return ec.fieldContext_Place_reviewable(ctx, field)
+			case "popular":
+				return ec.fieldContext_Place_popular(ctx, field)
+			case "order":
+				return ec.fieldContext_Place_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
@@ -7896,12 +8135,20 @@ func (ec *executionContext) fieldContext_Query_place(ctx context.Context, field 
 				return ec.fieldContext_Place_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Place_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Place_slug(ctx, field)
 			case "name":
 				return ec.fieldContext_Place_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Place_description(ctx, field)
 			case "location":
 				return ec.fieldContext_Place_location(ctx, field)
+			case "reviewable":
+				return ec.fieldContext_Place_reviewable(ctx, field)
+			case "popular":
+				return ec.fieldContext_Place_popular(ctx, field)
+			case "order":
+				return ec.fieldContext_Place_order(ctx, field)
 			case "status":
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
@@ -12409,7 +12656,7 @@ func (ec *executionContext) unmarshalInputNewLocation(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "locale", "type", "name", "description", "location", "images", "status", "metadata"}
+	fieldsInOrder := [...]string{"parent", "locale", "type", "name", "slug", "description", "location", "images", "status", "reviewable", "popular", "order", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12452,6 +12699,15 @@ func (ec *executionContext) unmarshalInputNewLocation(ctx context.Context, obj i
 				return it, err
 			}
 			it.Name = data
+		case "slug":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("slug"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Slug = data
 		case "description":
 			var err error
 
@@ -12488,6 +12744,33 @@ func (ec *executionContext) unmarshalInputNewLocation(ctx context.Context, obj i
 				return it, err
 			}
 			it.Status = data
+		case "reviewable":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reviewable"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Reviewable = data
+		case "popular":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("popular"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Popular = data
+		case "order":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Order = data
 		case "metadata":
 			var err error
 
@@ -12963,7 +13246,7 @@ func (ec *executionContext) unmarshalInputUpdateLocation(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "locale", "type", "name", "description", "location", "images", "status", "metadata"}
+	fieldsInOrder := [...]string{"parent", "locale", "type", "slug", "name", "description", "location", "images", "reviewable", "popular", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12997,6 +13280,15 @@ func (ec *executionContext) unmarshalInputUpdateLocation(ctx context.Context, ob
 				return it, err
 			}
 			it.Type = data
+		case "slug":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("slug"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Slug = data
 		case "name":
 			var err error
 
@@ -13033,6 +13325,24 @@ func (ec *executionContext) unmarshalInputUpdateLocation(ctx context.Context, ob
 				return it, err
 			}
 			it.Images = data
+		case "reviewable":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reviewable"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Reviewable = data
+		case "popular":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("popular"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Popular = data
 		case "status":
 			var err error
 
@@ -14540,6 +14850,11 @@ func (ec *executionContext) _Place(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "slug":
+			out.Values[i] = ec._Place_slug(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "name":
 			field := field
 
@@ -14611,6 +14926,12 @@ func (ec *executionContext) _Place(ctx context.Context, sel ast.SelectionSet, ob
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "location":
 			out.Values[i] = ec._Place_location(ctx, field, obj)
+		case "reviewable":
+			out.Values[i] = ec._Place_reviewable(ctx, field, obj)
+		case "popular":
+			out.Values[i] = ec._Place_popular(ctx, field, obj)
+		case "order":
+			out.Values[i] = ec._Place_order(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._Place_status(ctx, field, obj)
 		case "metadata":

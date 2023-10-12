@@ -22,9 +22,13 @@ type Place struct {
 	Parent      *primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
 	Locale      string              `json:"locale" bson:"locale"`
 	Type        string              `json:"type" bson:"type"`
+	Slug        string              `json:"slug" bson:"slug"`
 	Name        primitive.M         `json:"name" bson:"name"`
 	Description primitive.M         `json:"description,omitempty" bson:"description,omitempty"`
 	Location    *Location           `json:"location,omitempty" bson:"location,omitempty"`
+	Reviewable  *bool               `json:"reviewable" bson:"reviewable"`
+	Popular     *bool               `json:"popular" bson:"popular"`
+	Order       *int                `json:"order,omitempty" bson:"order,omitempty"`
 	Status      string              `json:"status" bson:"status"`
 }
 
@@ -77,7 +81,12 @@ func (i *Place) Index() []mongo.IndexModel {
 			Options: options.Index().SetUnique(true).SetPartialFilterExpression(bson.M{"name.en": bson.M{"$exists": true}}),
 		},
 		// Additional basic indices for frequently queried fields
+		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
+		{Keys: bson.D{{Key: "parent", Value: 1}}},
+		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "locale", Value: 1}}},
+		{Keys: bson.D{{Key: "reviewable", Value: 1}}},
+		{Keys: bson.D{{Key: "popular", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},
 		{Keys: bson.D{{Key: "updated", Value: 1}}},
@@ -90,9 +99,12 @@ func (i *Place) Schema() interface{} {
 		Fields: []api.Field{
 			{Name: "type", Type: "string", Facet: pointer.True()},
 			{Name: "locale", Type: "string", Facet: pointer.True()},
+			{Name: "slug", Type: "string"},
 			{Name: "name", Type: "object"},
 			{Name: "description", Type: "object", Optional: pointer.True()},
 			{Name: "location", Type: "geopoint", Optional: pointer.True()},
+			{Name: "reviewable", Type: "bool", Facet: pointer.True()},
+			{Name: "popular", Type: "bool", Facet: pointer.True()},
 			{Name: "status", Type: "string", Facet: pointer.True()},
 			{Name: "created", Type: "string"},
 			{Name: "updated", Type: "string"},
@@ -108,6 +120,7 @@ func (i *Place) Document() map[string]interface{} {
 		"id":          i.ID, // Convert ID to string if it's not already
 		"parent":      i.Parent,
 		"locale":      i.Locale,
+		"slug":        i.Slug,
 		"type":        i.Type,
 		"name":        i.Name,
 		"description": i.Description,
@@ -115,20 +128,6 @@ func (i *Place) Document() map[string]interface{} {
 		"created":     time.Unix(int64(i.Created.T), 0).Format(time.RFC3339),
 		"updated":     time.Unix(int64(i.Updated.T), 0).Format(time.RFC3339),
 	}
-
-	// for locale, name := range i.Name {
-	// 	document[fmt.Sprintf("name.%s", locale)] = name
-	// }
-
-	// if i.Description != nil {
-	// 	for locale, description := range i.Description {
-	// 		document[fmt.Sprintf("description.%s", locale)] = description
-	// 	}
-	// }
-
-	// if i.Location != nil {
-	// 	document["location"] = []float64{*i.Location.Lng, *i.Location.Lat} // Note the order [lng, lat]
-	// }
 
 	return document
 }

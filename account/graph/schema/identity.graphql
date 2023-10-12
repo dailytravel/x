@@ -2,10 +2,28 @@ type Identity {
   id: ID!
   user: User!
   provider: String!
-  accessToken: String!
-  expiresIn: Int!
-  connection: String! #google-oauth2
-  isSocial: Boolean!
+  user_id: String!
+  connection: String!
+  is_social: Boolean!
   metadata: Map
   status: String!
+}
+
+input NewIdentity {
+  user_id: String!
+  provider: String!
+  connection: String!
+  is_social: Boolean!
+  metadata: Map
+  status: String!
+}
+
+extend type Query {
+  identity(id: ID!): Identity @auth
+  identities: [Identity] @auth
+}
+
+extend type Mutation {
+  linkIdentity(input: NewIdentity!): Identity @auth
+  unlinkIdentity(id: ID!): Identity @auth
 }

@@ -16,17 +16,18 @@ import (
 type User struct {
 	Model         `bson:",inline"`
 	Name          string               `json:"name" bson:"name"`
+	GivenName     *string              `json:"given_name,omitempty" bson:"given_name,omitempty"`
+	FamilyName    *string              `json:"family_name,omitempty" bson:"family_name,omitempty"`
 	Email         string               `json:"email" bson:"email"`
 	Phone         *string              `json:"phone,omitempty" bson:"phone,omitempty"`
-	Password      string               `json:"password" bson:"password"`
 	Roles         []*string            `json:"roles,omitempty" bson:"roles,omitempty"`
 	Mfa           *Mfa                 `json:"mfa,omitempty" bson:"mfa,omitempty"`
 	Locale        *string              `json:"locale,omitempty" bson:"locale,omitempty"`
 	Timezone      *string              `json:"timezone,omitempty" bson:"timezone,omitempty"`
 	Picture       *string              `json:"picture,omitempty" bson:"picture,omitempty"`
-	LastLogin     *primitive.Timestamp `json:"lastLogin,omitempty" bson:"last_login,omitempty"`
-	EmailVerified *bool                `json:"emailVerified,omitempty" bson:"email_verified,omitempty"`
-	PhoneVerified *bool                `json:"phoneVerified,omitempty" bson:"phone_verified,omitempty"`
+	LastLogin     *primitive.Timestamp `json:"last_login,omitempty" bson:"last_login,omitempty"`
+	EmailVerified *bool                `json:"email_verified,omitempty" bson:"email_verified,omitempty"`
+	PhoneVerified *bool                `json:"phone_verified,omitempty" bson:"phone_verified,omitempty"`
 	Status        *string              `json:"status" bson:"status"`
 }
 

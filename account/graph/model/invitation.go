@@ -14,7 +14,7 @@ type Invitation struct {
 	Email    string              `json:"email" bson:"email"`
 	Roles    []*string           `json:"roles,omitempty" bson:"roles,omitempty"`
 	Status   string              `json:"status" bson:"status"`
-	Expires  primitive.Timestamp `json:"expiresAt" bson:"expires"`
+	Expires  primitive.Timestamp `json:"expires" bson:"expires"`
 	Metadata primitive.M         `json:"metadata,omitempty"`
 }
 

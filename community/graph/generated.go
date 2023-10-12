@@ -116,6 +116,7 @@ type ComplexityRoot struct {
 		FindContactByID  func(childComplexity int, id string) int
 		FindExpenseByID  func(childComplexity int, id string) int
 		FindFileByID     func(childComplexity int, id string) int
+		FindPlaceByID    func(childComplexity int, id string) int
 		FindPostByID     func(childComplexity int, id string) int
 		FindQuoteByID    func(childComplexity int, id string) int
 		FindReactionByID func(childComplexity int, id string) int
@@ -195,6 +196,11 @@ type ComplexityRoot struct {
 	Notifications struct {
 		Count func(childComplexity int) int
 		Data  func(childComplexity int) int
+	}
+
+	Place struct {
+		ID      func(childComplexity int) int
+		Reviews func(childComplexity int) int
 	}
 
 	Post struct {
@@ -319,6 +325,7 @@ type EntityResolver interface {
 	FindContactByID(ctx context.Context, id string) (*model.Contact, error)
 	FindExpenseByID(ctx context.Context, id string) (*model.Expense, error)
 	FindFileByID(ctx context.Context, id string) (*model.File, error)
+	FindPlaceByID(ctx context.Context, id string) (*model.Place, error)
 	FindPostByID(ctx context.Context, id string) (*model.Post, error)
 	FindQuoteByID(ctx context.Context, id string) (*model.Quote, error)
 	FindReactionByID(ctx context.Context, id string) (*model.Reaction, error)
@@ -729,6 +736,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.FindFileByID(childComplexity, args["id"].(string)), true
+
+	case "Entity.findPlaceByID":
+		if e.complexity.Entity.FindPlaceByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findPlaceByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindPlaceByID(childComplexity, args["id"].(string)), true
 
 	case "Entity.findPostByID":
 		if e.complexity.Entity.FindPostByID == nil {
@@ -1295,6 +1314,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Notifications.Data(childComplexity), true
+
+	case "Place.id":
+		if e.complexity.Place.ID == nil {
+			break
+		}
+
+		return e.complexity.Place.ID(childComplexity), true
+
+	case "Place.reviews":
+		if e.complexity.Place.Reviews == nil {
+			break
+		}
+
+		return e.complexity.Place.Reviews(childComplexity), true
 
 	case "Post.comments":
 		if e.complexity.Post.Comments == nil {
@@ -1872,7 +1905,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/comment.graphql" "schema/contact.graphql" "schema/conversation.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/message.graphql" "schema/notification.graphql" "schema/post.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/recipient.graphql" "schema/share.graphql" "schema/task.graphql" "schema/user.graphql"
+//go:embed "schema.graphqls" "schema/comment.graphql" "schema/contact.graphql" "schema/conversation.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/message.graphql" "schema/notification.graphql" "schema/place.graphql" "schema/post.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/recipient.graphql" "schema/share.graphql" "schema/task.graphql" "schema/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1892,6 +1925,7 @@ var sources = []*ast.Source{
 	{Name: "schema/file.graphql", Input: sourceData("schema/file.graphql"), BuiltIn: false},
 	{Name: "schema/message.graphql", Input: sourceData("schema/message.graphql"), BuiltIn: false},
 	{Name: "schema/notification.graphql", Input: sourceData("schema/notification.graphql"), BuiltIn: false},
+	{Name: "schema/place.graphql", Input: sourceData("schema/place.graphql"), BuiltIn: false},
 	{Name: "schema/post.graphql", Input: sourceData("schema/post.graphql"), BuiltIn: false},
 	{Name: "schema/quote.graphql", Input: sourceData("schema/quote.graphql"), BuiltIn: false},
 	{Name: "schema/reaction.graphql", Input: sourceData("schema/reaction.graphql"), BuiltIn: false},
@@ -1937,7 +1971,7 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Comment | Contact | Expense | File | Post | Quote | Reaction | Share | Task | User
+union _Entity = Comment | Contact | Expense | File | Place | Post | Quote | Reaction | Share | Task | User
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
@@ -1945,6 +1979,7 @@ type Entity {
 	findContactByID(id: ID!,): Contact!
 	findExpenseByID(id: ID!,): Expense!
 	findFileByID(id: ID!,): File!
+	findPlaceByID(id: ID!,): Place!
 	findPostByID(id: ID!,): Post!
 	findQuoteByID(id: ID!,): Quote!
 	findReactionByID(id: ID!,): Reaction!
@@ -2061,6 +2096,21 @@ func (ec *executionContext) field_Entity_findExpenseByID_args(ctx context.Contex
 }
 
 func (ec *executionContext) field_Entity_findFileByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findPlaceByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -4907,6 +4957,67 @@ func (ec *executionContext) fieldContext_Entity_findFileByID(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Entity_findFileByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Entity_findPlaceByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findPlaceByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindPlaceByID(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Place)
+	fc.Result = res
+	return ec.marshalNPlace2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐPlace(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findPlaceByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Place_id(ctx, field)
+			case "reviews":
+				return ec.fieldContext_Place_reviews(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findPlaceByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8662,6 +8773,123 @@ func (ec *executionContext) fieldContext_Notifications_count(ctx context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Place_id(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Place_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Place_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Place_reviews(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Place_reviews(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Reviews, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Comment)
+	fc.Result = res
+	return ec.marshalOComment2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Place_reviews(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Comment_id(ctx, field)
+			case "uid":
+				return ec.fieldContext_Comment_uid(ctx, field)
+			case "locale":
+				return ec.fieldContext_Comment_locale(ctx, field)
+			case "name":
+				return ec.fieldContext_Comment_name(ctx, field)
+			case "email":
+				return ec.fieldContext_Comment_email(ctx, field)
+			case "body":
+				return ec.fieldContext_Comment_body(ctx, field)
+			case "rating":
+				return ec.fieldContext_Comment_rating(ctx, field)
+			case "status":
+				return ec.fieldContext_Comment_status(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Comment_metadata(ctx, field)
+			case "parent":
+				return ec.fieldContext_Comment_parent(ctx, field)
+			case "children":
+				return ec.fieldContext_Comment_children(ctx, field)
+			case "object":
+				return ec.fieldContext_Comment_object(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
+			case "created":
+				return ec.fieldContext_Comment_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Comment_updated(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
 	}
 	return fc, nil
@@ -14505,6 +14733,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._File(ctx, sel, obj)
+	case model.Place:
+		return ec._Place(ctx, sel, &obj)
+	case *model.Place:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Place(ctx, sel, obj)
 	case model.Post:
 		return ec._Post(ctx, sel, &obj)
 	case *model.Post:
@@ -15506,6 +15741,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findPlaceByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findPlaceByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "findPostByID":
 			field := field
 
@@ -16441,6 +16698,47 @@ func (ec *executionContext) _Notifications(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var placeImplementors = []string{"Place", "_Entity"}
+
+func (ec *executionContext) _Place(ctx context.Context, sel ast.SelectionSet, obj *model.Place) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, placeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Place")
+		case "id":
+			out.Values[i] = ec._Place_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "reviews":
+			out.Values[i] = ec._Place_reviews(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18559,6 +18857,20 @@ func (ec *executionContext) marshalNNotification2ᚖgithubᚗcomᚋdailytravel�
 		return graphql.Null
 	}
 	return ec._Notification(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPlace2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐPlace(ctx context.Context, sel ast.SelectionSet, v model.Place) graphql.Marshaler {
+	return ec._Place(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPlace2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐPlace(ctx context.Context, sel ast.SelectionSet, v *model.Place) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Place(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNPost2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v model.Post) graphql.Marshaler {

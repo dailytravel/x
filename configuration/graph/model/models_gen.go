@@ -60,10 +60,14 @@ type NewLocation struct {
 	Locale      string                   `json:"locale"`
 	Type        string                   `json:"type"`
 	Name        string                   `json:"name"`
+	Slug        string                   `json:"slug"`
 	Description *string                  `json:"description,omitempty"`
 	Location    *LocationInput           `json:"location,omitempty"`
 	Images      []map[string]interface{} `json:"images,omitempty"`
 	Status      *string                  `json:"status,omitempty"`
+	Reviewable  *bool                    `json:"reviewable,omitempty"`
+	Popular     *bool                    `json:"popular,omitempty"`
+	Order       *int                     `json:"order,omitempty"`
 	Metadata    map[string]interface{}   `json:"metadata,omitempty"`
 }
 
@@ -146,10 +150,13 @@ type UpdateLocation struct {
 	Parent      *string                  `json:"parent,omitempty"`
 	Locale      *string                  `json:"locale,omitempty"`
 	Type        *string                  `json:"type,omitempty"`
+	Slug        *string                  `json:"slug,omitempty"`
 	Name        *string                  `json:"name,omitempty"`
 	Description *string                  `json:"description,omitempty"`
 	Location    *LocationInput           `json:"location,omitempty"`
 	Images      []map[string]interface{} `json:"images,omitempty"`
+	Reviewable  *bool                    `json:"reviewable,omitempty"`
+	Popular     *bool                    `json:"popular,omitempty"`
 	Status      *string                  `json:"status,omitempty"`
 	Metadata    map[string]interface{}   `json:"metadata,omitempty"`
 }

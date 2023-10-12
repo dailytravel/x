@@ -13,6 +13,14 @@ type Apis struct {
 	Count int    `json:"count"`
 }
 
+type AuthPayload struct {
+	AccessToken  *string `json:"access_token,omitempty"`
+	RefreshToken *string `json:"refresh_token,omitempty"`
+	ExpiresIn    *int    `json:"expires_in,omitempty"`
+	TokenType    *string `json:"token_type,omitempty"`
+	User         *User   `json:"user,omitempty"`
+}
+
 type Clients struct {
 	Data  []*Client `json:"data,omitempty"`
 	Count int       `json:"count"`
@@ -21,18 +29,6 @@ type Clients struct {
 type Connections struct {
 	Data  []*Connection `json:"data,omitempty"`
 	Count int           `json:"count"`
-}
-
-type Identity struct {
-	ID          string                 `json:"id"`
-	User        *User                  `json:"user"`
-	Provider    string                 `json:"provider"`
-	AccessToken string                 `json:"accessToken"`
-	ExpiresIn   int                    `json:"expiresIn"`
-	Connection  string                 `json:"connection"`
-	IsSocial    bool                   `json:"isSocial"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      string                 `json:"status"`
 }
 
 type Integrations struct {
@@ -48,6 +44,15 @@ type Invitations struct {
 type Keys struct {
 	Data  []*Key `json:"data,omitempty"`
 	Count int    `json:"count"`
+}
+
+type LoginInput struct {
+	Username     string  `json:"username"`
+	Password     string  `json:"password"`
+	GrantType    *string `json:"grant_type,omitempty"`
+	Scope        *string `json:"scope,omitempty"`
+	ClientID     *string `json:"client_id,omitempty"`
+	ClientSecret *string `json:"client_secret,omitempty"`
 }
 
 type Mfa struct {
@@ -91,6 +96,15 @@ type NewConnection struct {
 	Type        string                 `json:"type"`
 	Status      string                 `json:"status"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewIdentity struct {
+	UserID     string                 `json:"user_id"`
+	Provider   string                 `json:"provider"`
+	Connection string                 `json:"connection"`
+	IsSocial   bool                   `json:"is_social"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+	Status     string                 `json:"status"`
 }
 
 type NewIntegration struct {
@@ -149,10 +163,11 @@ type Organization struct {
 func (Organization) IsEntity() {}
 
 type Payload struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-	TokenType    string `json:"tokenType"`
-	ExpiresIn    int    `json:"expiresIn"`
+	AccessToken  string `json:"access_token"`
+	ExpiresIn    int    `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	TokenType    string `json:"token_type"`
+	User         *User  `json:"user"`
 }
 
 type Permissions struct {
@@ -167,9 +182,40 @@ type Quote struct {
 
 func (Quote) IsEntity() {}
 
+type RefreshTokenPayload struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresIn    int    `json:"expires_in"`
+	TokenType    string `json:"token_type"`
+}
+
+type RegisterInput struct {
+	Name                 string `json:"name"`
+	Email                string `json:"email"`
+	Password             string `json:"password"`
+	PasswordConfirmation string `json:"password_confirmation"`
+}
+
+type ResetPasswordInput struct {
+	Token                string `json:"token"`
+	Password             string `json:"password"`
+	PasswordConfirmation string `json:"password_confirmation"`
+}
+
 type Roles struct {
 	Data  []*Role `json:"data,omitempty"`
 	Count int     `json:"count"`
+}
+
+type SocialLoginInput struct {
+	Username     string  `json:"username"`
+	Password     string  `json:"password"`
+	GrantType    *string `json:"grant_type,omitempty"`
+	Scope        *string `json:"scope,omitempty"`
+	ClientID     *string `json:"client_id,omitempty"`
+	ClientSecret *string `json:"client_secret,omitempty"`
+	Provider     string  `json:"provider"`
+	Token        string  `json:"token"`
 }
 
 type UpdateAPI struct {
@@ -207,6 +253,12 @@ type UpdateIntegration struct {
 type UpdateInvitation struct {
 	Roles  []string `json:"roles"`
 	Status *string  `json:"status,omitempty"`
+}
+
+type UpdatePassword struct {
+	OldPassword          string `json:"old_password"`
+	Password             string `json:"password"`
+	PasswordConfirmation string `json:"password_confirmation"`
 }
 
 type UpdatePermission struct {

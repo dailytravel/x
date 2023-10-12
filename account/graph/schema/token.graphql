@@ -1,0 +1,7 @@
+type Token {
+  id: ID!
+  user: User!
+  token: String!
+  expires_at: String!
+  created_at: String!
+}

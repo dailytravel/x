@@ -3,9 +3,13 @@ type Place @key(fields: "id") {
   parent: Place
   locale: String!
   type: String!
+  slug: String!
   name: String!
   description: String
   location: Location
+  reviewable: Boolean
+  popular: Boolean
+  order: Int
   status: String
   metadata: Map
 }
@@ -43,10 +47,14 @@ input NewLocation {
   locale: String!
   type: String!
   name: String!
+  slug: String!
   description: String
   location: LocationInput
   images: [Map]
   status: String
+  reviewable: Boolean
+  popular: Boolean
+  order: Int
   metadata: Map
 }
 
@@ -54,10 +62,13 @@ input UpdateLocation {
   parent: ID
   locale: String
   type: String
+  slug: String
   name: String
   description: String
   location: LocationInput
   images: [Map]
+  reviewable: Boolean
+  popular: Boolean
   status: String
   metadata: Map
 }
