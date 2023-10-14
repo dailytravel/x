@@ -1,0 +1,24 @@
+type Search {
+  id: ID!
+  uid: ID!
+  query: String!
+  user_agent: String!
+  client_ip: String!
+  metadata: Map
+  timestamp: String!
+}
+
+extend type Query {
+  recentSearches(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): [Search]
+}
+
+extend type Mutation {
+  saveSearch(query: String!): Search!
+}

@@ -98,6 +98,14 @@ type NewConnection struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
+type NewCredential struct {
+	Type     string                 `json:"type"`
+	Secret   string                 `json:"secret"`
+	Expires  string                 `json:"expires"`
+	Status   string                 `json:"status"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type NewIdentity struct {
 	UserID     string                 `json:"user_id"`
 	Provider   string                 `json:"provider"`
@@ -137,15 +145,17 @@ type NewRole struct {
 }
 
 type NewUser struct {
-	Name     string    `json:"name"`
-	Email    string    `json:"email"`
-	Phone    *string   `json:"phone,omitempty"`
-	Password string    `json:"password"`
-	Roles    []*string `json:"roles,omitempty"`
-	Timezone *string   `json:"timezone,omitempty"`
-	Locale   *string   `json:"locale,omitempty"`
-	Picture  *string   `json:"picture,omitempty"`
-	Status   *string   `json:"status,omitempty"`
+	Name       string    `json:"name"`
+	GivenName  *string   `json:"given_name,omitempty"`
+	FamilyName *string   `json:"family_name,omitempty"`
+	Email      string    `json:"email"`
+	Phone      *string   `json:"phone,omitempty"`
+	Password   string    `json:"password"`
+	Roles      []*string `json:"roles,omitempty"`
+	Timezone   *string   `json:"timezone,omitempty"`
+	Locale     *string   `json:"locale,omitempty"`
+	Picture    *string   `json:"picture,omitempty"`
+	Status     *string   `json:"status,omitempty"`
 }
 
 type Order struct {
@@ -242,6 +252,14 @@ type UpdateConnection struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
+type UpdateCredential struct {
+	Type     *string                `json:"type,omitempty"`
+	Secret   *string                `json:"secret,omitempty"`
+	Expires  *string                `json:"expires,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type UpdateIntegration struct {
 	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
@@ -273,14 +291,16 @@ type UpdateRole struct {
 }
 
 type UpdateUser struct {
-	Name     *string                `json:"name,omitempty"`
-	Password *string                `json:"password,omitempty"`
-	Roles    []*string              `json:"roles,omitempty"`
-	Timezone *string                `json:"timezone,omitempty"`
-	Locale   *string                `json:"locale,omitempty"`
-	Picture  *string                `json:"picture,omitempty"`
-	Status   *string                `json:"status,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Name       *string                `json:"name,omitempty"`
+	GivenName  *string                `json:"given_name,omitempty"`
+	FamilyName *string                `json:"family_name,omitempty"`
+	Password   *string                `json:"password,omitempty"`
+	Roles      []*string              `json:"roles,omitempty"`
+	Timezone   *string                `json:"timezone,omitempty"`
+	Locale     *string                `json:"locale,omitempty"`
+	Picture    *string                `json:"picture,omitempty"`
+	Status     *string                `json:"status,omitempty"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type Users struct {
