@@ -144,7 +144,7 @@ type NewRole struct {
 	Permissions []*string `json:"permissions,omitempty"`
 }
 
-type NewUser struct {
+type NewUserInput struct {
 	Name       string    `json:"name"`
 	GivenName  *string   `json:"given_name,omitempty"`
 	FamilyName *string   `json:"family_name,omitempty"`
@@ -192,18 +192,12 @@ type Quote struct {
 
 func (Quote) IsEntity() {}
 
-type RefreshTokenPayload struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	ExpiresIn    int    `json:"expires_in"`
-	TokenType    string `json:"token_type"`
-}
-
 type RegisterInput struct {
-	Name                 string `json:"name"`
-	Email                string `json:"email"`
-	Password             string `json:"password"`
-	PasswordConfirmation string `json:"password_confirmation"`
+	Name                 string  `json:"name"`
+	Email                string  `json:"email"`
+	Password             string  `json:"password"`
+	PasswordConfirmation string  `json:"password_confirmation"`
+	ClientID             *string `json:"client_id,omitempty"`
 }
 
 type ResetPasswordInput struct {
@@ -218,11 +212,7 @@ type Roles struct {
 }
 
 type SocialLoginInput struct {
-	Username     string  `json:"username"`
-	Password     string  `json:"password"`
-	GrantType    *string `json:"grant_type,omitempty"`
-	Scope        *string `json:"scope,omitempty"`
-	ClientID     *string `json:"client_id,omitempty"`
+	ClientID     string  `json:"client_id"`
 	ClientSecret *string `json:"client_secret,omitempty"`
 	Provider     string  `json:"provider"`
 	Token        string  `json:"token"`
@@ -256,6 +246,7 @@ type UpdateCredential struct {
 	Type     *string                `json:"type,omitempty"`
 	Secret   *string                `json:"secret,omitempty"`
 	Expires  *string                `json:"expires,omitempty"`
+	Revoked  *bool                  `json:"revoked,omitempty"`
 	Status   *string                `json:"status,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
@@ -273,7 +264,7 @@ type UpdateInvitation struct {
 	Status *string  `json:"status,omitempty"`
 }
 
-type UpdatePassword struct {
+type UpdatePasswordInput struct {
 	OldPassword          string `json:"old_password"`
 	Password             string `json:"password"`
 	PasswordConfirmation string `json:"password_confirmation"`
@@ -290,7 +281,7 @@ type UpdateRole struct {
 	Permissions []*string `json:"permissions,omitempty"`
 }
 
-type UpdateUser struct {
+type UpdateUserInput struct {
 	Name       *string                `json:"name,omitempty"`
 	GivenName  *string                `json:"given_name,omitempty"`
 	FamilyName *string                `json:"family_name,omitempty"`

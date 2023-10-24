@@ -27,7 +27,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.NewOrder
 	item := &model.Order{
 		UID:         *uid,
 		Code:        utils.String(8),
-		Cancellable: &input.Cancellable,
+		Cancellable: input.Cancellable,
 		Status:      input.Status,
 		Model: model.Model{
 			Metadata: input.Metadata,
@@ -65,7 +65,7 @@ func (r *mutationResolver) UpdateOrder(ctx context.Context, id string, input mod
 	}
 
 	if input.Cancellable != nil {
-		item.Cancellable = input.Cancellable
+		item.Cancellable = *input.Cancellable
 	}
 
 	if input.Status != nil {
@@ -173,6 +173,21 @@ func (r *orderResolver) ID(ctx context.Context, obj *model.Order) (string, error
 	return obj.ID.Hex(), nil
 }
 
+// UID is the resolver for the uid field.
+func (r *orderResolver) UID(ctx context.Context, obj *model.Order) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// Items is the resolver for the items field.
+func (r *orderResolver) Items(ctx context.Context, obj *model.Order) ([]*model.Item, error) {
+	panic(fmt.Errorf("not implemented: Items - items"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *orderResolver) Metadata(ctx context.Context, obj *model.Order) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+}
+
 // Created is the resolver for the created field.
 func (r *orderResolver) Created(ctx context.Context, obj *model.Order) (string, error) {
 	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
@@ -181,11 +196,6 @@ func (r *orderResolver) Created(ctx context.Context, obj *model.Order) (string, 
 // Updated is the resolver for the updated field.
 func (r *orderResolver) Updated(ctx context.Context, obj *model.Order) (string, error) {
 	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
-}
-
-// UID is the resolver for the uid field.
-func (r *orderResolver) UID(ctx context.Context, obj *model.Order) (string, error) {
-	return obj.ID.Hex(), nil
 }
 
 // Order is the resolver for the order field.
@@ -209,7 +219,7 @@ func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, err
 }
 
 // Orders is the resolver for the orders field.
-func (r *queryResolver) Orders(ctx context.Context, args map[string]interface{}) (*model.Orders, error) {
+func (r *queryResolver) Orders(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Orders, error) {
 	var items []*model.Order
 	//find all items
 	cur, err := r.db.Collection("orders").Find(ctx, nil)

@@ -9,18 +9,20 @@ import (
 )
 
 type Package struct {
-	Model       `bson:",inline"`
-	Product     primitive.ObjectID   `json:"product" bson:"product"`
-	Locale      string               `json:"locale" bson:"locale"`
-	Name        primitive.M          `json:"name" bson:"name"`
-	Description primitive.M          `json:"description" bson:"description"`
-	Details     []primitive.ObjectID `json:"details" bson:"details"`
-	Includes    []primitive.ObjectID `json:"includes" bson:"includes"`
-	Excludes    []primitive.ObjectID `json:"excludes" bson:"excludes"`
-	Price       float64              `json:"price" bson:"price"`
-	Discount    float64              `json:"discount,omitempty" bson:"discount,omitempty"`
-	Currency    string               `json:"currency" bson:"currency"`
-	Status      string               `json:"status" bson:"status"`
+	Model        `bson:",inline"`
+	Product      primitive.ObjectID `json:"product" bson:"product"`
+	Locale       string             `json:"locale" bson:"locale"`
+	Name         primitive.M        `json:"name" bson:"name"`
+	Description  primitive.M        `json:"description" bson:"description"`
+	Includes     primitive.M        `json:"includes" bson:"includes"`
+	Excludes     primitive.M        `json:"excludes" bson:"excludes"`
+	Redeem       primitive.M        `json:"redeem" bson:"redeem"`
+	Cancellation primitive.M        `json:"cancellation" bson:"cancellation"`
+	Instant      bool               `json:"instant" bson:"instant"`
+	Price        float64            `json:"price" bson:"price"`
+	Discount     float64            `json:"discount,omitempty" bson:"discount,omitempty"`
+	Currency     string             `json:"currency" bson:"currency"`
+	Status       string             `json:"status" bson:"status"`
 }
 
 func (i *Package) MarshalBSON() ([]byte, error) {

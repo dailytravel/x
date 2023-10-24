@@ -265,19 +265,43 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 }
 
 // Posts is the resolver for the posts field.
-func (r *queryResolver) Posts(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	res, err := r.ts.Collection("posts").Documents().Search(utils.Params(args))
+func (r *queryResolver) Posts(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Posts, error) {
+	var items []*model.Post
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("posts").Find(ctx, _filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	//get total count
+	count, err := r.db.Collection("posts").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert struct to map
-	results, err := utils.StructToMap(res)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
+	return &model.Posts{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Post returns PostResolver implementation.

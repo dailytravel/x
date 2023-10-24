@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
@@ -27,7 +26,7 @@ import (
 )
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUserInput) (*model.User, error) {
 	// Check if a user with the same email already exists
 	var existingUser model.User
 	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingUser); err != nil {
@@ -74,7 +73,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUser) (*model.User, error) {
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUserInput) (*model.User, error) {
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -136,50 +135,96 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 }
 
 // Register is the resolver for the register field.
-func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.User, error) {
-	// Check if a user with the same email already exists
-	var existingUser model.User
-	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingUser); err != nil {
-		if err != mongo.ErrNoDocuments {
-			return nil, fmt.Errorf("error checking for existing user: %v", err)
-		}
+func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.AuthPayload, error) {
+	clientID, err := primitive.ObjectIDFromHex(*input.ClientID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid client ID: %v", err)
 	}
 
-	// Hash the password
+	client, err := r.getClientByID(ctx, clientID)
+	if err != nil {
+		return nil, fmt.Errorf("client not found: %v", err)
+	}
+
+	_, err = r.getUserByEmail(ctx, input.Email)
+	if err != nil {
+		return nil, fmt.Errorf("error checking for existing user: %v", err)
+	}
+
+	api, err := r.getAPIByIdentifier(ctx, client.Domain)
+	if err != nil {
+		return nil, fmt.Errorf("api not found: %v", err)
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
 
-	// Create the user
-	item := &model.User{
+	user := &model.User{
 		Name:   input.Name,
 		Email:  input.Email,
 		Status: pointer.String("PENDING"), // Use a constant or enum for status
 	}
 
-	// Insert the user
-	res, err := r.db.Collection("users").InsertOne(ctx, item)
-	if err != nil {
+	if err := r.insertUser(ctx, user); err != nil {
 		return nil, fmt.Errorf("failed to insert user: %v", err)
 	}
 
-	// Create the password credential
 	credential := &model.Credential{
-		UID:     item.ID,
+		UID:     user.ID,
 		Type:    "PASSWORD", // Use a constant or enum for type
 		Secret:  string(hashedPassword),
 		Expires: primitive.Timestamp{T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix())},
 		Status:  "ACTIVE", // Use a constant or enum for status
 	}
 
-	// Insert the credential
-	if _, err := r.db.Collection("credentials").InsertOne(ctx, credential); err != nil {
+	if err := r.insertCredential(ctx, credential); err != nil {
 		return nil, fmt.Errorf("failed to insert credential: %v", err)
 	}
 
-	item.ID = res.InsertedID.(primitive.ObjectID)
-	return item, nil
+	token, err := r.insertToken(ctx, &model.Token{
+		UID: user.ID,
+		Expires: primitive.Timestamp{
+			T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix()),
+			I: 0,
+		},
+		ClientIP:  *auth.ClientIP(ctx),
+		UserAgent: *auth.UserAgent(ctx),
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to insert token: %v", err)
+	}
+
+	// Generate a new access token
+	accessToken, err := r.generateTokens(ctx, user, jwt.MapClaims{
+		"jti":      token.ID.Hex(),
+		"sub":      user.ID.Hex(),
+		"email":    user.Email,
+		"name":     user.Name,
+		"locale":   user.Locale,
+		"timezone": user.Timezone,
+		"picture":  user.Picture,
+		"roles":    user.Roles,
+		"scope":    "*",
+		"aud":      api.Identifier,
+		"iss":      "https://api.trip.express/graphql",
+		"azp":      client.ID.Hex(),
+		"iat":      time.Now().Unix(),
+		"exp":      time.Now().Add(time.Duration(time.Second * time.Duration(api.Expiration))).Unix(),
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("error generating tokens: %v", err)
+	}
+
+	// Return the access token and refresh token
+	return &model.AuthPayload{
+		AccessToken: accessToken,
+		TokenType:   pointer.String("Bearer"),
+		ExpiresIn:   pointer.Int(int(api.Expiration)),
+	}, nil
 }
 
 // VerifyEmail is the resolver for the verifyEmail field.
@@ -295,171 +340,351 @@ func (r *mutationResolver) VerifyPhone(ctx context.Context, token string) (map[s
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error) {
-	var u *model.User
-	var k *model.Key
-	var a *model.Api
-	var c *model.Client
-	var credential *model.Credential
-
 	clientID, err := primitive.ObjectIDFromHex(*input.ClientID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("invalid client ID: %v", err)
 	}
 
-	//check client
-	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"_id": clientID}, nil).Decode(&c); err != nil {
-		return nil, fmt.Errorf("client not found")
+	client, err := r.getClientByID(ctx, clientID)
+	if err != nil {
+		return nil, fmt.Errorf("client not found: %v", err)
 	}
 
-	//check api
-	if err := r.db.Collection("apis").FindOne(ctx, bson.M{"identifier": "https://api.trip.express/graphql"}, nil).Decode(&a); err != nil {
-		return nil, fmt.Errorf("api not found")
+	api, err := r.getAPIByIdentifier(ctx, client.Domain)
+	if err != nil {
+		return nil, fmt.Errorf("api not found: %v", err)
 	}
 
-	//find user by email
-	if err := r.db.Collection("users").FindOne(ctx, bson.M{"$or": []bson.M{bson.M{"email": input.Username}, bson.M{"phone": input.Username}}}, nil).Decode(&u); err != nil {
-		return nil, fmt.Errorf("user not found")
+	user, err := r.getUserByEmail(ctx, input.Username)
+	if err != nil {
+		return nil, fmt.Errorf("error checking for existing user: %v", err)
 	}
 
-	//find credential by uid
-	if err := r.db.Collection("credentials").FindOne(ctx, bson.M{"uid": u.ID, "type": "PASSWORD"}, nil).Decode(&credential); err != nil {
-		return nil, fmt.Errorf("credential not found")
+	pwd, err := r.getCredentialPassword(ctx, user.ID)
+	if err != nil {
+		return nil, fmt.Errorf("client not found: %v", err)
 	}
 
 	//check password
-	if err := bcrypt.CompareHashAndPassword([]byte(credential.Secret), []byte(input.Password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(pwd.Secret), []byte(input.Password)); err != nil {
 		return nil, fmt.Errorf("password not match")
 	}
 
-	//get rsa key
-	if err := r.db.Collection("keys").FindOne(ctx, bson.M{"status": "current"}, nil).Decode(&k); err != nil {
-		return nil, fmt.Errorf("key not found")
+	token, err := r.insertToken(ctx, &model.Token{
+		UID: user.ID,
+		Expires: primitive.Timestamp{
+			T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix()),
+			I: 0,
+		},
+		ClientIP:  *auth.ClientIP(ctx),
+		UserAgent: *auth.UserAgent(ctx),
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to insert token: %v", err)
 	}
 
-	access_token, err := auth.Token(jwt.MapClaims{
-		"sub":      u.ID.Hex(),
-		"email":    u.Email,
-		"name":     u.Name,
-		"locale":   u.Locale,
-		"timezone": u.Timezone,
-		"picture":  u.Picture,
-		"roles":    u.Roles,
+	// Generate a new access token
+	accessToken, err := r.generateTokens(ctx, user, jwt.MapClaims{
+		"jti":      token.ID.Hex(),
+		"sub":      user.ID.Hex(),
+		"email":    user.Email,
+		"name":     user.Name,
+		"locale":   user.Locale,
+		"timezone": user.Timezone,
+		"picture":  user.Picture,
+		"roles":    user.Roles,
 		"scope":    "*",
-		"aud":      a.Identifier,
-		"iss":      strings.Join([]string{"https://", c.Domain}, ""),
-		"azp":      c.ID.Hex(),
+		"aud":      api.Identifier,
+		"iss":      "https://api.trip.express/graphql",
+		"azp":      client.ID.Hex(),
 		"iat":      time.Now().Unix(),
-		"exp":      time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
-	}, *k)
+		"exp":      time.Now().Add(time.Duration(time.Second * time.Duration(api.Expiration))).Unix(),
+	})
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error generating tokens: %v", err)
 	}
 
-	refresh_token, err := auth.Token(jwt.MapClaims{
-		"sub": u.ID.Hex(),
-		"aud": a.Identifier,
-		"iss": strings.Join([]string{"https://", c.Domain}, ""),
-		"azp": c.ID.Hex(),
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
-	}, *k)
-
-	if err != nil {
-		return nil, err
-	}
-
+	// Return the access token and refresh token
 	return &model.AuthPayload{
-		AccessToken:  access_token,
-		RefreshToken: refresh_token,
-		TokenType:    pointer.String("Bearer"),
-		ExpiresIn:    pointer.Int(3600),
+		AccessToken: accessToken,
+		TokenType:   pointer.String("Bearer"),
+		ExpiresIn:   pointer.Int(int(api.Expiration)),
 	}, nil
 }
 
 // SocialLogin is the resolver for the socialLogin field.
 func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLoginInput) (*model.AuthPayload, error) {
-	var u *model.User
-	var k *model.Key
-	var a *model.Api
-	var c *model.Client
-	var i *model.Identity
+	var user *model.User
+	var client *model.Client
+	var identity *model.Identity
 
-	clientID, err := primitive.ObjectIDFromHex(*input.ClientID)
+	clientID, err := primitive.ObjectIDFromHex(input.ClientID)
 	if err != nil {
 		return nil, err
 	}
 
-	//check client
-	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"_id": clientID}, nil).Decode(&c); err != nil {
+	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"_id": clientID}, nil).Decode(&client); err != nil {
 		return nil, fmt.Errorf("client not found")
 	}
 
-	userInfo, err := utils.FetchUserInfo(input.Provider, input.Token)
+	api, err := r.getAPIByIdentifier(ctx, client.Domain)
+	if err != nil {
+		return nil, fmt.Errorf("api not found: %v", err)
+	}
+
+	userInfo, err := utils.FetchUserInfo(input.Token, input.Provider)
 	if err != nil {
 		return nil, err
 	}
 
-	var user map[string]string
-	if err := json.Unmarshal([]byte(userInfo), &user); err != nil {
+	var data map[string]interface{}
+	if err := json.Unmarshal([]byte(userInfo), &data); err != nil {
 		return nil, err
 	}
 
-	//check identity if exits and status is active then return token
+	if err := r.db.Collection("identities").FindOne(ctx, bson.M{"provider": input.Provider, "user_id": data["sub"]}, nil).Decode(&identity); err != nil {
+		// Identity not found, check for the user
+		if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": data["email"]}, nil).Decode(&user); err != nil {
+			// User not found, create a new user
+			item := &model.User{
+				Name:    data["name"].(string),
+				Email:   data["email"].(string),
+				Picture: pointer.String(data["picture"].(string)),
+				Status:  pointer.String("ACTIVE"),
+			}
+			res, err := r.db.Collection("users").InsertOne(ctx, item)
+			if err != nil {
+				return nil, fmt.Errorf("failed to insert user: %v", err)
+			}
+			item.ID = res.InsertedID.(primitive.ObjectID)
+			user = item
+		}
+		// Create a new identity
+		item := &model.Identity{
+			Provider:   input.Provider,
+			UserID:     data["sub"].(string),
+			UID:        user.ID,
+			IsSocial:   true,
+			Connection: "google-oauth2",
+			Status:     "ACTIVE",
+		}
 
-	if err := r.db.Collection("identities").FindOne(ctx, bson.M{"provider": input.Provider, "user_id": user["user_id"]}, nil).Decode(&i); err != nil {
-		return nil, fmt.Errorf("identity not found")
-	}
-
-	// Check if the user already exists in the system
-	if err := r.db.Collection("users").FindOne(ctx, bson.M{"_id": i.UID}, nil).Decode(&u); err != nil {
+		if _, err := r.db.Collection("identities").InsertOne(ctx, item); err != nil {
+			return nil, fmt.Errorf("failed to insert identity: %v", err)
+		}
+	} else if err := r.db.Collection("users").FindOne(ctx, bson.M{"_id": identity.UID}, nil).Decode(&user); err != nil {
 		return nil, fmt.Errorf("user not found")
 	}
 
-	//get rsa key
-	if err := r.db.Collection("keys").FindOne(ctx, bson.M{"status": "current"}, nil).Decode(&k); err != nil {
-		return nil, fmt.Errorf("key not found")
-	}
-
-	access_token, err := auth.Token(jwt.MapClaims{
-		"sub":   u.ID.Hex(),
-		"roles": u.Roles,
-		"scope": "*",
-		"aud":   a.Identifier,
-		"iss":   strings.Join([]string{"https://", c.Domain}, ""),
-		"azp":   c.ID.Hex(),
-		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(time.Duration(time.Second * time.Duration(a.Expiration))).Unix(),
-	}, *k)
+	token, err := r.insertToken(ctx, &model.Token{
+		UID: user.ID,
+		Expires: primitive.Timestamp{
+			T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix()),
+			I: 0,
+		},
+		ClientIP:  *auth.ClientIP(ctx),
+		UserAgent: *auth.UserAgent(ctx),
+	})
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to insert token: %v", err)
 	}
 
-	refresh_token, err := auth.Token(jwt.MapClaims{
-		"sub": u.ID.Hex(),
-		"aud": a.Identifier,
-		"iss": strings.Join([]string{"https://", c.Domain}, ""),
-		"azp": c.ID.Hex(),
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
-	}, *k)
+	// Generate a new access token
+	accessToken, err := r.generateTokens(ctx, user, jwt.MapClaims{
+		"jti":      token.ID.Hex(),
+		"sub":      user.ID.Hex(),
+		"email":    user.Email,
+		"name":     user.Name,
+		"locale":   user.Locale,
+		"timezone": user.Timezone,
+		"picture":  user.Picture,
+		"roles":    user.Roles,
+		"scope":    "*",
+		"aud":      api.Identifier,
+		"iss":      "https://api.trip.express/graphql",
+		"azp":      client.ID.Hex(),
+		"iat":      time.Now().Unix(),
+		"exp":      time.Now().Add(time.Duration(time.Second * time.Duration(api.Expiration))).Unix(),
+	})
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error generating tokens: %v", err)
 	}
 
+	// Return the access token and refresh token
 	return &model.AuthPayload{
-		AccessToken:  access_token,
-		RefreshToken: refresh_token,
-		TokenType:    pointer.String("Bearer"),
-		ExpiresIn:    pointer.Int(3600),
+		AccessToken: accessToken,
+		TokenType:   pointer.String("Bearer"),
+		ExpiresIn:   pointer.Int(int(api.Expiration)),
 	}, nil
 }
 
 // RefreshToken is the resolver for the refreshToken field.
-func (r *mutationResolver) RefreshToken(ctx context.Context, refreshToken string) (*model.RefreshTokenPayload, error) {
-	panic(fmt.Errorf("not implemented: RefreshToken - refreshToken"))
+func (r *mutationResolver) RefreshToken(ctx context.Context, refreshToken string) (*model.AuthPayload, error) {
+	token, err := auth.ValidateToken(refreshToken, "http://localhost:3000/.well-known/jwks.json")
+	if err != nil {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	uid, err := primitive.ObjectIDFromHex(token.Claims.(jwt.MapClaims)["sub"].(string))
+	if err != nil {
+		return nil, fmt.Errorf("invalid id")
+	}
+
+	// Find the user by ID and ensure they exist
+	filter := bson.M{"_id": uid}
+	var user *model.User
+	err = r.db.Collection("users").FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, fmt.Errorf("error fetching user: %s", err.Error())
+	}
+
+	// Find the client by ID and ensure they exist
+	clientID, err := primitive.ObjectIDFromHex(token.Claims.(jwt.MapClaims)["aud"].(string))
+	if err != nil {
+		return nil, fmt.Errorf("invalid client id")
+	}
+
+	var client *model.Client
+	err = r.db.Collection("clients").FindOne(ctx, bson.M{"_id": clientID}).Decode(&client)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("client not found")
+		}
+		return nil, fmt.Errorf("error fetching client: %s", err.Error())
+	}
+
+	jti, err := primitive.ObjectIDFromHex(token.Claims.(jwt.MapClaims)["jti"].(string))
+	if err != nil {
+		return nil, fmt.Errorf("invalid jti")
+	}
+
+	//find token by jti
+	var t *model.Token
+	err = r.db.Collection("tokens").FindOne(ctx, bson.M{"_id": jti}).Decode(&t)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("token not found")
+		}
+
+		return nil, fmt.Errorf("error fetching token: %s", err.Error())
+	}
+
+	var api *model.Api
+	if err := r.db.Collection("apis").FindOne(ctx, bson.M{"identifier": client.Domain}).Decode(&api); err != nil {
+		return nil, fmt.Errorf("api not found")
+	}
+
+	// Generate a new access token
+	accessToken, err := r.generateTokens(ctx, user, jwt.MapClaims{
+		"jti":      t.ID.Hex(),
+		"sub":      user.ID.Hex(),
+		"email":    user.Email,
+		"name":     user.Name,
+		"locale":   user.Locale,
+		"timezone": user.Timezone,
+		"picture":  user.Picture,
+		"roles":    user.Roles,
+		"scope":    "*",
+		"aud":      api.Identifier,
+		"iss":      "https://api.trip.express/graphql",
+		"azp":      client.ID.Hex(),
+		"iat":      time.Now().Unix(),
+		"exp":      time.Now().Add(time.Duration(time.Second * time.Duration(api.Expiration))).Unix(),
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("error generating tokens: %v", err)
+	}
+
+	// Return the access token and refresh token
+	return &model.AuthPayload{
+		AccessToken: accessToken,
+		TokenType:   pointer.String("Bearer"),
+		ExpiresIn:   pointer.Int(int(api.Expiration)),
+	}, nil
+}
+
+// Logout is the resolver for the logout field.
+func (r *mutationResolver) Logout(ctx context.Context, all *bool) (map[string]interface{}, error) {
+	// Authenticate the request
+	claims := auth.Auth(ctx)
+	if claims == nil {
+		return nil, fmt.Errorf("not authenticated")
+	}
+
+	uid, err := primitive.ObjectIDFromHex(claims["sub"].(string))
+	if err != nil {
+		return nil, fmt.Errorf("invalid user ID")
+	}
+
+	// Define the common filter for token revocation
+	filter := bson.M{"uid": uid}
+
+	// Handle global logout or token-specific logout
+	update := bson.M{"$set": bson.M{"revoked": true}}
+	if all != nil && *all {
+		var tokens []*model.Token
+		// Global logout: Revoke all refresh tokens
+		_, err := r.db.Collection("tokens").UpdateMany(ctx, filter, update)
+		if err != nil {
+			return nil, fmt.Errorf("failed to revoke tokens: %v", err)
+		}
+
+		// Retrieve all revoked tokens
+		cursor, err := r.db.Collection("tokens").Find(ctx, bson.M{"uid": uid, "revoked": true}, options.Find().SetProjection(bson.M{"_id": 1}))
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve revoked tokens: %v", err)
+		}
+
+		// Check if the user has any revoked tokens
+		if err := cursor.All(ctx, &tokens); err != nil {
+			return nil, fmt.Errorf("failed to retrieve revoked tokens: %v", err)
+		}
+
+		for _, token := range tokens {
+			// Optionally, remove the token from Redis so it can't be used again
+			_, err = r.redis.Del(ctx, token.ID.Hex()).Result()
+			if err != nil {
+				// This isn't a critical error, but you may want to log it for audit purposes.
+				fmt.Printf("Warning: failed to delete token from cache: %s\n", err.Error())
+			}
+		}
+
+	} else {
+		// Token-specific logout: Revoke a specific token by JTI
+		jtiClaim, exists := claims["jti"]
+		if !exists {
+			return nil, fmt.Errorf("jti claim is missing")
+		}
+
+		jti, err := primitive.ObjectIDFromHex(jtiClaim.(string))
+		if err != nil {
+			return nil, fmt.Errorf("invalid jti")
+		}
+
+		_, err = r.db.Collection("tokens").UpdateOne(ctx, bson.M{"_id": jti}, update)
+		if err != nil {
+			return nil, fmt.Errorf("failed to revoke token: %v", err)
+		}
+
+		// Optionally, remove the token from Redis so it can't be used again
+		_, err = r.redis.Del(ctx, jti.Hex()).Result()
+		if err != nil {
+			// This isn't a critical error, but you may want to log it for audit purposes.
+			fmt.Printf("Warning: failed to delete token from cache: %s\n", err.Error())
+		}
+	}
+
+	return map[string]interface{}{
+		"message": "Successfully logged out.",
+	}, nil
 }
 
 // ForgotPassword is the resolver for the forgotPassword field.
@@ -473,11 +698,8 @@ func (r *mutationResolver) ForgotPassword(ctx context.Context, email string) (ma
 		return nil, fmt.Errorf("failed to retrieve user: %s", err.Error())
 	}
 
-	// Generate a unique code for the user
-	token := uuid.New().String()
-
 	// Store the code in Redis for 24 hours
-	if err := r.redis.Set(ctx, token, user.ID.Hex(), time.Hour*24).Err(); err != nil {
+	if err := r.redis.Set(ctx, uuid.New().String(), user.ID.Hex(), time.Hour*24).Err(); err != nil {
 		return nil, fmt.Errorf("failed to store code: %s", err.Error())
 	}
 
@@ -485,6 +707,7 @@ func (r *mutationResolver) ForgotPassword(ctx context.Context, email string) (ma
 	response := map[string]interface{}{
 		"message": "A password reset email has been sent.",
 	}
+
 	return response, nil
 }
 
@@ -571,7 +794,7 @@ func (r *mutationResolver) ResetPassword(ctx context.Context, input model.ResetP
 }
 
 // UpdatePassword is the resolver for the UpdatePassword field.
-func (r *mutationResolver) UpdatePassword(ctx context.Context, input model.UpdatePassword) (map[string]interface{}, error) {
+func (r *mutationResolver) UpdatePassword(ctx context.Context, input model.UpdatePasswordInput) (map[string]interface{}, error) {
 	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
@@ -852,6 +1075,11 @@ func (r *userResolver) LastLogin(ctx context.Context, obj *model.User) (*string,
 	return pointer.String(time.Unix(int64(obj.LastLogin.T), 0).Format(time.RFC3339)), nil
 }
 
+// LastActivity is the resolver for the last_activity field.
+func (r *userResolver) LastActivity(ctx context.Context, obj *model.User) (*string, error) {
+	panic(fmt.Errorf("not implemented: LastActivity - last_activity"))
+}
+
 // Metadata is the resolver for the metadata field.
 func (r *userResolver) Metadata(ctx context.Context, obj *model.User) (map[string]interface{}, error) {
 	return obj.Metadata, nil
@@ -869,7 +1097,29 @@ func (r *userResolver) Updated(ctx context.Context, obj *model.User) (string, er
 
 // Identities is the resolver for the identities field.
 func (r *userResolver) Identities(ctx context.Context, obj *model.User) ([]*model.Identity, error) {
-	panic(fmt.Errorf("not implemented: Identities - identities"))
+	var items []*model.Identity
+
+	uid, err := utils.UID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	//find user by id
+	cursor, err := r.db.Collection("identities").Find(ctx, bson.M{"uid": uid}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
 
 // User returns UserResolver implementation.

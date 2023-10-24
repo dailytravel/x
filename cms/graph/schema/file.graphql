@@ -45,7 +45,14 @@ input UpdateFile {
 }
 
 extend type Query {
-  files(args: Map): Files
+  files(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Files
   file(id: ID!): File @auth
 }
 

@@ -2,10 +2,10 @@ type Post @key(fields: "id") {
   id: ID!
   locale: String!
   type: String! #post, page, template, hotel, restaurant, product, etc.
+  slug: String!
   title: String!
   summary: String!
   body: String!
-  slug: String!
   status: String!
   commentable: Boolean!
   metadata: Map
@@ -71,7 +71,14 @@ input UpdatePost {
 
 extend type Query {
   post(id: ID!): Post
-  posts(args: Map): Map
+  posts(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Posts
 }
 
 extend type Mutation {

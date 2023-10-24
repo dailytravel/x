@@ -3,6 +3,7 @@ type Product @key(fields: "id") {
   uid: ID!
   locale: String!
   type: String!
+  slug: String!
   name: String!
   description: String!
   duration: Int! # in hours
@@ -22,7 +23,9 @@ type Product @key(fields: "id") {
   status: String!
   created: String!
   updated: String!
-  location: ID!
+  place: ID!
+  terms: [ID]
+  places: [ID]
 }
 
 enum ProductStatus {
@@ -33,7 +36,7 @@ enum ProductStatus {
 }
 
 type Products {
-  total: Int!
+  count: Int!
   data: [Product]
 }
 
@@ -41,6 +44,7 @@ input NewProduct {
   uid: ID!
   locale: String!
   type: String!
+  slug: String!
   name: String!
   description: String!
   duration: Int! # in hours
@@ -59,13 +63,14 @@ input NewProduct {
   currency: String!
   metadata: Map
   status: String!
-  location: ID!
+  place: ID!
 }
 
 input UpdateProduct {
   uid: ID
   locale: String
   type: String
+  slug: String
   name: String
   description: String
   duration: Int # in hours
@@ -84,12 +89,19 @@ input UpdateProduct {
   reviewable: Boolean
   metadata: Map
   status: String
-  location: ID
+  place: ID
 }
 
 extend type Query {
   product(id: ID!): Product
-  products(args: Map): Products
+  products(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Products
 }
 
 extend type Mutation {

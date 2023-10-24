@@ -21,14 +21,29 @@ func (r *tokenResolver) User(ctx context.Context, obj *model.Token) (*model.User
 	panic(fmt.Errorf("not implemented: User - user"))
 }
 
-// ExpiresAt is the resolver for the expires_at field.
-func (r *tokenResolver) ExpiresAt(ctx context.Context, obj *model.Token) (string, error) {
-	panic(fmt.Errorf("not implemented: ExpiresAt - expires_at"))
+// Expires is the resolver for the expires field.
+func (r *tokenResolver) Expires(ctx context.Context, obj *model.Token) (string, error) {
+	panic(fmt.Errorf("not implemented: Expires - expires"))
 }
 
-// CreatedAt is the resolver for the created_at field.
-func (r *tokenResolver) CreatedAt(ctx context.Context, obj *model.Token) (string, error) {
-	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+// Revoked is the resolver for the revoked field.
+func (r *tokenResolver) Revoked(ctx context.Context, obj *model.Token) (bool, error) {
+	panic(fmt.Errorf("not implemented: Revoked - revoked"))
+}
+
+// LastUsed is the resolver for the last_used field.
+func (r *tokenResolver) LastUsed(ctx context.Context, obj *model.Token) (string, error) {
+	panic(fmt.Errorf("not implemented: LastUsed - last_used"))
+}
+
+// Created is the resolver for the created field.
+func (r *tokenResolver) Created(ctx context.Context, obj *model.Token) (string, error) {
+	panic(fmt.Errorf("not implemented: Created - created"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *tokenResolver) Metadata(ctx context.Context, obj *model.Token) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Metadata - metadata"))
 }
 
 // Token returns TokenResolver implementation.

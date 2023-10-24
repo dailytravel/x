@@ -3,8 +3,9 @@ package auth
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"log"
 
+	"github.com/dailytravel/x/configuration/pkg/database"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -17,28 +18,38 @@ const GinContextKey contextKey = "GinContextKey"
 const AuthContextKey contextKey = "AuthContextKey"
 const APIKeyContextKey contextKey = "APIKeyContextKey"
 const LocaleContextKey contextKey = "LocaleContextKey"
+const ClientIPContextKey contextKey = "ClientIPContextKey"
+const UserAgentContextKey contextKey = "UserAgentContextKey"
 
 func Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ctx := c.Request.Context()
 
-		ctx := context.WithValue(c.Request.Context(), GinContextKey, c)
+		ctx = context.WithValue(ctx, GinContextKey, c)
 		ctx = context.WithValue(ctx, LocaleContextKey, c.GetHeader("x-locale"))
 		ctx = context.WithValue(ctx, APIKeyContextKey, c.GetHeader("x-api-key"))
-		// Decode the "auth" header into a map
-		authHeader := c.GetHeader("auth")
+		ctx = context.WithValue(ctx, ClientIPContextKey, c.ClientIP())
+		ctx = context.WithValue(ctx, UserAgentContextKey, c.GetHeader("user-agent"))
 
-		var authMap jwt.MapClaims
+		authHeader := c.GetHeader("auth")
 		if authHeader != "" {
-			if err := json.Unmarshal([]byte(authHeader), &authMap); err != nil {
-				fmt.Println("Error decoding auth header:", err)
+			var authMap jwt.MapClaims
+			if err := json.Unmarshal([]byte(authHeader), &authMap); err == nil {
+				if jti, ok := authMap["jti"].(string); ok {
+					if err == nil {
+						if _, err := database.Redis.Get(ctx, jti).Result(); err == nil {
+							ctx = context.WithValue(ctx, AuthContextKey, authMap)
+						} else {
+							log.Println(err)
+							c.AbortWithStatusJSON(401, gin.H{"error": "Invalid token"})
+							return
+						}
+					}
+				}
 			}
 		}
 
-		ctx = context.WithValue(ctx, AuthContextKey, authMap)
-
-		// Add the gin.Context to the request context using the custom context key
 		c.Request = c.Request.WithContext(ctx)
-
 		c.Next()
 	}
 }
@@ -55,5 +66,15 @@ func Locale(ctx context.Context) *string {
 
 func APIKey(ctx context.Context) *string {
 	raw, _ := ctx.Value(APIKeyContextKey).(string) // Change this line
+	return &raw
+}
+
+func ClientIP(ctx context.Context) *string {
+	raw, _ := ctx.Value(ClientIPContextKey).(string) // Change this line
+	return &raw
+}
+
+func UserAgent(ctx context.Context) *string {
+	raw, _ := ctx.Value(UserAgentContextKey).(string) // Change this line
 	return &raw
 }

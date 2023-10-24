@@ -151,7 +151,14 @@ input UpdateContact {
 }
 
 extend type Query {
-  contacts(args: Map): Map @auth @api
+  contacts(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Contacts @auth @api
   contact(id: ID!): Contact @auth
 }
 

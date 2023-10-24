@@ -19,7 +19,6 @@ import (
 	"github.com/dailytravel/x/configuration/pkg/auth"
 	"github.com/dailytravel/x/configuration/pkg/database"
 	"github.com/dailytravel/x/configuration/pkg/database/migrations"
-	"github.com/dailytravel/x/configuration/scheduler"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -112,7 +111,7 @@ func main() {
 	}
 
 	// start scheduler jobs
-	scheduler.SyncPlacesJob()
+	// scheduler.SyncPlacesJob()
 
 	// setting up Gin
 	r := gin.New()

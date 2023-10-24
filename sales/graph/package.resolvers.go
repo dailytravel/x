@@ -41,19 +41,24 @@ func (r *packageResolver) Description(ctx context.Context, obj *model.Package) (
 	panic(fmt.Errorf("not implemented: Description - description"))
 }
 
-// Details is the resolver for the details field.
-func (r *packageResolver) Details(ctx context.Context, obj *model.Package) ([]string, error) {
-	panic(fmt.Errorf("not implemented: Details - details"))
-}
-
 // Includes is the resolver for the includes field.
-func (r *packageResolver) Includes(ctx context.Context, obj *model.Package) ([]string, error) {
+func (r *packageResolver) Includes(ctx context.Context, obj *model.Package) (string, error) {
 	panic(fmt.Errorf("not implemented: Includes - includes"))
 }
 
 // Excludes is the resolver for the excludes field.
-func (r *packageResolver) Excludes(ctx context.Context, obj *model.Package) ([]string, error) {
+func (r *packageResolver) Excludes(ctx context.Context, obj *model.Package) (string, error) {
 	panic(fmt.Errorf("not implemented: Excludes - excludes"))
+}
+
+// Redeem is the resolver for the redeem field.
+func (r *packageResolver) Redeem(ctx context.Context, obj *model.Package) (string, error) {
+	panic(fmt.Errorf("not implemented: Redeem - redeem"))
+}
+
+// Cancellation is the resolver for the cancellation field.
+func (r *packageResolver) Cancellation(ctx context.Context, obj *model.Package) (string, error) {
+	panic(fmt.Errorf("not implemented: Cancellation - cancellation"))
 }
 
 // Metadata is the resolver for the metadata field.
@@ -76,9 +81,9 @@ func (r *packageResolver) Product(ctx context.Context, obj *model.Package) (*mod
 	panic(fmt.Errorf("not implemented: Product - product"))
 }
 
-// Variants is the resolver for the variants field.
-func (r *packageResolver) Variants(ctx context.Context, obj *model.Package) ([]*model.Variant, error) {
-	panic(fmt.Errorf("not implemented: Variants - variants"))
+// Vouchers is the resolver for the vouchers field.
+func (r *packageResolver) Vouchers(ctx context.Context, obj *model.Package) ([]*model.Voucher, error) {
+	panic(fmt.Errorf("not implemented: Vouchers - vouchers"))
 }
 
 // Package is the resolver for the package field.
@@ -102,6 +107,12 @@ type packageResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *packageResolver) Details(ctx context.Context, obj *model.Package) ([]string, error) {
+	panic(fmt.Errorf("not implemented: Details - details"))
+}
+func (r *packageResolver) Variants(ctx context.Context, obj *model.Package) ([]*model.Voucher, error) {
+	panic(fmt.Errorf("not implemented: Variants - variants"))
+}
 func (r *packageResolver) Images(ctx context.Context, obj *model.Package) ([]string, error) {
 	panic(fmt.Errorf("not implemented: Images - images"))
 }

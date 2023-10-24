@@ -43,6 +43,7 @@ type ResolverRoot interface {
 	Image() ImageResolver
 	Mutation() MutationResolver
 	Package() PackageResolver
+	Place() PlaceResolver
 	Post() PostResolver
 	Product() ProductResolver
 	Query() QueryResolver
@@ -63,6 +64,7 @@ type ComplexityRoot struct {
 		FindFileByID    func(childComplexity int, id string) int
 		FindImageByID   func(childComplexity int, id string) int
 		FindPackageByID func(childComplexity int, id string) int
+		FindPlaceByID   func(childComplexity int, id string) int
 		FindPostByID    func(childComplexity int, id string) int
 		FindProductByID func(childComplexity int, id string) int
 		FindTermByID    func(childComplexity int, id string) int
@@ -123,6 +125,11 @@ type ComplexityRoot struct {
 		Images func(childComplexity int) int
 	}
 
+	Place struct {
+		ID     func(childComplexity int) int
+		Images func(childComplexity int) int
+	}
+
 	Post struct {
 		Body        func(childComplexity int) int
 		Commentable func(childComplexity int) int
@@ -154,10 +161,9 @@ type ComplexityRoot struct {
 
 	Query struct {
 		File               func(childComplexity int, id string) int
-		Files              func(childComplexity int, args map[string]interface{}) int
+		Files              func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Post               func(childComplexity int, id string) int
-		Posts              func(childComplexity int, args map[string]interface{}) int
-		Search             func(childComplexity int, args map[string]interface{}) int
+		Posts              func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Term               func(childComplexity int, id string) int
 		Terms              func(childComplexity int, args map[string]interface{}) int
 		__resolve__service func(childComplexity int) int
@@ -170,6 +176,7 @@ type ComplexityRoot struct {
 		Created     func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
+		Images      func(childComplexity int) int
 		Locale      func(childComplexity int) int
 		Metadata    func(childComplexity int) int
 		Name        func(childComplexity int) int
@@ -200,6 +207,7 @@ type EntityResolver interface {
 	FindFileByID(ctx context.Context, id string) (*model.File, error)
 	FindImageByID(ctx context.Context, id string) (*model.Image, error)
 	FindPackageByID(ctx context.Context, id string) (*model.Package, error)
+	FindPlaceByID(ctx context.Context, id string) (*model.Place, error)
 	FindPostByID(ctx context.Context, id string) (*model.Post, error)
 	FindProductByID(ctx context.Context, id string) (*model.Product, error)
 	FindTermByID(ctx context.Context, id string) (*model.Term, error)
@@ -244,6 +252,9 @@ type MutationResolver interface {
 type PackageResolver interface {
 	Images(ctx context.Context, obj *model.Package) ([]*model.Image, error)
 }
+type PlaceResolver interface {
+	Images(ctx context.Context, obj *model.Place) ([]*model.Image, error)
+}
 type PostResolver interface {
 	ID(ctx context.Context, obj *model.Post) (string, error)
 
@@ -263,11 +274,10 @@ type ProductResolver interface {
 	Images(ctx context.Context, obj *model.Product) ([]*model.Image, error)
 }
 type QueryResolver interface {
-	Search(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
-	Files(ctx context.Context, args map[string]interface{}) (*model.Files, error)
+	Files(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Files, error)
 	File(ctx context.Context, id string) (*model.File, error)
 	Post(ctx context.Context, id string) (*model.Post, error)
-	Posts(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
+	Posts(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Posts, error)
 	Term(ctx context.Context, id string) (*model.Term, error)
 	Terms(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
 }
@@ -282,6 +292,7 @@ type TermResolver interface {
 	Metadata(ctx context.Context, obj *model.Term) (map[string]interface{}, error)
 	Created(ctx context.Context, obj *model.Term) (string, error)
 	Updated(ctx context.Context, obj *model.Term) (string, error)
+	Images(ctx context.Context, obj *model.Term) ([]*model.Image, error)
 }
 type UserResolver interface {
 	Posts(ctx context.Context, obj *model.User) ([]*model.Post, error)
@@ -338,6 +349,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.FindPackageByID(childComplexity, args["id"].(string)), true
+
+	case "Entity.findPlaceByID":
+		if e.complexity.Entity.FindPlaceByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findPlaceByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindPlaceByID(childComplexity, args["id"].(string)), true
 
 	case "Entity.findPostByID":
 		if e.complexity.Entity.FindPostByID == nil {
@@ -720,6 +743,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Package.Images(childComplexity), true
 
+	case "Place.id":
+		if e.complexity.Place.ID == nil {
+			break
+		}
+
+		return e.complexity.Place.ID(childComplexity), true
+
+	case "Place.images":
+		if e.complexity.Place.Images == nil {
+			break
+		}
+
+		return e.complexity.Place.Images(childComplexity), true
+
 	case "Post.body":
 		if e.complexity.Post.Body == nil {
 			break
@@ -882,7 +919,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Files(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Files(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.post":
 		if e.complexity.Query.Post == nil {
@@ -906,19 +943,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Posts(childComplexity, args["args"].(map[string]interface{})), true
-
-	case "Query.search":
-		if e.complexity.Query.Search == nil {
-			break
-		}
-
-		args, err := ec.field_Query_search_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Search(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Posts(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.term":
 		if e.complexity.Query.Term == nil {
@@ -997,6 +1022,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Term.ID(childComplexity), true
+
+	case "Term.images":
+		if e.complexity.Term.Images == nil {
+			break
+		}
+
+		return e.complexity.Term.Images(childComplexity), true
 
 	case "Term.locale":
 		if e.complexity.Term.Locale == nil {
@@ -1206,7 +1238,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/file.graphql" "schema/image.graphql" "schema/package.graphql" "schema/post.graphql" "schema/product.graphql" "schema/term.graphql" "schema/user.graphql"
+//go:embed "schema.graphqls" "schema/file.graphql" "schema/image.graphql" "schema/package.graphql" "schema/place.graphql" "schema/post.graphql" "schema/product.graphql" "schema/term.graphql" "schema/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1222,6 +1254,7 @@ var sources = []*ast.Source{
 	{Name: "schema/file.graphql", Input: sourceData("schema/file.graphql"), BuiltIn: false},
 	{Name: "schema/image.graphql", Input: sourceData("schema/image.graphql"), BuiltIn: false},
 	{Name: "schema/package.graphql", Input: sourceData("schema/package.graphql"), BuiltIn: false},
+	{Name: "schema/place.graphql", Input: sourceData("schema/place.graphql"), BuiltIn: false},
 	{Name: "schema/post.graphql", Input: sourceData("schema/post.graphql"), BuiltIn: false},
 	{Name: "schema/product.graphql", Input: sourceData("schema/product.graphql"), BuiltIn: false},
 	{Name: "schema/term.graphql", Input: sourceData("schema/term.graphql"), BuiltIn: false},
@@ -1264,13 +1297,14 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = File | Image | Package | Post | Product | Term | User
+union _Entity = File | Image | Package | Place | Post | Product | Term | User
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
 		findFileByID(id: ID!,): File!
 	findImageByID(id: ID!,): Image!
 	findPackageByID(id: ID!,): Package!
+	findPlaceByID(id: ID!,): Place!
 	findPostByID(id: ID!,): Post!
 	findProductByID(id: ID!,): Product!
 	findTermByID(id: ID!,): Term!
@@ -1370,6 +1404,21 @@ func (ec *executionContext) field_Entity_findImageByID_args(ctx context.Context,
 }
 
 func (ec *executionContext) field_Entity_findPackageByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findPlaceByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1700,14 +1749,59 @@ func (ec *executionContext) field_Query_files_args(ctx context.Context, rawArgs 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -1730,29 +1824,59 @@ func (ec *executionContext) field_Query_posts_args(ctx context.Context, rawArgs 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_search_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
-		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -2045,6 +2169,67 @@ func (ec *executionContext) fieldContext_Entity_findPackageByID(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Entity_findPlaceByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findPlaceByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindPlaceByID(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Place)
+	fc.Result = res
+	return ec.marshalNPlace2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐPlace(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findPlaceByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Place_id(ctx, field)
+			case "images":
+				return ec.fieldContext_Place_images(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findPlaceByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Entity_findPostByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Entity_findPostByID(ctx, field)
 	if err != nil {
@@ -2090,14 +2275,14 @@ func (ec *executionContext) fieldContext_Entity_findPostByID(ctx context.Context
 				return ec.fieldContext_Post_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Post_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Post_slug(ctx, field)
 			case "title":
 				return ec.fieldContext_Post_title(ctx, field)
 			case "summary":
 				return ec.fieldContext_Post_summary(ctx, field)
 			case "body":
 				return ec.fieldContext_Post_body(ctx, field)
-			case "slug":
-				return ec.fieldContext_Post_slug(ctx, field)
 			case "status":
 				return ec.fieldContext_Post_status(ctx, field)
 			case "commentable":
@@ -2260,6 +2445,8 @@ func (ec *executionContext) fieldContext_Entity_findTermByID(ctx context.Context
 				return ec.fieldContext_Term_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Term_updated(ctx, field)
+			case "images":
+				return ec.fieldContext_Term_images(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -3860,14 +4047,14 @@ func (ec *executionContext) fieldContext_Mutation_createPost(ctx context.Context
 				return ec.fieldContext_Post_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Post_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Post_slug(ctx, field)
 			case "title":
 				return ec.fieldContext_Post_title(ctx, field)
 			case "summary":
 				return ec.fieldContext_Post_summary(ctx, field)
 			case "body":
 				return ec.fieldContext_Post_body(ctx, field)
-			case "slug":
-				return ec.fieldContext_Post_slug(ctx, field)
 			case "status":
 				return ec.fieldContext_Post_status(ctx, field)
 			case "commentable":
@@ -3966,14 +4153,14 @@ func (ec *executionContext) fieldContext_Mutation_updatePost(ctx context.Context
 				return ec.fieldContext_Post_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Post_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Post_slug(ctx, field)
 			case "title":
 				return ec.fieldContext_Post_title(ctx, field)
 			case "summary":
 				return ec.fieldContext_Post_summary(ctx, field)
 			case "body":
 				return ec.fieldContext_Post_body(ctx, field)
-			case "slug":
-				return ec.fieldContext_Post_slug(ctx, field)
 			case "status":
 				return ec.fieldContext_Post_status(ctx, field)
 			case "commentable":
@@ -4236,6 +4423,8 @@ func (ec *executionContext) fieldContext_Mutation_createTerm(ctx context.Context
 				return ec.fieldContext_Term_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Term_updated(ctx, field)
+			case "images":
+				return ec.fieldContext_Term_images(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -4336,6 +4525,8 @@ func (ec *executionContext) fieldContext_Mutation_updateTerm(ctx context.Context
 				return ec.fieldContext_Term_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Term_updated(ctx, field)
+			case "images":
+				return ec.fieldContext_Term_images(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -4603,6 +4794,111 @@ func (ec *executionContext) fieldContext_Package_images(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Place_id(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Place_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Place_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Place_images(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Place_images(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Place().Images(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Image)
+	fc.Result = res
+	return ec.marshalOImage2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐImage(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Place_images(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Image_id(ctx, field)
+			case "type":
+				return ec.fieldContext_Image_type(ctx, field)
+			case "locale":
+				return ec.fieldContext_Image_locale(ctx, field)
+			case "object":
+				return ec.fieldContext_Image_object(ctx, field)
+			case "url":
+				return ec.fieldContext_Image_url(ctx, field)
+			case "title":
+				return ec.fieldContext_Image_title(ctx, field)
+			case "caption":
+				return ec.fieldContext_Image_caption(ctx, field)
+			case "order":
+				return ec.fieldContext_Image_order(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Image_metadata(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Image", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Post_id(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Post_id(ctx, field)
 	if err != nil {
@@ -4723,6 +5019,50 @@ func (ec *executionContext) _Post_type(ctx context.Context, field graphql.Collec
 }
 
 func (ec *executionContext) fieldContext_Post_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Post",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Post_slug(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Post_slug(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Slug, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalNString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Post_slug(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Post",
 		Field:      field,
@@ -4860,50 +5200,6 @@ func (ec *executionContext) fieldContext_Post_body(ctx context.Context, field gr
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Post_slug(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Post_slug(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Slug, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalNString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Post_slug(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Post",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -5234,6 +5530,8 @@ func (ec *executionContext) fieldContext_Post_terms(ctx context.Context, field g
 				return ec.fieldContext_Term_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Term_updated(ctx, field)
+			case "images":
+				return ec.fieldContext_Term_images(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -5283,14 +5581,14 @@ func (ec *executionContext) fieldContext_Post_parent(ctx context.Context, field 
 				return ec.fieldContext_Post_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Post_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Post_slug(ctx, field)
 			case "title":
 				return ec.fieldContext_Post_title(ctx, field)
 			case "summary":
 				return ec.fieldContext_Post_summary(ctx, field)
 			case "body":
 				return ec.fieldContext_Post_body(ctx, field)
-			case "slug":
-				return ec.fieldContext_Post_slug(ctx, field)
 			case "status":
 				return ec.fieldContext_Post_status(ctx, field)
 			case "commentable":
@@ -5463,14 +5761,14 @@ func (ec *executionContext) fieldContext_Posts_data(ctx context.Context, field g
 				return ec.fieldContext_Post_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Post_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Post_slug(ctx, field)
 			case "title":
 				return ec.fieldContext_Post_title(ctx, field)
 			case "summary":
 				return ec.fieldContext_Post_summary(ctx, field)
 			case "body":
 				return ec.fieldContext_Post_body(ctx, field)
-			case "slug":
-				return ec.fieldContext_Post_slug(ctx, field)
 			case "status":
 				return ec.fieldContext_Post_status(ctx, field)
 			case "commentable":
@@ -5601,58 +5899,6 @@ func (ec *executionContext) fieldContext_Product_images(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_search(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_search(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Search(rctx, fc.Args["args"].(map[string]interface{}))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(map[string]interface{})
-	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_search(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_search_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_files(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_files(ctx, field)
 	if err != nil {
@@ -5667,7 +5913,7 @@ func (ec *executionContext) _Query_files(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Files(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Files(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5855,14 +6101,14 @@ func (ec *executionContext) fieldContext_Query_post(ctx context.Context, field g
 				return ec.fieldContext_Post_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Post_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Post_slug(ctx, field)
 			case "title":
 				return ec.fieldContext_Post_title(ctx, field)
 			case "summary":
 				return ec.fieldContext_Post_summary(ctx, field)
 			case "body":
 				return ec.fieldContext_Post_body(ctx, field)
-			case "slug":
-				return ec.fieldContext_Post_slug(ctx, field)
 			case "status":
 				return ec.fieldContext_Post_status(ctx, field)
 			case "commentable":
@@ -5913,7 +6159,7 @@ func (ec *executionContext) _Query_posts(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Posts(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Posts(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5922,9 +6168,9 @@ func (ec *executionContext) _Query_posts(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(*model.Posts)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOPosts2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐPosts(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_posts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5934,7 +6180,13 @@ func (ec *executionContext) fieldContext_Query_posts(ctx context.Context, field 
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_Posts_count(ctx, field)
+			case "data":
+				return ec.fieldContext_Posts_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Posts", field.Name)
 		},
 	}
 	defer func() {
@@ -6013,6 +6265,8 @@ func (ec *executionContext) fieldContext_Query_term(ctx context.Context, field g
 				return ec.fieldContext_Term_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Term_updated(ctx, field)
+			case "images":
+				return ec.fieldContext_Term_images(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -6421,6 +6675,8 @@ func (ec *executionContext) fieldContext_Term_parent(ctx context.Context, field 
 				return ec.fieldContext_Term_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Term_updated(ctx, field)
+			case "images":
+				return ec.fieldContext_Term_images(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -6490,6 +6746,8 @@ func (ec *executionContext) fieldContext_Term_children(ctx context.Context, fiel
 				return ec.fieldContext_Term_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Term_updated(ctx, field)
+			case "images":
+				return ec.fieldContext_Term_images(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -6928,6 +7186,67 @@ func (ec *executionContext) fieldContext_Term_updated(ctx context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Term_images(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Term_images(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Term().Images(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Image)
+	fc.Result = res
+	return ec.marshalOImage2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐImage(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Term_images(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Term",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Image_id(ctx, field)
+			case "type":
+				return ec.fieldContext_Image_type(ctx, field)
+			case "locale":
+				return ec.fieldContext_Image_locale(ctx, field)
+			case "object":
+				return ec.fieldContext_Image_object(ctx, field)
+			case "url":
+				return ec.fieldContext_Image_url(ctx, field)
+			case "title":
+				return ec.fieldContext_Image_title(ctx, field)
+			case "caption":
+				return ec.fieldContext_Image_caption(ctx, field)
+			case "order":
+				return ec.fieldContext_Image_order(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Image_metadata(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Image", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Terms_count(ctx context.Context, field graphql.CollectedField, obj *model.Terms) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Terms_count(ctx, field)
 	if err != nil {
@@ -7034,6 +7353,8 @@ func (ec *executionContext) fieldContext_Terms_data(ctx context.Context, field g
 				return ec.fieldContext_Term_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Term_updated(ctx, field)
+			case "images":
+				return ec.fieldContext_Term_images(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
 		},
@@ -7127,14 +7448,14 @@ func (ec *executionContext) fieldContext_User_posts(ctx context.Context, field g
 				return ec.fieldContext_Post_locale(ctx, field)
 			case "type":
 				return ec.fieldContext_Post_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Post_slug(ctx, field)
 			case "title":
 				return ec.fieldContext_Post_title(ctx, field)
 			case "summary":
 				return ec.fieldContext_Post_summary(ctx, field)
 			case "body":
 				return ec.fieldContext_Post_body(ctx, field)
-			case "slug":
-				return ec.fieldContext_Post_slug(ctx, field)
 			case "status":
 				return ec.fieldContext_Post_status(ctx, field)
 			case "commentable":
@@ -9743,6 +10064,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._Package(ctx, sel, obj)
+	case model.Place:
+		return ec._Place(ctx, sel, &obj)
+	case *model.Place:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Place(ctx, sel, obj)
 	case model.Post:
 		return ec._Post(ctx, sel, &obj)
 	case *model.Post:
@@ -9853,6 +10181,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 					}
 				}()
 				res = ec._Entity_findPackageByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findPlaceByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findPlaceByID(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10716,6 +11066,78 @@ func (ec *executionContext) _Package(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var placeImplementors = []string{"Place", "_Entity"}
+
+func (ec *executionContext) _Place(ctx context.Context, sel ast.SelectionSet, obj *model.Place) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, placeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Place")
+		case "id":
+			out.Values[i] = ec._Place_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "images":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Place_images(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var postImplementors = []string{"Post", "_Entity"}
 
 func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj *model.Post) graphql.Marshaler {
@@ -10770,6 +11192,11 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "type":
 			out.Values[i] = ec._Post_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "slug":
+			out.Values[i] = ec._Post_slug(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -10881,11 +11308,6 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "slug":
-			out.Values[i] = ec._Post_slug(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "status":
 			out.Values[i] = ec._Post_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -11291,25 +11713,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "search":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_search(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "files":
 			field := field
 
@@ -11785,6 +12188,39 @@ func (ec *executionContext) _Term(ctx context.Context, sel ast.SelectionSet, obj
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "images":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Term_images(ctx, field, obj)
 				return res
 			}
 
@@ -12524,6 +12960,20 @@ func (ec *executionContext) marshalNPackage2ᚖgithubᚗcomᚋdailytravelᚋxᚋ
 	return ec._Package(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNPlace2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐPlace(ctx context.Context, sel ast.SelectionSet, v model.Place) graphql.Marshaler {
+	return ec._Place(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPlace2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐPlace(ctx context.Context, sel ast.SelectionSet, v *model.Place) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Place(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNPost2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v model.Post) graphql.Marshaler {
 	return ec._Post(ctx, sel, &v)
 }
@@ -13250,6 +13700,13 @@ func (ec *executionContext) marshalOPost2ᚖgithubᚗcomᚋdailytravelᚋxᚋcms
 		return graphql.Null
 	}
 	return ec._Post(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOPosts2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐPosts(ctx context.Context, sel ast.SelectionSet, v *model.Posts) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Posts(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

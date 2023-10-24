@@ -249,6 +249,11 @@ func (r *termResolver) Updated(ctx context.Context, obj *model.Term) (string, er
 	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
+// Images is the resolver for the images field.
+func (r *termResolver) Images(ctx context.Context, obj *model.Term) ([]*model.Image, error) {
+	panic(fmt.Errorf("not implemented: Images - images"))
+}
+
 // Term returns TermResolver implementation.
 func (r *Resolver) Term() TermResolver { return &termResolver{r} }
 

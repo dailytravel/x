@@ -1,24 +1,41 @@
 type Search {
   id: ID!
   uid: ID!
-  query: String!
+  locale: String!
+  keyword: String!
   user_agent: String!
   client_ip: String!
   metadata: Map
   timestamp: String!
 }
 
+type Searches {
+  count: Int!
+  data: [Search]
+}
+
+input SearchInput {
+  locale: String!
+  keyword: String!
+  user_agent: String
+  client_ip: String
+  metadata: Map
+}
+
 extend type Query {
-  recentSearches(
+  search(args: Map): Map
+  searches(
     filter: Map
     project: Map
     sort: Map
     collation: Map
     limit: Int
     skip: Int
-  ): [Search]
+  ): Searches
 }
 
 extend type Mutation {
-  saveSearch(query: String!): Search!
+  createSearch(input: SearchInput!): Search!
+  deleteSearch(id: ID!): Boolean @auth
+  deleteSearches(filter: Map): Boolean @auth
 }

@@ -11,6 +11,8 @@ type User @key(fields: "id") {
   locale: String
   picture: String
   last_login: String
+  last_ip: String
+  last_activity: String
   email_verified: Boolean
   phone_verified: Boolean
   metadata: Map
@@ -58,7 +60,7 @@ input MFAInput {
   code: String!
 }
 
-input NewUser {
+input NewUserInput {
   name: String!
   given_name: String
   family_name: String
@@ -72,7 +74,7 @@ input NewUser {
   status: String
 }
 
-input UpdateUser {
+input UpdateUserInput {
   name: String
   given_name: String
   family_name: String
@@ -86,33 +88,17 @@ input UpdateUser {
 }
 
 input LoginInput {
-  # User credentials
   username: String!
   password: String!
-
-  # OAuth 2.0 authentication parameters
   grant_type: String
   scope: String
-
-  # Client credentials (for OAuth 2.0 client authentication)
   client_id: String
   client_secret: String
 }
 
 input SocialLoginInput {
-  # User credentials
-  username: String!
-  password: String!
-
-  # OAuth 2.0 authentication parameters
-  grant_type: String
-  scope: String
-
-  # Client credentials (for OAuth 2.0 client authentication)
-  client_id: String
+  client_id: String!
   client_secret: String
-
-  # Social provider
   provider: String!
   token: String!
 }
@@ -122,9 +108,10 @@ input RegisterInput {
   email: String!
   password: String!
   password_confirmation: String!
+  client_id: String
 }
 
-input UpdatePassword {
+input UpdatePasswordInput {
   old_password: String!
   password: String!
   password_confirmation: String!
@@ -144,13 +131,6 @@ type AuthPayload {
   user: User
 }
 
-type RefreshTokenPayload {
-  access_token: String!
-  refresh_token: String!
-  expires_in: Int!
-  token_type: String!
-}
-
 extend type Query {
   users(args: Map): Map @auth(roles: [ADMIN]) #for search users on typesense
   user(id: ID!): User @auth(roles: [ADMIN])
@@ -159,17 +139,18 @@ extend type Query {
 }
 
 extend type Mutation {
-  createUser(input: NewUser!): User @auth(roles: [ADMIN])
-  updateUser(id: ID!, input: UpdateUser!): User
-  register(input: RegisterInput!): User
+  createUser(input: NewUserInput!): User @auth(roles: [ADMIN])
+  updateUser(id: ID!, input: UpdateUserInput!): User
+  register(input: RegisterInput!): AuthPayload
   verifyEmail(token: String!): Map
   verifyPhone(token: String!): Map
   login(input: LoginInput!): AuthPayload
   socialLogin(input: SocialLoginInput!): AuthPayload
-  refreshToken(refresh_token: String!): RefreshTokenPayload
+  refreshToken(refresh_token: String!): AuthPayload
+  logout(all: Boolean): Map @auth
   forgotPassword(email: String!): Map
   resetPassword(input: ResetPasswordInput!): Map
-  UpdatePassword(input: UpdatePassword!): Map @auth
+  updatePassword(input: UpdatePasswordInput!): Map @auth
   deactivate: User @auth
   deleteUser(id: ID!): Boolean
   deleteUsers(ids: [ID!]!): Boolean

@@ -7,8 +7,8 @@ type Log {
   utm: Map
   metadata: Map
   status: String!
-  clientIp: String
-  userAgent: String
+  client_ip: String
+  user_agent: String
   timestamp: String!
 }
 
@@ -25,8 +25,8 @@ input NewLog {
   utm: Map
   metadata: Map
   status: String!
-  clientIp: String
-  userAgent: String
+  client_ip: String
+  user_agent: String
 }
 
 input UpdateLog {
@@ -36,8 +36,8 @@ input UpdateLog {
   utm: Map
   metadata: Map
   status: String
-  clientIp: String
-  userAgent: String
+  client_ip: String
+  user_agent: String
 }
 
 extend type Query {
@@ -48,6 +48,6 @@ extend type Query {
 extend type Mutation {
   createLog(input: NewLog!): Log
   updateLog(id: ID!, input: UpdateLog!): Log
-  deleteLog(id: ID!): Map @auth(roles: [ADMIN])
-  deleteLogs(ids: [ID]!): Map @auth(roles: [ADMIN])
+  deleteLog(id: ID!): Boolean @auth(roles: [ADMIN])
+  deleteLogs(filter: Map): Boolean @auth(roles: [ADMIN])
 }

@@ -95,7 +95,10 @@ func main() {
 		log.Fatal("Error running migrations: ", err)
 	}
 
+	database.Client.Collection("products").Delete()
 	database.Client.Collection("contacts").Delete()
+	database.Client.Collection("companies").Delete()
+
 	// start scheduler jobs
 	scheduler.SyncContactsJob()
 

@@ -7,8 +7,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/dailytravel/x/marketing/internal/utils"
 	"github.com/go-redis/redis/v8"
+	"github.com/google/uuid"
 )
 
 var (
@@ -38,7 +38,7 @@ func SetEmail(ctx context.Context, email string) (string, error) {
 		DB:       0,
 	})
 
-	key, _ := utils.Base64(32, false)
+	key := uuid.New().String()
 
 	err := client.Set(ctx, key, email, time.Minute*5).Err()
 	if err != nil {

@@ -13,8 +13,8 @@ type Activity struct {
 	UID       primitive.ObjectID `json:"uid" bson:"uid"`
 	Object    Object             `json:"object" bson:"object"`
 	Action    string             `json:"action" bson:"action"`
-	ClientIP  *string            `json:"clientIp,omitempty" bson:"client_ip,omitempty"`
-	UserAgent *string            `json:"userAgent,omitempty" bson:"user_agent,omitempty"`
+	ClientIP  *string            `json:"client_ip,omitempty" bson:"client_ip,omitempty"`
+	UserAgent *string            `json:"user_agent,omitempty" bson:"user_agent,omitempty"`
 }
 
 type Object struct {

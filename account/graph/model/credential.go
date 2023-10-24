@@ -9,12 +9,13 @@ import (
 )
 
 type Credential struct {
-	Model
+	Model   `bson:",inline"`
 	UID     primitive.ObjectID  `json:"uid" bson:"uid"`
 	Type    string              `json:"type" bson:"type"`
 	Secret  string              `json:"secret" bson:"secret"`
 	Expires primitive.Timestamp `json:"expires" bson:"expires"`
-	Status  string              `json:"status"`
+	Revoked bool                `json:"revoked" bson:"revoked"`
+	Status  string              `json:"status" bson:"status"`
 }
 
 func (i *Credential) MarshalBSON() ([]byte, error) {

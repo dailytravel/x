@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/dailytravel/x/sales/graph/model"
+	"github.com/dailytravel/x/sales/internal/utils"
 )
 
 // CreateProduct is the resolver for the createProduct field.
@@ -28,12 +29,12 @@ func (r *mutationResolver) DeleteProduct(ctx context.Context, id string) (*bool,
 
 // ID is the resolver for the id field.
 func (r *productResolver) ID(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // UID is the resolver for the uid field.
 func (r *productResolver) UID(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.UID.Hex(), nil
 }
 
 // Name is the resolver for the name field.
@@ -91,9 +92,19 @@ func (r *productResolver) Updated(ctx context.Context, obj *model.Product) (stri
 	panic(fmt.Errorf("not implemented: Updated - updated"))
 }
 
-// Location is the resolver for the location field.
-func (r *productResolver) Location(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: Location - location"))
+// Place is the resolver for the place field.
+func (r *productResolver) Place(ctx context.Context, obj *model.Product) (string, error) {
+	panic(fmt.Errorf("not implemented: Place - place"))
+}
+
+// Terms is the resolver for the terms field.
+func (r *productResolver) Terms(ctx context.Context, obj *model.Product) ([]*string, error) {
+	panic(fmt.Errorf("not implemented: Terms - terms"))
+}
+
+// Places is the resolver for the places field.
+func (r *productResolver) Places(ctx context.Context, obj *model.Product) ([]*string, error) {
+	panic(fmt.Errorf("not implemented: Places - places"))
 }
 
 // Product is the resolver for the product field.
@@ -102,8 +113,43 @@ func (r *queryResolver) Product(ctx context.Context, id string) (*model.Product,
 }
 
 // Products is the resolver for the products field.
-func (r *queryResolver) Products(ctx context.Context, args map[string]interface{}) (*model.Products, error) {
-	panic(fmt.Errorf("not implemented: Products - products"))
+func (r *queryResolver) Products(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Products, error) {
+	var items []*model.Product
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("products").Find(ctx, _filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	//get total count
+	count, err := r.db.Collection("products").CountDocuments(ctx, _filter, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Products{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Product returns ProductResolver implementation.

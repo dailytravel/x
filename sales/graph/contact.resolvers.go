@@ -78,7 +78,7 @@ func (r *contactResolver) Updated(ctx context.Context, obj *model.Contact) (stri
 
 // UID is the resolver for the uid field.
 func (r *contactResolver) UID(ctx context.Context, obj *model.Contact) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.UID.Hex(), nil
 }
 
 // CreateContact is the resolver for the createContact field.
@@ -447,19 +447,43 @@ func (r *mutationResolver) DeleteContacts(ctx context.Context, ids []string) (ma
 }
 
 // Contacts is the resolver for the contacts field.
-func (r *queryResolver) Contacts(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	res, err := r.ts.Collection("contacts").Documents().Search(utils.Params(args))
+func (r *queryResolver) Contacts(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Contacts, error) {
+	var items []*model.Contact
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("contacts").Find(ctx, _filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	//get total count
+	count, err := r.db.Collection("contacts").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert struct to map
-	results, err := utils.StructToMap(res)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
+	return &model.Contacts{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Contact is the resolver for the contact field.

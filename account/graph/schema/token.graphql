@@ -1,7 +1,12 @@
 type Token {
   id: ID!
   user: User!
-  token: String!
-  expires_at: String!
-  created_at: String!
+  expires: String!
+  revoked: Boolean!
+  last_used: String!
+  client_ip: String!
+  user_agent: String!
+  created: String!
+  metadata: Map
+  status: String!
 }

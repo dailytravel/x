@@ -4,10 +4,14 @@ import (
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 
+	"github.com/MicahParks/keyfunc"
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -54,4 +58,35 @@ func Token(claims jwt.MapClaims, k model.Key) (*string, error) {
 	}
 
 	return &token, nil
+}
+
+func ValidateToken(tokenString string, jwksURL string) (*jwt.Token, error) {
+	// Fetch the JWKS from the provided URL
+	resp, err := http.Get(jwksURL)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to fetch JWKS: %s", resp.Status)
+	}
+
+	jwksJSON, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse the JWKS
+	jwks, err := keyfunc.NewJSON(json.RawMessage(jwksJSON))
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := jwt.Parse(tokenString, jwks.Keyfunc)
+	if err != nil || !token.Valid {
+		return nil, err
+	}
+
+	return token, nil
 }

@@ -1,0 +1,72 @@
+type Item {
+  id: ID!
+  uid: ID!
+  package: Package!
+  locale: String!
+  type: String!
+  code: String!
+  name: String!
+  description: String
+  quantity: Int!
+  price: Float!
+  discount: Float
+  currency: String!
+  metadata: Map
+  status: String
+  created: String!
+  updated: String!
+}
+
+type Items {
+  items: [Item] @auth
+  count: Int! @auth
+}
+
+input NewItem {
+  package: ID!
+  locale: String!
+  type: String!
+  code: String!
+  name: String!
+  description: String
+  quantity: Int!
+  price: Float!
+  discount: Float
+  currency: String!
+  metadata: Map
+  status: String
+}
+
+input UpdateItem {
+  package: ID
+  locale: String
+  type: String
+  code: String
+  name: String
+  description: String
+  quantity: Int
+  price: Float
+  discount: Float
+  currency: String
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  items(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Items
+  item(id: ID!): Item
+}
+
+extend type Mutation {
+  createItem(input: NewItem!): Item @auth
+  updateItem(id: ID!, input: UpdateItem!): Item @auth
+  deleteItem(id: ID!): Item @auth
+  deleteItems(filter: Map): [Item] @auth
+}

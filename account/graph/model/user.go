@@ -26,6 +26,8 @@ type User struct {
 	Timezone      *string              `json:"timezone,omitempty" bson:"timezone,omitempty"`
 	Picture       *string              `json:"picture,omitempty" bson:"picture,omitempty"`
 	LastLogin     *primitive.Timestamp `json:"last_login,omitempty" bson:"last_login,omitempty"`
+	LastActivity  *primitive.Timestamp `json:"last_activity,omitempty" bson:"last_activity,omitempty"`
+	LastIP        *string              `json:"last_ip,omitempty" bson:"last_ip,omitempty"`
 	EmailVerified *bool                `json:"email_verified,omitempty" bson:"email_verified,omitempty"`
 	PhoneVerified *bool                `json:"phone_verified,omitempty" bson:"phone_verified,omitempty"`
 	Status        *string              `json:"status" bson:"status"`

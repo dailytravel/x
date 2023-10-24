@@ -107,7 +107,7 @@ type Options struct {
 
 type Places struct {
 	Data  []*Place `json:"data,omitempty"`
-	Count *int     `json:"count,omitempty"`
+	Count int      `json:"count"`
 }
 
 type Templates struct {

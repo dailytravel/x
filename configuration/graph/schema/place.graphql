@@ -12,6 +12,8 @@ type Place @key(fields: "id") {
   order: Int
   status: String
   metadata: Map
+  created: String!
+  updated: String!
 }
 
 enum PlaceType {
@@ -34,7 +36,7 @@ type Location {
 
 type Places {
   data: [Place]
-  count: Int
+  count: Int!
 }
 
 input LocationInput {
@@ -75,7 +77,14 @@ input UpdateLocation {
 
 extend type Query {
   place(id: ID!): Place
-  places(args: Map): Map
+  places(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Places
 }
 
 extend type Mutation {

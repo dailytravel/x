@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/configuration/graph/model"
 	"github.com/dailytravel/x/configuration/internal/utils"
@@ -203,16 +204,32 @@ func (r *placeResolver) Description(ctx context.Context, obj *model.Place) (*str
 	}
 
 	// Try to retrieve the description for the requested locale
-	if description, ok := obj.Description[*locale].(string); ok {
-		return &description, nil
+	description, ok := obj.Description[*locale].(string)
+	if !ok {
+		// If the description for the requested locale is not found, fall back to the default locale
+		defaultDescription, defaultOK := obj.Description[obj.Locale].(string)
+		if !defaultOK {
+			return nil, nil
+		}
+		description = defaultDescription
 	}
 
-	return obj.Description[obj.Locale].(*string), nil
+	return &description, nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *placeResolver) Metadata(ctx context.Context, obj *model.Place) (map[string]interface{}, error) {
 	return obj.Metadata, nil
+}
+
+// Created is the resolver for the created field.
+func (r *placeResolver) Created(ctx context.Context, obj *model.Place) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
+}
+
+// Updated is the resolver for the updated field.
+func (r *placeResolver) Updated(ctx context.Context, obj *model.Place) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Place is the resolver for the place field.
@@ -237,19 +254,43 @@ func (r *queryResolver) Place(ctx context.Context, id string) (*model.Place, err
 }
 
 // Places is the resolver for the places field.
-func (r *queryResolver) Places(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	res, err := r.ts.Collection("places").Documents().Search(utils.Params(args))
+func (r *queryResolver) Places(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Places, error) {
+	var items []*model.Place
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("places").Find(ctx, _filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	//get total count
+	count, err := r.db.Collection("places").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert struct to map
-	results, err := utils.StructToMap(res)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
+	return &model.Places{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Place returns PlaceResolver implementation.

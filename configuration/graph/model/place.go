@@ -124,6 +124,7 @@ func (i *Place) Document() map[string]interface{} {
 		"type":        i.Type,
 		"name":        i.Name,
 		"description": i.Description,
+		"reviewable":  i.Reviewable,
 		"status":      i.Status,
 		"created":     time.Unix(int64(i.Created.T), 0).Format(time.RFC3339),
 		"updated":     time.Unix(int64(i.Updated.T), 0).Format(time.RFC3339),

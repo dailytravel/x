@@ -8,8 +8,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/insight/graph/model"
+	"github.com/dailytravel/x/insight/internal/utils"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -42,7 +45,7 @@ func (r *logResolver) Metadata(ctx context.Context, obj *model.Log) (map[string]
 
 // Timestamp is the resolver for the timestamp field.
 func (r *logResolver) Timestamp(ctx context.Context, obj *model.Log) (string, error) {
-	panic(fmt.Errorf("not implemented: Timestamp - timestamp"))
+	return time.Unix(int64(obj.Timestamp.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateLog is the resolver for the createLog field.
@@ -56,7 +59,7 @@ func (r *mutationResolver) UpdateLog(ctx context.Context, id string, input model
 }
 
 // DeleteLog is the resolver for the deleteLog field.
-func (r *mutationResolver) DeleteLog(ctx context.Context, id string) (map[string]interface{}, error) {
+func (r *mutationResolver) DeleteLog(ctx context.Context, id string) (*bool, error) {
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -70,24 +73,12 @@ func (r *mutationResolver) DeleteLog(ctx context.Context, id string) (map[string
 		return nil, fmt.Errorf("log not found")
 	}
 
-	return map[string]interface{}{
-		"status": "success",
-	}, nil
+	return pointer.True(), nil
 }
 
 // DeleteLogs is the resolver for the deleteLogs field.
-func (r *mutationResolver) DeleteLogs(ctx context.Context, ids []*string) (map[string]interface{}, error) {
-	var _ids []primitive.ObjectID
-
-	for _, id := range ids {
-		_id, err := primitive.ObjectIDFromHex(*id)
-		if err != nil {
-			return nil, err
-		}
-		_ids = append(_ids, _id)
-	}
-
-	res, err := r.db.Collection("logs").DeleteMany(ctx, bson.M{"_id": bson.M{"$in": _ids}})
+func (r *mutationResolver) DeleteLogs(ctx context.Context, filter map[string]interface{}) (*bool, error) {
+	res, err := r.db.Collection("logs").DeleteMany(ctx, utils.Filter(filter))
 	if err != nil {
 		return nil, fmt.Errorf("error deleting log: %v", err)
 	}
@@ -96,9 +87,7 @@ func (r *mutationResolver) DeleteLogs(ctx context.Context, ids []*string) (map[s
 		return nil, fmt.Errorf("log not found")
 	}
 
-	return map[string]interface{}{
-		"status": "success",
-	}, nil
+	return pointer.True(), nil
 }
 
 // Log is the resolver for the log field.

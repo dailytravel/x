@@ -10,7 +10,7 @@ import (
 )
 
 type Identity struct {
-	Model
+	Model      `bson:",inline"`
 	UID        primitive.ObjectID `json:"uid" bson:"uid"`
 	Provider   string             `json:"provider" bson:"provider"`
 	UserID     string             `json:"user_id" bson:"user_id"`

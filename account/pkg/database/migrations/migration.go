@@ -16,6 +16,8 @@ func AutoMigrate() error {
 		&Permission{Database: database.Database},
 		&Role{Database: database.Database},
 		&User{Database: database.Database},
+		&Credential{Database: database.Database},
+		&Token{Database: database.Database},
 	}
 
 	for _, migration := range migrators {

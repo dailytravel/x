@@ -94,6 +94,10 @@ func main() {
 		log.Fatal("Error running migrations: ", err)
 	}
 
+	database.Client.Collection("posts").Delete()
+	database.Client.Collection("content").Delete()
+	database.Client.Collection("terms").Delete()
+
 	// need restart the server if drop or create a new collection in mongodb, else will not work
 	for _, name := range []string{} {
 		stream, err := database.Database.Collection(name).Watch(context.Background(), mongo.Pipeline{})

@@ -154,6 +154,7 @@ type ComplexityRoot struct {
 	}
 
 	Place struct {
+		Created     func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Locale      func(childComplexity int) int
@@ -167,6 +168,7 @@ type ComplexityRoot struct {
 		Slug        func(childComplexity int) int
 		Status      func(childComplexity int) int
 		Type        func(childComplexity int) int
+		Updated     func(childComplexity int) int
 	}
 
 	Places struct {
@@ -182,7 +184,7 @@ type ComplexityRoot struct {
 		Option             func(childComplexity int, name string) int
 		Options            func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Place              func(childComplexity int, id string) int
-		Places             func(childComplexity int, args map[string]interface{}) int
+		Places             func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Template           func(childComplexity int, name string) int
 		Templates          func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Timezone           func(childComplexity int, id string) int
@@ -329,6 +331,8 @@ type PlaceResolver interface {
 	Description(ctx context.Context, obj *model.Place) (*string, error)
 
 	Metadata(ctx context.Context, obj *model.Place) (map[string]interface{}, error)
+	Created(ctx context.Context, obj *model.Place) (string, error)
+	Updated(ctx context.Context, obj *model.Place) (string, error)
 }
 type QueryResolver interface {
 	Currency(ctx context.Context, code string) (*model.Currency, error)
@@ -338,7 +342,7 @@ type QueryResolver interface {
 	Option(ctx context.Context, name string) (*model.Option, error)
 	Options(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Options, error)
 	Place(ctx context.Context, id string) (*model.Place, error)
-	Places(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
+	Places(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Places, error)
 	Template(ctx context.Context, name string) (*model.Template, error)
 	Templates(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Templates, error)
 	Timezones(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Timezones, error)
@@ -1014,6 +1018,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Options.Data(childComplexity), true
 
+	case "Place.created":
+		if e.complexity.Place.Created == nil {
+			break
+		}
+
+		return e.complexity.Place.Created(childComplexity), true
+
 	case "Place.description":
 		if e.complexity.Place.Description == nil {
 			break
@@ -1104,6 +1115,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Place.Type(childComplexity), true
+
+	case "Place.updated":
+		if e.complexity.Place.Updated == nil {
+			break
+		}
+
+		return e.complexity.Place.Updated(childComplexity), true
 
 	case "Places.count":
 		if e.complexity.Places.Count == nil {
@@ -1213,7 +1231,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Places(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Places(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.template":
 		if e.complexity.Query.Template == nil {
@@ -2648,14 +2666,59 @@ func (ec *executionContext) field_Query_places_args(ctx context.Context, rawArgs
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -3669,6 +3732,10 @@ func (ec *executionContext) fieldContext_Entity_findPlaceByID(ctx context.Contex
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Place_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Place_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Place_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
 		},
@@ -5444,6 +5511,10 @@ func (ec *executionContext) fieldContext_Mutation_createLocation(ctx context.Con
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Place_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Place_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Place_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
 		},
@@ -5544,6 +5615,10 @@ func (ec *executionContext) fieldContext_Mutation_updateLocation(ctx context.Con
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Place_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Place_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Place_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
 		},
@@ -7077,6 +7152,10 @@ func (ec *executionContext) fieldContext_Place_parent(ctx context.Context, field
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Place_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Place_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Place_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
 		},
@@ -7553,6 +7632,94 @@ func (ec *executionContext) fieldContext_Place_metadata(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Place_created(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Place_created(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Place().Created(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Place_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Place_updated(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Place_updated(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Place().Updated(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Place_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Places_data(ctx context.Context, field graphql.CollectedField, obj *model.Places) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Places_data(ctx, field)
 	if err != nil {
@@ -7615,6 +7782,10 @@ func (ec *executionContext) fieldContext_Places_data(ctx context.Context, field 
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Place_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Place_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Place_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
 		},
@@ -7643,11 +7814,14 @@ func (ec *executionContext) _Places_count(ctx context.Context, field graphql.Col
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Places_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8153,6 +8327,10 @@ func (ec *executionContext) fieldContext_Query_place(ctx context.Context, field 
 				return ec.fieldContext_Place_status(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Place_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Place_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Place_updated(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
 		},
@@ -8185,7 +8363,7 @@ func (ec *executionContext) _Query_places(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Places(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Places(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8194,9 +8372,9 @@ func (ec *executionContext) _Query_places(ctx context.Context, field graphql.Col
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(*model.Places)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOPlaces2ᚖgithubᚗcomᚋdailytravelᚋxᚋconfigurationᚋgraphᚋmodelᚐPlaces(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_places(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8206,7 +8384,13 @@ func (ec *executionContext) fieldContext_Query_places(ctx context.Context, field
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			switch field.Name {
+			case "data":
+				return ec.fieldContext_Places_data(ctx, field)
+			case "count":
+				return ec.fieldContext_Places_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Places", field.Name)
 		},
 	}
 	defer func() {
@@ -14967,6 +15151,78 @@ func (ec *executionContext) _Place(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "created":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Place_created(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "updated":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Place_updated(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15005,6 +15261,9 @@ func (ec *executionContext) _Places(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Places_data(ctx, field, obj)
 		case "count":
 			out.Values[i] = ec._Places_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -17715,6 +17974,13 @@ func (ec *executionContext) marshalOPlace2ᚖgithubᚗcomᚋdailytravelᚋxᚋco
 		return graphql.Null
 	}
 	return ec._Place(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOPlaces2ᚖgithubᚗcomᚋdailytravelᚋxᚋconfigurationᚋgraphᚋmodelᚐPlaces(ctx context.Context, sel ast.SelectionSet, v *model.Places) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Places(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

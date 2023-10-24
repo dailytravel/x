@@ -188,3 +188,12 @@ func Sort(sortCriteria map[string]interface{}) *options.FindOptions {
 func Project(projection map[string]interface{}) *options.FindOptions {
 	return options.Find().SetProjection(projection)
 }
+
+//Convert string to base64
+func ToBase64(s string, padded bool) (string, error) {
+	encodedBytes := base64.RawURLEncoding.EncodeToString([]byte(s))
+	if !padded {
+		encodedBytes = strings.TrimRight(encodedBytes, "=")
+	}
+	return encodedBytes, nil
+}

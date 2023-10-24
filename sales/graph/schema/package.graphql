@@ -3,15 +3,17 @@ type Package {
   locale: String!
   name: String!
   description: String!
-  details: [ID!]!
-  includes: [String!]!
-  excludes: [String!]!
+  includes: String!
+  excludes: String!
+  redeem: String!
+  cancellation: String!
+  instant: Boolean!
   metadata: Map
   status: String!
   created: String!
   updated: String!
   product: Product!
-  variants: [Variant!]!
+  vouchers: [Voucher!]!
 }
 
 type Packages {
@@ -23,11 +25,13 @@ input NewPackage {
   locale: String!
   name: String!
   description: String!
-  details: [ID!]!
-  includes: [String!]!
-  excludes: [String!]!
-  images: [String!]
+  includes: String!
+  excludes: String!
+  redeem: String!
+  cancellation: String!
+  instant: Boolean!
   metadata: Map
+  status: String!
   product: ID!
 }
 
@@ -35,11 +39,14 @@ input UpdatePackage {
   locale: String
   name: String
   description: String
-  details: [ID!]
-  includes: [String!]
-  excludes: [String!]
-  images: [String!]
+  includes: String
+  excludes: String
+  redeem: String
+  cancellation: String
+  instant: Boolean
   metadata: Map
+  status: String
+  product: ID
 }
 
 extend type Query {

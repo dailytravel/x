@@ -8,8 +8,8 @@ type Event {
   status: MailStatus! # e.g., "SENT", "FAILED", "DELIVERED", etc.
   timestamp: String! # When the mail was sent
   metadata: Map # Additional context or details about the send operation
-  clientIp: String # IP of the sender, if relevant
-  userAgent: String # User agent of the sender, if relevant
+  client_ip: String # IP of the sender, if relevant
+  user_agent: String # User agent of the sender, if relevant
   exception: String # Exception message, if relevant
 }
 

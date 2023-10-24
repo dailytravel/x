@@ -54,7 +54,7 @@ func (i *Post) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "uid", Value: 1}}},
 		{Keys: bson.D{{Key: "parent", Value: 1}}},
 		{Keys: bson.D{{Key: "type", Value: 1}}},
-		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
+		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "created ", Value: 1}}},
 		{Keys: bson.D{{Key: "updated ", Value: 1}}},

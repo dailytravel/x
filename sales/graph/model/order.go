@@ -11,14 +11,15 @@ import (
 
 type Order struct {
 	Model       `bson:",inline"`
-	UID         primitive.ObjectID `bson:"uid" json:"uid"`
-	Locale      string             `json:"locale" bson:"locale"`
-	Type        string             `json:"type" bson:"type"`
-	Code        string             `json:"code" bson:"code"`
-	Coupon      *string            `json:"coupon,omitempty" bson:"coupon,omitempty"`
-	Cancellable *bool              `json:"cancellable" bson:"cancellable"`
-	Payment     string             `json:"payment" bson:"payment"`
-	Status      string             `json:"status" bson:"status"`
+	UID         primitive.ObjectID   `bson:"uid" json:"uid"`
+	Locale      string               `json:"locale" bson:"locale"`
+	Type        string               `json:"type" bson:"type"`
+	Code        string               `json:"code" bson:"code"`
+	Coupon      *string              `json:"coupon,omitempty" bson:"coupon,omitempty"`
+	Cancellable bool                 `json:"cancellable" bson:"cancellable"`
+	Payment     string               `json:"payment" bson:"payment"`
+	Items       []primitive.ObjectID `json:"items" bson:"items"`
+	Status      string               `json:"status" bson:"status"`
 }
 
 func (i *Order) MarshalBSON() ([]byte, error) {
@@ -49,6 +50,5 @@ func (i *Order) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "cancellable", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},
 		{Keys: bson.D{{Key: "updated", Value: 1}}},
-		{Keys: bson.D{{Key: "deleted", Value: 1}}},
 	}
 }

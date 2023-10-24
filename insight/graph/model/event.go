@@ -16,8 +16,8 @@ type Event struct {
 	Subject   string              `json:"subject" bson:"subject"`
 	Message   string              `json:"message" bson:"message"`
 	Status    string              `json:"status" bson:"status"`
-	ClientIP  *string             `json:"clientIp,omitempty" bson:"client_ip,omitempty"`
-	UserAgent *string             `json:"userAgent,omitempty" bson:"user_agent,omitempty"`
+	ClientIP  *string             `json:"client_p,omitempty" bson:"client_ip,omitempty"`
+	UserAgent *string             `json:"user_agent,omitempty" bson:"user_agent,omitempty"`
 	Exception *string             `json:"exception,omitempty" bson:"exception,omitempty"`
 }
 

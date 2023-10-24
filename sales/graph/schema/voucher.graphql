@@ -1,0 +1,70 @@
+type Voucher {
+  id: ID!
+  locale: String!
+  code: String!
+  type: String! #gift certificate, ticket, pass
+  name: String!
+  description: String!
+  start: String!
+  end: String!
+  price: Float!
+  discount: Float
+  currency: String!
+  metadata: Map
+  status: String!
+  created: String!
+  updated: String!
+  package: ID!
+  supplier: ID! #refers to the supplier of the voucher as contact
+}
+
+type Vouchers {
+  count: Int!
+  data: [Voucher]
+}
+
+input NewVoucher {
+  locale: String!
+  code: String!
+  type: String!
+  name: String!
+  description: String!
+  start: String!
+  end: String!
+  price: Float!
+  discount: Float
+  currency: String!
+  metadata: Map
+  status: String!
+  package: ID!
+  supplier: ID!
+}
+
+input UpdateVoucher {
+  locale: String
+  code: String
+  type: String
+  name: String
+  description: String
+  start: String
+  end: String!
+  price: Float
+  discount: Float
+  currency: String
+  metadata: Map
+  status: String
+  package: ID
+  supplier: ID
+}
+
+extend type Query {
+  voucher(id: ID!): Voucher
+  vouchers(args: Map): Vouchers
+}
+
+extend type Mutation {
+  createVoucher(input: NewVoucher!): Voucher
+  updateVoucher(id: ID!, input: UpdateVoucher!): Voucher
+  deleteVoucher(id: ID!): Map
+  deleteVouchers(ids: [ID!]!): Map
+}

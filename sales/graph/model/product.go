@@ -11,18 +11,20 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Product struct {
 	Model       `bson:",inline"`
 	UID         primitive.ObjectID    `json:"uid" bson:"uid"`
+	Place       primitive.ObjectID    `json:"place" bson:"place"`
 	Locale      string                `json:"locale" bson:"locale"`
+	Slug        string                `json:"slug" bson:"slug"`
 	Type        string                `json:"type" bson:"type"`
 	Name        primitive.M           `json:"name" bson:"name"`
 	Description primitive.M           `json:"description" bson:"description"`
 	Duration    int32                 `json:"duration" bson:"duration"`
 	Notes       primitive.M           `json:"notes" bson:"notes"`
-	Location    primitive.ObjectID    `json:"location" bson:"location"`
 	Tips        primitive.M           `json:"tips" bson:"tips"`
 	Highlights  primitive.M           `json:"highlights" bson:"highlights"`
 	Expectation primitive.M           `json:"expectation" bson:"expectation"`
@@ -36,6 +38,7 @@ type Product struct {
 	Currency    string                `json:"currency" bson:"currency"`
 	Status      string                `json:"status" bson:"status"`
 	Terms       []*primitive.ObjectID `json:"terms,omitempty" bson:"terms,omitempty"`
+	Places      []*primitive.ObjectID `json:"places,omitempty" bson:"places,omitempty"`
 }
 
 func (Product) IsEntity() {}
@@ -61,6 +64,7 @@ func (i *Product) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "uid", Value: 1}}},
 		{Keys: bson.D{{Key: "type", Value: 1}}},
+		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "duration", Value: 1}}},
 		{Keys: bson.D{{Key: "rating", Value: 1}}},
 		{Keys: bson.D{{Key: "booked", Value: 1}}},
@@ -75,12 +79,14 @@ func (i *Product) Schema() interface{} {
 		Name: i.Collection(),
 		Fields: []api.Field{
 			{Name: "type", Type: "string", Facet: pointer.True()},
+			{Name: "slug", Type: "string"},
 			{Name: "locale", Type: "string", Facet: pointer.True()},
 			{Name: "duration", Type: "int32", Facet: pointer.True()},
 			{Name: "name", Type: "object[]"},
 			{Name: "description", Type: "object[]", Optional: pointer.True()},
 			{Name: "images", Type: "object[]", Optional: pointer.True()},
 			{Name: "terms", Type: "string[]", Optional: pointer.True()},
+			{Name: "places", Type: "string[]", Optional: pointer.True()},
 			{Name: "status", Type: "string", Facet: pointer.True()},
 			{Name: "created ", Type: "string"},
 			{Name: "updated ", Type: "string"},
@@ -98,8 +104,12 @@ func (i *Product) Document() map[string]interface{} {
 		"uid":         i.UID,
 		"locale":      i.Locale,
 		"type":        i.Type,
+		"slug":        i.Slug,
+		"duration":    i.Duration,
 		"name":        i.Name,
 		"description": i.Description,
+		"terms":       i.Terms,
+		"places":      i.Places,
 		"created ":    time.Unix(int64(i.Created.T), 0).Format(time.RFC3339),
 		"updated ":    time.Unix(int64(i.Updated.T), 0).Format(time.RFC3339),
 	}

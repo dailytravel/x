@@ -2,9 +2,7 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Query {
-  search(args: Map): Map
-}
+type Query
 type Mutation
 
 scalar Map

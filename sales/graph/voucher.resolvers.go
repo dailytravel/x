@@ -18,14 +18,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// CreateVariant is the resolver for the createVariant field.
-func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVariant) (*model.Variant, error) {
+// CreateVoucher is the resolver for the createVoucher field.
+func (r *mutationResolver) CreateVoucher(ctx context.Context, input model.NewVoucher) (*model.Voucher, error) {
 	// uid, err := utils.UID(ctx)
 	// if err != nil {
 	// 	return nil, err
 	// }
 
-	item := &model.Variant{
+	item := &model.Voucher{
 		Locale: input.Locale,
 		Description: bson.M{
 			input.Locale: input.Description,
@@ -35,8 +35,8 @@ func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVar
 		},
 	}
 
-	utils.Date(&input.Start, item.Start)
-	utils.Date(&input.End, item.End)
+	utils.Date(&input.Start, &item.Start)
+	utils.Date(&input.End, &item.End)
 
 	// Set the fields from the input
 	_, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -47,8 +47,8 @@ func (r *mutationResolver) CreateVariant(ctx context.Context, input model.NewVar
 	return item, nil
 }
 
-// UpdateVariant is the resolver for the updateVariant field.
-func (r *mutationResolver) UpdateVariant(ctx context.Context, id string, input model.UpdateVariant) (*model.Variant, error) {
+// UpdateVoucher is the resolver for the updateVoucher field.
+func (r *mutationResolver) UpdateVoucher(ctx context.Context, id string, input model.UpdateVoucher) (*model.Voucher, error) {
 	// uid, err := utils.UID(ctx)
 	// if err != nil {
 	// 	return nil, err
@@ -61,7 +61,7 @@ func (r *mutationResolver) UpdateVariant(ctx context.Context, id string, input m
 	}
 
 	// Create an update document with the fields to be updated
-	item := &model.Variant{}
+	item := &model.Voucher{}
 	filter := bson.M{"_id": _id}
 	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
 	if err != nil {
@@ -96,8 +96,8 @@ func (r *mutationResolver) UpdateVariant(ctx context.Context, id string, input m
 	return item, nil
 }
 
-// DeleteVariant is the resolver for the deleteVariant field.
-func (r *mutationResolver) DeleteVariant(ctx context.Context, id string) (map[string]interface{}, error) {
+// DeleteVoucher is the resolver for the deleteVoucher field.
+func (r *mutationResolver) DeleteVoucher(ctx context.Context, id string) (map[string]interface{}, error) {
 	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
@@ -109,10 +109,10 @@ func (r *mutationResolver) DeleteVariant(ctx context.Context, id string) (map[st
 		return nil, err
 	}
 
-	// Define the filter to match the given variant ID
+	// Define the filter to match the given voucher ID
 	filter := bson.M{"_id": objectID}
 
-	// Define the update to mark the variant as deleted
+	// Define the update to mark the voucher as deleted
 	update := bson.M{
 		"$set": bson.M{
 			"status":     "deleted",
@@ -122,7 +122,7 @@ func (r *mutationResolver) DeleteVariant(ctx context.Context, id string) (map[st
 	}
 
 	// Perform the update operation in the database
-	result, err := r.db.Collection("variants").UpdateOne(ctx, filter, update)
+	result, err := r.db.Collection("vouchers").UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +130,8 @@ func (r *mutationResolver) DeleteVariant(ctx context.Context, id string) (map[st
 	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
-// DeleteVariants is the resolver for the deleteVariants field.
-func (r *mutationResolver) DeleteVariants(ctx context.Context, ids []string) (map[string]interface{}, error) {
+// DeleteVouchers is the resolver for the deleteVouchers field.
+func (r *mutationResolver) DeleteVouchers(ctx context.Context, ids []string) (map[string]interface{}, error) {
 	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
@@ -147,10 +147,10 @@ func (r *mutationResolver) DeleteVariants(ctx context.Context, ids []string) (ma
 		objectIDs = append(objectIDs, _id)
 	}
 
-	// Define the filter to match the given variant IDs
+	// Define the filter to match the given voucher IDs
 	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
 
-	// Define the update to mark variants as deleted
+	// Define the update to mark vouchers as deleted
 	update := bson.M{
 		"$set": bson.M{
 			"status":     "deleted",
@@ -160,7 +160,7 @@ func (r *mutationResolver) DeleteVariants(ctx context.Context, ids []string) (ma
 	}
 
 	// Perform the update operation in the database
-	result, err := r.db.Collection("variants").UpdateMany(ctx, filter, update)
+	result, err := r.db.Collection("vouchers").UpdateMany(ctx, filter, update)
 	if err != nil {
 		return nil, err
 	}
@@ -168,9 +168,9 @@ func (r *mutationResolver) DeleteVariants(ctx context.Context, ids []string) (ma
 	return map[string]interface{}{"status": "success", "deletedCount": result.ModifiedCount}, nil
 }
 
-// Variant is the resolver for the variant field.
-func (r *queryResolver) Variant(ctx context.Context, id string) (*model.Variant, error) {
-	var item *model.Variant
+// Voucher is the resolver for the voucher field.
+func (r *queryResolver) Voucher(ctx context.Context, id string) (*model.Voucher, error) {
+	var item *model.Voucher
 
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -188,17 +188,17 @@ func (r *queryResolver) Variant(ctx context.Context, id string) (*model.Variant,
 	return item, nil
 }
 
-// Variants is the resolver for the variants field.
-func (r *queryResolver) Variants(ctx context.Context, args map[string]interface{}) (*model.Variants, error) {
-	var items []*model.Variant
+// Vouchers is the resolver for the vouchers field.
+func (r *queryResolver) Vouchers(ctx context.Context, args map[string]interface{}) (*model.Vouchers, error) {
+	var items []*model.Voucher
 	//find all items
-	cur, err := r.db.Collection("variants").Find(ctx, nil)
+	cur, err := r.db.Collection("vouchers").Find(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	for cur.Next(ctx) {
-		var item *model.Variant
+		var item *model.Voucher
 		if err := cur.Decode(&item); err != nil {
 			return nil, err
 		}
@@ -206,24 +206,24 @@ func (r *queryResolver) Variants(ctx context.Context, args map[string]interface{
 	}
 
 	//get total count
-	count, err := r.db.Collection("variants").CountDocuments(ctx, nil)
+	count, err := r.db.Collection("vouchers").CountDocuments(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Variants{
+	return &model.Vouchers{
 		Count: int(count),
 		Data:  items,
 	}, nil
 }
 
 // ID is the resolver for the id field.
-func (r *variantResolver) ID(ctx context.Context, obj *model.Variant) (string, error) {
+func (r *voucherResolver) ID(ctx context.Context, obj *model.Voucher) (string, error) {
 	return obj.ID.Hex(), nil
 }
 
 // Name is the resolver for the name field.
-func (r *variantResolver) Name(ctx context.Context, obj *model.Variant) (string, error) {
+func (r *voucherResolver) Name(ctx context.Context, obj *model.Voucher) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
 	if locale == nil {
@@ -240,7 +240,7 @@ func (r *variantResolver) Name(ctx context.Context, obj *model.Variant) (string,
 }
 
 // Description is the resolver for the description field.
-func (r *variantResolver) Description(ctx context.Context, obj *model.Variant) (string, error) {
+func (r *voucherResolver) Description(ctx context.Context, obj *model.Voucher) (string, error) {
 	// Get the locale from the context
 	locale := auth.Locale(ctx)
 	if locale == nil {
@@ -256,37 +256,42 @@ func (r *variantResolver) Description(ctx context.Context, obj *model.Variant) (
 	return "", errors.New("Description not found for any locale")
 }
 
-// Metadata is the resolver for the metadata field.
-func (r *variantResolver) Metadata(ctx context.Context, obj *model.Variant) (map[string]interface{}, error) {
-	return obj.Metadata, nil
-}
-
 // Start is the resolver for the start field.
-func (r *variantResolver) Start(ctx context.Context, obj *model.Variant) (string, error) {
-	panic(fmt.Errorf("not implemented: Start - start"))
+func (r *voucherResolver) Start(ctx context.Context, obj *model.Voucher) (string, error) {
+	return time.Unix(int64(obj.Start), 0).Format(time.RFC3339), nil
 }
 
 // End is the resolver for the end field.
-func (r *variantResolver) End(ctx context.Context, obj *model.Variant) (string, error) {
-	panic(fmt.Errorf("not implemented: End - end"))
+func (r *voucherResolver) End(ctx context.Context, obj *model.Voucher) (string, error) {
+	return time.Unix(int64(obj.End), 0).Format(time.RFC3339), nil
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *voucherResolver) Metadata(ctx context.Context, obj *model.Voucher) (map[string]interface{}, error) {
+	return obj.Metadata, nil
 }
 
 // Created is the resolver for the created field.
-func (r *variantResolver) Created(ctx context.Context, obj *model.Variant) (string, error) {
+func (r *voucherResolver) Created(ctx context.Context, obj *model.Voucher) (string, error) {
 	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
 // Updated is the resolver for the updated field.
-func (r *variantResolver) Updated(ctx context.Context, obj *model.Variant) (string, error) {
+func (r *voucherResolver) Updated(ctx context.Context, obj *model.Voucher) (string, error) {
 	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Package is the resolver for the package field.
-func (r *variantResolver) Package(ctx context.Context, obj *model.Variant) (string, error) {
-	return obj.Package.Hex(), nil
+func (r *voucherResolver) Package(ctx context.Context, obj *model.Voucher) (string, error) {
+	panic(fmt.Errorf("not implemented: Package - package"))
 }
 
-// Variant returns VariantResolver implementation.
-func (r *Resolver) Variant() VariantResolver { return &variantResolver{r} }
+// Supplier is the resolver for the supplier field.
+func (r *voucherResolver) Supplier(ctx context.Context, obj *model.Voucher) (string, error) {
+	panic(fmt.Errorf("not implemented: Supplier - supplier"))
+}
 
-type variantResolver struct{ *Resolver }
+// Voucher returns VoucherResolver implementation.
+func (r *Resolver) Voucher() VoucherResolver { return &voucherResolver{r} }
+
+type voucherResolver struct{ *Resolver }

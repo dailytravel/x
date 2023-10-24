@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/insight/graph/model"
 )
@@ -28,12 +29,12 @@ func (r *eventResolver) Status(ctx context.Context, obj *model.Event) (model.Mai
 
 // Timestamp is the resolver for the timestamp field.
 func (r *eventResolver) Timestamp(ctx context.Context, obj *model.Event) (string, error) {
-	panic(fmt.Errorf("not implemented: Timestamp - timestamp"))
+	return time.Unix(int64(obj.Timestamp.T), 0).Format(time.RFC3339), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *eventResolver) Metadata(ctx context.Context, obj *model.Event) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Event returns EventResolver implementation.

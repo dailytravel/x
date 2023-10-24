@@ -10,7 +10,7 @@ import (
 
 type Variant struct {
 	Database *mongo.Database
-	Model    *model.Variant
+	Model    *model.Voucher
 }
 
 // Create mongo collection

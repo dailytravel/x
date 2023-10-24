@@ -33,7 +33,7 @@ const authenticate = expressjwt({
     jwksUri: "http://localhost:4000/.well-known/jwks.json",
   }),
   audience: "https://api.trip.express/graphql",
-  issuer: "https://api.trip.express",
+  issuer: "https://api.trip.express/graphql",
   algorithms: ["RS256"],
   credentialsRequired: false,
 });
@@ -103,7 +103,7 @@ async function startApolloServer() {
     expressMiddleware(server, {
       context: async ({ req }) => ({
         ...req.headers,
-        auth: req.auth,
+        auth: req.auth || {},
       }),
     })
   );

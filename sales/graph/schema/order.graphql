@@ -3,10 +3,13 @@ type Order {
   code: String!
   cancellable: Boolean!
   payment: String!
+  coupon: String
+  uid: ID!
+  items: [Item]
+  metadata: Map
   status: String!
   created: String!
   updated: String!
-  uid: ID!
 }
 
 type Orders {
@@ -16,23 +19,36 @@ type Orders {
 
 input NewOrder {
   code: String!
-  data: [ID!]
   cancellable: Boolean!
-  status: String!
+  payment: String!
+  coupon: String
+  uid: ID!
+  items: [ID!]!
   metadata: Map
+  status: String!
 }
 
 input UpdateOrder {
   code: String
-  data: [ID!]
   cancellable: Boolean
-  status: String
+  payment: String
+  coupon: String
+  uid: ID
+  items: [ID!]
   metadata: Map
+  status: String
 }
 
 extend type Query {
   order(id: ID!): Order @auth
-  orders(args: Map): Orders @auth
+  orders(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Orders @auth
 }
 
 extend type Mutation {
