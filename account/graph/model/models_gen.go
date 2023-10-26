@@ -55,16 +55,6 @@ type LoginInput struct {
 	ClientSecret *string `json:"client_secret,omitempty"`
 }
 
-type Mfa struct {
-	Enabled bool   `json:"enabled"`
-	Code    string `json:"code"`
-}
-
-type MFAInput struct {
-	Enabled bool   `json:"enabled"`
-	Code    string `json:"code"`
-}
-
 type Membership struct {
 	UID  string `json:"uid"`
 	User *User  `json:"user,omitempty"`
@@ -297,6 +287,11 @@ type UpdateUserInput struct {
 type Users struct {
 	Count int     `json:"count"`
 	Data  []*User `json:"data,omitempty"`
+}
+
+type VerifyInput struct {
+	Code string `json:"code"`
+	Type string `json:"type"`
 }
 
 type Wishlist struct {

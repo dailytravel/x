@@ -6,44 +6,55 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // ID is the resolver for the id field.
 func (r *tokenResolver) ID(ctx context.Context, obj *model.Token) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // User is the resolver for the user field.
 func (r *tokenResolver) User(ctx context.Context, obj *model.Token) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	var user *model.User
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"_id": obj.UID}).Decode(&user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+// Client is the resolver for the client field.
+func (r *tokenResolver) Client(ctx context.Context, obj *model.Token) (*model.Client, error) {
+	var client *model.Client
+	if err := r.db.Collection("clients").FindOne(ctx, bson.M{"_id": obj.Client}).Decode(&client); err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }
 
 // Expires is the resolver for the expires field.
 func (r *tokenResolver) Expires(ctx context.Context, obj *model.Token) (string, error) {
-	panic(fmt.Errorf("not implemented: Expires - expires"))
-}
-
-// Revoked is the resolver for the revoked field.
-func (r *tokenResolver) Revoked(ctx context.Context, obj *model.Token) (bool, error) {
-	panic(fmt.Errorf("not implemented: Revoked - revoked"))
+	return time.Unix(int64(obj.Expires.T), 0).Format(time.RFC3339), nil
 }
 
 // LastUsed is the resolver for the last_used field.
 func (r *tokenResolver) LastUsed(ctx context.Context, obj *model.Token) (string, error) {
-	panic(fmt.Errorf("not implemented: LastUsed - last_used"))
+	return time.Unix(int64(obj.LastUsed.T), 0).Format(time.RFC3339), nil
 }
 
 // Created is the resolver for the created field.
 func (r *tokenResolver) Created(ctx context.Context, obj *model.Token) (string, error) {
-	panic(fmt.Errorf("not implemented: Created - created"))
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *tokenResolver) Metadata(ctx context.Context, obj *model.Token) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Token returns TokenResolver implementation.

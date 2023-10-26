@@ -6,7 +6,6 @@ type User @key(fields: "id") {
   email: String!
   phone: String
   roles: [String]
-  mfa: MFA
   timezone: String
   locale: String
   picture: String
@@ -41,23 +40,12 @@ type Users {
   data: [User]
 }
 
-type MFA {
-  enabled: Boolean!
-  code: String!
-}
-
 type Payload {
   access_token: String!
   expires_in: Int!
   refresh_token: String!
   token_type: String!
   user: User!
-}
-
-# Input Types
-input MFAInput {
-  enabled: Boolean!
-  code: String!
 }
 
 input NewUserInput {
@@ -123,6 +111,11 @@ input ResetPasswordInput {
   password_confirmation: String!
 }
 
+input VerifyInput {
+  code: String!
+  type: String!
+}
+
 type AuthPayload {
   access_token: String
   refresh_token: String
@@ -145,8 +138,9 @@ extend type Mutation {
   verifyEmail(token: String!): Map
   verifyPhone(token: String!): Map
   login(input: LoginInput!): AuthPayload
+  verify(input: VerifyInput!): Map
   socialLogin(input: SocialLoginInput!): AuthPayload
-  refreshToken(refresh_token: String!): AuthPayload
+  refreshToken(token: String!): AuthPayload
   logout(all: Boolean): Map @auth
   forgotPassword(email: String!): Map
   resetPassword(input: ResetPasswordInput!): Map

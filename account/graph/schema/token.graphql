@@ -1,6 +1,7 @@
 type Token {
   id: ID!
   user: User!
+  client: Client!
   expires: String!
   revoked: Boolean!
   last_used: String!

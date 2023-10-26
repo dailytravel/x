@@ -11,8 +11,9 @@ import (
 type Token struct {
 	Model     `bson:",inline"`
 	UID       primitive.ObjectID  `json:"uid" bson:"uid"`
+	Client    primitive.ObjectID  `json:"client" bson:"client"`
 	Expires   primitive.Timestamp `json:"expires" bson:"expires"`
-	Revoked   primitive.Timestamp `json:"revoked" bson:"revoked"`
+	Revoked   bool                `json:"revoked" bson:"revoked"`
 	LastUsed  primitive.Timestamp `json:"last_used" bson:"last_used"`
 	ClientIP  string              `json:"client_ip" bson:"client_ip"`
 	UserAgent string              `json:"user_agent" bson:"user_agent"`
@@ -38,6 +39,8 @@ func (i *Token) Collection() string {
 
 func (i *Token) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
+		{Keys: bson.D{{Key: "client", Value: 1}}},
+		{Keys: bson.D{{Key: "revoked", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "expires", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},

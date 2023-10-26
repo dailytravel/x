@@ -10,6 +10,7 @@ func AutoMigrate() error {
 	migrators := []Migrator{
 		&Activity{Database: database.Database},
 		&Log{Database: database.Database},
+		&Search{Database: database.Database},
 	}
 
 	for _, migration := range migrators {

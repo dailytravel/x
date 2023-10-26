@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/cms/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -54,7 +53,9 @@ func (r *entityResolver) FindPackageByID(ctx context.Context, id string) (*model
 
 // FindPlaceByID is the resolver for the findPlaceByID field.
 func (r *entityResolver) FindPlaceByID(ctx context.Context, id string) (*model.Place, error) {
-	panic(fmt.Errorf("not implemented: FindPlaceByID - findPlaceByID"))
+	return &model.Place{
+		ID: id,
+	}, nil
 }
 
 // FindPostByID is the resolver for the findPostByID field.

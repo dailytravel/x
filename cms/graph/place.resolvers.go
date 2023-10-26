@@ -6,14 +6,37 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/cms/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Images is the resolver for the images field.
 func (r *placeResolver) Images(ctx context.Context, obj *model.Place) ([]*model.Image, error) {
-	panic(fmt.Errorf("not implemented: Images - images"))
+	var items []*model.Image
+
+	uid, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"uid": uid}
+	//find all items
+	cur, err := r.db.Collection("images").Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var item *model.Image
+		if err := cur.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }
 
 // Place returns PlaceResolver implementation.

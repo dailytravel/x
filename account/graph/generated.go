@@ -67,6 +67,7 @@ type ResolverRoot interface {
 	Query() QueryResolver
 	Reaction() ReactionResolver
 	Role() RoleResolver
+	Session() SessionResolver
 	Share() ShareResolver
 	Task() TaskResolver
 	Token() TokenResolver
@@ -315,11 +316,6 @@ type ComplexityRoot struct {
 		User func(childComplexity int) int
 	}
 
-	MFA struct {
-		Code    func(childComplexity int) int
-		Enabled func(childComplexity int) int
-	}
-
 	Membership struct {
 		UID  func(childComplexity int) int
 		User func(childComplexity int) int
@@ -358,7 +354,7 @@ type ComplexityRoot struct {
 		LinkIdentity       func(childComplexity int, input model.NewIdentity) int
 		Login              func(childComplexity int, input model.LoginInput) int
 		Logout             func(childComplexity int, all *bool) int
-		RefreshToken       func(childComplexity int, refreshToken string) int
+		RefreshToken       func(childComplexity int, token string) int
 		Register           func(childComplexity int, input model.RegisterInput) int
 		ResetPassword      func(childComplexity int, input model.ResetPasswordInput) int
 		RevokeKey          func(childComplexity int) int
@@ -374,6 +370,7 @@ type ComplexityRoot struct {
 		UpdatePermission   func(childComplexity int, id string, input model.UpdatePermission) int
 		UpdateRole         func(childComplexity int, id string, input model.UpdateRole) int
 		UpdateUser         func(childComplexity int, id string, input model.UpdateUserInput) int
+		Verify             func(childComplexity int, input model.VerifyInput) int
 		VerifyEmail        func(childComplexity int, token string) int
 		VerifyPhone        func(childComplexity int, token string) int
 	}
@@ -473,6 +470,16 @@ type ComplexityRoot struct {
 		Data  func(childComplexity int) int
 	}
 
+	Session struct {
+		Created  func(childComplexity int) int
+		Expires  func(childComplexity int) int
+		ID       func(childComplexity int) int
+		Metadata func(childComplexity int) int
+		Status   func(childComplexity int) int
+		Token    func(childComplexity int) int
+		User     func(childComplexity int) int
+	}
+
 	Share struct {
 		UID  func(childComplexity int) int
 		User func(childComplexity int) int
@@ -484,6 +491,7 @@ type ComplexityRoot struct {
 	}
 
 	Token struct {
+		Client    func(childComplexity int) int
 		ClientIP  func(childComplexity int) int
 		Created   func(childComplexity int) int
 		Expires   func(childComplexity int) int
@@ -509,7 +517,6 @@ type ComplexityRoot struct {
 		LastLogin     func(childComplexity int) int
 		Locale        func(childComplexity int) int
 		Metadata      func(childComplexity int) int
-		Mfa           func(childComplexity int) int
 		Name          func(childComplexity int) int
 		Phone         func(childComplexity int) int
 		PhoneVerified func(childComplexity int) int
@@ -707,8 +714,9 @@ type MutationResolver interface {
 	VerifyEmail(ctx context.Context, token string) (map[string]interface{}, error)
 	VerifyPhone(ctx context.Context, token string) (map[string]interface{}, error)
 	Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error)
+	Verify(ctx context.Context, input model.VerifyInput) (map[string]interface{}, error)
 	SocialLogin(ctx context.Context, input model.SocialLoginInput) (*model.AuthPayload, error)
-	RefreshToken(ctx context.Context, refreshToken string) (*model.AuthPayload, error)
+	RefreshToken(ctx context.Context, token string) (*model.AuthPayload, error)
 	Logout(ctx context.Context, all *bool) (map[string]interface{}, error)
 	ForgotPassword(ctx context.Context, email string) (map[string]interface{}, error)
 	ResetPassword(ctx context.Context, input model.ResetPasswordInput) (map[string]interface{}, error)
@@ -766,6 +774,15 @@ type RoleResolver interface {
 	Created(ctx context.Context, obj *model.Role) (string, error)
 	Updated(ctx context.Context, obj *model.Role) (string, error)
 }
+type SessionResolver interface {
+	ID(ctx context.Context, obj *model.Session) (string, error)
+	User(ctx context.Context, obj *model.Session) (*model.User, error)
+
+	Expires(ctx context.Context, obj *model.Session) (string, error)
+	Metadata(ctx context.Context, obj *model.Session) (map[string]interface{}, error)
+
+	Created(ctx context.Context, obj *model.Session) (string, error)
+}
 type ShareResolver interface {
 	User(ctx context.Context, obj *model.Share) (*model.User, error)
 }
@@ -775,8 +792,9 @@ type TaskResolver interface {
 type TokenResolver interface {
 	ID(ctx context.Context, obj *model.Token) (string, error)
 	User(ctx context.Context, obj *model.Token) (*model.User, error)
+	Client(ctx context.Context, obj *model.Token) (*model.Client, error)
 	Expires(ctx context.Context, obj *model.Token) (string, error)
-	Revoked(ctx context.Context, obj *model.Token) (bool, error)
+
 	LastUsed(ctx context.Context, obj *model.Token) (string, error)
 
 	Created(ctx context.Context, obj *model.Token) (string, error)
@@ -1953,20 +1971,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.List.User(childComplexity), true
 
-	case "MFA.code":
-		if e.complexity.MFA.Code == nil {
-			break
-		}
-
-		return e.complexity.MFA.Code(childComplexity), true
-
-	case "MFA.enabled":
-		if e.complexity.MFA.Enabled == nil {
-			break
-		}
-
-		return e.complexity.MFA.Enabled(childComplexity), true
-
 	case "Membership.uid":
 		if e.complexity.Membership.UID == nil {
 			break
@@ -2370,7 +2374,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.RefreshToken(childComplexity, args["refresh_token"].(string)), true
+		return e.complexity.Mutation.RefreshToken(childComplexity, args["token"].(string)), true
 
 	case "Mutation.register":
 		if e.complexity.Mutation.Register == nil {
@@ -2541,6 +2545,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(string), args["input"].(model.UpdateUserInput)), true
+
+	case "Mutation.verify":
+		if e.complexity.Mutation.Verify == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_verify_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Verify(childComplexity, args["input"].(model.VerifyInput)), true
 
 	case "Mutation.verifyEmail":
 		if e.complexity.Mutation.VerifyEmail == nil {
@@ -3089,6 +3105,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Roles.Data(childComplexity), true
 
+	case "Session.created":
+		if e.complexity.Session.Created == nil {
+			break
+		}
+
+		return e.complexity.Session.Created(childComplexity), true
+
+	case "Session.expires":
+		if e.complexity.Session.Expires == nil {
+			break
+		}
+
+		return e.complexity.Session.Expires(childComplexity), true
+
+	case "Session.id":
+		if e.complexity.Session.ID == nil {
+			break
+		}
+
+		return e.complexity.Session.ID(childComplexity), true
+
+	case "Session.metadata":
+		if e.complexity.Session.Metadata == nil {
+			break
+		}
+
+		return e.complexity.Session.Metadata(childComplexity), true
+
+	case "Session.status":
+		if e.complexity.Session.Status == nil {
+			break
+		}
+
+		return e.complexity.Session.Status(childComplexity), true
+
+	case "Session.token":
+		if e.complexity.Session.Token == nil {
+			break
+		}
+
+		return e.complexity.Session.Token(childComplexity), true
+
+	case "Session.user":
+		if e.complexity.Session.User == nil {
+			break
+		}
+
+		return e.complexity.Session.User(childComplexity), true
+
 	case "Share.uid":
 		if e.complexity.Share.UID == nil {
 			break
@@ -3116,6 +3181,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Task.User(childComplexity), true
+
+	case "Token.client":
+		if e.complexity.Token.Client == nil {
+			break
+		}
+
+		return e.complexity.Token.Client(childComplexity), true
 
 	case "Token.client_ip":
 		if e.complexity.Token.ClientIP == nil {
@@ -3271,13 +3343,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Metadata(childComplexity), true
 
-	case "User.mfa":
-		if e.complexity.User.Mfa == nil {
-			break
-		}
-
-		return e.complexity.User.Mfa(childComplexity), true
-
 	case "User.name":
 		if e.complexity.User.Name == nil {
 			break
@@ -3378,7 +3443,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputLoginInput,
-		ec.unmarshalInputMFAInput,
 		ec.unmarshalInputNewApi,
 		ec.unmarshalInputNewClient,
 		ec.unmarshalInputNewConnection,
@@ -3403,6 +3467,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdatePermission,
 		ec.unmarshalInputUpdateRole,
 		ec.unmarshalInputUpdateUserInput,
+		ec.unmarshalInputVerifyInput,
 	)
 	first := true
 
@@ -3499,7 +3564,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/api.graphql" "schema/attendance.graphql" "schema/board.graphql" "schema/campaign.graphql" "schema/client.graphql" "schema/comment.graphql" "schema/company.graphql" "schema/connection.graphql" "schema/contact.graphql" "schema/coupon.graphql" "schema/credential.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/goal.graphql" "schema/identity.graphql" "schema/integration.graphql" "schema/invitation.graphql" "schema/invoice.graphql" "schema/key.graphql" "schema/link.graphql" "schema/list.graphql" "schema/membership.graphql" "schema/order.graphql" "schema/organization.graphql" "schema/permission.graphql" "schema/portfolio.graphql" "schema/post.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/role.graphql" "schema/share.graphql" "schema/task.graphql" "schema/token.graphql" "schema/user.graphql" "schema/wishlist.graphql"
+//go:embed "schema.graphqls" "schema/api.graphql" "schema/attendance.graphql" "schema/board.graphql" "schema/campaign.graphql" "schema/client.graphql" "schema/comment.graphql" "schema/company.graphql" "schema/connection.graphql" "schema/contact.graphql" "schema/coupon.graphql" "schema/credential.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/goal.graphql" "schema/identity.graphql" "schema/integration.graphql" "schema/invitation.graphql" "schema/invoice.graphql" "schema/key.graphql" "schema/link.graphql" "schema/list.graphql" "schema/membership.graphql" "schema/order.graphql" "schema/organization.graphql" "schema/permission.graphql" "schema/portfolio.graphql" "schema/post.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/role.graphql" "schema/session.graphql" "schema/share.graphql" "schema/task.graphql" "schema/token.graphql" "schema/user.graphql" "schema/wishlist.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -3542,6 +3607,7 @@ var sources = []*ast.Source{
 	{Name: "schema/quote.graphql", Input: sourceData("schema/quote.graphql"), BuiltIn: false},
 	{Name: "schema/reaction.graphql", Input: sourceData("schema/reaction.graphql"), BuiltIn: false},
 	{Name: "schema/role.graphql", Input: sourceData("schema/role.graphql"), BuiltIn: false},
+	{Name: "schema/session.graphql", Input: sourceData("schema/session.graphql"), BuiltIn: false},
 	{Name: "schema/share.graphql", Input: sourceData("schema/share.graphql"), BuiltIn: false},
 	{Name: "schema/task.graphql", Input: sourceData("schema/task.graphql"), BuiltIn: false},
 	{Name: "schema/token.graphql", Input: sourceData("schema/token.graphql"), BuiltIn: false},
@@ -4506,14 +4572,14 @@ func (ec *executionContext) field_Mutation_refreshToken_args(ctx context.Context
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["refresh_token"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("refresh_token"))
+	if tmp, ok := rawArgs["token"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["refresh_token"] = arg0
+	args["token"] = arg0
 	return args, nil
 }
 
@@ -4811,6 +4877,21 @@ func (ec *executionContext) field_Mutation_verifyPhone_args(ctx context.Context,
 		}
 	}
 	args["token"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_verify_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.VerifyInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNVerifyInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐVerifyInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -6210,8 +6291,6 @@ func (ec *executionContext) fieldContext_Attendance_user(ctx context.Context, fi
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -6459,8 +6538,6 @@ func (ec *executionContext) fieldContext_AuthPayload_user(ctx context.Context, f
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -6588,8 +6665,6 @@ func (ec *executionContext) fieldContext_Board_user(ctx context.Context, field g
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -6717,8 +6792,6 @@ func (ec *executionContext) fieldContext_Campaign_user(ctx context.Context, fiel
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -7318,8 +7391,6 @@ func (ec *executionContext) fieldContext_Client_user(ctx context.Context, field 
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -7560,8 +7631,6 @@ func (ec *executionContext) fieldContext_Comment_user(ctx context.Context, field
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -7689,8 +7758,6 @@ func (ec *executionContext) fieldContext_Company_user(ctx context.Context, field
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -8341,8 +8408,6 @@ func (ec *executionContext) fieldContext_Contact_user(ctx context.Context, field
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -8470,8 +8535,6 @@ func (ec *executionContext) fieldContext_Coupon_user(ctx context.Context, field 
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -8602,8 +8665,6 @@ func (ec *executionContext) fieldContext_Credential_user(ctx context.Context, fi
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -10381,8 +10442,6 @@ func (ec *executionContext) fieldContext_Entity_findUserByID(ctx context.Context
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -10582,8 +10641,6 @@ func (ec *executionContext) fieldContext_Expense_user(ctx context.Context, field
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -10711,8 +10768,6 @@ func (ec *executionContext) fieldContext_File_user(ctx context.Context, field gr
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -10840,8 +10895,6 @@ func (ec *executionContext) fieldContext_Goal_user(ctx context.Context, field gr
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -10972,8 +11025,6 @@ func (ec *executionContext) fieldContext_Identity_user(ctx context.Context, fiel
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -11814,8 +11865,6 @@ func (ec *executionContext) fieldContext_Invitation_user(ctx context.Context, fi
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -12353,8 +12402,6 @@ func (ec *executionContext) fieldContext_Invoice_user(ctx context.Context, field
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -12919,8 +12966,6 @@ func (ec *executionContext) fieldContext_Key_user(ctx context.Context, field gra
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -13159,8 +13204,6 @@ func (ec *executionContext) fieldContext_Link_user(ctx context.Context, field gr
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -13288,8 +13331,6 @@ func (ec *executionContext) fieldContext_List_user(ctx context.Context, field gr
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -13318,94 +13359,6 @@ func (ec *executionContext) fieldContext_List_user(ctx context.Context, field gr
 				return ec.fieldContext_User_identities(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _MFA_enabled(ctx context.Context, field graphql.CollectedField, obj *model.Mfa) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MFA_enabled(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Enabled, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_MFA_enabled(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "MFA",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _MFA_code(ctx context.Context, field graphql.CollectedField, obj *model.Mfa) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MFA_code(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Code, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_MFA_code(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "MFA",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -13505,8 +13458,6 @@ func (ec *executionContext) fieldContext_Membership_user(ctx context.Context, fi
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -16360,8 +16311,6 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -16456,8 +16405,6 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -16734,6 +16681,58 @@ func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_verify(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_verify(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Verify(rctx, fc.Args["input"].(model.VerifyInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(map[string]interface{})
+	fc.Result = res
+	return ec.marshalOMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_verify(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_verify_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_socialLogin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_socialLogin(ctx, field)
 	if err != nil {
@@ -16812,7 +16811,7 @@ func (ec *executionContext) _Mutation_refreshToken(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RefreshToken(rctx, fc.Args["refresh_token"].(string))
+		return ec.resolvers.Mutation().RefreshToken(rctx, fc.Args["token"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17180,8 +17179,6 @@ func (ec *executionContext) fieldContext_Mutation_deactivate(ctx context.Context
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -17413,8 +17410,6 @@ func (ec *executionContext) fieldContext_Order_user(ctx context.Context, field g
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -17542,8 +17537,6 @@ func (ec *executionContext) fieldContext_Organization_user(ctx context.Context, 
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -17806,8 +17799,6 @@ func (ec *executionContext) fieldContext_Payload_user(ctx context.Context, field
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -18314,8 +18305,6 @@ func (ec *executionContext) fieldContext_Portfolio_user(ctx context.Context, fie
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -18443,8 +18432,6 @@ func (ec *executionContext) fieldContext_Post_user(ctx context.Context, field gr
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -20231,8 +20218,6 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -20425,8 +20410,6 @@ func (ec *executionContext) fieldContext_Query_me(ctx context.Context, field gra
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -20786,8 +20769,6 @@ func (ec *executionContext) fieldContext_Quote_user(ctx context.Context, field g
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -20915,8 +20896,6 @@ func (ec *executionContext) fieldContext_Reaction_user(ctx context.Context, fiel
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -21321,6 +21300,353 @@ func (ec *executionContext) fieldContext_Roles_count(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Session_id(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Session().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_user(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Session().User(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "given_name":
+				return ec.fieldContext_User_given_name(ctx, field)
+			case "family_name":
+				return ec.fieldContext_User_family_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "timezone":
+				return ec.fieldContext_User_timezone(ctx, field)
+			case "locale":
+				return ec.fieldContext_User_locale(ctx, field)
+			case "picture":
+				return ec.fieldContext_User_picture(ctx, field)
+			case "last_login":
+				return ec.fieldContext_User_last_login(ctx, field)
+			case "last_ip":
+				return ec.fieldContext_User_last_ip(ctx, field)
+			case "last_activity":
+				return ec.fieldContext_User_last_activity(ctx, field)
+			case "email_verified":
+				return ec.fieldContext_User_email_verified(ctx, field)
+			case "phone_verified":
+				return ec.fieldContext_User_phone_verified(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
+			case "status":
+				return ec.fieldContext_User_status(ctx, field)
+			case "created":
+				return ec.fieldContext_User_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_User_updated(ctx, field)
+			case "identities":
+				return ec.fieldContext_User_identities(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_token(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_token(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_token(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_expires(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_expires(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Session().Expires(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_expires(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_metadata(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_metadata(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Session().Metadata(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(map[string]interface{})
+	fc.Result = res
+	return ec.marshalOMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_status(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Session_created(ctx context.Context, field graphql.CollectedField, obj *model.Session) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Session_created(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Session().Created(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Session_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Session",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Share_uid(ctx context.Context, field graphql.CollectedField, obj *model.Share) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Share_uid(ctx, field)
 	if err != nil {
@@ -21415,8 +21741,6 @@ func (ec *executionContext) fieldContext_Share_user(ctx context.Context, field g
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -21544,8 +21868,6 @@ func (ec *executionContext) fieldContext_Task_user(ctx context.Context, field gr
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -21676,8 +21998,6 @@ func (ec *executionContext) fieldContext_Token_user(ctx context.Context, field g
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -21706,6 +22026,78 @@ func (ec *executionContext) fieldContext_Token_user(ctx context.Context, field g
 				return ec.fieldContext_User_identities(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Token_client(ctx context.Context, field graphql.CollectedField, obj *model.Token) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Token_client(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Token().Client(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Client)
+	fc.Result = res
+	return ec.marshalNClient2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐClient(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Token_client(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Token",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Client_id(ctx, field)
+			case "type":
+				return ec.fieldContext_Client_type(ctx, field)
+			case "name":
+				return ec.fieldContext_Client_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Client_description(ctx, field)
+			case "domain":
+				return ec.fieldContext_Client_domain(ctx, field)
+			case "secret":
+				return ec.fieldContext_Client_secret(ctx, field)
+			case "provider":
+				return ec.fieldContext_Client_provider(ctx, field)
+			case "redirect":
+				return ec.fieldContext_Client_redirect(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Client_metadata(ctx, field)
+			case "status":
+				return ec.fieldContext_Client_status(ctx, field)
+			case "created":
+				return ec.fieldContext_Client_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Client_updated(ctx, field)
+			case "user":
+				return ec.fieldContext_Client_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Client", field.Name)
 		},
 	}
 	return fc, nil
@@ -21769,7 +22161,7 @@ func (ec *executionContext) _Token_revoked(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Token().Revoked(rctx, obj)
+		return obj.Revoked, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -21790,8 +22182,8 @@ func (ec *executionContext) fieldContext_Token_revoked(ctx context.Context, fiel
 	fc = &graphql.FieldContext{
 		Object:     "Token",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
 		},
@@ -22351,53 +22743,6 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _User_mfa(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_mfa(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Mfa, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Mfa)
-	fc.Result = res
-	return ec.marshalOMFA2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐMfa(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_User_mfa(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "enabled":
-				return ec.fieldContext_MFA_enabled(ctx, field)
-			case "code":
-				return ec.fieldContext_MFA_code(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type MFA", field.Name)
 		},
 	}
 	return fc, nil
@@ -23054,8 +23399,6 @@ func (ec *executionContext) fieldContext_Users_data(ctx context.Context, field g
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -23183,8 +23526,6 @@ func (ec *executionContext) fieldContext_Wishlist_user(ctx context.Context, fiel
 				return ec.fieldContext_User_phone(ctx, field)
 			case "roles":
 				return ec.fieldContext_User_roles(ctx, field)
-			case "mfa":
-				return ec.fieldContext_User_mfa(ctx, field)
 			case "timezone":
 				return ec.fieldContext_User_timezone(ctx, field)
 			case "locale":
@@ -25106,44 +25447,6 @@ func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputMFAInput(ctx context.Context, obj interface{}) (model.MFAInput, error) {
-	var it model.MFAInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"enabled", "code"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "enabled":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("enabled"))
-			data, err := ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Enabled = data
-		case "code":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Code = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputNewApi(ctx context.Context, obj interface{}) (model.NewAPI, error) {
 	var it model.NewAPI
 	asMap := map[string]interface{}{}
@@ -26617,6 +26920,44 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.Metadata = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputVerifyInput(ctx context.Context, obj interface{}) (model.VerifyInput, error) {
+	var it model.VerifyInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"code", "type"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "code":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Code = data
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
 		}
 	}
 
@@ -30401,50 +30742,6 @@ func (ec *executionContext) _List(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
-var mFAImplementors = []string{"MFA"}
-
-func (ec *executionContext) _MFA(ctx context.Context, sel ast.SelectionSet, obj *model.Mfa) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, mFAImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("MFA")
-		case "enabled":
-			out.Values[i] = ec._MFA_enabled(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "code":
-			out.Values[i] = ec._MFA_code(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var membershipImplementors = []string{"Membership", "_Entity"}
 
 func (ec *executionContext) _Membership(ctx context.Context, sel ast.SelectionSet, obj *model.Membership) graphql.Marshaler {
@@ -30674,6 +30971,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "login":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_login(ctx, field)
+			})
+		case "verify":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_verify(ctx, field)
 			})
 		case "socialLogin":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -32131,6 +32432,227 @@ func (ec *executionContext) _Roles(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var sessionImplementors = []string{"Session"}
+
+func (ec *executionContext) _Session(ctx context.Context, sel ast.SelectionSet, obj *model.Session) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, sessionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Session")
+		case "id":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Session_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "user":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Session_user(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "token":
+			out.Values[i] = ec._Session_token(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "expires":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Session_expires(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "metadata":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Session_metadata(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "status":
+			out.Values[i] = ec._Session_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "created":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Session_created(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var shareImplementors = []string{"Share", "_Entity"}
 
 func (ec *executionContext) _Share(ctx context.Context, sel ast.SelectionSet, obj *model.Share) graphql.Marshaler {
@@ -32358,6 +32880,42 @@ func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "client":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Token_client(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "expires":
 			field := field
 
@@ -32395,41 +32953,10 @@ func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, ob
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "revoked":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Token_revoked(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._Token_revoked(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "last_used":
 			field := field
 
@@ -32638,8 +33165,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_phone(ctx, field, obj)
 		case "roles":
 			out.Values[i] = ec._User_roles(ctx, field, obj)
-		case "mfa":
-			out.Values[i] = ec._User_mfa(ctx, field, obj)
 		case "timezone":
 			out.Values[i] = ec._User_timezone(ctx, field, obj)
 		case "locale":
@@ -33392,6 +33917,20 @@ func (ec *executionContext) marshalNCampaign2ᚖgithubᚗcomᚋdailytravelᚋx�
 	return ec._Campaign(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNClient2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐClient(ctx context.Context, sel ast.SelectionSet, v model.Client) graphql.Marshaler {
+	return ec._Client(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNClient2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐClient(ctx context.Context, sel ast.SelectionSet, v *model.Client) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Client(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNComment2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v model.Comment) graphql.Marshaler {
 	return ec._Comment(ctx, sel, &v)
 }
@@ -33991,6 +34530,11 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋacc
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNVerifyInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐVerifyInput(ctx context.Context, v interface{}) (model.VerifyInput, error) {
+	res, err := ec.unmarshalInputVerifyInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNWishlist2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐWishlist(ctx context.Context, sel ast.SelectionSet, v model.Wishlist) graphql.Marshaler {
@@ -34892,13 +35436,6 @@ func (ec *executionContext) marshalOKeys2ᚖgithubᚗcomᚋdailytravelᚋxᚋacc
 		return graphql.Null
 	}
 	return ec._Keys(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOMFA2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐMfa(ctx context.Context, sel ast.SelectionSet, v *model.Mfa) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._MFA(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOMap2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {

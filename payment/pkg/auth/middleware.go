@@ -37,7 +37,7 @@ func Middleware() gin.HandlerFunc {
 			if err := json.Unmarshal([]byte(authHeader), &authMap); err == nil {
 				if jti, ok := authMap["jti"].(string); ok {
 					if err == nil {
-						if _, err := database.Redis.Get(ctx, jti).Result(); err == nil {
+						if token, err := database.Redis.Get(ctx, jti).Result(); err == nil && token == "authenticated" {
 							ctx = context.WithValue(ctx, AuthContextKey, authMap)
 						} else {
 							log.Println(err)

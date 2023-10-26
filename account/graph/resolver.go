@@ -94,9 +94,9 @@ func (r *Resolver) insertUser(ctx context.Context, i *model.User) error {
 	return nil
 }
 
-func (r *Resolver) insertCredential(ctx context.Context, i *model.Credential) error {
-	if _, err := r.db.Collection(i.Collection()).InsertOne(ctx, i); err != nil {
-		return fmt.Errorf("failed to insert credential: %v", err)
+func (r *Resolver) insertCredentials(ctx context.Context, docs []interface{}) error {
+	if _, err := r.db.Collection("credentials").InsertMany(ctx, docs); err != nil {
+		return fmt.Errorf("failed to insert credentials: %v", err)
 	}
 	return nil
 }

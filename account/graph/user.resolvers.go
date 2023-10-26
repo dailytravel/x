@@ -171,20 +171,20 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 		return nil, fmt.Errorf("failed to insert user: %v", err)
 	}
 
-	credential := &model.Credential{
-		UID:     user.ID,
-		Type:    "PASSWORD", // Use a constant or enum for type
-		Secret:  string(hashedPassword),
-		Expires: primitive.Timestamp{T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix())},
-		Status:  "ACTIVE", // Use a constant or enum for status
+	credentials := []interface{}{}
+	credentials = append(credentials, utils.Credential(*user, "PASSWORD", string(hashedPassword), &primitive.Timestamp{T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix())}))
+
+	for _, code := range utils.RecoveryCodes(10, 8) {
+		credentials = append(credentials, utils.Credential(*user, "BACKUP_CODE", code, nil))
 	}
 
-	if err := r.insertCredential(ctx, credential); err != nil {
+	if err := r.insertCredentials(ctx, credentials); err != nil {
 		return nil, fmt.Errorf("failed to insert credential: %v", err)
 	}
 
 	token, err := r.insertToken(ctx, &model.Token{
-		UID: user.ID,
+		UID:    user.ID,
+		Client: client.ID,
 		Expires: primitive.Timestamp{
 			T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix()),
 			I: 0,
@@ -221,9 +221,10 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 
 	// Return the access token and refresh token
 	return &model.AuthPayload{
-		AccessToken: accessToken,
-		TokenType:   pointer.String("Bearer"),
-		ExpiresIn:   pointer.Int(int(api.Expiration)),
+		AccessToken:  accessToken,
+		RefreshToken: pointer.String(token.ID.Hex()),
+		TokenType:    pointer.String("Bearer"),
+		ExpiresIn:    pointer.Int(int(api.Expiration)),
 	}, nil
 }
 
@@ -371,7 +372,8 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	}
 
 	token, err := r.insertToken(ctx, &model.Token{
-		UID: user.ID,
+		UID:    user.ID,
+		Client: client.ID,
 		Expires: primitive.Timestamp{
 			T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix()),
 			I: 0,
@@ -408,9 +410,46 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 
 	// Return the access token and refresh token
 	return &model.AuthPayload{
-		AccessToken: accessToken,
-		TokenType:   pointer.String("Bearer"),
-		ExpiresIn:   pointer.Int(int(api.Expiration)),
+		AccessToken:  accessToken,
+		RefreshToken: pointer.String(token.ID.Hex()),
+		TokenType:    pointer.String("Bearer"),
+		ExpiresIn:    pointer.Int(int(api.Expiration)),
+	}, nil
+}
+
+// Verify 2FA is the resolver for the verify field.
+func (r *mutationResolver) Verify(ctx context.Context, input model.VerifyInput) (map[string]interface{}, error) {
+	// Retrieve the token's ID from the token. This could be stored in Redis or another cache.
+	tokenID, err := r.redis.Get(ctx, input.Code).Result() // using Redis as an example
+	if err == redis.Nil {
+		return nil, fmt.Errorf("invalid or expired token")
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to retrieve token data: %s", err.Error())
+	}
+
+	// Retrieve the authentication status from the token stored in Redis or another cache.
+	token, err := r.redis.Get(ctx, tokenID).Result() // using Redis as an example
+	if err == redis.Nil {
+		return nil, fmt.Errorf("invalid or expired token")
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to retrieve token data: %s", err.Error())
+	}
+
+	// Check if the user's 2FA is already verified
+	if token == "authenticated" {
+		return map[string]interface{}{
+			"message": "2FA has already been verified.",
+		}, nil
+	}
+
+	// Update the token value to indicate authentication
+	_, err = r.redis.Set(ctx, token, "authenticated", 0).Result()
+	if err != nil {
+		return nil, fmt.Errorf("failed to update token data: %s", err.Error())
+	}
+
+	return map[string]interface{}{
+		"message": "2FA successfully verified.",
 	}, nil
 }
 
@@ -460,6 +499,15 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLo
 			}
 			item.ID = res.InsertedID.(primitive.ObjectID)
 			user = item
+
+			credentials := []interface{}{}
+			for _, code := range utils.RecoveryCodes(10, 8) {
+				credentials = append(credentials, utils.Credential(*user, "BACKUP_CODE", code, nil))
+			}
+
+			if err := r.insertCredentials(ctx, credentials); err != nil {
+				return nil, fmt.Errorf("failed to insert credential: %v", err)
+			}
 		}
 		// Create a new identity
 		item := &model.Identity{
@@ -479,7 +527,8 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLo
 	}
 
 	token, err := r.insertToken(ctx, &model.Token{
-		UID: user.ID,
+		UID:    user.ID,
+		Client: client.ID,
 		Expires: primitive.Timestamp{
 			T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix()),
 			I: 0,
@@ -516,43 +565,31 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLo
 
 	// Return the access token and refresh token
 	return &model.AuthPayload{
-		AccessToken: accessToken,
-		TokenType:   pointer.String("Bearer"),
-		ExpiresIn:   pointer.Int(int(api.Expiration)),
+		AccessToken:  accessToken,
+		RefreshToken: pointer.String(token.ID.Hex()),
+		TokenType:    pointer.String("Bearer"),
+		ExpiresIn:    pointer.Int(int(api.Expiration)),
 	}, nil
 }
 
 // RefreshToken is the resolver for the refreshToken field.
-func (r *mutationResolver) RefreshToken(ctx context.Context, refreshToken string) (*model.AuthPayload, error) {
-	token, err := auth.ValidateToken(refreshToken, "http://localhost:3000/.well-known/jwks.json")
+func (r *mutationResolver) RefreshToken(ctx context.Context, token string) (*model.AuthPayload, error) {
+	id, err := primitive.ObjectIDFromHex(token)
 	if err != nil {
-		return nil, fmt.Errorf("invalid token")
+		return nil, fmt.Errorf("invalid refresh token")
 	}
 
-	uid, err := primitive.ObjectIDFromHex(token.Claims.(jwt.MapClaims)["sub"].(string))
-	if err != nil {
-		return nil, fmt.Errorf("invalid id")
-	}
-
-	// Find the user by ID and ensure they exist
-	filter := bson.M{"_id": uid}
-	var user *model.User
-	err = r.db.Collection("users").FindOne(ctx, filter).Decode(&user)
-	if err != nil {
+	// Retrieve the _token from Redis or another cache
+	var _token *model.Token
+	if err := r.db.Collection("tokens").FindOne(ctx, bson.M{"_id": id, "revoked": false, "expires": bson.M{"$gt": primitive.Timestamp{T: uint32(time.Now().Unix())}}}).Decode(&_token); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, fmt.Errorf("user not found")
+			return nil, fmt.Errorf("token not found")
 		}
-		return nil, fmt.Errorf("error fetching user: %s", err.Error())
-	}
-
-	// Find the client by ID and ensure they exist
-	clientID, err := primitive.ObjectIDFromHex(token.Claims.(jwt.MapClaims)["aud"].(string))
-	if err != nil {
-		return nil, fmt.Errorf("invalid client id")
+		return nil, fmt.Errorf("error fetching token: %s", err.Error())
 	}
 
 	var client *model.Client
-	err = r.db.Collection("clients").FindOne(ctx, bson.M{"_id": clientID}).Decode(&client)
+	err = r.db.Collection("clients").FindOne(ctx, bson.M{"_id": _token.Client}).Decode(&client)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, fmt.Errorf("client not found")
@@ -560,30 +597,19 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, refreshToken string
 		return nil, fmt.Errorf("error fetching client: %s", err.Error())
 	}
 
-	jti, err := primitive.ObjectIDFromHex(token.Claims.(jwt.MapClaims)["jti"].(string))
-	if err != nil {
-		return nil, fmt.Errorf("invalid jti")
-	}
-
-	//find token by jti
-	var t *model.Token
-	err = r.db.Collection("tokens").FindOne(ctx, bson.M{"_id": jti}).Decode(&t)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, fmt.Errorf("token not found")
-		}
-
-		return nil, fmt.Errorf("error fetching token: %s", err.Error())
-	}
-
 	var api *model.Api
 	if err := r.db.Collection("apis").FindOne(ctx, bson.M{"identifier": client.Domain}).Decode(&api); err != nil {
 		return nil, fmt.Errorf("api not found")
 	}
 
+	var user *model.User
+	if err := r.db.Collection("users").FindOne(ctx, bson.M{"_id": _token.UID}).Decode(&user); err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
 	// Generate a new access token
 	accessToken, err := r.generateTokens(ctx, user, jwt.MapClaims{
-		"jti":      t.ID.Hex(),
+		"jti":      _token.ID.Hex(),
 		"sub":      user.ID.Hex(),
 		"email":    user.Email,
 		"name":     user.Name,
@@ -605,9 +631,10 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, refreshToken string
 
 	// Return the access token and refresh token
 	return &model.AuthPayload{
-		AccessToken: accessToken,
-		TokenType:   pointer.String("Bearer"),
-		ExpiresIn:   pointer.Int(int(api.Expiration)),
+		AccessToken:  accessToken,
+		RefreshToken: pointer.String(_token.ID.Hex()),
+		TokenType:    pointer.String("Bearer"),
+		ExpiresIn:    pointer.Int(int(api.Expiration)),
 	}, nil
 }
 

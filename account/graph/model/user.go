@@ -21,7 +21,6 @@ type User struct {
 	Email         string               `json:"email" bson:"email"`
 	Phone         *string              `json:"phone,omitempty" bson:"phone,omitempty"`
 	Roles         []*string            `json:"roles,omitempty" bson:"roles,omitempty"`
-	Mfa           *Mfa                 `json:"mfa,omitempty" bson:"mfa,omitempty"`
 	Locale        *string              `json:"locale,omitempty" bson:"locale,omitempty"`
 	Timezone      *string              `json:"timezone,omitempty" bson:"timezone,omitempty"`
 	Picture       *string              `json:"picture,omitempty" bson:"picture,omitempty"`
