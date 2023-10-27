@@ -17,6 +17,7 @@ func SyncUsersJob() {
 		// c.AddFunc("*/5 * * * * *", func() {
 		log.Println("Starting synchronization...")
 		syncUsersToTypesense()
+
 		log.Println("Synchronization complete.")
 	})
 	c.Start()

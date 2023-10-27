@@ -219,6 +219,19 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 		return nil, fmt.Errorf("error generating tokens: %v", err)
 	}
 
+	// Send email verification
+	// emailData := map[string]interface{}{
+	// 	"name":  user.Name,
+	// 	"email": user.Email,
+	// }
+
+	// Marshal the map into a JSON string
+	// jsonData, err := json.Marshal(emailData)
+	// if err != nil {
+	// 	fmt.Println("Error marshaling JSON:", err)
+	// 	return nil, err
+	// }
+
 	// Return the access token and refresh token
 	return &model.AuthPayload{
 		AccessToken:  accessToken,
@@ -419,31 +432,33 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 
 // Verify 2FA is the resolver for the verify field.
 func (r *mutationResolver) Verify(ctx context.Context, input model.VerifyInput) (map[string]interface{}, error) {
-	// Retrieve the token's ID from the token. This could be stored in Redis or another cache.
-	tokenID, err := r.redis.Get(ctx, input.Code).Result() // using Redis as an example
+	// Retrieve the token's ID from the cache (e.g., Redis).
+	tokenID, err := r.redis.Get(ctx, input.Code).Result()
 	if err == redis.Nil {
 		return nil, fmt.Errorf("invalid or expired token")
 	} else if err != nil {
 		return nil, fmt.Errorf("failed to retrieve token data: %s", err.Error())
 	}
 
-	// Retrieve the authentication status from the token stored in Redis or another cache.
-	token, err := r.redis.Get(ctx, tokenID).Result() // using Redis as an example
-	if err == redis.Nil {
-		return nil, fmt.Errorf("invalid or expired token")
-	} else if err != nil {
-		return nil, fmt.Errorf("failed to retrieve token data: %s", err.Error())
+	id, err := primitive.ObjectIDFromHex(tokenID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user ID: %s", err.Error())
 	}
 
-	// Check if the user's 2FA is already verified
-	if token == "authenticated" {
-		return map[string]interface{}{
-			"message": "2FA has already been verified.",
-		}, nil
+	var token *model.Token
+	if err := r.db.Collection("tokens").FindOne(
+		ctx,
+		bson.M{"_id": id, "revoked": false},
+	).Decode(&token); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("token not found")
+		}
+		return nil, fmt.Errorf("error fetching token: %s", err.Error())
 	}
 
-	// Update the token value to indicate authentication
-	_, err = r.redis.Set(ctx, token, "authenticated", 0).Result()
+	// Update the token value to indicate successful authentication.
+	cacheTTL := time.Duration(token.Expires.T) * time.Second
+	_, err = r.redis.Set(ctx, token.ID.Hex(), "authenticated", cacheTTL).Result()
 	if err != nil {
 		return nil, fmt.Errorf("failed to update token data: %s", err.Error())
 	}

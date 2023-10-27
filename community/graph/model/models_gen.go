@@ -86,6 +86,15 @@ type NewRecipient struct {
 	Message string `json:"message"`
 }
 
+type NewTemplate struct {
+	Locale   string                 `json:"locale"`
+	Name     string                 `json:"name"`
+	Subject  string                 `json:"subject"`
+	Body     string                 `json:"body"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
+}
+
 type Notifications struct {
 	Data  []*Notification `json:"data,omitempty"`
 	Count int             `json:"count"`
@@ -149,6 +158,11 @@ type Task struct {
 
 func (Task) IsEntity() {}
 
+type Templates struct {
+	Count int         `json:"count"`
+	Data  []*Template `json:"data,omitempty"`
+}
+
 type UpdateComment struct {
 	Parent      *string                `json:"parent,omitempty"`
 	Locale      string                 `json:"locale"`
@@ -182,6 +196,15 @@ type UpdateReaction struct {
 
 type UpdateRecipient struct {
 	Read *string `json:"read,omitempty"`
+}
+
+type UpdateTemplate struct {
+	Locale   *string                `json:"locale,omitempty"`
+	Name     *string                `json:"name,omitempty"`
+	Subject  *string                `json:"subject,omitempty"`
+	Body     *string                `json:"body,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
 }
 
 type ConversationStatus string

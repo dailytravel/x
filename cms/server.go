@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -26,11 +27,18 @@ import (
 )
 
 func init() {
+	flag.Parse()
 	os.Setenv("GIN_MODE", "release")
 	os.Setenv("PORT", "4003")
 	os.Setenv("DB_HOST", "localhost")
 	os.Setenv("DB_NAME", "cms")
 	os.Setenv("MONGODB_URI", "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1")
+}
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Panicf("%s: %s", msg, err)
+	}
 }
 
 // Defining the playgroundHandler handler
@@ -108,7 +116,7 @@ func main() {
 		go controllers.IndexStream(&waitGroup, stream, name)
 	}
 
-	// setting up Gin
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(auth.Middleware())
 	r.Use(cors.New(cors.Config{

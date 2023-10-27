@@ -47,6 +47,7 @@ type ResolverRoot interface {
 	Post() PostResolver
 	Product() ProductResolver
 	Query() QueryResolver
+	Template() TemplateResolver
 	Term() TermResolver
 	User() UserResolver
 }
@@ -61,14 +62,15 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Entity struct {
-		FindFileByID    func(childComplexity int, id string) int
-		FindImageByID   func(childComplexity int, id string) int
-		FindPackageByID func(childComplexity int, id string) int
-		FindPlaceByID   func(childComplexity int, id string) int
-		FindPostByID    func(childComplexity int, id string) int
-		FindProductByID func(childComplexity int, id string) int
-		FindTermByID    func(childComplexity int, id string) int
-		FindUserByID    func(childComplexity int, id string) int
+		FindFileByID     func(childComplexity int, id string) int
+		FindImageByID    func(childComplexity int, id string) int
+		FindPackageByID  func(childComplexity int, id string) int
+		FindPlaceByID    func(childComplexity int, id string) int
+		FindPostByID     func(childComplexity int, id string) int
+		FindProductByID  func(childComplexity int, id string) int
+		FindTemplateByID func(childComplexity int, id string) int
+		FindTermByID     func(childComplexity int, id string) int
+		FindUserByID     func(childComplexity int, id string) int
 	}
 
 	File struct {
@@ -170,6 +172,11 @@ type ComplexityRoot struct {
 		__resolve_entities func(childComplexity int, representations []map[string]interface{}) int
 	}
 
+	Template struct {
+		ID     func(childComplexity int) int
+		Images func(childComplexity int) int
+	}
+
 	Term struct {
 		Children    func(childComplexity int) int
 		Count       func(childComplexity int) int
@@ -210,6 +217,7 @@ type EntityResolver interface {
 	FindPlaceByID(ctx context.Context, id string) (*model.Place, error)
 	FindPostByID(ctx context.Context, id string) (*model.Post, error)
 	FindProductByID(ctx context.Context, id string) (*model.Product, error)
+	FindTemplateByID(ctx context.Context, id string) (*model.Template, error)
 	FindTermByID(ctx context.Context, id string) (*model.Term, error)
 	FindUserByID(ctx context.Context, id string) (*model.User, error)
 }
@@ -280,6 +288,9 @@ type QueryResolver interface {
 	Posts(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Posts, error)
 	Term(ctx context.Context, id string) (*model.Term, error)
 	Terms(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
+}
+type TemplateResolver interface {
+	Images(ctx context.Context, obj *model.Template) ([]*model.Image, error)
 }
 type TermResolver interface {
 	ID(ctx context.Context, obj *model.Term) (string, error)
@@ -385,6 +396,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.FindProductByID(childComplexity, args["id"].(string)), true
+
+	case "Entity.findTemplateByID":
+		if e.complexity.Entity.FindTemplateByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findTemplateByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindTemplateByID(childComplexity, args["id"].(string)), true
 
 	case "Entity.findTermByID":
 		if e.complexity.Entity.FindTermByID == nil {
@@ -988,6 +1011,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.__resolve_entities(childComplexity, args["representations"].([]map[string]interface{})), true
 
+	case "Template.id":
+		if e.complexity.Template.ID == nil {
+			break
+		}
+
+		return e.complexity.Template.ID(childComplexity), true
+
+	case "Template.images":
+		if e.complexity.Template.Images == nil {
+			break
+		}
+
+		return e.complexity.Template.Images(childComplexity), true
+
 	case "Term.children":
 		if e.complexity.Term.Children == nil {
 			break
@@ -1238,7 +1275,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/file.graphql" "schema/image.graphql" "schema/package.graphql" "schema/place.graphql" "schema/post.graphql" "schema/product.graphql" "schema/term.graphql" "schema/user.graphql"
+//go:embed "schema.graphqls" "schema/file.graphql" "schema/image.graphql" "schema/package.graphql" "schema/place.graphql" "schema/post.graphql" "schema/product.graphql" "schema/template.graphql" "schema/term.graphql" "schema/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1257,6 +1294,7 @@ var sources = []*ast.Source{
 	{Name: "schema/place.graphql", Input: sourceData("schema/place.graphql"), BuiltIn: false},
 	{Name: "schema/post.graphql", Input: sourceData("schema/post.graphql"), BuiltIn: false},
 	{Name: "schema/product.graphql", Input: sourceData("schema/product.graphql"), BuiltIn: false},
+	{Name: "schema/template.graphql", Input: sourceData("schema/template.graphql"), BuiltIn: false},
 	{Name: "schema/term.graphql", Input: sourceData("schema/term.graphql"), BuiltIn: false},
 	{Name: "schema/user.graphql", Input: sourceData("schema/user.graphql"), BuiltIn: false},
 	{Name: "../federation/directives.graphql", Input: `
@@ -1297,7 +1335,7 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = File | Image | Package | Place | Post | Product | Term | User
+union _Entity = File | Image | Package | Place | Post | Product | Template | Term | User
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
@@ -1307,6 +1345,7 @@ type Entity {
 	findPlaceByID(id: ID!,): Place!
 	findPostByID(id: ID!,): Post!
 	findProductByID(id: ID!,): Product!
+	findTemplateByID(id: ID!,): Template!
 	findTermByID(id: ID!,): Term!
 	findUserByID(id: ID!,): User!
 
@@ -1449,6 +1488,21 @@ func (ec *executionContext) field_Entity_findPostByID_args(ctx context.Context, 
 }
 
 func (ec *executionContext) field_Entity_findProductByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findTemplateByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -2374,6 +2428,67 @@ func (ec *executionContext) fieldContext_Entity_findProductByID(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Entity_findProductByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Entity_findTemplateByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findTemplateByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindTemplateByID(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Template)
+	fc.Result = res
+	return ec.marshalNTemplate2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findTemplateByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Template_id(ctx, field)
+			case "images":
+				return ec.fieldContext_Template_images(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Template", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findTemplateByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6569,6 +6684,111 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Template_id(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Template_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Template",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Template_images(ctx context.Context, field graphql.CollectedField, obj *model.Template) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Template_images(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Template().Images(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Image)
+	fc.Result = res
+	return ec.marshalOImage2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐImage(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Template_images(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Template",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Image_id(ctx, field)
+			case "type":
+				return ec.fieldContext_Image_type(ctx, field)
+			case "locale":
+				return ec.fieldContext_Image_locale(ctx, field)
+			case "object":
+				return ec.fieldContext_Image_object(ctx, field)
+			case "url":
+				return ec.fieldContext_Image_url(ctx, field)
+			case "title":
+				return ec.fieldContext_Image_title(ctx, field)
+			case "caption":
+				return ec.fieldContext_Image_caption(ctx, field)
+			case "order":
+				return ec.fieldContext_Image_order(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Image_metadata(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Image", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Term_id(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Term_id(ctx, field)
 	if err != nil {
@@ -10085,6 +10305,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._Product(ctx, sel, obj)
+	case model.Template:
+		return ec._Template(ctx, sel, &obj)
+	case *model.Template:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Template(ctx, sel, obj)
 	case model.Term:
 		return ec._Term(ctx, sel, &obj)
 	case *model.Term:
@@ -10247,6 +10474,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 					}
 				}()
 				res = ec._Entity_findProductByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findTemplateByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findTemplateByID(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -11902,6 +12151,78 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
+var templateImplementors = []string{"Template", "_Entity"}
+
+func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet, obj *model.Template) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, templateImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Template")
+		case "id":
+			out.Values[i] = ec._Template_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "images":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Template_images(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var termImplementors = []string{"Term", "_Entity"}
 
 func (ec *executionContext) _Term(ctx context.Context, sel ast.SelectionSet, obj *model.Term) graphql.Marshaler {
@@ -13036,6 +13357,20 @@ func (ec *executionContext) marshalNString2ᚖstring(ctx context.Context, sel as
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNTemplate2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTemplate(ctx context.Context, sel ast.SelectionSet, v model.Template) graphql.Marshaler {
+	return ec._Template(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTemplate2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTemplate(ctx context.Context, sel ast.SelectionSet, v *model.Template) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Template(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNTerm2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx context.Context, sel ast.SelectionSet, v model.Term) graphql.Marshaler {

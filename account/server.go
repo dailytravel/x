@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,6 +20,7 @@ import (
 	"github.com/dailytravel/x/account/pkg/auth"
 	"github.com/dailytravel/x/account/pkg/database"
 	"github.com/dailytravel/x/account/pkg/database/migrations"
+	"github.com/dailytravel/x/account/pkg/queuing/producer"
 	"github.com/dailytravel/x/account/scheduler"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -26,7 +28,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var (
+	uri          = flag.String("uri", "amqp://guest:guest@localhost:5672/", "AMQP URI")
+	exchangeName = flag.String("exchange", "test-exchange", "Durable AMQP exchange name")
+	exchangeType = flag.String("exchange-type", "direct", "Exchange type - direct|fanout|topic|x-custom")
+	routingKey   = flag.String("key", "test-key", "AMQP routing key")
+	body         = flag.String("body", "foobar", "Body of message")
+	reliable     = flag.Bool("reliable", true, "Wait for the publisher confirmation before exiting")
+)
+
 func init() {
+	flag.Parse()
 	os.Setenv("GIN_MODE", "release")
 	os.Setenv("PORT", "4001")
 	os.Setenv("DB_HOST", "localhost")
@@ -35,6 +47,12 @@ func init() {
 	os.Setenv("ISSUER", "https://api.trip.express")
 	os.Setenv("AUDIENCE", "https://api.trip.express/graphql")
 	os.Setenv("JWKS_URI", "https://api.trip.express/.well-known/jwks.json")
+}
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Panicf("%s: %s", msg, err)
+	}
 }
 
 // Defining the playgroundHandler handler
@@ -80,23 +98,19 @@ func main() {
 	var waitGroup sync.WaitGroup
 	// connect MongoDB
 	client, err := database.ConnectDB()
-	if err != nil {
-		log.Fatal("Error connecting to MongoDB: ", err)
-	}
+	failOnError(err, "Failed to connect to MongoDB")
 
 	defer func() {
-		if err := client.Disconnect(context.Background()); err != nil {
-			log.Fatal("Failed to close MongoDB connection: ", err)
-		}
+		err := client.Disconnect(context.Background())
+		failOnError(err, "Failed to disconnect from MongoDB")
 	}()
 
 	database.Database = client.Database(os.Getenv("DB_NAME"))
 	database.Redis = database.ConnectRedis()
 	database.Client = database.ConnectTypesense()
 
-	if err := migrations.AutoMigrate(); err != nil {
-		log.Fatal("Error running migrations: ", err)
-	}
+	err = migrations.AutoMigrate()
+	failOnError(err, "Failed to migrate database")
 
 	database.Client.Collection("users").Delete()
 	// start scheduler jobs
@@ -105,14 +119,17 @@ func main() {
 	// need restart the server if drop or create a new collection in mongodb, else will not work
 	for _, name := range []string{} {
 		stream, err := database.Database.Collection(name).Watch(context.Background(), mongo.Pipeline{})
-		if err != nil {
-			panic(err)
-		}
+		failOnError(err, "Failed to watch collection")
 		waitGroup.Add(1)
 		go controllers.IndexStream(&waitGroup, stream, name)
 	}
 
-	// setting up Gin
+	err = producer.Publish(*uri, *exchangeName, *exchangeType, *routingKey, []byte(*body), *reliable)
+	failOnError(err, "Failed to publish a message")
+
+	log.Printf("published %dB OK", len(*body))
+
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(auth.Middleware())
 	r.Use(cors.New(cors.Config{
@@ -137,9 +154,7 @@ func main() {
 
 	// Wait for the server to start or throw an error
 	err = <-errCh
-	if err != nil {
-		log.Fatal("Error starting server: ", err)
-	}
+	failOnError(err, "Failed to start server")
 
 	// Wait for the waitGroup to finish
 	waitGroup.Wait()

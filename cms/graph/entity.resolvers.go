@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/dailytravel/x/cms/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -79,6 +80,11 @@ func (r *entityResolver) FindProductByID(ctx context.Context, id string) (*model
 	return &model.Product{
 		ID: id,
 	}, nil
+}
+
+// FindTemplateByID is the resolver for the findTemplateByID field.
+func (r *entityResolver) FindTemplateByID(ctx context.Context, id string) (*model.Template, error) {
+	panic(fmt.Errorf("not implemented: FindTemplateByID - findTemplateByID"))
 }
 
 // FindTermByID is the resolver for the findTermByID field.

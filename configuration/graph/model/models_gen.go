@@ -76,15 +76,6 @@ type NewOption struct {
 	Data string `json:"data"`
 }
 
-type NewTemplate struct {
-	Locale   string                 `json:"locale"`
-	Name     string                 `json:"name"`
-	Subject  string                 `json:"subject"`
-	Body     string                 `json:"body"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-	Status   *string                `json:"status,omitempty"`
-}
-
 type NewTimezone struct {
 	Locale      string                 `json:"locale"`
 	Name        string                 `json:"name"`
@@ -108,11 +99,6 @@ type Options struct {
 type Places struct {
 	Data  []*Place `json:"data,omitempty"`
 	Count int      `json:"count"`
-}
-
-type Templates struct {
-	Count int         `json:"count"`
-	Data  []*Template `json:"data,omitempty"`
 }
 
 type Timezones struct {
@@ -164,15 +150,6 @@ type UpdateLocation struct {
 type UpdateOption struct {
 	Name *string `json:"name,omitempty"`
 	Data *string `json:"data,omitempty"`
-}
-
-type UpdateTemplate struct {
-	Locale   *string                `json:"locale,omitempty"`
-	Name     *string                `json:"name,omitempty"`
-	Subject  *string                `json:"subject,omitempty"`
-	Body     *string                `json:"body,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-	Status   *string                `json:"status,omitempty"`
 }
 
 type UpdateTimezone struct {

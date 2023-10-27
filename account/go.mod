@@ -12,6 +12,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.5.0
+	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/robfig/cron v1.2.0
 	github.com/streadway/amqp v1.1.0
 	github.com/typesense/typesense-go v0.7.0
@@ -19,6 +20,7 @@ require (
 	go.mongodb.org/mongo-driver v1.12.0
 	golang.org/x/crypto v0.12.0
 	google.golang.org/api v0.137.0
+	google.golang.org/grpc v1.57.0
 )
 
 require (
@@ -77,7 +79,6 @@ require (
 	golang.org/x/tools v0.11.1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230807174057-1744710a1577 // indirect
-	google.golang.org/grpc v1.57.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

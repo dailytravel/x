@@ -1,9 +1,0 @@
-type Session {
-  id: ID!
-  user: User!
-  token: String!
-  expires: String!
-  metadata: Map
-  status: String!
-  created: String!
-}

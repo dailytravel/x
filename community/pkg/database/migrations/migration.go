@@ -15,6 +15,7 @@ func AutoMigrate() error {
 		&Notification{Database: database.Database},
 		&Reaction{Database: database.Database},
 		&Recipient{Database: database.Database},
+		&Template{Database: database.Database},
 	}
 
 	for _, migration := range migrators {

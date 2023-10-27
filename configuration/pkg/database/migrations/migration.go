@@ -12,7 +12,6 @@ func AutoMigrate() error {
 		&Locale{Database: database.Database},
 		&Option{Database: database.Database},
 		&Place{Database: database.Database},
-		&Template{Database: database.Database},
 		&Timezone{Database: database.Database},
 		&Webhook{Database: database.Database},
 	}

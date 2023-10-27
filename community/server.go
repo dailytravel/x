@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -17,17 +18,35 @@ import (
 	"github.com/dailytravel/x/community/pkg/auth"
 	"github.com/dailytravel/x/community/pkg/database"
 	"github.com/dailytravel/x/community/pkg/database/migrations"
+	"github.com/dailytravel/x/community/pkg/queuing/consumer"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
+var (
+	uri          = flag.String("uri", "amqp://guest:guest@localhost:5672/", "AMQP URI")
+	exchange     = flag.String("exchange", "test-exchange", "Durable, non-auto-deleted AMQP exchange name")
+	exchangeType = flag.String("exchange-type", "direct", "Exchange type - direct|fanout|topic|x-custom")
+	queue        = flag.String("queue", "test-queue", "Ephemeral AMQP queue name")
+	bindingKey   = flag.String("key", "test-key", "AMQP binding key")
+	consumerTag  = flag.String("consumer-tag", "simple-consumer", "AMQP consumer tag (should not be blank)")
+	lifetime     = flag.Duration("lifetime", 5*time.Second, "lifetime of process before shutdown (0s=infinite)")
+)
+
 func init() {
+	flag.Parse()
 	os.Setenv("GIN_MODE", "release")
 	os.Setenv("PORT", "4004")
 	os.Setenv("DB_HOST", "localhost")
 	os.Setenv("DB_NAME", "community")
 	os.Setenv("MONGODB_URI", "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1")
+}
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Panicf("%s: %s", msg, err)
+	}
 }
 
 // Defining the playgroundHandler handler
@@ -70,27 +89,26 @@ func graphqlHandler() gin.HandlerFunc {
 }
 
 func main() {
-	// connect MongoDB
+	var waitGroup sync.WaitGroup
+	// Connect to MongoDB
 	client, err := database.ConnectDB()
-	if err != nil {
-		log.Fatal("Error connecting to MongoDB: ", err)
-	}
+	failOnError(err, "Failed to connect to MongoDB")
 
 	defer func() {
-		if err := client.Disconnect(context.Background()); err != nil {
-			log.Fatal("Failed to close MongoDB connection: ", err)
-		}
+		err := client.Disconnect(context.Background())
+		failOnError(err, "Failed to disconnect from MongoDB")
 	}()
 
+	// Initialize database connections
 	database.Database = client.Database(os.Getenv("DB_NAME"))
 	database.Redis = database.ConnectRedis()
 	database.Client = database.ConnectTypesense()
 
-	if err := migrations.AutoMigrate(); err != nil {
-		log.Fatal("Error running migrations: ", err)
-	}
+	// Run database migrations
+	err = migrations.AutoMigrate()
+	failOnError(err, "Failed to run database migrations")
 
-	// setting up Gin
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(auth.Middleware())
 	r.Use(cors.New(cors.Config{
@@ -107,15 +125,32 @@ func main() {
 		})
 	})
 
-	// Start the server with error handling using a simple channel
+	// Start the server and handle errors using a goroutine
 	errCh := make(chan error)
 	go func() {
-		errCh <- r.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
+		errCh <- r.Run(":" + os.Getenv("PORT"))
 	}()
 
 	// Wait for the server to start or throw an error
 	err = <-errCh
-	if err != nil {
-		log.Fatal("Error starting server: ", err)
+	failOnError(err, "Failed to start server")
+
+	c, err := consumer.NewConsumer(*uri, *exchange, *exchangeType, *queue, *bindingKey, *consumerTag)
+	failOnError(err, "Failed to connect to RabbitMQ")
+
+	if *lifetime > 0 {
+		log.Printf("running for %s", *lifetime)
+		time.Sleep(*lifetime)
+	} else {
+		log.Printf("running forever")
+		select {}
 	}
+
+	log.Printf("shutting down")
+
+	err = c.Shutdown()
+	failOnError(err, "Failed to shutdown consumer")
+
+	// Wait for the server to shutdown
+	waitGroup.Wait()
 }

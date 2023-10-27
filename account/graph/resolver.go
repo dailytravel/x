@@ -4,7 +4,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
 	"github.com/dailytravel/x/account/pkg/auth"
@@ -123,13 +122,6 @@ func (r *Resolver) insertToken(ctx context.Context, document *model.Token) (*mod
 	}
 
 	document.ID = res.InsertedID.(primitive.ObjectID)
-	// Convert Expires (primitive.Timestamp) to time.Duration
-	expiration := time.Duration(document.Expires.T) * time.Second
-
-	//insert token to redis
-	if err := r.redis.Set(ctx, document.ID.Hex(), true, expiration).Err(); err != nil {
-		return nil, fmt.Errorf("failed to insert token to redis: %v", err)
-	}
 
 	return document, nil
 }
