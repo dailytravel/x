@@ -19,6 +19,7 @@ import (
 	"github.com/dailytravel/x/community/pkg/database"
 	"github.com/dailytravel/x/community/pkg/database/migrations"
 	"github.com/dailytravel/x/community/pkg/queuing/consumer"
+	"github.com/dailytravel/x/community/pkg/stub"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -103,6 +104,9 @@ func main() {
 	database.Database = client.Database(os.Getenv("DB_NAME"))
 	database.Redis = database.ConnectRedis()
 	database.Client = database.ConnectTypesense()
+	stub.RPC, err = stub.ConnectRPC()
+
+	failOnError(err, "Failed to connect to RPC")
 
 	// Run database migrations
 	err = migrations.AutoMigrate()
@@ -110,7 +114,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	r.Use(auth.Middleware())
+	r.Use(auth.Middleware(stub.RPC))
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowHeaders:     []string{"*"},

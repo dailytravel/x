@@ -20,6 +20,7 @@ import (
 	"github.com/dailytravel/x/configuration/pkg/auth"
 	"github.com/dailytravel/x/configuration/pkg/database"
 	"github.com/dailytravel/x/configuration/pkg/database/migrations"
+	"github.com/dailytravel/x/configuration/pkg/stub"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -86,23 +87,22 @@ func main() {
 	var waitGroup sync.WaitGroup
 	// connect MongoDB
 	client, err := database.ConnectDB()
-	if err != nil {
-		log.Fatal("Error connecting to MongoDB: ", err)
-	}
+	failOnError(err, "Failed to connect to MongoDB")
 
 	defer func() {
-		if err := client.Disconnect(context.Background()); err != nil {
-			log.Fatal("Failed to close MongoDB connection: ", err)
-		}
+		err := client.Disconnect(context.Background())
+		failOnError(err, "Failed to disconnect MongoDB")
 	}()
 
 	database.Database = client.Database(os.Getenv("DB_NAME"))
 	database.Redis = database.ConnectRedis()
 	database.Client = database.ConnectTypesense()
+	stub.RPC, err = stub.ConnectRPC()
 
-	if err := migrations.AutoMigrate(); err != nil {
-		log.Fatal("Error running migrations: ", err)
-	}
+	failOnError(err, "Failed to connect to RPC")
+
+	err = migrations.AutoMigrate()
+	failOnError(err, "Failed to migrate MongoDB")
 
 	database.Client.Collection("places").Delete()
 
@@ -111,9 +111,7 @@ func main() {
 		"places",
 	} {
 		stream, err := database.Database.Collection(name).Watch(context.Background(), mongo.Pipeline{})
-		if err != nil {
-			panic(err)
-		}
+		failOnError(err, "Failed to watch MongoDB")
 		waitGroup.Add(1)
 		go controllers.IndexStream(&waitGroup, stream, name)
 	}
@@ -123,7 +121,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	r.Use(auth.Middleware())
+	r.Use(auth.Middleware(stub.RPC))
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowHeaders:     []string{"*"},
@@ -146,9 +144,7 @@ func main() {
 
 	// Wait for the server to start or throw an error
 	err = <-errCh
-	if err != nil {
-		log.Fatal("Error starting server: ", err)
-	}
+	failOnError(err, "Failed to start server")
 
 	waitGroup.Wait()
 }

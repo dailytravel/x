@@ -21,6 +21,7 @@ import (
 	"github.com/dailytravel/x/account/pkg/database"
 	"github.com/dailytravel/x/account/pkg/database/migrations"
 	"github.com/dailytravel/x/account/pkg/queuing/producer"
+	"github.com/dailytravel/x/account/pkg/stub"
 	"github.com/dailytravel/x/account/scheduler"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -109,6 +110,13 @@ func main() {
 	database.Redis = database.ConnectRedis()
 	database.Client = database.ConnectTypesense()
 
+	// connect to gRPC stub
+	stub.RPC, err = stub.ConnectRPC()
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer stub.RPC.Close()
+
 	err = migrations.AutoMigrate()
 	failOnError(err, "Failed to migrate database")
 
@@ -131,7 +139,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	r.Use(auth.Middleware())
+	r.Use(auth.Middleware(stub.RPC))
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowHeaders:     []string{"*"},

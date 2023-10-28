@@ -19,6 +19,7 @@ import (
 	"github.com/dailytravel/x/base/pkg/auth"
 	"github.com/dailytravel/x/base/pkg/database"
 	"github.com/dailytravel/x/base/pkg/database/migrations"
+	"github.com/dailytravel/x/base/pkg/stub"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -82,27 +83,25 @@ func main() {
 	var waitGroup sync.WaitGroup
 	// connect MongoDB
 	client, err := database.ConnectDB()
-	if err != nil {
-		log.Fatal("Error connecting to MongoDB: ", err)
-	}
+	failOnError(err, "Failed to connect to MongoDB")
 
 	defer func() {
-		if err := client.Disconnect(context.Background()); err != nil {
-			log.Fatal("Failed to close MongoDB connection: ", err)
-		}
+		err := client.Disconnect(context.Background())
+		failOnError(err, "Failed to disconnect from MongoDB")
 	}()
 
 	database.Database = client.Database(os.Getenv("DB_NAME"))
 	database.Redis = database.ConnectRedis()
 	database.Client = database.ConnectTypesense()
+	stub.RPC, err = stub.ConnectRPC()
+	failOnError(err, "Failed to connect to RPC")
 
-	if err := migrations.AutoMigrate(); err != nil {
-		log.Fatal("Error running migrations: ", err)
-	}
+	err = migrations.AutoMigrate()
+	failOnError(err, "Failed to migrate database")
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	r.Use(auth.Middleware())
+	r.Use(auth.Middleware(stub.RPC))
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowHeaders:     []string{"*"},
@@ -125,9 +124,7 @@ func main() {
 
 	// Wait for the server to start or throw an error
 	err = <-errCh
-	if err != nil {
-		log.Fatal("Error starting server: ", err)
-	}
+	failOnError(err, "Failed to start server")
 
 	waitGroup.Wait()
 }

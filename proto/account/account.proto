@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package account;
+option go_package = "github.com/dailytravel/x/proto/account";
+
+message Request {
+  string message = 1;
+}
+
+message Response {
+  string status = 1;
+  string message = 2;
+}
+
+service Account {
+  rpc Authorization(Request) returns (Response);
+}

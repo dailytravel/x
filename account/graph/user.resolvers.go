@@ -578,6 +578,13 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLo
 		return nil, fmt.Errorf("error generating tokens: %v", err)
 	}
 
+	// Update the token value to indicate successful authentication.
+	cacheTTL := time.Duration(token.Expires.T) * time.Second
+	_, err = r.redis.Set(ctx, token.ID.Hex(), "authenticated", cacheTTL).Result()
+	if err != nil {
+		return nil, fmt.Errorf("failed to update token data: %s", err.Error())
+	}
+
 	// Return the access token and refresh token
 	return &model.AuthPayload{
 		AccessToken:  accessToken,

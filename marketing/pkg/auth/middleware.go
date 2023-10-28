@@ -8,6 +8,7 @@ import (
 	"github.com/dailytravel/x/marketing/pkg/database"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"google.golang.org/grpc"
 )
 
 // Define a custom context key type
@@ -21,7 +22,7 @@ const LocaleContextKey contextKey = "LocaleContextKey"
 const ClientIPContextKey contextKey = "ClientIPContextKey"
 const UserAgentContextKey contextKey = "UserAgentContextKey"
 
-func Middleware() gin.HandlerFunc {
+func Middleware(client *grpc.ClientConn) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
 
