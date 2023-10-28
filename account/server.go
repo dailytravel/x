@@ -120,7 +120,7 @@ func main() {
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	_r, err := c.Authorization(ctx, &account.Request{Message: "Hello RPC server"})
+	_r, err := c.Authorization(ctx, &account.Request{Message: "Trip Express"})
 	failOnError(err, "Failed to call Authorization RPC")
 	log.Printf("%s", _r.GetMessage())
 

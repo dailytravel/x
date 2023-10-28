@@ -30,7 +30,7 @@ type server struct {
 	account.UnimplementedAccountServer
 }
 
-func (s *server) SayHello(ctx context.Context, in *account.Request) (*account.Response, error) {
+func (s *server) Authorization(ctx context.Context, in *account.Request) (*account.Response, error) {
 	log.Printf("Received: %v", in.Message)
 	return &account.Response{Message: "Hello " + in.Message}, nil
 }
@@ -45,7 +45,7 @@ func main() {
 
 	// Load your TLS certificate and key
 	cert, err := tls.LoadX509KeyPair(
-		filepath.Join(currentDir, "certs", "server", "cert.pem"), filepath.Join(currentDir, "certs", "server", "key.pem"))
+		filepath.Join(currentDir, "certs", "x509", "server_cert.pem"), filepath.Join(currentDir, "certs", "x509", "server_key.pem"))
 	failOnError(err, "Failed to load key pair")
 
 	// Create a new gRPC server with TLS credentials
