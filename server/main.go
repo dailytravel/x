@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"flag"
 	"fmt"
@@ -22,6 +23,16 @@ func failOnError(err error, msg string) {
 	if err != nil {
 		log.Panicf("%s: %s", msg, err)
 	}
+}
+
+// server is used to implement helloworld.GreeterServer.
+type server struct {
+	account.UnimplementedAccountServer
+}
+
+func (s *server) SayHello(ctx context.Context, in *account.Request) (*account.Response, error) {
+	log.Printf("Received: %v", in.Message)
+	return &account.Response{Message: "Hello " + in.Message}, nil
 }
 
 func main() {
@@ -49,7 +60,7 @@ func main() {
 	failOnError(err, "Failed to listen")
 
 	s := grpc.NewServer(opts...)
-	account.RegisterAccountServer(s, &account.UnimplementedAccountServer{})
+	account.RegisterAccountServer(s, &server{})
 	fmt.Printf("gRPC server listening at %v\n", lis.Addr())
 
 	err = s.Serve(lis)

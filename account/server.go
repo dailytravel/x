@@ -23,6 +23,7 @@ import (
 	"github.com/dailytravel/x/account/pkg/queuing/producer"
 	"github.com/dailytravel/x/account/pkg/stub"
 	"github.com/dailytravel/x/account/scheduler"
+	"github.com/dailytravel/x/proto/account"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -112,10 +113,16 @@ func main() {
 
 	// connect to gRPC stub
 	stub.RPC, err = stub.ConnectRPC()
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
+	failOnError(err, "Failed to connect to gRPC stub")
 	defer stub.RPC.Close()
+
+	c := account.NewAccountClient(stub.RPC)
+	// Contact the server and print out its response.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	_r, err := c.Authorization(ctx, &account.Request{Message: "Hello RPC server"})
+	failOnError(err, "Failed to call Authorization RPC")
+	log.Printf("%s", _r.GetMessage())
 
 	err = migrations.AutoMigrate()
 	failOnError(err, "Failed to migrate database")
