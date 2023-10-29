@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/dailytravel/x/sales/pkg/database"
+	"github.com/dailytravel/x/proto/account"
+	"github.com/dailytravel/x/sales/pkg/stub"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"google.golang.org/grpc"
@@ -37,15 +38,13 @@ func Middleware(client *grpc.ClientConn) gin.HandlerFunc {
 			var authMap jwt.MapClaims
 			if err := json.Unmarshal([]byte(authHeader), &authMap); err == nil {
 				if jti, ok := authMap["jti"].(string); ok {
-					if err == nil {
-						if token, err := database.Redis.Get(ctx, jti).Result(); err == nil && token == "authenticated" {
-							ctx = context.WithValue(ctx, AuthContextKey, authMap)
-						} else {
-							log.Println(err)
-							c.AbortWithStatusJSON(401, gin.H{"error": "Invalid token"})
-							return
-						}
+					c := account.NewAccountClient(stub.RPC)
+					r, err := c.Authorization(ctx, &account.Request{Message: jti})
+					if err == nil && r.GetStatus() == "authenticated" {
+						ctx = context.WithValue(ctx, AuthContextKey, authMap)
 					}
+
+					log.Printf("%s", r.GetMessage())
 				}
 			}
 		}
