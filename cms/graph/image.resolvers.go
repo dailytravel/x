@@ -6,34 +6,62 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dailytravel/x/cms/graph/model"
+	"github.com/dailytravel/x/cms/pkg/auth"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // ID is the resolver for the id field.
 func (r *imageResolver) ID(ctx context.Context, obj *model.Image) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Object is the resolver for the object field.
 func (r *imageResolver) Object(ctx context.Context, obj *model.Image) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Object - object"))
+	var object map[string]interface{}
+	if err := r.db.Collection(obj.Object.Collection).FindOne(ctx, bson.M{"_id": obj.Object.ID}).Decode(&object); err != nil {
+		return nil, err
+	}
+
+	return object, nil
 }
 
 // Title is the resolver for the title field.
 func (r *imageResolver) Title(ctx context.Context, obj *model.Image) (*string, error) {
-	panic(fmt.Errorf("not implemented: Title - title"))
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
+
+	// Try to retrieve the title for the requested locale
+	if title, ok := obj.Title[*locale].(string); ok {
+		return &title, nil
+	}
+
+	return obj.Title[obj.Locale].(*string), nil
 }
 
 // Caption is the resolver for the caption field.
 func (r *imageResolver) Caption(ctx context.Context, obj *model.Image) (*string, error) {
-	panic(fmt.Errorf("not implemented: Caption - caption"))
+	// Get the locale from the context
+	locale := auth.Locale(ctx)
+	if locale == nil {
+		locale = &obj.Locale
+	}
+
+	// Try to retrieve the caption for the requested locale
+	if caption, ok := obj.Caption[*locale].(string); ok {
+		return &caption, nil
+	}
+
+	return obj.Caption[obj.Locale].(*string), nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *imageResolver) Metadata(ctx context.Context, obj *model.Image) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Image returns ImageResolver implementation.

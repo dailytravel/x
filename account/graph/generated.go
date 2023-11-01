@@ -480,17 +480,18 @@ type ComplexityRoot struct {
 	}
 
 	Token struct {
-		Client    func(childComplexity int) int
-		ClientIP  func(childComplexity int) int
-		Created   func(childComplexity int) int
-		Expires   func(childComplexity int) int
-		ID        func(childComplexity int) int
-		LastUsed  func(childComplexity int) int
-		Metadata  func(childComplexity int) int
-		Revoked   func(childComplexity int) int
-		Status    func(childComplexity int) int
-		User      func(childComplexity int) int
-		UserAgent func(childComplexity int) int
+		Authenticated func(childComplexity int) int
+		Client        func(childComplexity int) int
+		ClientIP      func(childComplexity int) int
+		Created       func(childComplexity int) int
+		Expires       func(childComplexity int) int
+		ID            func(childComplexity int) int
+		LastUsed      func(childComplexity int) int
+		Metadata      func(childComplexity int) int
+		Revoked       func(childComplexity int) int
+		Status        func(childComplexity int) int
+		User          func(childComplexity int) int
+		UserAgent     func(childComplexity int) int
 	}
 
 	User struct {
@@ -3112,6 +3113,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Task.User(childComplexity), true
+
+	case "Token.authenticated":
+		if e.complexity.Token.Authenticated == nil {
+			break
+		}
+
+		return e.complexity.Token.Authenticated(childComplexity), true
 
 	case "Token.client":
 		if e.complexity.Token.Client == nil {
@@ -21774,6 +21782,50 @@ func (ec *executionContext) fieldContext_Token_revoked(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Token_authenticated(ctx context.Context, field graphql.CollectedField, obj *model.Token) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Token_authenticated(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Authenticated, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Token_authenticated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Token",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Token_last_used(ctx context.Context, field graphql.CollectedField, obj *model.Token) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Token_last_used(ctx, field)
 	if err != nil {
@@ -26303,7 +26355,7 @@ func (ec *executionContext) unmarshalInputUpdatePasswordInput(ctx context.Contex
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password_confirmation"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -32316,6 +32368,11 @@ func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, ob
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "revoked":
 			out.Values[i] = ec._Token_revoked(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "authenticated":
+			out.Values[i] = ec._Token_authenticated(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}

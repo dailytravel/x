@@ -14,7 +14,7 @@ import (
 
 // ID is the resolver for the id field.
 func (r *campaignResolver) ID(ctx context.Context, obj *model.Campaign) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Audience is the resolver for the audience field.
@@ -76,16 +76,3 @@ func (r *queryResolver) Campaign(ctx context.Context, id string) (*model.Campaig
 func (r *Resolver) Campaign() CampaignResolver { return &campaignResolver{r} }
 
 type campaignResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *campaignResolver) CreatedBy(ctx context.Context, obj *model.Campaign) (*string, error) {
-	panic(fmt.Errorf("not implemented: CreatedBy - created_by"))
-}
-func (r *campaignResolver) UpdatedBy(ctx context.Context, obj *model.Campaign) (*string, error) {
-	panic(fmt.Errorf("not implemented: UpdatedBy - updated_by"))
-}

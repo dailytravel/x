@@ -185,6 +185,7 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 	token, err := r.insertToken(ctx, &model.Token{
 		UID:    user.ID,
 		Client: client.ID,
+		Token:  uuid.New().String(),
 		Expires: primitive.Timestamp{
 			T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix()),
 			I: 0,
@@ -235,7 +236,7 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 	// Return the access token and refresh token
 	return &model.AuthPayload{
 		AccessToken:  accessToken,
-		RefreshToken: pointer.String(token.ID.Hex()),
+		RefreshToken: pointer.String(token.Token),
 		TokenType:    pointer.String("Bearer"),
 		ExpiresIn:    pointer.Int(int(api.Expiration)),
 	}, nil
@@ -387,6 +388,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	token, err := r.insertToken(ctx, &model.Token{
 		UID:    user.ID,
 		Client: client.ID,
+		Token:  uuid.New().String(),
 		Expires: primitive.Timestamp{
 			T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix()),
 			I: 0,
@@ -424,7 +426,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	// Return the access token and refresh token
 	return &model.AuthPayload{
 		AccessToken:  accessToken,
-		RefreshToken: pointer.String(token.ID.Hex()),
+		RefreshToken: pointer.String(token.Token),
 		TokenType:    pointer.String("Bearer"),
 		ExpiresIn:    pointer.Int(int(api.Expiration)),
 	}, nil
@@ -446,10 +448,7 @@ func (r *mutationResolver) Verify(ctx context.Context, input model.VerifyInput) 
 	}
 
 	var token *model.Token
-	if err := r.db.Collection("tokens").FindOne(
-		ctx,
-		bson.M{"_id": id, "revoked": false},
-	).Decode(&token); err != nil {
+	if err := r.db.Collection("tokens").FindOne(ctx, bson.M{"_id": id, "revoked": false}).Decode(&token); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, fmt.Errorf("token not found")
 		}
@@ -457,8 +456,13 @@ func (r *mutationResolver) Verify(ctx context.Context, input model.VerifyInput) 
 	}
 
 	// Update the token value to indicate successful authentication.
-	cacheTTL := time.Duration(token.Expires.T) * time.Second
-	_, err = r.redis.Set(ctx, token.ID.Hex(), "authenticated", cacheTTL).Result()
+	_, err = r.db.Collection("tokens").UpdateOne(ctx, token.ID, bson.M{
+		"$set": bson.M{
+			"authenticated": true,
+			"last_used":     primitive.Timestamp{T: uint32(time.Now().Unix())},
+		},
+	})
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to update token data: %s", err.Error())
 	}
@@ -544,6 +548,7 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLo
 	token, err := r.insertToken(ctx, &model.Token{
 		UID:    user.ID,
 		Client: client.ID,
+		Token:  uuid.New().String(),
 		Expires: primitive.Timestamp{
 			T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix()),
 			I: 0,
@@ -578,17 +583,10 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLo
 		return nil, fmt.Errorf("error generating tokens: %v", err)
 	}
 
-	// Update the token value to indicate successful authentication.
-	cacheTTL := time.Duration(token.Expires.T) * time.Second
-	_, err = r.redis.Set(ctx, token.ID.Hex(), "authenticated", cacheTTL).Result()
-	if err != nil {
-		return nil, fmt.Errorf("failed to update token data: %s", err.Error())
-	}
-
 	// Return the access token and refresh token
 	return &model.AuthPayload{
 		AccessToken:  accessToken,
-		RefreshToken: pointer.String(token.ID.Hex()),
+		RefreshToken: pointer.String(token.Token),
 		TokenType:    pointer.String("Bearer"),
 		ExpiresIn:    pointer.Int(int(api.Expiration)),
 	}, nil
@@ -601,7 +599,6 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, token string) (*mod
 		return nil, fmt.Errorf("invalid refresh token")
 	}
 
-	// Retrieve the _token from Redis or another cache
 	var _token *model.Token
 	if err := r.db.Collection("tokens").FindOne(ctx, bson.M{"_id": id, "revoked": false, "expires": bson.M{"$gt": primitive.Timestamp{T: uint32(time.Now().Unix())}}}).Decode(&_token); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -698,11 +695,9 @@ func (r *mutationResolver) Logout(ctx context.Context, all *bool) (map[string]in
 		}
 
 		for _, token := range tokens {
-			// Optionally, remove the token from Redis so it can't be used again
-			_, err = r.redis.Del(ctx, token.ID.Hex()).Result()
-			if err != nil {
-				// This isn't a critical error, but you may want to log it for audit purposes.
-				fmt.Printf("Warning: failed to delete token from cache: %s\n", err.Error())
+			//update many to revoked tokens from MongoDB
+			if _, err := r.db.Collection("tokens").UpdateMany(ctx, bson.M{"_id": token.ID}, update); err != nil {
+				return nil, fmt.Errorf("failed to revoke tokens: %v", err)
 			}
 		}
 
@@ -718,14 +713,12 @@ func (r *mutationResolver) Logout(ctx context.Context, all *bool) (map[string]in
 			return nil, fmt.Errorf("invalid jti")
 		}
 
-		_, err = r.db.Collection("tokens").UpdateOne(ctx, bson.M{"_id": jti}, update)
-		if err != nil {
+		if _, err = r.db.Collection("tokens").UpdateOne(ctx, bson.M{"_id": jti}, update); err != nil {
 			return nil, fmt.Errorf("failed to revoke token: %v", err)
 		}
 
 		// Optionally, remove the token from Redis so it can't be used again
-		_, err = r.redis.Del(ctx, jti.Hex()).Result()
-		if err != nil {
+		if _, err = r.db.Collection("tokens").UpdateOne(ctx, bson.M{"_id": jti}, update); err != nil {
 			// This isn't a critical error, but you may want to log it for audit purposes.
 			fmt.Printf("Warning: failed to delete token from cache: %s\n", err.Error())
 		}
@@ -850,7 +843,7 @@ func (r *mutationResolver) UpdatePassword(ctx context.Context, input model.Updat
 	}
 
 	//check password and password confirmation
-	if input.Password != input.PasswordConfirmation {
+	if input.PasswordConfirmation != nil && input.Password != *input.PasswordConfirmation {
 		return nil, errors.New("passwords do not match")
 	}
 

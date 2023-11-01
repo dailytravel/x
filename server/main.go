@@ -9,8 +9,10 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/dailytravel/x/proto/account"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -26,7 +28,7 @@ var (
 func ConnectDB() (*mongo.Client, error) {
 	// Use the SetServerAPIOptions() method to set the Stable API version to 1
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI(os.Getenv("MONGODB_URI")).SetServerAPIOptions(serverAPI)
+	opts := options.Client().ApplyURI("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.1").SetServerAPIOptions(serverAPI)
 	// Create a new client and connect to the server
 	client, err := mongo.Connect(context.Background(), opts)
 	if err != nil {
@@ -59,7 +61,9 @@ func (s *server) Authorization(ctx context.Context, in *account.Request) (*accou
 		log.Printf("Failed to connect to MongoDB: %v", err)
 		return nil, err
 	}
-	defer client.Disconnect(context.Background())
+	defer client.Disconnect(ctx)
+
+	log.Println("Token:", in.Message)
 
 	// Convert the input message (token ID) to an ObjectID
 	id, err := primitive.ObjectIDFromHex(in.Message)
@@ -69,16 +73,24 @@ func (s *server) Authorization(ctx context.Context, in *account.Request) (*accou
 	}
 
 	// Find the token by ID
+	result := client.Database("account").Collection("tokens").FindOneAndUpdate(ctx,
+		primitive.M{"_id": id, "revoked": false, "expires": bson.M{"$gt": primitive.Timestamp{T: uint32(time.Now().Unix())}}},
+		bson.M{"$set": bson.M{"last_used": primitive.Timestamp{T: uint32(time.Now().Unix())}}})
+
+	if result.Err() != nil {
+		log.Printf("Failed to find and update token: %v", result.Err())
+		return nil, result.Err()
+	}
+
 	var token map[string]interface{}
-	err = client.Database("accounts").Collection("tokens").FindOne(context.Background(), primitive.M{"_id": id}).Decode(&token)
-	if err != nil {
-		log.Printf("Failed to find token: %v", err)
+	if err := result.Decode(&token); err != nil {
+		log.Printf("Failed to decode result: %v", err)
 		return nil, err
 	}
 
 	// Find the user by user ID from the token
 	var user map[string]interface{}
-	err = client.Database("accounts").Collection("users").FindOne(context.Background(), primitive.M{"_id": token["uid"]}).Decode(&user)
+	err = client.Database("account").Collection("users").FindOne(ctx, primitive.M{"_id": token["uid"]}).Decode(&user)
 	if err != nil {
 		log.Printf("Failed to find user: %v", err)
 		return nil, err

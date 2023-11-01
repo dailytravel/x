@@ -2,8 +2,10 @@ type Token {
   id: ID!
   user: User!
   client: Client!
+  token: String!
   expires: String!
   revoked: Boolean!
+  authenticated: Boolean!
   last_used: String!
   client_ip: String!
   user_agent: String!

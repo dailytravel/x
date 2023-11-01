@@ -14,7 +14,7 @@ import (
 
 // ID is the resolver for the id field.
 func (r *audienceResolver) ID(ctx context.Context, obj *model.Audience) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Segments is the resolver for the segments field.

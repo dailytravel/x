@@ -1,14 +1,16 @@
-type Link {
+type Link @key(fields: "id") {
   id: ID!
   domain: String!
   code: String!
+  url: String!
   title: String
-  destination: String!
   metadata: Map
+  engagements: Int!
   status: String
   created: String!
   updated: String!
   uid: ID!
+  tags: [ID]
 }
 
 type Links {
@@ -17,22 +19,23 @@ type Links {
 }
 
 input NewLink {
-  user: ID
-  title: String
   domain: String!
   code: String!
-  destination: String!
-  terms: [ID!]
+  url: String!
+  title: String
   metadata: Map
+  tags: [ID]
+  status: String
 }
 
 input UpdateLink {
-  user: ID
-  title: String
   domain: String
   code: String
-  terms: [ID!]
+  url: String
+  title: String
+  destination: String
   metadata: Map
+  status: String
 }
 
 extend type Query {

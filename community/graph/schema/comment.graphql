@@ -6,6 +6,7 @@ type Comment @key(fields: "id") {
   email: String
   body: String!
   rating: Int
+  recommended: Boolean
   status: String!
   metadata: Map
   parent: Comment
@@ -43,6 +44,7 @@ input UpdateComment {
   email: String
   body: String
   rating: Int
+  recommended: Boolean
   metadata: Map
   status: String
   attachments: [ID]

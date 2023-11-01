@@ -24,19 +24,6 @@ type Comment struct {
 
 func (Comment) IsEntity() {}
 
-type Link struct {
-	ID          string                 `json:"id"`
-	Domain      string                 `json:"domain"`
-	Code        string                 `json:"code"`
-	Title       *string                `json:"title,omitempty"`
-	Destination string                 `json:"destination"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      *string                `json:"status,omitempty"`
-	Created     string                 `json:"created"`
-	Updated     string                 `json:"updated"`
-	UID         string                 `json:"uid"`
-}
-
 type Links struct {
 	Data  []*Link `json:"data,omitempty"`
 	Count int     `json:"count"`
@@ -58,13 +45,12 @@ type NewCampaign struct {
 }
 
 type NewLink struct {
-	User        *string                `json:"user,omitempty"`
-	Title       *string                `json:"title,omitempty"`
-	Domain      string                 `json:"domain"`
-	Code        string                 `json:"code"`
-	Destination string                 `json:"destination"`
-	Terms       []string               `json:"terms,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Domain   string                 `json:"domain"`
+	Code     string                 `json:"code"`
+	URL      string                 `json:"url"`
+	Title    *string                `json:"title,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
 }
 
 type RuleInput struct {
@@ -135,12 +121,13 @@ type UpdateCampaign struct {
 }
 
 type UpdateLink struct {
-	User     *string                `json:"user,omitempty"`
-	Title    *string                `json:"title,omitempty"`
-	Domain   *string                `json:"domain,omitempty"`
-	Code     *string                `json:"code,omitempty"`
-	Terms    []string               `json:"terms,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Domain      *string                `json:"domain,omitempty"`
+	Code        *string                `json:"code,omitempty"`
+	URL         *string                `json:"url,omitempty"`
+	Title       *string                `json:"title,omitempty"`
+	Destination *string                `json:"destination,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      *string                `json:"status,omitempty"`
 }
 
 type CampaignStatus string

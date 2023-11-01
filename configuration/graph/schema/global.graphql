@@ -1,0 +1,43 @@
+type Global {
+  id: ID!
+  name: String!
+  metadata: Map!
+  status: String!
+  created: String!
+  updated: String!
+}
+
+type Globals {
+  data: [Global]
+  count: Int!
+}
+
+input NewGlobal {
+  name: String!
+  metadata: Map!
+  status: String
+}
+
+input UpdateGlobal {
+  metadata: Map
+  status: String
+}
+
+extend type Query {
+  global(name: String!): Global
+  globals(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Globals
+}
+
+extend type Mutation {
+  createGlobal(input: NewGlobal!): Global @auth
+  updateGlobal(id: ID!, input: UpdateGlobal!): Global @auth
+  deleteGlobal(id: ID!): Map @auth
+  deleteGlobals(ids: [ID!]!): Map @auth
+}

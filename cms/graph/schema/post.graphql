@@ -84,6 +84,5 @@ extend type Query {
 extend type Mutation {
   createPost(input: NewPost!): Post @auth
   updatePost(id: ID!, input: UpdatePost!): Post @auth
-  deletePost(id: ID!): Map @auth
-  deletePosts(ids: [ID!]!): Map @auth
+  deletePost(filter: Map!): Map @auth
 }

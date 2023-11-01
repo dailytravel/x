@@ -102,7 +102,7 @@ input RegisterInput {
 input UpdatePasswordInput {
   old_password: String!
   password: String!
-  password_confirmation: String!
+  password_confirmation: String
 }
 
 input ResetPasswordInput {

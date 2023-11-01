@@ -100,6 +100,26 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				list[idx[i]] = entity
 				return nil
 			}
+		case "Link":
+			resolverName, err := entityResolverNameForLink(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Link": %w`, err)
+			}
+			switch resolverName {
+
+			case "findLinkByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findLinkByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindLinkByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Link": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
 		case "User":
 			resolverName, err := entityResolverNameForUser(ctx, rep)
 			if err != nil {
@@ -204,6 +224,23 @@ func entityResolverNameForCampaign(ctx context.Context, rep map[string]interface
 		return "findCampaignByID", nil
 	}
 	return "", fmt.Errorf("%w for Campaign", ErrTypeNotFound)
+}
+
+func entityResolverNameForLink(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findLinkByID", nil
+	}
+	return "", fmt.Errorf("%w for Link", ErrTypeNotFound)
 }
 
 func entityResolverNameForUser(ctx context.Context, rep map[string]interface{}) (string, error) {

@@ -13,6 +13,11 @@ type Currencies struct {
 	Count int         `json:"count"`
 }
 
+type Globals struct {
+	Data  []*Global `json:"data,omitempty"`
+	Count int       `json:"count"`
+}
+
 type Locales struct {
 	Count int       `json:"count"`
 	Data  []*Locale `json:"data,omitempty"`
@@ -40,6 +45,12 @@ type NewCurrency struct {
 	Thousand  string                 `json:"thousand"`
 	Order     int                    `json:"order"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type NewGlobal struct {
+	Name     string                 `json:"name"`
+	Metadata map[string]interface{} `json:"metadata"`
+	Status   *string                `json:"status,omitempty"`
 }
 
 type NewLocale struct {
@@ -71,11 +82,6 @@ type NewLocation struct {
 	Metadata    map[string]interface{}   `json:"metadata,omitempty"`
 }
 
-type NewOption struct {
-	Name string `json:"name"`
-	Data string `json:"data"`
-}
-
 type NewTimezone struct {
 	Locale      string                 `json:"locale"`
 	Name        string                 `json:"name"`
@@ -89,11 +95,6 @@ type NewWebhook struct {
 	URL     string                `json:"url"`
 	Headers []*WebhookHeaderInput `json:"headers,omitempty"`
 	Events  []*WebhookEventInput  `json:"events,omitempty"`
-}
-
-type Options struct {
-	Data  []*Option `json:"data,omitempty"`
-	Count int       `json:"count"`
 }
 
 type Places struct {
@@ -118,6 +119,11 @@ type UpdateCurrency struct {
 	Order     *int                   `json:"order,omitempty"`
 	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	Status    *string                `json:"status,omitempty"`
+}
+
+type UpdateGlobal struct {
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Status   *string                `json:"status,omitempty"`
 }
 
 type UpdateLocale struct {
@@ -145,11 +151,6 @@ type UpdateLocation struct {
 	Popular     *bool                    `json:"popular,omitempty"`
 	Status      *string                  `json:"status,omitempty"`
 	Metadata    map[string]interface{}   `json:"metadata,omitempty"`
-}
-
-type UpdateOption struct {
-	Name *string `json:"name,omitempty"`
-	Data *string `json:"data,omitempty"`
 }
 
 type UpdateTimezone struct {

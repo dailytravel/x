@@ -7,9 +7,35 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/marketing/graph/model"
 )
+
+// ID is the resolver for the id field.
+func (r *linkResolver) ID(ctx context.Context, obj *model.Link) (string, error) {
+	return obj.ID.Hex(), nil
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *linkResolver) Metadata(ctx context.Context, obj *model.Link) (map[string]interface{}, error) {
+	return obj.Metadata, nil
+}
+
+// Created is the resolver for the created field.
+func (r *linkResolver) Created(ctx context.Context, obj *model.Link) (string, error) {
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
+}
+
+// Updated is the resolver for the updated field.
+func (r *linkResolver) Updated(ctx context.Context, obj *model.Link) (string, error) {
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
+}
+
+// UID is the resolver for the uid field.
+func (r *linkResolver) UID(ctx context.Context, obj *model.Link) (string, error) {
+	return obj.UID.Hex(), nil
+}
 
 // CreateLink is the resolver for the createLink field.
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
@@ -40,3 +66,8 @@ func (r *queryResolver) Links(ctx context.Context, args map[string]interface{}) 
 func (r *queryResolver) Link(ctx context.Context, id string) (*model.Link, error) {
 	panic(fmt.Errorf("not implemented: Link - link"))
 }
+
+// Link returns LinkResolver implementation.
+func (r *Resolver) Link() LinkResolver { return &linkResolver{r} }
+
+type linkResolver struct{ *Resolver }

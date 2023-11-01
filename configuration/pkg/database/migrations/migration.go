@@ -10,7 +10,7 @@ func AutoMigrate() error {
 	migrators := []Migrator{
 		&Currency{Database: database.Database},
 		&Locale{Database: database.Database},
-		&Option{Database: database.Database},
+		&Global{Database: database.Database},
 		&Place{Database: database.Database},
 		&Timezone{Database: database.Database},
 		&Webhook{Database: database.Database},

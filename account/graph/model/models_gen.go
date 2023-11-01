@@ -255,9 +255,9 @@ type UpdateInvitation struct {
 }
 
 type UpdatePasswordInput struct {
-	OldPassword          string `json:"old_password"`
-	Password             string `json:"password"`
-	PasswordConfirmation string `json:"password_confirmation"`
+	OldPassword          string  `json:"old_password"`
+	Password             string  `json:"password"`
+	PasswordConfirmation *string `json:"password_confirmation,omitempty"`
 }
 
 type UpdatePermission struct {
