@@ -44,7 +44,7 @@ func Middleware(client *grpc.ClientConn) gin.HandlerFunc {
 						ctx = context.WithValue(ctx, AuthContextKey, authMap)
 					}
 
-					log.Printf("%s", r.GetMessage())
+					log.Printf("Account: %s", r.GetStatus())
 				}
 			}
 		}

@@ -3,17 +3,15 @@ type Task {
   name: String!
   parent: Task
   subtasks: [Task]
-  list: List!
   notes: String
   priority: String! # enum of low, medium, high
   start: String
   end: String
   labels: [String]
-  order: Int
   status: String!
   metadata: Map
-
   uid: ID!
+  lists: [List]
   created: String!
   updated: String!
 }
@@ -32,11 +30,9 @@ enum TaskStatus {
 input NewTask {
   user: ID
   parent: ID
-  list: ID
   name: String!
   notes: String
   priority: String
-  order: Int
   start: String
   end: String
   labels: [String]
@@ -47,11 +43,9 @@ input NewTask {
 input UpdateTask {
   user: ID
   parent: ID
-  list: ID
   name: String
   notes: String
   priority: String
-  order: Int
   start: String
   end: String
   labels: [String]

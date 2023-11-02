@@ -63,8 +63,6 @@ func (s *server) Authorization(ctx context.Context, in *account.Request) (*accou
 	}
 	defer client.Disconnect(ctx)
 
-	log.Println("Token:", in.Message)
-
 	// Convert the input message (token ID) to an ObjectID
 	id, err := primitive.ObjectIDFromHex(in.Message)
 	if err != nil {
@@ -89,8 +87,7 @@ func (s *server) Authorization(ctx context.Context, in *account.Request) (*accou
 	}
 
 	// Find the user by user ID from the token
-	var user map[string]interface{}
-	err = client.Database("account").Collection("users").FindOne(ctx, primitive.M{"_id": token["uid"]}).Decode(&user)
+	err = client.Database("account").Collection("users").FindOne(ctx, primitive.M{"_id": token["uid"]}).Err()
 	if err != nil {
 		log.Printf("Failed to find user: %v", err)
 		return nil, err
@@ -98,8 +95,7 @@ func (s *server) Authorization(ctx context.Context, in *account.Request) (*accou
 
 	// Construct the response message
 	response := &account.Response{
-		Status:  "authenticated",
-		Message: fmt.Sprintf("Hello %s", user["name"]),
+		Status: "authenticated",
 	}
 
 	return response, nil

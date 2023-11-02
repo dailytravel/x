@@ -62,7 +62,7 @@ input UpdateBoard {
 }
 
 extend type Query {
-  board(id: ID!): Board
+  board(id: ID!): Board @auth
   boards(args: Map): Boards @auth
 }
 

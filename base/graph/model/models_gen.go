@@ -70,6 +70,7 @@ type NewGoal struct {
 type NewList struct {
 	Name     string                 `json:"name"`
 	Board    string                 `json:"board"`
+	Tasks    []*string              `json:"tasks,omitempty"`
 	Order    *int                   `json:"order,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
@@ -84,11 +85,9 @@ type NewPortfolio struct {
 type NewTask struct {
 	User     *string                `json:"user,omitempty"`
 	Parent   *string                `json:"parent,omitempty"`
-	List     *string                `json:"list,omitempty"`
 	Name     string                 `json:"name"`
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`
-	Order    *int                   `json:"order,omitempty"`
 	Start    *string                `json:"start,omitempty"`
 	End      *string                `json:"end,omitempty"`
 	Labels   []*string              `json:"labels,omitempty"`
@@ -149,7 +148,9 @@ type UpdateGoal struct {
 }
 
 type UpdateList struct {
+	Board    *string                `json:"board,omitempty"`
 	Name     *string                `json:"name,omitempty"`
+	Tasks    []*string              `json:"tasks,omitempty"`
 	Order    *int                   `json:"order,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
@@ -164,11 +165,9 @@ type UpdatePortfolio struct {
 type UpdateTask struct {
 	User     *string                `json:"user,omitempty"`
 	Parent   *string                `json:"parent,omitempty"`
-	List     *string                `json:"list,omitempty"`
 	Name     *string                `json:"name,omitempty"`
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`
-	Order    *int                   `json:"order,omitempty"`
 	Start    *string                `json:"start,omitempty"`
 	End      *string                `json:"end,omitempty"`
 	Labels   []*string              `json:"labels,omitempty"`

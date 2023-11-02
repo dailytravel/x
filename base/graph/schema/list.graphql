@@ -4,7 +4,7 @@ type List {
   board: Board!
   order: Int!
   metadata: Map
-  tasks: [Task]
+  tasks: [Task] #task order
   uid: ID!
   created: String!
   updated: String!
@@ -18,12 +18,15 @@ type Lists {
 input NewList {
   name: String!
   board: ID!
+  tasks: [ID]
   order: Int
   metadata: Map
 }
 
 input UpdateList {
+  board: ID
   name: String
+  tasks: [ID]
   order: Int
   metadata: Map
 }

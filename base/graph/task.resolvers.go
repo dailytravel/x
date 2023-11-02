@@ -26,7 +26,6 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 		Name:     input.Name,
 		Priority: input.Priority,
 		Notes:    input.Notes,
-		Order:    *input.Order,
 		Status:   *input.Status,
 		Model: model.Model{
 			Metadata: input.Metadata,
@@ -43,15 +42,6 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 			return nil, err
 		}
 		item.Parent = &_id
-	}
-
-	if input.List != nil {
-		_id, err := primitive.ObjectIDFromHex(*input.List)
-		if err != nil {
-			return nil, err
-		}
-
-		item.List = &_id
 	}
 
 	if input.Start != nil {
@@ -110,10 +100,6 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 		item.Notes = input.Notes
 	}
 
-	if input.Order != nil {
-		item.Order = *input.Order
-	}
-
 	if input.Status != nil {
 		item.Status = *input.Status
 	}
@@ -128,14 +114,6 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 			return nil, err
 		}
 		item.Parent = &_id
-	}
-
-	if input.List != nil {
-		_id, err := primitive.ObjectIDFromHex(*input.List)
-		if err != nil {
-			return nil, err
-		}
-		item.List = &_id
 	}
 
 	if input.Start != nil {
@@ -351,21 +329,6 @@ func (r *taskResolver) Subtasks(ctx context.Context, obj *model.Task) ([]*model.
 	return items, nil
 }
 
-// List is the resolver for the list field.
-func (r *taskResolver) List(ctx context.Context, obj *model.Task) (*model.List, error) {
-	var item *model.List
-
-	filter := bson.M{"_id": obj.List}
-	options := options.FindOne().SetProjection(bson.M{"_id": 1, "name": 1})
-
-	err := r.db.Collection(item.Collection()).FindOne(ctx, filter, options).Decode(&item)
-	if err != nil {
-		return nil, nil
-	}
-
-	return item, nil
-}
-
 // Start is the resolver for the start field.
 func (r *taskResolver) Start(ctx context.Context, obj *model.Task) (*string, error) {
 	if obj.Start == nil {
@@ -392,6 +355,26 @@ func (r *taskResolver) Metadata(ctx context.Context, obj *model.Task) (map[strin
 // UID is the resolver for the uid field.
 func (r *taskResolver) UID(ctx context.Context, obj *model.Task) (string, error) {
 	return obj.UID.Hex(), nil
+}
+
+// Lists is the resolver for the lists field.
+func (r *taskResolver) Lists(ctx context.Context, obj *model.Task) ([]*model.List, error) {
+	var items []*model.List
+
+	// filter where list.tasks array contains obj.ID
+	filter := bson.M{"tasks": bson.M{"$in": []primitive.ObjectID{obj.ID}}}
+	cursor, err := r.db.Collection("lists").Find(ctx, filter, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(context.Background(), &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
 
 // Created is the resolver for the created field.

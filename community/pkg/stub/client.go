@@ -7,16 +7,12 @@ import (
 	"path/filepath"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/status"
 )
 
 var (
-	addr               = flag.String("addr", "localhost:50051", "the address to connect to")
-	RPC                *grpc.ClientConn
-	errMissingMetadata = status.Errorf(codes.InvalidArgument, "missing option metadata")
-	err                error
+	addr = flag.String("addr", "localhost:50051", "the address to connect to")
+	RPC  *grpc.ClientConn
 )
 
 func ConnectRPC() (*grpc.ClientConn, error) {
@@ -26,7 +22,7 @@ func ConnectRPC() (*grpc.ClientConn, error) {
 	}
 
 	// Provide the correct paths to your TLS certificate file and the server's hostname
-	creds, err := credentials.NewClientTLSFromFile(filepath.Join(currentDir, "certs", "server", "cert.pem"), "localhost")
+	creds, err := credentials.NewClientTLSFromFile(filepath.Join(currentDir, "certs", "x509", "ca_cert.pem"), "x.test.example.com")
 	if err != nil {
 		log.Fatalf("Failed to load credentials: %v", err)
 	}

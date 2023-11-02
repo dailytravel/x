@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/dailytravel/x/base/graph/model"
@@ -38,11 +39,14 @@ func (r *listResolver) Metadata(ctx context.Context, obj *model.List) (map[strin
 
 // Tasks is the resolver for the tasks field.
 func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Task, error) {
+	if len(obj.Tasks) == 0 {
+		return []*model.Task{}, nil
+	}
+
 	var items []*model.Task
 
-	filter := bson.M{"list": obj.ID}
-	opts := options.Find().SetSort(bson.M{"order": 1})
-	cursor, err := r.db.Collection("tasks").Find(ctx, filter, opts)
+	filter := bson.M{"_id": bson.M{"$in": obj.Tasks}, "status": bson.M{"$ne": "deleted"}}
+	cursor, err := r.db.Collection("tasks").Find(ctx, filter, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -75,8 +79,11 @@ func (r *listResolver) Updated(ctx context.Context, obj *model.List) (string, er
 func (r *mutationResolver) CreateList(ctx context.Context, input model.NewList) (*model.List, error) {
 	uid, err := utils.UID(ctx)
 	if err != nil {
+		log.Printf("error getting uid: %v", err)
 		return nil, err
 	}
+
+	log.Println("CreateList")
 
 	board, err := primitive.ObjectIDFromHex(input.Board)
 	if err != nil {
@@ -87,7 +94,34 @@ func (r *mutationResolver) CreateList(ctx context.Context, input model.NewList) 
 		UID:   *uid,
 		Board: board,
 		Name:  input.Name,
-		Order: *input.Order,
+	}
+
+	if input.Order != nil {
+		item.Order = *input.Order
+	}
+
+	if input.Tasks != nil {
+		var taskIDs []primitive.ObjectID // Create a slice to collect converted task IDs
+
+		for _, task := range input.Tasks {
+			_id, err := primitive.ObjectIDFromHex(*task)
+			if err != nil {
+				return nil, err
+			}
+			taskIDs = append(taskIDs, _id) // Collect the converted IDs
+		}
+
+		item.Tasks = taskIDs // Assign the collected IDs to item.Tasks
+	}
+
+	if input.Metadata != nil {
+		if item.Metadata == nil {
+			item.Metadata = make(map[string]interface{})
+		}
+
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
 	}
 
 	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)

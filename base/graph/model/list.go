@@ -10,10 +10,11 @@ import (
 
 type List struct {
 	Model `bson:",inline"`
-	UID   primitive.ObjectID `json:"uid" bson:"uid"`
-	Board primitive.ObjectID `json:"board" bson:"board"`
-	Name  string             `json:"name" bson:"name"`
-	Order int                `json:"order" bson:"order"`
+	UID   primitive.ObjectID   `json:"uid" bson:"uid"`
+	Board primitive.ObjectID   `json:"board" bson:"board"`
+	Name  string               `json:"name" bson:"name"`
+	Order int                  `json:"order" bson:"order"`
+	Tasks []primitive.ObjectID `json:"tasks,omitempty" bson:"tasks,omitempty"`
 }
 
 func (i *List) MarshalBSON() ([]byte, error) {
@@ -36,6 +37,7 @@ func (i *List) Collection() string {
 func (i *List) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "board", Value: 1}}},
+		{Keys: bson.D{{Key: "tasks", Value: 1}}},
 		{Keys: bson.D{{Key: "name", Value: "text"}}},
 		{Keys: bson.D{{Key: "order", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},
