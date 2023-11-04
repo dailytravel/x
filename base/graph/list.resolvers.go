@@ -45,7 +45,7 @@ func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Tas
 
 	var items []*model.Task
 
-	filter := bson.M{"_id": bson.M{"$in": obj.Tasks}, "status": bson.M{"$ne": "deleted"}}
+	filter := bson.M{"_id": bson.M{"$in": obj.Tasks}, "parent": bson.M{"$or": []bson.M{{"$exists": false}, {"$eq": nil}}}, "status": bson.M{"$ne": "deleted"}}
 	cursor, err := r.db.Collection("tasks").Find(ctx, filter, nil)
 	if err != nil {
 		return nil, err
@@ -82,8 +82,6 @@ func (r *mutationResolver) CreateList(ctx context.Context, input model.NewList) 
 		log.Printf("error getting uid: %v", err)
 		return nil, err
 	}
-
-	log.Println("CreateList")
 
 	board, err := primitive.ObjectIDFromHex(input.Board)
 	if err != nil {
@@ -142,31 +140,69 @@ func (r *mutationResolver) UpdateList(ctx context.Context, id string, input mode
 	}
 
 	// Fetch the existing list
-	existingList := &model.List{}
+	item := &model.List{}
 	filter := bson.M{"_id": _id}
-	err = r.db.Collection(existingList.Collection()).FindOne(ctx, filter).Decode(existingList)
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
 	if err != nil {
 		return nil, err
+	}
+
+	if input.Board != nil {
+		board, err := primitive.ObjectIDFromHex(*input.Board)
+		if err != nil {
+			return nil, err
+		}
+
+		item.Board = board
 	}
 
 	// Update fields based on input
 	if input.Name != nil {
-		existingList.Name = *input.Name
+		item.Name = *input.Name
 	}
+
 	if input.Order != nil {
-		existingList.Order = *input.Order
+		item.Order = *input.Order
+	}
+
+	if input.Status != nil {
+		item.Status = *input.Status
+	}
+
+	if input.Tasks != nil {
+		var taskIDs []primitive.ObjectID // Create a slice to collect converted task IDs
+
+		for _, task := range input.Tasks {
+			_id, err := primitive.ObjectIDFromHex(*task)
+			if err != nil {
+				return nil, err
+			}
+			taskIDs = append(taskIDs, _id) // Collect the converted IDs
+		}
+
+		item.Tasks = taskIDs // Assign the collected IDs to item.Tasks
+	}
+
+	if input.Metadata != nil {
+		if item.Metadata == nil {
+			item.Metadata = make(map[string]interface{})
+		}
+
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
 	}
 
 	// Perform the update in the database
 	update := bson.M{
-		"$set": existingList,
+		"$set": item,
 	}
-	_, err = r.db.Collection(existingList.Collection()).UpdateOne(ctx, filter, update)
+	_, err = r.db.Collection(item.Collection()).UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, err
 	}
 
-	return existingList, nil
+	return item, nil
 }
 
 // DeleteList is the resolver for the deleteList field.

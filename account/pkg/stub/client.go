@@ -22,7 +22,7 @@ func ConnectRPC() (*grpc.ClientConn, error) {
 	}
 
 	// Provide the correct paths to your TLS certificate file and the server's hostname
-	creds, err := credentials.NewClientTLSFromFile(filepath.Join(currentDir, "certs", "x509", "ca_cert.pem"), "x.test.example.com")
+	creds, err := credentials.NewClientTLSFromFile(filepath.Join(currentDir, "certs", "x509", "ca_cert.pem"), "x.trip.express")
 	if err != nil {
 		log.Fatalf("Failed to load credentials: %v", err)
 	}

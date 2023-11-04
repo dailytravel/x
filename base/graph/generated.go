@@ -2962,14 +2962,11 @@ func (ec *executionContext) _Board_order(ctx context.Context, field graphql.Coll
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Board_order(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12281,7 +12278,7 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"portfolio", "type", "title", "description", "end", "isTemplate", "background", "metadata", "starred", "order", "status", "lists", "uid"}
+	fieldsInOrder := [...]string{"portfolio", "type", "title", "description", "end", "isTemplate", "background", "metadata", "starred", "order", "status", "uid"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12292,7 +12289,7 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("portfolio"))
-			data, err := ec.unmarshalNID2string(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12301,7 +12298,7 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12337,7 +12334,7 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isTemplate"))
-			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12364,7 +12361,7 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("starred"))
-			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12373,7 +12370,7 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12382,20 +12379,11 @@ func (ec *executionContext) unmarshalInputNewBoard(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Status = data
-		case "lists":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lists"))
-			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Lists = data
 		case "uid":
 			var err error
 
@@ -12649,7 +12637,7 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "parent", "name", "notes", "priority", "start", "end", "labels", "status", "metadata"}
+	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "start", "end", "labels", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12674,6 +12662,15 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Parent = data
+		case "list":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("list"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.List = data
 		case "name":
 			var err error
 
@@ -12824,7 +12821,7 @@ func (ec *executionContext) unmarshalInputUpdateBoard(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"portfolio", "type", "title", "description", "end", "isTemplate", "background", "metadata", "starred", "order", "status", "lists", "uid"}
+	fieldsInOrder := [...]string{"portfolio", "type", "title", "description", "end", "isTemplate", "background", "metadata", "starred", "order", "status", "uid"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12930,15 +12927,6 @@ func (ec *executionContext) unmarshalInputUpdateBoard(ctx context.Context, obj i
 				return it, err
 			}
 			it.Status = data
-		case "lists":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lists"))
-			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Lists = data
 		case "uid":
 			var err error
 
@@ -13071,7 +13059,7 @@ func (ec *executionContext) unmarshalInputUpdateList(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"board", "name", "tasks", "order", "metadata"}
+	fieldsInOrder := [...]string{"board", "name", "tasks", "order", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13114,6 +13102,15 @@ func (ec *executionContext) unmarshalInputUpdateList(ctx context.Context, obj in
 				return it, err
 			}
 			it.Order = data
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
 		case "metadata":
 			var err error
 
@@ -13570,9 +13567,6 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "order":
 			out.Values[i] = ec._Board_order(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "status":
 			out.Values[i] = ec._Board_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -17637,44 +17631,6 @@ func (ec *executionContext) marshalOGoals2ᚖgithubᚗcomᚋdailytravelᚋxᚋba
 		return graphql.Null
 	}
 	return ec._Goals(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]string, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNID2string(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOID2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalNID2string(ctx, sel, v[i])
-	}
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) unmarshalOID2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {

@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/dailytravel/x/base/graph/model"
@@ -21,15 +22,37 @@ import (
 
 // CreateTask is the resolver for the createTask field.
 func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) (*model.Task, error) {
+	uid, err := utils.UID(ctx)
+	if err != nil {
+		log.Printf("error getting uid: %v", err)
+		return nil, err
+	}
+
 	// Create a new task
 	item := &model.Task{
-		Name:     input.Name,
-		Priority: input.Priority,
-		Notes:    input.Notes,
-		Status:   *input.Status,
-		Model: model.Model{
-			Metadata: input.Metadata,
-		},
+		UID:  *uid,
+		Name: input.Name,
+	}
+
+	if input.Priority != nil {
+		item.Priority = input.Priority
+	}
+
+	if input.Notes != nil {
+		item.Notes = input.Notes
+	}
+
+	if input.Status != nil {
+		item.Status = *input.Status
+	}
+
+	if input.Metadata != nil {
+		if item.Metadata == nil {
+			item.Metadata = make(map[string]interface{})
+		}
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
 	}
 
 	for _, label := range input.Labels {

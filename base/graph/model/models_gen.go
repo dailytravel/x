@@ -39,18 +39,17 @@ type Metric struct {
 }
 
 type NewBoard struct {
-	Portfolio   string                 `json:"portfolio"`
-	Type        string                 `json:"type"`
+	Portfolio   *string                `json:"portfolio,omitempty"`
+	Type        *string                `json:"type,omitempty"`
 	Title       string                 `json:"title"`
 	Description *string                `json:"description,omitempty"`
 	End         *string                `json:"end,omitempty"`
-	IsTemplate  bool                   `json:"isTemplate"`
+	IsTemplate  *bool                  `json:"isTemplate,omitempty"`
 	Background  *string                `json:"background,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Starred     bool                   `json:"starred"`
-	Order       int                    `json:"order"`
-	Status      string                 `json:"status"`
-	Lists       []string               `json:"lists,omitempty"`
+	Starred     *bool                  `json:"starred,omitempty"`
+	Order       *int                   `json:"order,omitempty"`
+	Status      *string                `json:"status,omitempty"`
 	UID         *string                `json:"uid,omitempty"`
 }
 
@@ -85,6 +84,7 @@ type NewPortfolio struct {
 type NewTask struct {
 	User     *string                `json:"user,omitempty"`
 	Parent   *string                `json:"parent,omitempty"`
+	List     *string                `json:"list,omitempty"`
 	Name     string                 `json:"name"`
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`
@@ -130,7 +130,6 @@ type UpdateBoard struct {
 	Starred     *bool                  `json:"starred,omitempty"`
 	Order       *int                   `json:"order,omitempty"`
 	Status      *string                `json:"status,omitempty"`
-	Lists       []string               `json:"lists,omitempty"`
 	UID         *string                `json:"uid,omitempty"`
 }
 
@@ -152,6 +151,7 @@ type UpdateList struct {
 	Name     *string                `json:"name,omitempty"`
 	Tasks    []*string              `json:"tasks,omitempty"`
 	Order    *int                   `json:"order,omitempty"`
+	Status   *string                `json:"status,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 

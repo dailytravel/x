@@ -30,6 +30,7 @@ enum TaskStatus {
 input NewTask {
   user: ID
   parent: ID
+  list: ID
   name: String!
   notes: String
   priority: String

@@ -28,6 +28,7 @@ input UpdateList {
   name: String
   tasks: [ID]
   order: Int
+  status: String
   metadata: Map
 }
 

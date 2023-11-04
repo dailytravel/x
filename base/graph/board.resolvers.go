@@ -97,13 +97,46 @@ func (r *mutationResolver) CreateBoard(ctx context.Context, input model.NewBoard
 	}
 
 	item := &model.Board{
-		UID:         *uid,
-		Title:       input.Title,
-		Type:        input.Type,
-		Description: input.Description,
-		IsTemplate:  input.IsTemplate,
-		Order:       input.Order,
-		Starred:     input.Starred,
+		UID:   *uid,
+		Title: input.Title,
+	}
+
+	if input.Description != nil {
+		item.Description = input.Description
+	}
+
+	if input.Order != nil {
+		item.Order = input.Order
+	}
+
+	if input.Starred != nil {
+		item.Starred = *input.Starred
+	}
+
+	if input.IsTemplate != nil {
+		item.IsTemplate = *input.IsTemplate
+	}
+
+	if input.Portfolio != nil {
+		portfolioID, err := primitive.ObjectIDFromHex(*input.Portfolio)
+		if err != nil {
+			return nil, err
+		}
+		item.Portfolio = &portfolioID
+	}
+
+	if input.Status != nil {
+		item.Status = *input.Status
+	}
+
+	if input.Metadata != nil {
+		if item.Metadata == nil {
+			item.Metadata = make(map[string]interface{})
+		}
+
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
 	}
 
 	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -123,40 +156,60 @@ func (r *mutationResolver) UpdateBoard(ctx context.Context, id string, input mod
 		return nil, err
 	}
 
-	// Fetch the existing board
-	item := &model.Board{}
-	filter := bson.M{"_id": _id}
-	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
-	if err != nil {
+	var item *model.Board
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
 		return nil, err
 	}
 
-	// Update fields based on input
 	if input.Title != nil {
 		item.Title = *input.Title
 	}
+
 	if input.Description != nil {
 		item.Description = input.Description
 	}
-	if input.IsTemplate != nil {
-		item.IsTemplate = *input.IsTemplate
-	}
-	if input.Order != nil {
-		item.Order = *input.Order
-	}
+
 	if input.Starred != nil {
 		item.Starred = *input.Starred
 	}
 
-	// Perform the update in the database
-	update := bson.M{
-		"$set": item,
+	if input.IsTemplate != nil {
+		item.IsTemplate = *input.IsTemplate
 	}
-	_, err = r.db.Collection(item.Collection()).UpdateOne(ctx, filter, update)
+
+	if input.Portfolio != nil {
+		portfolioID, err := primitive.ObjectIDFromHex(*input.Portfolio)
+		if err != nil {
+			return nil, err
+		}
+		item.Portfolio = &portfolioID
+	}
+
+	if input.Status != nil {
+		item.Status = *input.Status
+	}
+
+	if input.Metadata != nil {
+		if item.Metadata == nil {
+			item.Metadata = make(map[string]interface{})
+		}
+
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
+	}
+	// Execute the update in a single database call
+	result, err := r.db.Collection(item.Collection()).UpdateOne(ctx, bson.M{"_id": _id}, bson.M{"$set": item})
 	if err != nil {
 		return nil, err
 	}
 
+	if result.ModifiedCount == 0 {
+		// Handle the case when no document was updated
+		return nil, errors.New("no board document was updated")
+	}
+
+	// Return the updated board
 	return item, nil
 }
 

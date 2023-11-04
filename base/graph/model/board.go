@@ -20,7 +20,7 @@ type Board struct {
 	End          *primitive.DateTime `json:"end,omitempty" bson:"end,omitempty"`
 	Starred      bool                `json:"starred,omitempty" bson:"starred,omitempty"`
 	Background   string              `json:"background,omitempty" bson:"background,omitempty"`
-	Order        int                 `json:"order" bson:"order"`
+	Order        *int                `json:"order,omitempty" bson:"order,omitempty"`
 	Status       string              `json:"status" bson:"status"`
 }
 
