@@ -1119,7 +1119,11 @@ func (r *userResolver) LastLogin(ctx context.Context, obj *model.User) (*string,
 
 // LastActivity is the resolver for the last_activity field.
 func (r *userResolver) LastActivity(ctx context.Context, obj *model.User) (*string, error) {
-	panic(fmt.Errorf("not implemented: LastActivity - last_activity"))
+	if obj.LastActivity == nil {
+		return nil, nil
+	}
+
+	return pointer.String(time.Unix(int64(obj.LastActivity.T), 0).Format(time.RFC3339)), nil
 }
 
 // Metadata is the resolver for the metadata field.

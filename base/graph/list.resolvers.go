@@ -45,7 +45,19 @@ func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Tas
 
 	var items []*model.Task
 
-	filter := bson.M{"_id": bson.M{"$in": obj.Tasks}, "parent": bson.M{"$or": []bson.M{{"$exists": false}, {"$eq": nil}}}, "status": bson.M{"$ne": "deleted"}}
+	filter := bson.M{
+		"_id": bson.M{"$in": obj.Tasks},
+		"$and": []bson.M{
+			bson.M{
+				"$or": []bson.M{
+					{"parent": bson.M{"$exists": false}},
+					{"parent": bson.M{"$eq": nil}},
+				},
+			},
+			bson.M{"status": bson.M{"$ne": "deleted"}},
+		},
+	}
+
 	cursor, err := r.db.Collection("tasks").Find(ctx, filter, nil)
 	if err != nil {
 		return nil, err
