@@ -171,6 +171,7 @@ type UpdateComment struct {
 	Email       *string                `json:"email,omitempty"`
 	Body        *string                `json:"body,omitempty"`
 	Rating      *int                   `json:"rating,omitempty"`
+	Recommended *bool                  `json:"recommended,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 	Attachments []*string              `json:"attachments,omitempty"`
@@ -351,5 +352,50 @@ func (e *ReactionType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ReactionType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ShareStatus string
+
+const (
+	ShareStatusPending  ShareStatus = "PENDING"
+	ShareStatusAccepted ShareStatus = "ACCEPTED"
+	ShareStatusRejected ShareStatus = "REJECTED"
+	ShareStatusRevoked  ShareStatus = "REVOKED"
+)
+
+var AllShareStatus = []ShareStatus{
+	ShareStatusPending,
+	ShareStatusAccepted,
+	ShareStatusRejected,
+	ShareStatusRevoked,
+}
+
+func (e ShareStatus) IsValid() bool {
+	switch e {
+	case ShareStatusPending, ShareStatusAccepted, ShareStatusRejected, ShareStatusRevoked:
+		return true
+	}
+	return false
+}
+
+func (e ShareStatus) String() string {
+	return string(e)
+}
+
+func (e *ShareStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ShareStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ShareStatus", str)
+	}
+	return nil
+}
+
+func (e ShareStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

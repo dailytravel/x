@@ -65,7 +65,14 @@ input UpdateQuote {
 }
 
 extend type Query {
-  quotes(args: Map): Quotes @auth
+  quotes(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Quotes @auth
   quote(id: ID!): Quote @auth
 }
 

@@ -182,7 +182,7 @@ func (r *queryResolver) Application(ctx context.Context, id string) (*model.Appl
 }
 
 // Applications is the resolver for the applications field.
-func (r *queryResolver) Applications(ctx context.Context, args map[string]interface{}) (*model.Applications, error) {
+func (r *queryResolver) Applications(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Applications, error) {
 	var items []*model.Application
 	//find all items
 	cur, err := r.db.Collection("applications").Find(ctx, nil)

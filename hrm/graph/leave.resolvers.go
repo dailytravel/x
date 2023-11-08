@@ -208,7 +208,7 @@ func (r *mutationResolver) DeleteLeaves(ctx context.Context, ids []string) (map[
 }
 
 // Leaves is the resolver for the leaves field.
-func (r *queryResolver) Leaves(ctx context.Context, args map[string]interface{}) (*model.Leaves, error) {
+func (r *queryResolver) Leaves(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Leaves, error) {
 	var items []*model.Leave
 	//find all items
 	cur, err := r.db.Collection("leaves").Find(ctx, nil)

@@ -11,7 +11,9 @@ import (
 
 	"github.com/dailytravel/x/base/pkg/auth"
 	"github.com/typesense/typesense-go/typesense/api"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ContextKey string
@@ -29,7 +31,7 @@ func Bytes(n int) ([]byte, error) {
 	return bytes, nil
 }
 
-//Number ...
+// Number ...
 func Number(n int) string {
 	var letters = []rune("0123456789")
 
@@ -143,4 +145,24 @@ func Filter(input interface{}) interface{} {
 		// Return as it is if it's any other type
 		return v
 	}
+}
+
+// Sort converts a map of sort criteria into MongoDB-compatible sort options.
+func Sort(sortCriteria map[string]interface{}) *options.FindOptions {
+	sortMap := bson.D{}
+
+	for field, order := range sortCriteria {
+		orderStr, ok := order.(string)
+		if !ok {
+			continue
+		}
+
+		orderValue := 1 // default to ascending
+		if orderStr == "desc" {
+			orderValue = -1
+		}
+		sortMap = append(sortMap, bson.E{Key: field, Value: orderValue})
+	}
+
+	return options.Find().SetSort(sortMap)
 }

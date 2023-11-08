@@ -58,7 +58,14 @@ input UpdateLeave {
 }
 
 extend type Query {
-  leaves(args: Map): Leaves
+  leaves(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Leaves
   leave(id: ID!): Leave
 }
 

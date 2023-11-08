@@ -100,16 +100,18 @@ type ComplexityRoot struct {
 	}
 
 	Link struct {
-		Code     func(childComplexity int) int
-		Created  func(childComplexity int) int
-		Domain   func(childComplexity int) int
-		ID       func(childComplexity int) int
-		Metadata func(childComplexity int) int
-		Status   func(childComplexity int) int
-		Title    func(childComplexity int) int
-		UID      func(childComplexity int) int
-		URL      func(childComplexity int) int
-		Updated  func(childComplexity int) int
+		Code        func(childComplexity int) int
+		Created     func(childComplexity int) int
+		Domain      func(childComplexity int) int
+		Engagements func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Metadata    func(childComplexity int) int
+		Status      func(childComplexity int) int
+		Tags        func(childComplexity int) int
+		Title       func(childComplexity int) int
+		UID         func(childComplexity int) int
+		URL         func(childComplexity int) int
+		Updated     func(childComplexity int) int
 	}
 
 	Links struct {
@@ -138,13 +140,13 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Audience           func(childComplexity int, id string) int
-		Audiences          func(childComplexity int, args map[string]interface{}) int
+		Audiences          func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Campaign           func(childComplexity int, id string) int
-		Campaigns          func(childComplexity int, args map[string]interface{}) int
+		Campaigns          func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Link               func(childComplexity int, id string) int
-		Links              func(childComplexity int, args map[string]interface{}) int
+		Links              func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Segment            func(childComplexity int, id string) int
-		Segments           func(childComplexity int, args map[string]interface{}) int
+		Segments           func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		__resolve__service func(childComplexity int) int
 		__resolve_entities func(childComplexity int, representations []map[string]interface{}) int
 	}
@@ -238,6 +240,7 @@ type LinkResolver interface {
 	Created(ctx context.Context, obj *model.Link) (string, error)
 	Updated(ctx context.Context, obj *model.Link) (string, error)
 	UID(ctx context.Context, obj *model.Link) (string, error)
+	Tags(ctx context.Context, obj *model.Link) ([]*string, error)
 }
 type MutationResolver interface {
 	CreateAudience(ctx context.Context, input model.NewAudience) (*model.Audience, error)
@@ -259,13 +262,13 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Audience(ctx context.Context, id string) (*model.Audience, error)
-	Audiences(ctx context.Context, args map[string]interface{}) ([]*model.Audience, error)
-	Campaigns(ctx context.Context, args map[string]interface{}) ([]*model.Campaign, error)
+	Audiences(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) ([]*model.Audience, error)
+	Campaigns(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) ([]*model.Campaign, error)
 	Campaign(ctx context.Context, id string) (*model.Campaign, error)
-	Links(ctx context.Context, args map[string]interface{}) (*model.Links, error)
+	Links(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Links, error)
 	Link(ctx context.Context, id string) (*model.Link, error)
 	Segment(ctx context.Context, id string) (*model.Segment, error)
-	Segments(ctx context.Context, args map[string]interface{}) (*model.Segments, error)
+	Segments(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Segments, error)
 }
 type UserResolver interface {
 	Campaigns(ctx context.Context, obj *model.User) ([]*model.Campaign, error)
@@ -498,6 +501,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Link.Domain(childComplexity), true
 
+	case "Link.engagements":
+		if e.complexity.Link.Engagements == nil {
+			break
+		}
+
+		return e.complexity.Link.Engagements(childComplexity), true
+
 	case "Link.id":
 		if e.complexity.Link.ID == nil {
 			break
@@ -518,6 +528,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Link.Status(childComplexity), true
+
+	case "Link.tags":
+		if e.complexity.Link.Tags == nil {
+			break
+		}
+
+		return e.complexity.Link.Tags(childComplexity), true
 
 	case "Link.title":
 		if e.complexity.Link.Title == nil {
@@ -775,7 +792,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Audiences(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Audiences(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.campaign":
 		if e.complexity.Query.Campaign == nil {
@@ -799,7 +816,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Campaigns(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Campaigns(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.link":
 		if e.complexity.Query.Link == nil {
@@ -823,7 +840,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Links(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Links(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.segment":
 		if e.complexity.Query.Segment == nil {
@@ -847,7 +864,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Segments(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Segments(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query._service":
 		if e.complexity.Query.__resolve__service == nil {
@@ -1705,14 +1722,59 @@ func (ec *executionContext) field_Query_audiences_args(ctx context.Context, rawA
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -1735,14 +1797,59 @@ func (ec *executionContext) field_Query_campaigns_args(ctx context.Context, rawA
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -1765,14 +1872,59 @@ func (ec *executionContext) field_Query_links_args(ctx context.Context, rawArgs 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -1795,14 +1947,59 @@ func (ec *executionContext) field_Query_segments_args(ctx context.Context, rawAr
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -2997,6 +3194,8 @@ func (ec *executionContext) fieldContext_Entity_findLinkByID(ctx context.Context
 				return ec.fieldContext_Link_title(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Link_metadata(ctx, field)
+			case "engagements":
+				return ec.fieldContext_Link_engagements(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
 			case "created":
@@ -3005,6 +3204,8 @@ func (ec *executionContext) fieldContext_Entity_findLinkByID(ctx context.Context
 				return ec.fieldContext_Link_updated(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
+			case "tags":
+				return ec.fieldContext_Link_tags(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -3344,6 +3545,50 @@ func (ec *executionContext) fieldContext_Link_metadata(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Link_engagements(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_engagements(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Engagements, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Link_engagements(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Link",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Link_status(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Link_status(ctx, field)
 	if err != nil {
@@ -3517,6 +3762,47 @@ func (ec *executionContext) fieldContext_Link_uid(ctx context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Link_tags(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Link_tags(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Link().Tags(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*string)
+	fc.Result = res
+	return ec.marshalOID2ᚕᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Link_tags(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Link",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Links_data(ctx context.Context, field graphql.CollectedField, obj *model.Links) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Links_data(ctx, field)
 	if err != nil {
@@ -3565,6 +3851,8 @@ func (ec *executionContext) fieldContext_Links_data(ctx context.Context, field g
 				return ec.fieldContext_Link_title(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Link_metadata(ctx, field)
+			case "engagements":
+				return ec.fieldContext_Link_engagements(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
 			case "created":
@@ -3573,6 +3861,8 @@ func (ec *executionContext) fieldContext_Links_data(ctx context.Context, field g
 				return ec.fieldContext_Link_updated(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
+			case "tags":
+				return ec.fieldContext_Link_tags(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -4360,6 +4650,8 @@ func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context
 				return ec.fieldContext_Link_title(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Link_metadata(ctx, field)
+			case "engagements":
+				return ec.fieldContext_Link_engagements(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
 			case "created":
@@ -4368,6 +4660,8 @@ func (ec *executionContext) fieldContext_Mutation_createLink(ctx context.Context
 				return ec.fieldContext_Link_updated(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
+			case "tags":
+				return ec.fieldContext_Link_tags(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -4454,6 +4748,8 @@ func (ec *executionContext) fieldContext_Mutation_updateLink(ctx context.Context
 				return ec.fieldContext_Link_title(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Link_metadata(ctx, field)
+			case "engagements":
+				return ec.fieldContext_Link_engagements(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
 			case "created":
@@ -4462,6 +4758,8 @@ func (ec *executionContext) fieldContext_Mutation_updateLink(ctx context.Context
 				return ec.fieldContext_Link_updated(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
+			case "tags":
+				return ec.fieldContext_Link_tags(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -5073,7 +5371,7 @@ func (ec *executionContext) _Query_audiences(ctx context.Context, field graphql.
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Audiences(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Query().Audiences(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			roles, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"ADMIN"})
@@ -5167,7 +5465,7 @@ func (ec *executionContext) _Query_campaigns(ctx context.Context, field graphql.
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Campaigns(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Query().Campaigns(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -5351,7 +5649,7 @@ func (ec *executionContext) _Query_links(ctx context.Context, field graphql.Coll
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Links(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Query().Links(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -5482,6 +5780,8 @@ func (ec *executionContext) fieldContext_Query_link(ctx context.Context, field g
 				return ec.fieldContext_Link_title(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Link_metadata(ctx, field)
+			case "engagements":
+				return ec.fieldContext_Link_engagements(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
 			case "created":
@@ -5490,6 +5790,8 @@ func (ec *executionContext) fieldContext_Query_link(ctx context.Context, field g
 				return ec.fieldContext_Link_updated(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
+			case "tags":
+				return ec.fieldContext_Link_tags(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -5617,7 +5919,7 @@ func (ec *executionContext) _Query_segments(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Segments(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Query().Segments(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			roles, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"ADMIN"})
@@ -7303,6 +7605,8 @@ func (ec *executionContext) fieldContext_User_links(ctx context.Context, field g
 				return ec.fieldContext_Link_title(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Link_metadata(ctx, field)
+			case "engagements":
+				return ec.fieldContext_Link_engagements(ctx, field)
 			case "status":
 				return ec.fieldContext_Link_status(ctx, field)
 			case "created":
@@ -7311,6 +7615,8 @@ func (ec *executionContext) fieldContext_User_links(ctx context.Context, field g
 				return ec.fieldContext_Link_updated(ctx, field)
 			case "uid":
 				return ec.fieldContext_Link_uid(ctx, field)
+			case "tags":
+				return ec.fieldContext_Link_tags(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Link", field.Name)
 		},
@@ -9260,7 +9566,7 @@ func (ec *executionContext) unmarshalInputNewLink(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"domain", "code", "url", "title", "metadata", "status"}
+	fieldsInOrder := [...]string{"domain", "code", "url", "title", "metadata", "tags", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9312,6 +9618,15 @@ func (ec *executionContext) unmarshalInputNewLink(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Metadata = data
+		case "tags":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tags"))
+			data, err := ec.unmarshalOID2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Tags = data
 		case "status":
 			var err error
 
@@ -10513,6 +10828,11 @@ func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "engagements":
+			out.Values[i] = ec._Link_engagements(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "status":
 			out.Values[i] = ec._Link_status(ctx, field, obj)
 		case "created":
@@ -10600,6 +10920,39 @@ func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "tags":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Link_tags(ctx, field, obj)
 				return res
 			}
 
@@ -11956,6 +12309,21 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int64(ctx context.Context, v interface{}) (int64, error) {
+	res, err := graphql.UnmarshalInt64(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
+	res := graphql.MarshalInt64(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNLink2githubᚗcomᚋdailytravelᚋxᚋmarketingᚋgraphᚋmodelᚐLink(ctx context.Context, sel ast.SelectionSet, v model.Link) graphql.Marshaler {
 	return ec._Link(ctx, sel, &v)
 }
@@ -12608,6 +12976,38 @@ func (ec *executionContext) marshalOCampaignType2ᚖgithubᚗcomᚋdailytravel�
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOID2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOID2ᚖstring(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOID2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOID2ᚖstring(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

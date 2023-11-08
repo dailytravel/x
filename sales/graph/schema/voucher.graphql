@@ -59,7 +59,14 @@ input UpdateVoucher {
 
 extend type Query {
   voucher(id: ID!): Voucher
-  vouchers(args: Map): Vouchers
+  vouchers(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Vouchers
 }
 
 extend type Mutation {

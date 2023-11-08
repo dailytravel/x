@@ -51,7 +51,14 @@ input UpdateComment {
 }
 
 extend type Query {
-  comments(args: Map): Comments
+  comments(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Comments
   comment(id: ID!): Comment
 }
 

@@ -16,7 +16,14 @@ type Notifications {
 }
 
 extend type Query {
-  notifications(args: Map): Notifications @auth
+  notifications(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Notifications @auth
   notification(id: ID!): Notification! @auth
 }
 

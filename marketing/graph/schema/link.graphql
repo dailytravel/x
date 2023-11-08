@@ -39,7 +39,14 @@ input UpdateLink {
 }
 
 extend type Query {
-  links(args: Map): Links @auth
+  links(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Links @auth
   link(id: ID!): Link @auth
 }
 

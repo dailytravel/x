@@ -143,7 +143,7 @@ func (r *mutationResolver) DeleteQuotes(ctx context.Context, ids []string) (map[
 }
 
 // Quotes is the resolver for the quotes field.
-func (r *queryResolver) Quotes(ctx context.Context, args map[string]interface{}) (*model.Quotes, error) {
+func (r *queryResolver) Quotes(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Quotes, error) {
 	var items []*model.Quote
 	//find all items
 	cur, err := r.db.Collection("quotes").Find(ctx, nil)

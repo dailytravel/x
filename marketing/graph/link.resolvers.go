@@ -37,6 +37,11 @@ func (r *linkResolver) UID(ctx context.Context, obj *model.Link) (string, error)
 	return obj.UID.Hex(), nil
 }
 
+// Tags is the resolver for the tags field.
+func (r *linkResolver) Tags(ctx context.Context, obj *model.Link) ([]*string, error) {
+	panic(fmt.Errorf("not implemented: Tags - tags"))
+}
+
 // CreateLink is the resolver for the createLink field.
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
 	panic(fmt.Errorf("not implemented: CreateLink - createLink"))
@@ -58,7 +63,7 @@ func (r *mutationResolver) DeleteLinks(ctx context.Context, ids []string) (map[s
 }
 
 // Links is the resolver for the links field.
-func (r *queryResolver) Links(ctx context.Context, args map[string]interface{}) (*model.Links, error) {
+func (r *queryResolver) Links(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Links, error) {
 	panic(fmt.Errorf("not implemented: Links - links"))
 }
 

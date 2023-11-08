@@ -63,7 +63,7 @@ func (r *mutationResolver) DeleteCampaigns(ctx context.Context, ids []string) (m
 }
 
 // Campaigns is the resolver for the campaigns field.
-func (r *queryResolver) Campaigns(ctx context.Context, args map[string]interface{}) ([]*model.Campaign, error) {
+func (r *queryResolver) Campaigns(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) ([]*model.Campaign, error) {
 	panic(fmt.Errorf("not implemented: Campaigns - campaigns"))
 }
 

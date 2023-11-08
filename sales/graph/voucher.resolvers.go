@@ -189,7 +189,7 @@ func (r *queryResolver) Voucher(ctx context.Context, id string) (*model.Voucher,
 }
 
 // Vouchers is the resolver for the vouchers field.
-func (r *queryResolver) Vouchers(ctx context.Context, args map[string]interface{}) (*model.Vouchers, error) {
+func (r *queryResolver) Vouchers(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Vouchers, error) {
 	var items []*model.Voucher
 	//find all items
 	cur, err := r.db.Collection("vouchers").Find(ctx, nil)

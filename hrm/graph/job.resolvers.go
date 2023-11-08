@@ -288,19 +288,47 @@ func (r *queryResolver) Job(ctx context.Context, id string) (*model.Job, error) 
 }
 
 // Jobs is the resolver for the jobs field.
-func (r *queryResolver) Jobs(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	res, err := r.ts.Collection("jobs").Documents().Search(utils.Params(args))
+func (r *queryResolver) Jobs(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Jobs, error) {
+	var items []*model.Job
+
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("jobs").Find(ctx, _filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		item := &model.Job{}
+		if err := cursor.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("jobs").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert struct to map
-	results, err := utils.StructToMap(res)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
+	return &model.Jobs{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Job returns JobResolver implementation.

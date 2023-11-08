@@ -992,19 +992,56 @@ func (r *mutationResolver) DeleteUsers(ctx context.Context, ids []string) (*bool
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error) {
-	res, err := r.ts.Collection("users").Documents().Search(utils.Params(args))
+func (r *queryResolver) Users(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Users, error) {
+	var items []*model.User
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+
+	opts := options.Find()
+
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if sort != nil {
+		opts.SetSort(sort)
+	}
+	if collation != nil {
+		col := &options.Collation{
+			// you can set collation fields here...
+		}
+		opts.SetCollation(col)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
+
+	cursor, err := r.db.Collection("users").Find(ctx, _filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var user model.User
+		if err := cursor.Decode(&user); err != nil {
+			return nil, err
+		}
+		items = append(items, &user)
+	}
+
+	//get total count
+	count, err := r.db.Collection("users").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert struct to map
-	results, err := utils.StructToMap(res)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
+	return &model.Users{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // User is the resolver for the user field.

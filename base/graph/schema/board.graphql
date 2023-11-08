@@ -61,7 +61,14 @@ input UpdateBoard {
 
 extend type Query {
   board(id: ID!): Board @auth
-  boards(args: Map): Boards @auth
+  boards(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Boards @auth
 }
 
 extend type Mutation {

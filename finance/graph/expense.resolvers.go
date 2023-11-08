@@ -107,7 +107,7 @@ func (r *mutationResolver) DeleteExpenses(ctx context.Context, ids []string) (bo
 }
 
 // Expenses is the resolver for the expenses field.
-func (r *queryResolver) Expenses(ctx context.Context, args map[string]interface{}) (*model.Expenses, error) {
+func (r *queryResolver) Expenses(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Expenses, error) {
 	var items []*model.Expense
 	//find all items
 	cur, err := r.db.Collection("expenses").Find(ctx, nil)

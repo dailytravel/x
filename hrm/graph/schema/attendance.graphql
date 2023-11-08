@@ -42,7 +42,14 @@ input UpdateAttendance {
 
 extend type Query {
   attendance(id: ID!): Attendance @auth
-  attendances(args: Map): Attendances @auth
+  attendances(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Attendances @auth
 }
 
 extend type Mutation {

@@ -78,7 +78,7 @@ func (r *queryResolver) Invoice(ctx context.Context, id string) (*model.Invoice,
 }
 
 // Invoices is the resolver for the invoices field.
-func (r *queryResolver) Invoices(ctx context.Context, args map[string]interface{}) (*model.Invoices, error) {
+func (r *queryResolver) Invoices(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Invoices, error) {
 	panic(fmt.Errorf("not implemented: Invoices - invoices"))
 }
 

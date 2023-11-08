@@ -289,7 +289,7 @@ func (r *mutationResolver) DeleteComments(ctx context.Context, ids []string) (ma
 }
 
 // Comments is the resolver for the comments field.
-func (r *queryResolver) Comments(ctx context.Context, args map[string]interface{}) (*model.Comments, error) {
+func (r *queryResolver) Comments(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Comments, error) {
 	var items []*model.Comment
 	//find all items
 	cur, err := r.db.Collection("comments").Find(ctx, nil)

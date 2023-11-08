@@ -277,7 +277,7 @@ func (r *queryResolver) Coupon(ctx context.Context, id string) (*model.Coupon, e
 }
 
 // Coupons is the resolver for the coupons field.
-func (r *queryResolver) Coupons(ctx context.Context, args map[string]interface{}) (*model.Coupons, error) {
+func (r *queryResolver) Coupons(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Coupons, error) {
 	var items []*model.Coupon
 	//find all items
 	cur, err := r.db.Collection("coupons").Find(ctx, nil)
@@ -313,9 +313,9 @@ type couponResolver struct{ *Resolver }
 // !!! WARNING !!!
 // The code below was going to be deleted when updating resolvers. It has been copied here so you have
 // one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
 func (r *couponResolver) Start(ctx context.Context, obj *model.Coupon) (string, error) {
 	panic(fmt.Errorf("not implemented: Start - start"))
 }

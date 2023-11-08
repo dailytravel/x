@@ -61,7 +61,14 @@ input UpdateCoupon {
 
 extend type Query {
   coupon(id: ID!): Coupon @auth
-  coupons(args: Map): Coupons @auth
+  coupons(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Coupons @auth
 }
 
 extend type Mutation {

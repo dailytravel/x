@@ -41,7 +41,14 @@ input UpdateMessage {
 
 extend type Query {
   message(id: ID!): Message @auth
-  messages(args: Map): Map @auth
+  messages(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Messages @auth
 }
 
 extend type Mutation {

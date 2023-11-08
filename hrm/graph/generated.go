@@ -217,17 +217,17 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Application        func(childComplexity int, id string) int
-		Applications       func(childComplexity int, args map[string]interface{}) int
+		Applications       func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Attendance         func(childComplexity int, id string) int
-		Attendances        func(childComplexity int, args map[string]interface{}) int
+		Attendances        func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Job                func(childComplexity int, id string) int
-		Jobs               func(childComplexity int, args map[string]interface{}) int
+		Jobs               func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Leave              func(childComplexity int, id string) int
-		Leaves             func(childComplexity int, args map[string]interface{}) int
+		Leaves             func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Organization       func(childComplexity int, id string) int
-		Organizations      func(childComplexity int, args map[string]interface{}) int
+		Organizations      func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Resume             func(childComplexity int, id string) int
-		Resumes            func(childComplexity int, args map[string]interface{}) int
+		Resumes            func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		__resolve__service func(childComplexity int) int
 		__resolve_entities func(childComplexity int, representations []map[string]interface{}) int
 	}
@@ -369,17 +369,17 @@ type OrganizationResolver interface {
 }
 type QueryResolver interface {
 	Application(ctx context.Context, id string) (*model.Application, error)
-	Applications(ctx context.Context, args map[string]interface{}) (*model.Applications, error)
+	Applications(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Applications, error)
 	Attendance(ctx context.Context, id string) (*model.Attendance, error)
-	Attendances(ctx context.Context, args map[string]interface{}) (*model.Attendances, error)
+	Attendances(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Attendances, error)
 	Job(ctx context.Context, id string) (*model.Job, error)
-	Jobs(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
-	Leaves(ctx context.Context, args map[string]interface{}) (*model.Leaves, error)
+	Jobs(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Jobs, error)
+	Leaves(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Leaves, error)
 	Leave(ctx context.Context, id string) (*model.Leave, error)
-	Organizations(ctx context.Context, args map[string]interface{}) (*model.Organizations, error)
+	Organizations(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Organizations, error)
 	Organization(ctx context.Context, id string) (*model.Organization, error)
 	Resume(ctx context.Context, id string) (*model.Resume, error)
-	Resumes(ctx context.Context, args map[string]interface{}) (*model.Resumes, error)
+	Resumes(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Resumes, error)
 }
 type ResumeResolver interface {
 	ID(ctx context.Context, obj *model.Resume) (string, error)
@@ -1314,7 +1314,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Applications(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Applications(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.attendance":
 		if e.complexity.Query.Attendance == nil {
@@ -1338,7 +1338,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Attendances(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Attendances(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.job":
 		if e.complexity.Query.Job == nil {
@@ -1362,7 +1362,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Jobs(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Jobs(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.leave":
 		if e.complexity.Query.Leave == nil {
@@ -1386,7 +1386,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Leaves(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Leaves(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.organization":
 		if e.complexity.Query.Organization == nil {
@@ -1410,7 +1410,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Organizations(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Organizations(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.resume":
 		if e.complexity.Query.Resume == nil {
@@ -1434,7 +1434,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Resumes(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Resumes(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query._service":
 		if e.complexity.Query.__resolve__service == nil {
@@ -2379,14 +2379,59 @@ func (ec *executionContext) field_Query_applications_args(ctx context.Context, r
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -2409,14 +2454,59 @@ func (ec *executionContext) field_Query_attendances_args(ctx context.Context, ra
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -2439,14 +2529,59 @@ func (ec *executionContext) field_Query_jobs_args(ctx context.Context, rawArgs m
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -2469,14 +2604,59 @@ func (ec *executionContext) field_Query_leaves_args(ctx context.Context, rawArgs
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -2499,14 +2679,59 @@ func (ec *executionContext) field_Query_organizations_args(ctx context.Context, 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -2529,14 +2754,59 @@ func (ec *executionContext) field_Query_resumes_args(ctx context.Context, rawArg
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -5138,11 +5408,14 @@ func (ec *executionContext) _Jobs_count(ctx context.Context, field graphql.Colle
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Jobs_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8291,7 +8564,7 @@ func (ec *executionContext) _Query_applications(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Applications(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Applications(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8444,7 +8717,7 @@ func (ec *executionContext) _Query_attendances(ctx context.Context, field graphq
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Attendances(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Query().Attendances(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -8603,7 +8876,7 @@ func (ec *executionContext) _Query_jobs(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Jobs(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Jobs(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8612,9 +8885,9 @@ func (ec *executionContext) _Query_jobs(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(*model.Jobs)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOJobs2ᚖgithubᚗcomᚋdailytravelᚋxᚋhrmᚋgraphᚋmodelᚐJobs(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_jobs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8624,7 +8897,13 @@ func (ec *executionContext) fieldContext_Query_jobs(ctx context.Context, field g
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			switch field.Name {
+			case "data":
+				return ec.fieldContext_Jobs_data(ctx, field)
+			case "count":
+				return ec.fieldContext_Jobs_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Jobs", field.Name)
 		},
 	}
 	defer func() {
@@ -8655,7 +8934,7 @@ func (ec *executionContext) _Query_leaves(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Leaves(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Leaves(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8787,7 +9066,7 @@ func (ec *executionContext) _Query_organizations(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Organizations(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Organizations(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9001,7 +9280,7 @@ func (ec *executionContext) _Query_resumes(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Resumes(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Resumes(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15090,6 +15369,9 @@ func (ec *executionContext) _Jobs(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Jobs_data(ctx, field, obj)
 		case "count":
 			out.Values[i] = ec._Jobs_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18469,6 +18751,13 @@ func (ec *executionContext) marshalOJob2ᚖgithubᚗcomᚋdailytravelᚋxᚋhrm�
 		return graphql.Null
 	}
 	return ec._Job(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOJobs2ᚖgithubᚗcomᚋdailytravelᚋxᚋhrmᚋgraphᚋmodelᚐJobs(ctx context.Context, sel ast.SelectionSet, v *model.Jobs) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Jobs(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOLanguageInput2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋhrmᚋgraphᚋmodelᚐLanguageInput(ctx context.Context, v interface{}) ([]*model.LanguageInput, error) {

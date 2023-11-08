@@ -16,7 +16,14 @@ type Activities {
 
 extend type Query {
   activity(id: ID!): Activity @auth
-  activities(args: Map): Activities @auth
+  activities(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Activities @auth
 }
 
 extend type Mutation {

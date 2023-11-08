@@ -9,6 +9,13 @@ type Share @key(fields: "id") {
   updated: String!
 }
 
+enum ShareStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  REVOKED
+}
+
 type Shares {
   data: [Share]
   count: Int!
@@ -36,7 +43,14 @@ input ShareUpdateInput {
 
 extend type Query {
   share(id: ID!): Share
-  shares(args: Map): Shares
+  shares(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Shares
 }
 
 extend type Mutation {

@@ -276,20 +276,20 @@ func (e GoalStatus) MarshalGQL(w io.Writer) {
 type TaskStatus string
 
 const (
-	TaskStatusPending    TaskStatus = "PENDING"
-	TaskStatusInProgress TaskStatus = "IN_PROGRESS"
-	TaskStatusCompleted  TaskStatus = "COMPLETED"
+	TaskStatusPublic   TaskStatus = "PUBLIC"
+	TaskStatusPrivate  TaskStatus = "PRIVATE"
+	TaskStatusArchived TaskStatus = "ARCHIVED"
 )
 
 var AllTaskStatus = []TaskStatus{
-	TaskStatusPending,
-	TaskStatusInProgress,
-	TaskStatusCompleted,
+	TaskStatusPublic,
+	TaskStatusPrivate,
+	TaskStatusArchived,
 }
 
 func (e TaskStatus) IsValid() bool {
 	switch e {
-	case TaskStatusPending, TaskStatusInProgress, TaskStatusCompleted:
+	case TaskStatusPublic, TaskStatusPrivate, TaskStatusArchived:
 		return true
 	}
 	return false

@@ -21,7 +21,14 @@ input UpdateRecipient {
 
 extend type Query {
   recipient(id: ID!): Recipient @auth
-  recipients(args: Map): Recipients @auth
+  recipients(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Recipients @auth
 }
 
 extend type Mutation {

@@ -15,7 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreatePortfolio is the resolver for the createPortfolio field.
@@ -199,29 +198,29 @@ func (r *queryResolver) Portfolio(ctx context.Context, id string) (*model.Portfo
 }
 
 // Portfolios is the resolver for the portfolios field.
-func (r *queryResolver) Portfolios(ctx context.Context, args map[string]interface{}) (*model.Portfolios, error) {
+func (r *queryResolver) Portfolios(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Portfolios, error) {
 	var items []*model.Portfolio
 
-	opts := options.Find()
-	opts.SetSort(bson.M{"order": 1})
-	opts.SetSort(bson.M{"created": -1})
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
 
-	// Build the filter based on the provided arguments
-	filter := bson.M{}
-
-	// Add filters based on the arguments, if provided
-	if name, ok := args["name"].(string); ok && name != "" {
-		filter["name"] = name
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
 	}
 
-	// Create a cursor for the query
-	cursor, err := r.db.Collection("portfolios").Find(ctx, nil, opts)
+	cursor, err := r.db.Collection("portfolios").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	// Iterate over the cursor and decode documents
 	for cursor.Next(ctx) {
 		var item model.Portfolio
 		if err := cursor.Decode(&item); err != nil {
@@ -230,18 +229,16 @@ func (r *queryResolver) Portfolios(ctx context.Context, args map[string]interfac
 		items = append(items, &item)
 	}
 
-	// Check for cursor errors
-	if err := cursor.Err(); err != nil {
-		return nil, err
-	}
-
-	// You can get the total count using CountDocuments method
-	count, err := r.db.Collection("portfolios").CountDocuments(ctx, filter)
+	//get total count
+	count, err := r.db.Collection("portfolios").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Portfolios{Data: items, Count: int(count)}, nil
+	return &model.Portfolios{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Portfolio returns PortfolioResolver implementation.

@@ -166,7 +166,7 @@ type ComplexityRoot struct {
 		Post               func(childComplexity int, id string) int
 		Posts              func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Term               func(childComplexity int, id string) int
-		Terms              func(childComplexity int, args map[string]interface{}) int
+		Terms              func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		__resolve__service func(childComplexity int) int
 		__resolve_entities func(childComplexity int, representations []map[string]interface{}) int
 	}
@@ -285,7 +285,7 @@ type QueryResolver interface {
 	Post(ctx context.Context, id string) (*model.Post, error)
 	Posts(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Posts, error)
 	Term(ctx context.Context, id string) (*model.Term, error)
-	Terms(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
+	Terms(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Terms, error)
 }
 type TemplateResolver interface {
 	Images(ctx context.Context, obj *model.Template) ([]*model.Image, error)
@@ -976,7 +976,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Terms(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Terms(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query._service":
 		if e.complexity.Query.__resolve__service == nil {
@@ -1924,14 +1924,59 @@ func (ec *executionContext) field_Query_terms_args(ctx context.Context, rawArgs 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -6313,7 +6358,7 @@ func (ec *executionContext) _Query_terms(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Terms(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Terms(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6322,9 +6367,9 @@ func (ec *executionContext) _Query_terms(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(*model.Terms)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOTerms2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerms(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_terms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6334,7 +6379,13 @@ func (ec *executionContext) fieldContext_Query_terms(ctx context.Context, field 
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_Terms_count(ctx, field)
+			case "data":
+				return ec.fieldContext_Terms_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Terms", field.Name)
 		},
 	}
 	defer func() {
@@ -14081,6 +14132,13 @@ func (ec *executionContext) marshalOTerm2ᚖgithubᚗcomᚋdailytravelᚋxᚋcms
 		return graphql.Null
 	}
 	return ec._Term(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOTerms2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerms(ctx context.Context, sel ast.SelectionSet, v *model.Terms) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Terms(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO_Entity2githubᚗcomᚋ99designsᚋgqlgenᚋpluginᚋfederationᚋfedruntimeᚐEntity(ctx context.Context, sel ast.SelectionSet, v fedruntime.Entity) graphql.Marshaler {

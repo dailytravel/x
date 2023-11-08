@@ -12,6 +12,7 @@ import (
 type Order struct {
 	Model       `bson:",inline"`
 	UID         primitive.ObjectID   `bson:"uid" json:"uid"`
+	Contact     primitive.ObjectID   `json:"contact" bson:"contact"`
 	Locale      string               `json:"locale" bson:"locale"`
 	Type        string               `json:"type" bson:"type"`
 	Code        string               `json:"code" bson:"code"`
@@ -43,6 +44,7 @@ func (i *Order) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "code", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "uid", Value: 1}}},
+		{Keys: bson.D{{Key: "contact", Value: 1}}},
 		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "locale", Value: 1}}},
 		{Keys: bson.D{{Key: "coupon", Value: 1}}},

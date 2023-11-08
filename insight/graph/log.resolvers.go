@@ -111,7 +111,7 @@ func (r *queryResolver) Log(ctx context.Context, id string) (*model.Log, error) 
 }
 
 // Logs is the resolver for the logs field.
-func (r *queryResolver) Logs(ctx context.Context, args map[string]interface{}) (*model.Logs, error) {
+func (r *queryResolver) Logs(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Logs, error) {
 	var items []*model.Log
 	//find all items
 	cur, err := r.db.Collection("logs").Find(ctx, nil)

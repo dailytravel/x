@@ -45,7 +45,14 @@ input UpdateInvoice {
 
 extend type Query {
   invoice(id: ID!): Invoice @auth
-  invoices(args: Map): Invoices @auth
+  invoices(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Invoices @auth
 }
 
 extend type Mutation {

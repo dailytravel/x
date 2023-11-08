@@ -125,7 +125,14 @@ type AuthPayload {
 }
 
 extend type Query {
-  users(args: Map): Map @auth(roles: [ADMIN]) #for search users on typesense
+  users(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Users @auth(roles: [ADMIN]) #for search users on typesense
   user(id: ID!): User @auth(roles: [ADMIN])
   owners(ids: [String!]!, limit: Int, offset: Int): Users @auth
   me: User @auth

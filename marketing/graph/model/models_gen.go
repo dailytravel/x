@@ -50,6 +50,7 @@ type NewLink struct {
 	URL      string                 `json:"url"`
 	Title    *string                `json:"title,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Tags     []*string              `json:"tags,omitempty"`
 	Status   *string                `json:"status,omitempty"`
 }
 

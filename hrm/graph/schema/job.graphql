@@ -17,7 +17,7 @@ type Job {
 
 type Jobs {
   data: [Job]
-  count: Int
+  count: Int!
 }
 
 enum JobType {
@@ -61,7 +61,14 @@ input UpdateJob {
 
 extend type Query {
   job(id: ID!): Job
-  jobs(args: Map): Map
+  jobs(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Jobs
 }
 
 extend type Mutation {

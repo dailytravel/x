@@ -45,7 +45,14 @@ input RuleInput {
 
 extend type Query {
   segment(id: ID!): Segment @auth(roles: [ADMIN])
-  segments(args: Map): Segments @auth(roles: [ADMIN])
+  segments(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Segments @auth(roles: [ADMIN])
 }
 
 extend type Mutation {

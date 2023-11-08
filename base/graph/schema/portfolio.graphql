@@ -32,7 +32,14 @@ input UpdatePortfolio {
 
 extend type Query {
   portfolio(id: ID!): Portfolio
-  portfolios(args: Map): Portfolios
+  portfolios(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Portfolios
 }
 
 extend type Mutation {

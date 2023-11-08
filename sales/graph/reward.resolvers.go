@@ -164,7 +164,7 @@ func (r *mutationResolver) DeleteRewards(ctx context.Context, ids []string) (map
 }
 
 // Rewards is the resolver for the rewards field.
-func (r *queryResolver) Rewards(ctx context.Context, args map[string]interface{}) (*model.Rewards, error) {
+func (r *queryResolver) Rewards(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Rewards, error) {
 	var items []*model.Reward
 	//find all items
 	cur, err := r.db.Collection("rewards").Find(ctx, nil)

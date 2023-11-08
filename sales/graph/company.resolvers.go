@@ -218,7 +218,7 @@ func (r *mutationResolver) DeleteCompanies(ctx context.Context, ids []*string) (
 }
 
 // Companies is the resolver for the companies field.
-func (r *queryResolver) Companies(ctx context.Context, args map[string]interface{}) (*model.Companies, error) {
+func (r *queryResolver) Companies(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Companies, error) {
 	var items []*model.Company
 	//find all items
 	cur, err := r.db.Collection("companies").Find(ctx, nil)

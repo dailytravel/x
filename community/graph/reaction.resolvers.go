@@ -116,50 +116,47 @@ func (r *queryResolver) Reaction(ctx context.Context, object map[string]interfac
 }
 
 // Reactions is the resolver for the reactions field.
-func (r *queryResolver) Reactions(ctx context.Context, args map[string]interface{}) (*model.Reactions, error) {
-	col := r.db.Collection("reactions")
+func (r *queryResolver) Reactions(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Reactions, error) {
 	var items []*model.Reaction
 
-	// Build the filter based on the provided arguments
-	filter := bson.M{}
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
 
-	if objectID, ok := args["objectID"].(string); ok {
-		objectObjID, err := primitive.ObjectIDFromHex(objectID)
-		if err != nil {
-			return nil, fmt.Errorf("invalid objectID: %v", err)
-		}
-		filter["object._id"] = objectObjID
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
 	}
 
-	if objectType, ok := args["objectType"].(string); ok {
-		filter["object.collection"] = objectType
-	}
-
-	cursor, err := col.Find(ctx, filter)
+	cursor, err := r.db.Collection("reactions").Find(ctx, _filter, opts)
 	if err != nil {
-		return nil, fmt.Errorf("error querying reactions: %v", err)
+		return nil, err
 	}
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
-		var reaction model.Reaction
-		if err := cursor.Decode(&reaction); err != nil {
-			return nil, fmt.Errorf("error decoding reaction: %v", err)
+		item := &model.Reaction{}
+		if err := cursor.Decode(&item); err != nil {
+			return nil, err
 		}
-		items = append(items, &reaction)
+		items = append(items, item)
 	}
 
-	if err := cursor.Err(); err != nil {
-		return nil, fmt.Errorf("cursor error: %v", err)
-	}
-
-	// Get total count
-	count, err := col.CountDocuments(ctx, filter)
+	//get total count
+	count, err := r.db.Collection("reactions").CountDocuments(ctx, _filter, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error getting count: %v", err)
+		return nil, err
 	}
 
-	return &model.Reactions{Data: items, Count: int(count)}, nil
+	return &model.Reactions{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // ID is the resolver for the id field.

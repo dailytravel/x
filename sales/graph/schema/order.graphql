@@ -5,6 +5,7 @@ type Order {
   payment: String!
   coupon: String
   uid: ID!
+  contact: Contact
   items: [Item]
   metadata: Map
   status: String!
@@ -22,7 +23,8 @@ input NewOrder {
   cancellable: Boolean!
   payment: String!
   coupon: String
-  uid: ID!
+  uid: ID
+  contact: ID
   items: [ID!]!
   metadata: Map
   status: String!
@@ -34,6 +36,7 @@ input UpdateOrder {
   payment: String
   coupon: String
   uid: ID
+  contact: ID
   items: [ID!]
   metadata: Map
   status: String

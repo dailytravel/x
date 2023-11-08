@@ -33,7 +33,14 @@ input UpdateReaction {
 
 extend type Query {
   reaction(object: Map!): Reaction
-  reactions(args: Map): Reactions
+  reactions(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Reactions
 }
 
 extend type Mutation {

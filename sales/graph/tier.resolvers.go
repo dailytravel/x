@@ -168,7 +168,7 @@ func (r *mutationResolver) DeleteTiers(ctx context.Context, ids []string) (map[s
 }
 
 // Tiers is the resolver for the tiers field.
-func (r *queryResolver) Tiers(ctx context.Context, args map[string]interface{}) (*model.Tiers, error) {
+func (r *queryResolver) Tiers(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Tiers, error) {
 	var items []*model.Tier
 	//find all items
 	cur, err := r.db.Collection("tiers").Find(ctx, nil)

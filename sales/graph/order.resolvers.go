@@ -178,6 +178,11 @@ func (r *orderResolver) UID(ctx context.Context, obj *model.Order) (string, erro
 	return obj.ID.Hex(), nil
 }
 
+// Contact is the resolver for the contact field.
+func (r *orderResolver) Contact(ctx context.Context, obj *model.Order) (*model.Contact, error) {
+	panic(fmt.Errorf("not implemented: Contact - contact"))
+}
+
 // Items is the resolver for the items field.
 func (r *orderResolver) Items(ctx context.Context, obj *model.Order) ([]*model.Item, error) {
 	panic(fmt.Errorf("not implemented: Items - items"))

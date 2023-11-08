@@ -16,15 +16,15 @@ type Task {
   updated: String!
 }
 
+enum TaskStatus {
+  PUBLIC
+  PRIVATE
+  ARCHIVED
+}
+
 type Tasks {
   data: [Task]
   count: Int!
-}
-
-enum TaskStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
 }
 
 input NewTask {
@@ -56,7 +56,14 @@ input UpdateTask {
 
 extend type Query {
   task(id: ID!): Task
-  tasks(args: Map): Tasks @auth
+  tasks(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Tasks @auth
 }
 
 extend type Mutation {

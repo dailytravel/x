@@ -246,7 +246,7 @@ func (r *queryResolver) Promotion(ctx context.Context, id string) (*model.Promot
 }
 
 // Promotions is the resolver for the promotions field.
-func (r *queryResolver) Promotions(ctx context.Context, args map[string]interface{}) (*model.Promotions, error) {
+func (r *queryResolver) Promotions(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Promotions, error) {
 	var items []*model.Promotion
 	//find all items
 	cur, err := r.db.Collection("promotions").Find(ctx, nil)

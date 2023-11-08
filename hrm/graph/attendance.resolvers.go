@@ -302,29 +302,39 @@ func (r *queryResolver) Attendance(ctx context.Context, id string) (*model.Atten
 }
 
 // Attendances is the resolver for the attendances field.
-func (r *queryResolver) Attendances(ctx context.Context, args map[string]interface{}) (*model.Attendances, error) {
+func (r *queryResolver) Attendances(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Attendances, error) {
 	var items []*model.Attendance
 
-	filter := bson.M{}
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
 
-	opts := options.Find()
-	opts.SetSort(bson.M{"time_in": -1})
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
+	}
 
-	cur, err := r.db.Collection("attendances").Find(ctx, filter, opts)
+	cursor, err := r.db.Collection("attendances").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cur.Next(ctx) {
-		var item *model.Attendance
-		if err := cur.Decode(&item); err != nil {
+	for cursor.Next(ctx) {
+		item := &model.Attendance{}
+		if err := cursor.Decode(&item); err != nil {
 			return nil, err
 		}
 		items = append(items, item)
 	}
 
 	//get total count
-	count, err := r.db.Collection("attendances").CountDocuments(ctx, filter, nil)
+	count, err := r.db.Collection("attendances").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}

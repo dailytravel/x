@@ -164,7 +164,8 @@ type NewOrder struct {
 	Cancellable bool                   `json:"cancellable"`
 	Payment     string                 `json:"payment"`
 	Coupon      *string                `json:"coupon,omitempty"`
-	UID         string                 `json:"uid"`
+	UID         *string                `json:"uid,omitempty"`
+	Contact     *string                `json:"contact,omitempty"`
 	Items       []string               `json:"items"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      string                 `json:"status"`
@@ -439,6 +440,7 @@ type UpdateOrder struct {
 	Payment     *string                `json:"payment,omitempty"`
 	Coupon      *string                `json:"coupon,omitempty"`
 	UID         *string                `json:"uid,omitempty"`
+	Contact     *string                `json:"contact,omitempty"`
 	Items       []string               `json:"items,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`

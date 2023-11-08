@@ -64,7 +64,7 @@ type ExperienceInput struct {
 
 type Jobs struct {
 	Data  []*Job `json:"data,omitempty"`
-	Count *int   `json:"count,omitempty"`
+	Count int    `json:"count"`
 }
 
 type Language struct {

@@ -63,7 +63,14 @@ input UpdateGoal {
 
 extend type Query {
   goal(id: ID!): Goal @auth
-  goals(args: Map): Goals @auth
+  goals(
+    filter: Map
+    project: Map
+    sort: Map
+    collation: Map
+    limit: Int
+    skip: Int
+  ): Goals @auth
 }
 
 extend type Mutation {

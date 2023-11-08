@@ -79,7 +79,7 @@ func (r *queryResolver) Activity(ctx context.Context, id string) (*model.Activit
 }
 
 // Activities is the resolver for the activities field.
-func (r *queryResolver) Activities(ctx context.Context, args map[string]interface{}) (*model.Activities, error) {
+func (r *queryResolver) Activities(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Activities, error) {
 	panic(fmt.Errorf("not implemented: Activities - activities"))
 }
 

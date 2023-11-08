@@ -45,20 +45,26 @@ func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Tas
 
 	var items []*model.Task
 
-	filter := bson.M{
-		"_id": bson.M{"$in": obj.Tasks},
-		"$and": []bson.M{
-			bson.M{
-				"$or": []bson.M{
-					{"parent": bson.M{"$exists": false}},
-					{"parent": bson.M{"$eq": nil}},
+	// Create an aggregation pipeline to sort tasks by list.Tasks index
+	pipeline := []bson.M{
+		{
+			"$match": bson.M{
+				"_id": bson.M{"$in": obj.Tasks},
+			},
+		},
+		{
+			"$addFields": bson.M{
+				"order": bson.M{
+					"$indexOfArray": []interface{}{obj.Tasks, "$_id"},
 				},
 			},
-			bson.M{"status": bson.M{"$ne": "deleted"}},
+		},
+		{
+			"$sort": bson.M{"order": 1}, // Sort by the "order" field in ascending order
 		},
 	}
 
-	cursor, err := r.db.Collection("tasks").Find(ctx, filter, nil)
+	cursor, err := r.db.Collection("tasks").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}

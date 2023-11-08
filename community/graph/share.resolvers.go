@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/community/graph/model"
+	"github.com/dailytravel/x/community/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -97,45 +98,47 @@ func (r *queryResolver) Share(ctx context.Context, id string) (*model.Share, err
 }
 
 // Shares is the resolver for the shares field.
-func (r *queryResolver) Shares(ctx context.Context, args map[string]interface{}) (*model.Shares, error) {
+func (r *queryResolver) Shares(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Shares, error) {
 	var items []*model.Share
 
-	// Ensure type and id exist in args map
-	shareableType, typeOk := args["type"].(string)
-	shareableID, idOk := args["id"].(primitive.ObjectID)
+	// Convert map to bson.M which is a type alias for map[string]interface{}
+	_filter := utils.Filter(filter)
+	opts := utils.Sort(sort)
 
-	if !typeOk || !idOk {
-		return nil, fmt.Errorf("missing or invalid type or id arguments")
+	if project != nil {
+		opts.SetProjection(project)
+	}
+	if limit != nil {
+		opts.SetLimit(int64(*limit))
+	}
+	if skip != nil {
+		opts.SetSkip(int64(*skip))
 	}
 
-	// Filter by shareable
-	filter := bson.M{
-		"shareable": bson.M{
-			"type": shareableType,
-			"_id":  shareableID,
-		},
-	}
-
-	// Query the MongoDB collection
-	cursor, err := r.db.Collection("shares").Find(ctx, filter)
+	cursor, err := r.db.Collection("shares").Find(ctx, _filter, opts)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	// Decode cursor into items slice
-	err = cursor.All(ctx, &items)
+	for cursor.Next(ctx) {
+		item := &model.Share{}
+		if err := cursor.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	//get total count
+	count, err := r.db.Collection("shares").CountDocuments(ctx, _filter, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	// Count
-	count, err := r.db.Collection("shares").CountDocuments(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	return &model.Shares{Data: items, Count: int(count)}, nil
+	return &model.Shares{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // ID is the resolver for the id field.

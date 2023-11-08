@@ -63,21 +63,22 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Comment struct {
-		Body      func(childComplexity int) int
-		Children  func(childComplexity int) int
-		Created   func(childComplexity int) int
-		Email     func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Locale    func(childComplexity int) int
-		Metadata  func(childComplexity int) int
-		Name      func(childComplexity int) int
-		Object    func(childComplexity int) int
-		Parent    func(childComplexity int) int
-		Rating    func(childComplexity int) int
-		Reactions func(childComplexity int) int
-		Status    func(childComplexity int) int
-		UID       func(childComplexity int) int
-		Updated   func(childComplexity int) int
+		Body        func(childComplexity int) int
+		Children    func(childComplexity int) int
+		Created     func(childComplexity int) int
+		Email       func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Locale      func(childComplexity int) int
+		Metadata    func(childComplexity int) int
+		Name        func(childComplexity int) int
+		Object      func(childComplexity int) int
+		Parent      func(childComplexity int) int
+		Rating      func(childComplexity int) int
+		Reactions   func(childComplexity int) int
+		Recommended func(childComplexity int) int
+		Status      func(childComplexity int) int
+		UID         func(childComplexity int) int
+		Updated     func(childComplexity int) int
 	}
 
 	Comments struct {
@@ -215,19 +216,19 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Comment            func(childComplexity int, id string) int
-		Comments           func(childComplexity int, args map[string]interface{}) int
+		Comments           func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Conversation       func(childComplexity int, id string) int
-		Conversations      func(childComplexity int, args map[string]interface{}) int
+		Conversations      func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Message            func(childComplexity int, id string) int
-		Messages           func(childComplexity int, args map[string]interface{}) int
+		Messages           func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Notification       func(childComplexity int, id string) int
-		Notifications      func(childComplexity int, args map[string]interface{}) int
+		Notifications      func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Reaction           func(childComplexity int, object map[string]interface{}) int
-		Reactions          func(childComplexity int, args map[string]interface{}) int
+		Reactions          func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Recipient          func(childComplexity int, id string) int
-		Recipients         func(childComplexity int, args map[string]interface{}) int
+		Recipients         func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Share              func(childComplexity int, id string) int
-		Shares             func(childComplexity int, args map[string]interface{}) int
+		Shares             func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Template           func(childComplexity int, name string) int
 		Templates          func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		__resolve__service func(childComplexity int) int
@@ -410,20 +411,20 @@ type PostResolver interface {
 	Comments(ctx context.Context, obj *model.Post) ([]*model.Comment, error)
 }
 type QueryResolver interface {
-	Comments(ctx context.Context, args map[string]interface{}) (*model.Comments, error)
+	Comments(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Comments, error)
 	Comment(ctx context.Context, id string) (*model.Comment, error)
 	Conversation(ctx context.Context, id string) (*model.Conversation, error)
-	Conversations(ctx context.Context, args map[string]interface{}) (*model.Conversations, error)
+	Conversations(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Conversations, error)
 	Message(ctx context.Context, id string) (*model.Message, error)
-	Messages(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
-	Notifications(ctx context.Context, args map[string]interface{}) (*model.Notifications, error)
+	Messages(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Messages, error)
+	Notifications(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Notifications, error)
 	Notification(ctx context.Context, id string) (*model.Notification, error)
 	Reaction(ctx context.Context, object map[string]interface{}) (*model.Reaction, error)
-	Reactions(ctx context.Context, args map[string]interface{}) (*model.Reactions, error)
+	Reactions(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Reactions, error)
 	Recipient(ctx context.Context, id string) (*model.Recipient, error)
-	Recipients(ctx context.Context, args map[string]interface{}) (*model.Recipients, error)
+	Recipients(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Recipients, error)
 	Share(ctx context.Context, id string) (*model.Share, error)
-	Shares(ctx context.Context, args map[string]interface{}) (*model.Shares, error)
+	Shares(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Shares, error)
 	Template(ctx context.Context, name string) (*model.Template, error)
 	Templates(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Templates, error)
 }
@@ -567,6 +568,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Comment.Reactions(childComplexity), true
+
+	case "Comment.recommended":
+		if e.complexity.Comment.Recommended == nil {
+			break
+		}
+
+		return e.complexity.Comment.Recommended(childComplexity), true
 
 	case "Comment.status":
 		if e.complexity.Comment.Status == nil {
@@ -1453,7 +1461,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Comments(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Comments(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.conversation":
 		if e.complexity.Query.Conversation == nil {
@@ -1477,7 +1485,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Conversations(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Conversations(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.message":
 		if e.complexity.Query.Message == nil {
@@ -1501,7 +1509,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Messages(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Messages(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.notification":
 		if e.complexity.Query.Notification == nil {
@@ -1525,7 +1533,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Notifications(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Notifications(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.reaction":
 		if e.complexity.Query.Reaction == nil {
@@ -1549,7 +1557,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Reactions(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Reactions(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.recipient":
 		if e.complexity.Query.Recipient == nil {
@@ -1573,7 +1581,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Recipients(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Recipients(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.share":
 		if e.complexity.Query.Share == nil {
@@ -1597,7 +1605,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Shares(childComplexity, args["args"].(map[string]interface{})), true
+		return e.complexity.Query.Shares(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
 	case "Query.template":
 		if e.complexity.Query.Template == nil {
@@ -2969,14 +2977,59 @@ func (ec *executionContext) field_Query_comments_args(ctx context.Context, rawAr
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -2999,14 +3052,59 @@ func (ec *executionContext) field_Query_conversations_args(ctx context.Context, 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -3029,14 +3127,59 @@ func (ec *executionContext) field_Query_messages_args(ctx context.Context, rawAr
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -3059,14 +3202,59 @@ func (ec *executionContext) field_Query_notifications_args(ctx context.Context, 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -3089,14 +3277,59 @@ func (ec *executionContext) field_Query_reactions_args(ctx context.Context, rawA
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -3119,14 +3352,59 @@ func (ec *executionContext) field_Query_recipients_args(ctx context.Context, raw
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -3149,14 +3427,59 @@ func (ec *executionContext) field_Query_shares_args(ctx context.Context, rawArgs
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["args"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("args"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["args"] = arg0
+	args["filter"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["project"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["project"] = arg1
+	var arg2 map[string]interface{}
+	if tmp, ok := rawArgs["sort"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sort"] = arg2
+	var arg3 map[string]interface{}
+	if tmp, ok := rawArgs["collation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
+		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collation"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["skip"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["skip"] = arg5
 	return args, nil
 }
 
@@ -3569,6 +3892,47 @@ func (ec *executionContext) fieldContext_Comment_rating(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Comment_recommended(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_recommended(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Recommended, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_recommended(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Comment_status(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comment_status(ctx, field)
 	if err != nil {
@@ -3704,6 +4068,8 @@ func (ec *executionContext) fieldContext_Comment_parent(ctx context.Context, fie
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -3777,6 +4143,8 @@ func (ec *executionContext) fieldContext_Comment_children(ctx context.Context, f
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -4081,6 +4449,8 @@ func (ec *executionContext) fieldContext_Comments_data(ctx context.Context, fiel
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -4198,6 +4568,8 @@ func (ec *executionContext) fieldContext_Contact_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -4887,6 +5259,8 @@ func (ec *executionContext) fieldContext_Conversation_comments(ctx context.Conte
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -5076,6 +5450,8 @@ func (ec *executionContext) fieldContext_Entity_findCommentByID(ctx context.Cont
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -5852,6 +6228,8 @@ func (ec *executionContext) fieldContext_Expense_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -6028,6 +6406,8 @@ func (ec *executionContext) fieldContext_File_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -6627,6 +7007,8 @@ func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Cont
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -6731,6 +7113,8 @@ func (ec *executionContext) fieldContext_Mutation_updateComment(ctx context.Cont
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -9456,6 +9840,8 @@ func (ec *executionContext) fieldContext_Place_reviews(ctx context.Context, fiel
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -9573,6 +9959,8 @@ func (ec *executionContext) fieldContext_Post_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -9610,7 +9998,7 @@ func (ec *executionContext) _Query_comments(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Comments(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Comments(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9704,6 +10092,8 @@ func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, fiel
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -9853,7 +10243,7 @@ func (ec *executionContext) _Query_conversations(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Conversations(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Query().Conversations(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -10019,7 +10409,7 @@ func (ec *executionContext) _Query_messages(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Messages(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Query().Messages(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -10035,10 +10425,10 @@ func (ec *executionContext) _Query_messages(ctx context.Context, field graphql.C
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(map[string]interface{}); ok {
+		if data, ok := tmp.(*model.Messages); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be map[string]interface{}`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/dailytravel/x/community/graph/model.Messages`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10047,9 +10437,9 @@ func (ec *executionContext) _Query_messages(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(*model.Messages)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOMessages2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐMessages(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_messages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10059,7 +10449,13 @@ func (ec *executionContext) fieldContext_Query_messages(ctx context.Context, fie
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			switch field.Name {
+			case "data":
+				return ec.fieldContext_Messages_data(ctx, field)
+			case "count":
+				return ec.fieldContext_Messages_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Messages", field.Name)
 		},
 	}
 	defer func() {
@@ -10091,7 +10487,7 @@ func (ec *executionContext) _Query_notifications(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Notifications(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Query().Notifications(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -10329,7 +10725,7 @@ func (ec *executionContext) _Query_reactions(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Reactions(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Reactions(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10470,7 +10866,7 @@ func (ec *executionContext) _Query_recipients(ctx context.Context, field graphql
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Recipients(rctx, fc.Args["args"].(map[string]interface{}))
+			return ec.resolvers.Query().Recipients(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -10617,7 +11013,7 @@ func (ec *executionContext) _Query_shares(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Shares(rctx, fc.Args["args"].(map[string]interface{}))
+		return ec.resolvers.Query().Shares(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11117,6 +11513,8 @@ func (ec *executionContext) fieldContext_Quote_comments(ctx context.Context, fie
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -12392,6 +12790,8 @@ func (ec *executionContext) fieldContext_Task_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -13196,6 +13596,8 @@ func (ec *executionContext) fieldContext_User_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
+			case "recommended":
+				return ec.fieldContext_Comment_recommended(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -15710,7 +16112,7 @@ func (ec *executionContext) unmarshalInputUpdateComment(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "locale", "uid", "name", "email", "body", "rating", "metadata", "status", "attachments"}
+	fieldsInOrder := [...]string{"parent", "locale", "uid", "name", "email", "body", "rating", "recommended", "metadata", "status", "attachments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15780,6 +16182,15 @@ func (ec *executionContext) unmarshalInputUpdateComment(ctx context.Context, obj
 				return it, err
 			}
 			it.Rating = data
+		case "recommended":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recommended"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Recommended = data
 		case "metadata":
 			var err error
 
@@ -16278,6 +16689,8 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "rating":
 			out.Values[i] = ec._Comment_rating(ctx, field, obj)
+		case "recommended":
+			out.Values[i] = ec._Comment_recommended(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._Comment_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -21502,6 +21915,13 @@ func (ec *executionContext) marshalOMessage2ᚖgithubᚗcomᚋdailytravelᚋxᚋ
 		return graphql.Null
 	}
 	return ec._Message(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOMessages2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐMessages(ctx context.Context, sel ast.SelectionSet, v *model.Messages) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Messages(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalONotification2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐNotification(ctx context.Context, sel ast.SelectionSet, v []*model.Notification) graphql.Marshaler {
