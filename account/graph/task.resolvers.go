@@ -38,7 +38,7 @@ func (r *taskResolver) User(ctx context.Context, obj *model.Task) (*model.User, 
 func (r *taskResolver) Lead(ctx context.Context, obj *model.Task) (*model.User, error) {
 	_id, err := primitive.ObjectIDFromHex(obj.Assignee)
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert UID to ObjectID: %w", err)
+		return nil, nil
 	}
 
 	var item *model.User
@@ -48,7 +48,7 @@ func (r *taskResolver) Lead(ctx context.Context, obj *model.Task) (*model.User, 
 		if err == mongo.ErrNoDocuments {
 			return nil, nil // Return nil if no user is found, rather than an error.
 		}
-		return nil, fmt.Errorf("failed to fetch user from database: %w", err)
+		return nil, nil
 	}
 
 	return item, nil
@@ -57,27 +57,33 @@ func (r *taskResolver) Lead(ctx context.Context, obj *model.Task) (*model.User, 
 // Followers is the resolver for the followers field.
 func (r *taskResolver) Followers(ctx context.Context, obj *model.Task) ([]*model.User, error) {
 	var items []*model.User
-
 	var ids []primitive.ObjectID
+
+	if len(obj.Members) == 0 {
+		return nil, nil // No IDs, return empty result
+	}
 
 	for _, id := range obj.Members {
 		_id, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			return nil, fmt.Errorf("failed to convert UID to ObjectID: %w", err)
+			return nil, nil
 		}
 		ids = append(ids, _id)
+	}
+
+	if len(ids) == 0 {
+		return nil, nil // No IDs, return empty result
 	}
 
 	filter := bson.M{"_id": bson.M{"$in": ids}}
 	cursor, err := r.db.Collection("users").Find(ctx, filter)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch users from database: %w", err)
+		return nil, nil
 	}
-
 	defer cursor.Close(ctx)
 
 	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
+		return nil, nil
 	}
 
 	return items, nil

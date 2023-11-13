@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/base/graph/model"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -20,12 +21,20 @@ func (r *goalResolver) ID(ctx context.Context, obj *model.Goal) (string, error) 
 
 // Start is the resolver for the start field.
 func (r *goalResolver) Start(ctx context.Context, obj *model.Goal) (*string, error) {
-	panic(fmt.Errorf("not implemented: Start - start"))
+	if obj.Start == nil {
+		return nil, nil
+	}
+
+	return pointer.String(obj.Start.Time().Format(time.RFC3339)), nil
 }
 
 // End is the resolver for the end field.
 func (r *goalResolver) End(ctx context.Context, obj *model.Goal) (*string, error) {
-	panic(fmt.Errorf("not implemented: End - end"))
+	if obj.End == nil {
+		return nil, nil
+	}
+
+	return pointer.String(obj.End.Time().Format(time.RFC3339)), nil
 }
 
 // Metadata is the resolver for the metadata field.

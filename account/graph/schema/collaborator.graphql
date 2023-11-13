@@ -1,0 +1,4 @@
+extend type Collaborator @key(fields: "uid") {
+  uid: ID! @external
+  user: User
+}

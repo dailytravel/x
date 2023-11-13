@@ -18,6 +18,8 @@ func AutoMigrate() error {
 		&User{Database: database.Database},
 		&Credential{Database: database.Database},
 		&Token{Database: database.Database},
+		&Workspace{Database: database.Database},
+		&Member{Database: database.Database},
 	}
 
 	for _, migration := range migrators {

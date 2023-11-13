@@ -33,6 +33,13 @@ func (r *entityResolver) FindCampaignByUID(ctx context.Context, uid string) (*mo
 	}, nil
 }
 
+// FindCollaboratorByUID is the resolver for the findCollaboratorByUID field.
+func (r *entityResolver) FindCollaboratorByUID(ctx context.Context, uid string) (*model.Collaborator, error) {
+	return &model.Collaborator{
+		UID: uid,
+	}, nil
+}
+
 // FindCommentByUID is the resolver for the findCommentByUID field.
 func (r *entityResolver) FindCommentByUID(ctx context.Context, uid string) (*model.Comment, error) {
 	return &model.Comment{

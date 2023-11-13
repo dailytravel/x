@@ -6,39 +6,46 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/base/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // ID is the resolver for the id field.
 func (r *collaboratorResolver) ID(ctx context.Context, obj *model.Collaborator) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // UID is the resolver for the uid field.
 func (r *collaboratorResolver) UID(ctx context.Context, obj *model.Collaborator) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.UID.Hex(), nil
 }
 
 // Board is the resolver for the board field.
 func (r *collaboratorResolver) Board(ctx context.Context, obj *model.Collaborator) (*model.Board, error) {
-	panic(fmt.Errorf("not implemented: Board - board"))
+	var item *model.Board
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": obj.Board}).Decode(item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *collaboratorResolver) Metadata(ctx context.Context, obj *model.Collaborator) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Created is the resolver for the created field.
 func (r *collaboratorResolver) Created(ctx context.Context, obj *model.Collaborator) (string, error) {
-	panic(fmt.Errorf("not implemented: Created - created"))
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
 // Updated is the resolver for the updated field.
 func (r *collaboratorResolver) Updated(ctx context.Context, obj *model.Collaborator) (string, error) {
-	panic(fmt.Errorf("not implemented: Updated - updated"))
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Collaborator returns CollaboratorResolver implementation.

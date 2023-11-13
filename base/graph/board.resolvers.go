@@ -91,7 +91,20 @@ func (r *boardResolver) Updated(ctx context.Context, obj *model.Board) (string, 
 
 // Collaborators is the resolver for the collaborators field.
 func (r *boardResolver) Collaborators(ctx context.Context, obj *model.Board) ([]*model.Collaborator, error) {
-	panic(fmt.Errorf("not implemented: Collaborators - collaborators"))
+	var items []*model.Collaborator
+
+	cursor, err := r.db.Collection("collaborators").Find(ctx, bson.M{"board": obj.ID})
+	if err != nil {
+		return nil, err
+	}
+
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(context.Background(), &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
 
 // CreateBoard is the resolver for the createBoard field.

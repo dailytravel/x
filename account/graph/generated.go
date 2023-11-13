@@ -43,6 +43,7 @@ type ResolverRoot interface {
 	Board() BoardResolver
 	Campaign() CampaignResolver
 	Client() ClientResolver
+	Collaborator() CollaboratorResolver
 	Comment() CommentResolver
 	Company() CompanyResolver
 	Connection() ConnectionResolver
@@ -146,6 +147,11 @@ type ComplexityRoot struct {
 		Data  func(childComplexity int) int
 	}
 
+	Collaborator struct {
+		UID  func(childComplexity int) int
+		User func(childComplexity int) int
+	}
+
 	Comment struct {
 		UID  func(childComplexity int) int
 		User func(childComplexity int) int
@@ -200,6 +206,7 @@ type ComplexityRoot struct {
 		FindAttendanceByUID   func(childComplexity int, uid string) int
 		FindBoardByUID        func(childComplexity int, uid string) int
 		FindCampaignByUID     func(childComplexity int, uid string) int
+		FindCollaboratorByUID func(childComplexity int, uid string) int
 		FindCommentByUID      func(childComplexity int, uid string) int
 		FindCompanyByUID      func(childComplexity int, uid string) int
 		FindContactByUID      func(childComplexity int, uid string) int
@@ -599,6 +606,9 @@ type ClientResolver interface {
 	Updated(ctx context.Context, obj *model.Client) (string, error)
 	User(ctx context.Context, obj *model.Client) (*model.User, error)
 }
+type CollaboratorResolver interface {
+	User(ctx context.Context, obj *model.Collaborator) (*model.User, error)
+}
 type CommentResolver interface {
 	User(ctx context.Context, obj *model.Comment) (*model.User, error)
 }
@@ -633,6 +643,7 @@ type EntityResolver interface {
 	FindAttendanceByUID(ctx context.Context, uid string) (*model.Attendance, error)
 	FindBoardByUID(ctx context.Context, uid string) (*model.Board, error)
 	FindCampaignByUID(ctx context.Context, uid string) (*model.Campaign, error)
+	FindCollaboratorByUID(ctx context.Context, uid string) (*model.Collaborator, error)
 	FindCommentByUID(ctx context.Context, uid string) (*model.Comment, error)
 	FindCompanyByUID(ctx context.Context, uid string) (*model.Company, error)
 	FindContactByUID(ctx context.Context, uid string) (*model.Contact, error)
@@ -1147,6 +1158,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Clients.Data(childComplexity), true
 
+	case "Collaborator.uid":
+		if e.complexity.Collaborator.UID == nil {
+			break
+		}
+
+		return e.complexity.Collaborator.UID(childComplexity), true
+
+	case "Collaborator.user":
+		if e.complexity.Collaborator.User == nil {
+			break
+		}
+
+		return e.complexity.Collaborator.User(childComplexity), true
+
 	case "Comment.uid":
 		if e.complexity.Comment.UID == nil {
 			break
@@ -1385,6 +1410,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.FindCampaignByUID(childComplexity, args["uid"].(string)), true
+
+	case "Entity.findCollaboratorByUID":
+		if e.complexity.Entity.FindCollaboratorByUID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findCollaboratorByUID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindCollaboratorByUID(childComplexity, args["uid"].(string)), true
 
 	case "Entity.findCommentByUID":
 		if e.complexity.Entity.FindCommentByUID == nil {
@@ -3826,7 +3863,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/api.graphql" "schema/attendance.graphql" "schema/board.graphql" "schema/campaign.graphql" "schema/client.graphql" "schema/comment.graphql" "schema/company.graphql" "schema/connection.graphql" "schema/contact.graphql" "schema/coupon.graphql" "schema/credential.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/goal.graphql" "schema/identity.graphql" "schema/integration.graphql" "schema/invitation.graphql" "schema/invoice.graphql" "schema/key.graphql" "schema/link.graphql" "schema/list.graphql" "schema/member.graphql" "schema/membership.graphql" "schema/order.graphql" "schema/organization.graphql" "schema/permission.graphql" "schema/portfolio.graphql" "schema/post.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/role.graphql" "schema/share.graphql" "schema/task.graphql" "schema/token.graphql" "schema/user.graphql" "schema/wishlist.graphql" "schema/workspace.graphql"
+//go:embed "schema.graphqls" "schema/api.graphql" "schema/attendance.graphql" "schema/board.graphql" "schema/campaign.graphql" "schema/client.graphql" "schema/collaborator.graphql" "schema/comment.graphql" "schema/company.graphql" "schema/connection.graphql" "schema/contact.graphql" "schema/coupon.graphql" "schema/credential.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/goal.graphql" "schema/identity.graphql" "schema/integration.graphql" "schema/invitation.graphql" "schema/invoice.graphql" "schema/key.graphql" "schema/link.graphql" "schema/list.graphql" "schema/member.graphql" "schema/membership.graphql" "schema/order.graphql" "schema/organization.graphql" "schema/permission.graphql" "schema/portfolio.graphql" "schema/post.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/role.graphql" "schema/share.graphql" "schema/task.graphql" "schema/token.graphql" "schema/user.graphql" "schema/wishlist.graphql" "schema/workspace.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -3844,6 +3881,7 @@ var sources = []*ast.Source{
 	{Name: "schema/board.graphql", Input: sourceData("schema/board.graphql"), BuiltIn: false},
 	{Name: "schema/campaign.graphql", Input: sourceData("schema/campaign.graphql"), BuiltIn: false},
 	{Name: "schema/client.graphql", Input: sourceData("schema/client.graphql"), BuiltIn: false},
+	{Name: "schema/collaborator.graphql", Input: sourceData("schema/collaborator.graphql"), BuiltIn: false},
 	{Name: "schema/comment.graphql", Input: sourceData("schema/comment.graphql"), BuiltIn: false},
 	{Name: "schema/company.graphql", Input: sourceData("schema/company.graphql"), BuiltIn: false},
 	{Name: "schema/connection.graphql", Input: sourceData("schema/connection.graphql"), BuiltIn: false},
@@ -3914,13 +3952,14 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Attendance | Board | Campaign | Comment | Company | Contact | Coupon | Expense | File | Goal | Invoice | Link | List | Member | Membership | Order | Organization | Portfolio | Post | Quote | Reaction | Share | Task | User | Wishlist
+union _Entity = Attendance | Board | Campaign | Collaborator | Comment | Company | Contact | Coupon | Expense | File | Goal | Invoice | Link | List | Member | Membership | Order | Organization | Portfolio | Post | Quote | Reaction | Share | Task | User | Wishlist
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
 		findAttendanceByUID(uid: ID!,): Attendance!
 	findBoardByUID(uid: ID!,): Board!
 	findCampaignByUID(uid: ID!,): Campaign!
+	findCollaboratorByUID(uid: ID!,): Collaborator!
 	findCommentByUID(uid: ID!,): Comment!
 	findCompanyByUID(uid: ID!,): Company!
 	findContactByUID(uid: ID!,): Contact!
@@ -4040,6 +4079,21 @@ func (ec *executionContext) field_Entity_findBoardByUID_args(ctx context.Context
 }
 
 func (ec *executionContext) field_Entity_findCampaignByUID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["uid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uid"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findCollaboratorByUID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -7977,6 +8031,133 @@ func (ec *executionContext) fieldContext_Clients_count(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Collaborator_uid(ctx context.Context, field graphql.CollectedField, obj *model.Collaborator) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collaborator_uid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collaborator_uid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collaborator",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collaborator_user(ctx context.Context, field graphql.CollectedField, obj *model.Collaborator) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collaborator_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collaborator().User(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collaborator_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collaborator",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "given_name":
+				return ec.fieldContext_User_given_name(ctx, field)
+			case "family_name":
+				return ec.fieldContext_User_family_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "timezone":
+				return ec.fieldContext_User_timezone(ctx, field)
+			case "locale":
+				return ec.fieldContext_User_locale(ctx, field)
+			case "picture":
+				return ec.fieldContext_User_picture(ctx, field)
+			case "last_login":
+				return ec.fieldContext_User_last_login(ctx, field)
+			case "last_ip":
+				return ec.fieldContext_User_last_ip(ctx, field)
+			case "last_activity":
+				return ec.fieldContext_User_last_activity(ctx, field)
+			case "email_verified":
+				return ec.fieldContext_User_email_verified(ctx, field)
+			case "phone_verified":
+				return ec.fieldContext_User_phone_verified(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
+			case "status":
+				return ec.fieldContext_User_status(ctx, field)
+			case "created":
+				return ec.fieldContext_User_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_User_updated(ctx, field)
+			case "identities":
+				return ec.fieldContext_User_identities(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Comment_uid(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comment_uid(ctx, field)
 	if err != nil {
@@ -9664,6 +9845,67 @@ func (ec *executionContext) fieldContext_Entity_findCampaignByUID(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Entity_findCampaignByUID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Entity_findCollaboratorByUID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findCollaboratorByUID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindCollaboratorByUID(rctx, fc.Args["uid"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Collaborator)
+	fc.Result = res
+	return ec.marshalNCollaborator2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐCollaborator(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findCollaboratorByUID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "uid":
+				return ec.fieldContext_Collaborator_uid(ctx, field)
+			case "user":
+				return ec.fieldContext_Collaborator_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Collaborator", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findCollaboratorByUID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -28899,6 +29141,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._Campaign(ctx, sel, obj)
+	case model.Collaborator:
+		return ec._Collaborator(ctx, sel, &obj)
+	case *model.Collaborator:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Collaborator(ctx, sel, obj)
 	case model.Comment:
 		return ec._Comment(ctx, sel, &obj)
 	case *model.Comment:
@@ -29845,6 +30094,78 @@ func (ec *executionContext) _Clients(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var collaboratorImplementors = []string{"Collaborator", "_Entity"}
+
+func (ec *executionContext) _Collaborator(ctx context.Context, sel ast.SelectionSet, obj *model.Collaborator) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, collaboratorImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Collaborator")
+		case "uid":
+			out.Values[i] = ec._Collaborator_uid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "user":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collaborator_user(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var commentImplementors = []string{"Comment", "_Entity"}
 
 func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, obj *model.Comment) graphql.Marshaler {
@@ -30742,6 +31063,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 					}
 				}()
 				res = ec._Entity_findCampaignByUID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findCollaboratorByUID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findCollaboratorByUID(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -36364,6 +36707,20 @@ func (ec *executionContext) marshalNClient2ᚖgithubᚗcomᚋdailytravelᚋxᚋa
 		return graphql.Null
 	}
 	return ec._Client(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCollaborator2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐCollaborator(ctx context.Context, sel ast.SelectionSet, v model.Collaborator) graphql.Marshaler {
+	return ec._Collaborator(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCollaborator2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐCollaborator(ctx context.Context, sel ast.SelectionSet, v *model.Collaborator) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Collaborator(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNComment2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v model.Comment) graphql.Marshaler {

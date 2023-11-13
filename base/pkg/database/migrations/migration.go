@@ -14,6 +14,7 @@ func AutoMigrate() error {
 		&Task{Database: database.Database},
 		&Phase{Database: database.Database},
 		&Portfolio{Database: database.Database},
+		&Collaborator{Database: database.Database},
 	}
 
 	for _, migration := range migrators {
