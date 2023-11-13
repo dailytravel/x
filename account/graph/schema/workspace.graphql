@@ -1,0 +1,39 @@
+type Workspace {
+  id: ID!
+  name: String!
+  description: String!
+  owner: User!
+  members: [Member]
+  metadata: Map
+  status: String!
+  created: String!
+  updated: String!
+}
+
+type Workspaces {
+  data: [Workspace]
+  count: Int!
+}
+
+input NewWorkspace {
+  name: String!
+  description: String!
+  metadata: Map
+}
+
+input UpdateWorkspace {
+  name: String
+  description: String
+  metadata: Map
+}
+
+extend type Query {
+  workspace(id: ID!): Workspace
+  workspaces: Workspaces
+}
+
+extend type Mutation {
+  createWorkspace(input: NewWorkspace!): Workspace
+  updateWorkspace(id: ID!, input: UpdateWorkspace!): Workspace
+  deleteWorkspace(id: ID!): Workspace
+}

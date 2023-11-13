@@ -34,6 +34,35 @@ func (r *taskResolver) User(ctx context.Context, obj *model.Task) (*model.User, 
 	return item, nil
 }
 
+// Followers is the resolver for the followers field.
+func (r *taskResolver) Followers(ctx context.Context, obj *model.Task) ([]*model.User, error) {
+	var items []*model.User
+
+	var ids []primitive.ObjectID
+
+	for _, id := range obj.Collaborators {
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert UID to ObjectID: %w", err)
+		}
+		ids = append(ids, _id)
+	}
+
+	filter := bson.M{"_id": bson.M{"$in": ids}}
+	cursor, err := r.db.Collection("users").Find(ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch users from database: %w", err)
+	}
+
+	defer cursor.Close(ctx)
+
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 // Task returns TaskResolver implementation.
 func (r *Resolver) Task() TaskResolver { return &taskResolver{r} }
 

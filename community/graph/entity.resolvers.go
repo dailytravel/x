@@ -15,6 +15,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// FindBoardByID is the resolver for the findBoardByID field.
+func (r *entityResolver) FindBoardByID(ctx context.Context, id string) (*model.Board, error) {
+	return &model.Board{
+		ID: id,
+	}, nil
+}
+
 // FindCommentByID is the resolver for the findCommentByID field.
 func (r *entityResolver) FindCommentByID(ctx context.Context, id string) (*model.Comment, error) {
 	var item *model.Comment
@@ -59,12 +66,16 @@ func (r *entityResolver) FindFileByID(ctx context.Context, id string) (*model.Fi
 
 // FindPlaceByID is the resolver for the findPlaceByID field.
 func (r *entityResolver) FindPlaceByID(ctx context.Context, id string) (*model.Place, error) {
-	panic(fmt.Errorf("not implemented: FindPlaceByID - findPlaceByID"))
+	return &model.Place{
+		ID: id,
+	}, nil
 }
 
 // FindPostByID is the resolver for the findPostByID field.
 func (r *entityResolver) FindPostByID(ctx context.Context, id string) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented: FindPostByID - findPostByID"))
+	return &model.Post{
+		ID: id,
+	}, nil
 }
 
 // FindQuoteByID is the resolver for the findQuoteByID field.

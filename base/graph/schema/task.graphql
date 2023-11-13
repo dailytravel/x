@@ -7,11 +7,12 @@ type Task {
   priority: String! # enum of low, medium, high
   start: String
   end: String
-  labels: [String]
+  order: Int
   status: String!
   metadata: Map
   uid: ID!
-  lists: [List]
+  assignment: Assignment
+  collaborators: [ID!]
   created: String!
   updated: String!
 }
@@ -36,7 +37,7 @@ input NewTask {
   priority: String
   start: String
   end: String
-  labels: [String]
+  order: Int
   status: String
   metadata: Map
 }
@@ -49,21 +50,14 @@ input UpdateTask {
   priority: String
   start: String
   end: String
-  labels: [String]
+  order: Int
   status: String
   metadata: Map
 }
 
 extend type Query {
-  task(id: ID!): Task
-  tasks(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Tasks @auth
+  task(id: ID!): Task @auth
+  tasks(stages: Map): Tasks @auth
 }
 
 extend type Mutation {

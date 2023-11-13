@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package activity;
+option go_package = "github.com/dailytravel/x/proto/activity";
+
+message Request {
+  string uid = 1;
+  string object_id = 2;
+  string object_type = 3;
+  string target_id = 4;
+  string target_type = 5;
+  string action = 6;
+  int32 timestamp = 7;
+}
+
+message Response {
+  string status = 1;
+  string message = 2;
+}
+
+service Activity {
+  rpc Create(Request) returns (Response);
+}

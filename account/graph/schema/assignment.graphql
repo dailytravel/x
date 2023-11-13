@@ -1,0 +1,4 @@
+extend type Assignment @key(fields: "uid") {
+  uid: ID! @external
+  assignee: User
+}

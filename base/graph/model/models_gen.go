@@ -44,7 +44,7 @@ type NewBoard struct {
 	Title       string                 `json:"title"`
 	Description *string                `json:"description,omitempty"`
 	End         *string                `json:"end,omitempty"`
-	IsTemplate  *bool                  `json:"isTemplate,omitempty"`
+	IsTemplate  *bool                  `json:"is_template,omitempty"`
 	Background  *string                `json:"background,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Starred     *bool                  `json:"starred,omitempty"`
@@ -89,8 +89,7 @@ type NewTask struct {
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`
 	Start    *string                `json:"start,omitempty"`
-	End      *string                `json:"end,omitempty"`
-	Labels   []*string              `json:"labels,omitempty"`
+	Order    *int                   `json:"order,omitempty"`
 	Status   *string                `json:"status,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
@@ -108,6 +107,14 @@ type Portfolios struct {
 	Count int          `json:"count"`
 }
 
+type Relationship struct {
+	ID    string  `json:"id"`
+	Lists []*List `json:"lists,omitempty"`
+	Tasks []*Task `json:"tasks,omitempty"`
+}
+
+func (Relationship) IsEntity() {}
+
 type Tasks struct {
 	Data  []*Task `json:"data,omitempty"`
 	Count int     `json:"count"`
@@ -124,7 +131,7 @@ type UpdateBoard struct {
 	Title       *string                `json:"title,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	End         *string                `json:"end,omitempty"`
-	IsTemplate  *bool                  `json:"isTemplate,omitempty"`
+	IsTemplate  *bool                  `json:"is_template,omitempty"`
 	Background  *string                `json:"background,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Starred     *bool                  `json:"starred,omitempty"`
@@ -169,8 +176,7 @@ type UpdateTask struct {
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`
 	Start    *string                `json:"start,omitempty"`
-	End      *string                `json:"end,omitempty"`
-	Labels   []*string              `json:"labels,omitempty"`
+	Order    *int                   `json:"order,omitempty"`
 	Status   *string                `json:"status,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }

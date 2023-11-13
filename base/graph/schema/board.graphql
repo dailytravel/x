@@ -5,7 +5,7 @@ type Board @key(fields: "id") {
   title: String!
   description: String
   end: String
-  isTemplate: Boolean!
+  is_template: Boolean!
   background: String
   metadata: Map
   starred: Boolean!
@@ -35,7 +35,7 @@ input NewBoard {
   title: String!
   description: String
   end: String
-  isTemplate: Boolean
+  is_template: Boolean
   background: String
   metadata: Map
   starred: Boolean
@@ -50,7 +50,7 @@ input UpdateBoard {
   title: String
   description: String
   end: String
-  isTemplate: Boolean
+  is_template: Boolean
   background: String
   metadata: Map
   starred: Boolean
@@ -61,14 +61,7 @@ input UpdateBoard {
 
 extend type Query {
   board(id: ID!): Board @auth
-  boards(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Boards @auth
+  boards(stages: Map): Boards @auth
 }
 
 extend type Mutation {

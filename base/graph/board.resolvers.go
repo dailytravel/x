@@ -292,45 +292,39 @@ func (r *queryResolver) Board(ctx context.Context, id string) (*model.Board, err
 }
 
 // Boards is the resolver for the boards field.
-func (r *queryResolver) Boards(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Boards, error) {
-	var items []*model.Board
-
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+func (r *queryResolver) Boards(ctx context.Context, stages map[string]interface{}) (*model.Boards, error) {
+	uid, err := utils.UID(ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	cursor, err := r.db.Collection("locales").Find(ctx, _filter, opts)
+	pipeline := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "shares.object._id", Value: bson.D{{Key: "$in", Value: bson.A{"$_id"}}}},
+			{Key: "shares.object.type", Value: "boards"},
+			{Key: "shares.uid", Value: uid},
+		}}},
+	}
+
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
+	}
+
+	cursor, err := r.db.Collection("boards").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	for cursor.Next(ctx) {
-		var item model.Board
-		if err := cursor.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, &item)
-	}
+	var items []*model.Board
 
-	//get total count
-	count, err := r.db.Collection("locales").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Boards{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

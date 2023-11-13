@@ -12,14 +12,15 @@ type Activity struct {
 	Model     `bson:",inline"`
 	UID       primitive.ObjectID `json:"uid" bson:"uid"`
 	Object    Object             `json:"object" bson:"object"`
+	Target    *Object            `json:"target,omitempty" bson:"target,omitempty"`
 	Action    string             `json:"action" bson:"action"`
 	ClientIP  *string            `json:"client_ip,omitempty" bson:"client_ip,omitempty"`
 	UserAgent *string            `json:"user_agent,omitempty" bson:"user_agent,omitempty"`
 }
 
 type Object struct {
-	ID         primitive.ObjectID `json:"id" bson:"id"`
-	Collection string             `json:"collection" bson:"collection"`
+	ID   primitive.ObjectID `json:"id" bson:"_id"`
+	Type string             `json:"type" bson:"type"`
 }
 
 func (i *Activity) Collection() string {
@@ -40,7 +41,7 @@ func (i *Activity) MarshalBSON() ([]byte, error) {
 func (i *Activity) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "uid", Value: 1}}},
-		{Keys: bson.D{{Key: "object._id", Value: 1}, {Key: "object.collection", Value: 1}}},
+		{Keys: bson.D{{Key: "object._id", Value: 1}, {Key: "object.type", Value: 1}}},
 		{Keys: bson.D{{Key: "action", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "timestamp", Value: 1}}},

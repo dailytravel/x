@@ -10,16 +10,17 @@ import (
 )
 
 type Task struct {
-	Model    `bson:",inline"`
-	UID      primitive.ObjectID    `json:"uid" bson:"uid"`
-	Parent   *primitive.ObjectID   `json:"parent,omitempty" bson:"parent,omitempty"`
-	Name     string                `json:"name" bson:"name"`
-	Notes    *string               `json:"notes,omitempty" bson:"notes,omitempty"`
-	Priority *string               `json:"priority,omitempty" bson:"priority,omitempty"`
-	Start    *primitive.DateTime   `json:"start" bson:"start"`
-	End      *primitive.DateTime   `json:"end" bson:"end"`
-	Status   string                `json:"status" bson:"status"`
-	Labels   []string              `json:"labels,omitempty" bson:"labels,omitempty"`
+	Model         `bson:",inline"`
+	UID           primitive.ObjectID    `json:"uid" bson:"uid"`
+	Parent        *primitive.ObjectID   `json:"parent,omitempty" bson:"parent,omitempty"`
+	Name          string                `json:"name" bson:"name"`
+	Notes         *string               `json:"notes,omitempty" bson:"notes,omitempty"`
+	Priority      *string               `json:"priority,omitempty" bson:"priority,omitempty"`
+	Start         *primitive.DateTime   `json:"start" bson:"start"`
+	End           *primitive.DateTime   `json:"end,omitempty" bson:"end,omitempty"`
+	Order         *int                  `json:"order,omitempty" bson:"order,omitempty"`
+	Status        string                `json:"status" bson:"status"`
+	Collaborators []*primitive.ObjectID `json:"collaborators,omitempty" bson:"collaborators,omitempty"`
 }
 
 func (i *Task) MarshalBSON() ([]byte, error) {

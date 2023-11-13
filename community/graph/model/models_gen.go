@@ -150,14 +150,6 @@ type Shares struct {
 	Count int      `json:"count"`
 }
 
-type Task struct {
-	ID       string     `json:"id"`
-	Comments []*Comment `json:"comments,omitempty"`
-	Shares   []*Share   `json:"shares,omitempty"`
-}
-
-func (Task) IsEntity() {}
-
 type Templates struct {
 	Count int         `json:"count"`
 	Data  []*Template `json:"data,omitempty"`

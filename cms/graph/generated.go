@@ -48,7 +48,6 @@ type ResolverRoot interface {
 	Product() ProductResolver
 	Query() QueryResolver
 	Template() TemplateResolver
-	Term() TermResolver
 	User() UserResolver
 }
 
@@ -69,7 +68,6 @@ type ComplexityRoot struct {
 		FindPostByID     func(childComplexity int, id string) int
 		FindProductByID  func(childComplexity int, id string) int
 		FindTemplateByID func(childComplexity int, id string) int
-		FindTermByID     func(childComplexity int, id string) int
 		FindUserByID     func(childComplexity int, id string) int
 	}
 
@@ -110,15 +108,11 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateFile  func(childComplexity int, input model.NewFile) int
 		CreatePost  func(childComplexity int, input model.NewPost) int
-		CreateTerm  func(childComplexity int, input model.NewTerm) int
 		DeleteFile  func(childComplexity int, id string) int
 		DeleteFiles func(childComplexity int, ids []string) int
 		DeletePost  func(childComplexity int, filter map[string]interface{}) int
-		DeleteTerm  func(childComplexity int, id string) int
-		DeleteTerms func(childComplexity int, ids []string) int
 		UpdateFile  func(childComplexity int, id string, input model.UpdateFile) int
 		UpdatePost  func(childComplexity int, id string, input model.UpdatePost) int
-		UpdateTerm  func(childComplexity int, id string, input model.UpdateTerm) int
 	}
 
 	Package struct {
@@ -143,7 +137,6 @@ type ComplexityRoot struct {
 		Slug        func(childComplexity int) int
 		Status      func(childComplexity int) int
 		Summary     func(childComplexity int) int
-		Terms       func(childComplexity int) int
 		Title       func(childComplexity int) int
 		Type        func(childComplexity int) int
 		UID         func(childComplexity int) int
@@ -165,8 +158,6 @@ type ComplexityRoot struct {
 		Files              func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		Post               func(childComplexity int, id string) int
 		Posts              func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
-		Term               func(childComplexity int, id string) int
-		Terms              func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
 		__resolve__service func(childComplexity int) int
 		__resolve_entities func(childComplexity int, representations []map[string]interface{}) int
 	}
@@ -174,28 +165,6 @@ type ComplexityRoot struct {
 	Template struct {
 		ID     func(childComplexity int) int
 		Images func(childComplexity int) int
-	}
-
-	Term struct {
-		Children    func(childComplexity int) int
-		Count       func(childComplexity int) int
-		Created     func(childComplexity int) int
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Images      func(childComplexity int) int
-		Locale      func(childComplexity int) int
-		Metadata    func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Order       func(childComplexity int) int
-		Parent      func(childComplexity int) int
-		Slug        func(childComplexity int) int
-		Type        func(childComplexity int) int
-		Updated     func(childComplexity int) int
-	}
-
-	Terms struct {
-		Count func(childComplexity int) int
-		Data  func(childComplexity int) int
 	}
 
 	User struct {
@@ -217,7 +186,6 @@ type EntityResolver interface {
 	FindPostByID(ctx context.Context, id string) (*model.Post, error)
 	FindProductByID(ctx context.Context, id string) (*model.Product, error)
 	FindTemplateByID(ctx context.Context, id string) (*model.Template, error)
-	FindTermByID(ctx context.Context, id string) (*model.Term, error)
 	FindUserByID(ctx context.Context, id string) (*model.User, error)
 }
 type FileResolver interface {
@@ -250,10 +218,6 @@ type MutationResolver interface {
 	CreatePost(ctx context.Context, input model.NewPost) (*model.Post, error)
 	UpdatePost(ctx context.Context, id string, input model.UpdatePost) (*model.Post, error)
 	DeletePost(ctx context.Context, filter map[string]interface{}) (map[string]interface{}, error)
-	CreateTerm(ctx context.Context, input model.NewTerm) (*model.Term, error)
-	UpdateTerm(ctx context.Context, id string, input model.UpdateTerm) (*model.Term, error)
-	DeleteTerm(ctx context.Context, id string) (map[string]interface{}, error)
-	DeleteTerms(ctx context.Context, ids []string) (map[string]interface{}, error)
 }
 type PackageResolver interface {
 	Images(ctx context.Context, obj *model.Package) ([]*model.Image, error)
@@ -272,7 +236,6 @@ type PostResolver interface {
 	UID(ctx context.Context, obj *model.Post) (string, error)
 	Created(ctx context.Context, obj *model.Post) (string, error)
 	Updated(ctx context.Context, obj *model.Post) (string, error)
-	Terms(ctx context.Context, obj *model.Post) ([]*model.Term, error)
 	Parent(ctx context.Context, obj *model.Post) (*model.Post, error)
 	Images(ctx context.Context, obj *model.Post) ([]*model.Image, error)
 }
@@ -284,24 +247,9 @@ type QueryResolver interface {
 	File(ctx context.Context, id string) (*model.File, error)
 	Post(ctx context.Context, id string) (*model.Post, error)
 	Posts(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Posts, error)
-	Term(ctx context.Context, id string) (*model.Term, error)
-	Terms(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Terms, error)
 }
 type TemplateResolver interface {
 	Images(ctx context.Context, obj *model.Template) ([]*model.Image, error)
-}
-type TermResolver interface {
-	ID(ctx context.Context, obj *model.Term) (string, error)
-	Parent(ctx context.Context, obj *model.Term) (*model.Term, error)
-	Children(ctx context.Context, obj *model.Term) ([]*model.Term, error)
-
-	Name(ctx context.Context, obj *model.Term) (string, error)
-	Description(ctx context.Context, obj *model.Term) (*string, error)
-
-	Metadata(ctx context.Context, obj *model.Term) (map[string]interface{}, error)
-	Created(ctx context.Context, obj *model.Term) (string, error)
-	Updated(ctx context.Context, obj *model.Term) (string, error)
-	Images(ctx context.Context, obj *model.Term) ([]*model.Image, error)
 }
 type UserResolver interface {
 	Posts(ctx context.Context, obj *model.User) ([]*model.Post, error)
@@ -406,18 +354,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.FindTemplateByID(childComplexity, args["id"].(string)), true
-
-	case "Entity.findTermByID":
-		if e.complexity.Entity.FindTermByID == nil {
-			break
-		}
-
-		args, err := ec.field_Entity_findTermByID_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Entity.FindTermByID(childComplexity, args["id"].(string)), true
 
 	case "Entity.findUserByID":
 		if e.complexity.Entity.FindUserByID == nil {
@@ -630,18 +566,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreatePost(childComplexity, args["input"].(model.NewPost)), true
 
-	case "Mutation.createTerm":
-		if e.complexity.Mutation.CreateTerm == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createTerm_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateTerm(childComplexity, args["input"].(model.NewTerm)), true
-
 	case "Mutation.deleteFile":
 		if e.complexity.Mutation.DeleteFile == nil {
 			break
@@ -678,30 +602,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeletePost(childComplexity, args["filter"].(map[string]interface{})), true
 
-	case "Mutation.deleteTerm":
-		if e.complexity.Mutation.DeleteTerm == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteTerm_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteTerm(childComplexity, args["id"].(string)), true
-
-	case "Mutation.deleteTerms":
-		if e.complexity.Mutation.DeleteTerms == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteTerms_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteTerms(childComplexity, args["ids"].([]string)), true
-
 	case "Mutation.updateFile":
 		if e.complexity.Mutation.UpdateFile == nil {
 			break
@@ -725,18 +625,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdatePost(childComplexity, args["id"].(string), args["input"].(model.UpdatePost)), true
-
-	case "Mutation.updateTerm":
-		if e.complexity.Mutation.UpdateTerm == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateTerm_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateTerm(childComplexity, args["id"].(string), args["input"].(model.UpdateTerm)), true
 
 	case "Package.id":
 		if e.complexity.Package.ID == nil {
@@ -843,13 +731,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Post.Summary(childComplexity), true
 
-	case "Post.terms":
-		if e.complexity.Post.Terms == nil {
-			break
-		}
-
-		return e.complexity.Post.Terms(childComplexity), true
-
 	case "Post.title":
 		if e.complexity.Post.Title == nil {
 			break
@@ -954,30 +835,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Posts(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
 
-	case "Query.term":
-		if e.complexity.Query.Term == nil {
-			break
-		}
-
-		args, err := ec.field_Query_term_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Term(childComplexity, args["id"].(string)), true
-
-	case "Query.terms":
-		if e.complexity.Query.Terms == nil {
-			break
-		}
-
-		args, err := ec.field_Query_terms_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Terms(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
-
 	case "Query._service":
 		if e.complexity.Query.__resolve__service == nil {
 			break
@@ -1010,118 +867,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Template.Images(childComplexity), true
-
-	case "Term.children":
-		if e.complexity.Term.Children == nil {
-			break
-		}
-
-		return e.complexity.Term.Children(childComplexity), true
-
-	case "Term.count":
-		if e.complexity.Term.Count == nil {
-			break
-		}
-
-		return e.complexity.Term.Count(childComplexity), true
-
-	case "Term.created":
-		if e.complexity.Term.Created == nil {
-			break
-		}
-
-		return e.complexity.Term.Created(childComplexity), true
-
-	case "Term.description":
-		if e.complexity.Term.Description == nil {
-			break
-		}
-
-		return e.complexity.Term.Description(childComplexity), true
-
-	case "Term.id":
-		if e.complexity.Term.ID == nil {
-			break
-		}
-
-		return e.complexity.Term.ID(childComplexity), true
-
-	case "Term.images":
-		if e.complexity.Term.Images == nil {
-			break
-		}
-
-		return e.complexity.Term.Images(childComplexity), true
-
-	case "Term.locale":
-		if e.complexity.Term.Locale == nil {
-			break
-		}
-
-		return e.complexity.Term.Locale(childComplexity), true
-
-	case "Term.metadata":
-		if e.complexity.Term.Metadata == nil {
-			break
-		}
-
-		return e.complexity.Term.Metadata(childComplexity), true
-
-	case "Term.name":
-		if e.complexity.Term.Name == nil {
-			break
-		}
-
-		return e.complexity.Term.Name(childComplexity), true
-
-	case "Term.order":
-		if e.complexity.Term.Order == nil {
-			break
-		}
-
-		return e.complexity.Term.Order(childComplexity), true
-
-	case "Term.parent":
-		if e.complexity.Term.Parent == nil {
-			break
-		}
-
-		return e.complexity.Term.Parent(childComplexity), true
-
-	case "Term.slug":
-		if e.complexity.Term.Slug == nil {
-			break
-		}
-
-		return e.complexity.Term.Slug(childComplexity), true
-
-	case "Term.type":
-		if e.complexity.Term.Type == nil {
-			break
-		}
-
-		return e.complexity.Term.Type(childComplexity), true
-
-	case "Term.updated":
-		if e.complexity.Term.Updated == nil {
-			break
-		}
-
-		return e.complexity.Term.Updated(childComplexity), true
-
-	case "Terms.count":
-		if e.complexity.Terms.Count == nil {
-			break
-		}
-
-		return e.complexity.Terms.Count(childComplexity), true
-
-	case "Terms.data":
-		if e.complexity.Terms.Data == nil {
-			break
-		}
-
-		return e.complexity.Terms.Data(childComplexity), true
 
 	case "User.files":
 		if e.complexity.User.Files == nil {
@@ -1161,10 +906,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputNewFile,
 		ec.unmarshalInputNewPost,
-		ec.unmarshalInputNewTerm,
 		ec.unmarshalInputUpdateFile,
 		ec.unmarshalInputUpdatePost,
-		ec.unmarshalInputUpdateTerm,
 	)
 	first := true
 
@@ -1261,7 +1004,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/file.graphql" "schema/image.graphql" "schema/package.graphql" "schema/place.graphql" "schema/post.graphql" "schema/product.graphql" "schema/template.graphql" "schema/term.graphql" "schema/user.graphql"
+//go:embed "schema.graphqls" "schema/file.graphql" "schema/image.graphql" "schema/package.graphql" "schema/place.graphql" "schema/post.graphql" "schema/product.graphql" "schema/template.graphql" "schema/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1281,7 +1024,6 @@ var sources = []*ast.Source{
 	{Name: "schema/post.graphql", Input: sourceData("schema/post.graphql"), BuiltIn: false},
 	{Name: "schema/product.graphql", Input: sourceData("schema/product.graphql"), BuiltIn: false},
 	{Name: "schema/template.graphql", Input: sourceData("schema/template.graphql"), BuiltIn: false},
-	{Name: "schema/term.graphql", Input: sourceData("schema/term.graphql"), BuiltIn: false},
 	{Name: "schema/user.graphql", Input: sourceData("schema/user.graphql"), BuiltIn: false},
 	{Name: "../federation/directives.graphql", Input: `
 	directive @composeDirective(name: String!) repeatable on SCHEMA
@@ -1321,7 +1063,7 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = File | Image | Package | Place | Post | Product | Template | Term | User
+union _Entity = File | Image | Package | Place | Post | Product | Template | User
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
@@ -1332,7 +1074,6 @@ type Entity {
 	findPostByID(id: ID!,): Post!
 	findProductByID(id: ID!,): Product!
 	findTemplateByID(id: ID!,): Template!
-	findTermByID(id: ID!,): Term!
 	findUserByID(id: ID!,): User!
 
 }
@@ -1503,21 +1244,6 @@ func (ec *executionContext) field_Entity_findTemplateByID_args(ctx context.Conte
 	return args, nil
 }
 
-func (ec *executionContext) field_Entity_findTermByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Entity_findUserByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1555,21 +1281,6 @@ func (ec *executionContext) field_Mutation_createPost_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNNewPost2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐNewPost(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createTerm_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NewTerm
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewTerm2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐNewTerm(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1623,36 +1334,6 @@ func (ec *executionContext) field_Mutation_deletePost_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteTerm_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteTerms_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 []string
-	if tmp, ok := rawArgs["ids"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ids"))
-		arg0, err = ec.unmarshalNID2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["ids"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_updateFile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1693,30 +1374,6 @@ func (ec *executionContext) field_Mutation_updatePost_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg1, err = ec.unmarshalNUpdatePost2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐUpdatePost(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_updateTerm_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	var arg1 model.UpdateTerm
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateTerm2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐUpdateTerm(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1846,81 +1503,6 @@ func (ec *executionContext) field_Query_post_args(ctx context.Context, rawArgs m
 }
 
 func (ec *executionContext) field_Query_posts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_term_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_terms_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
@@ -2365,8 +1947,6 @@ func (ec *executionContext) fieldContext_Entity_findPostByID(ctx context.Context
 				return ec.fieldContext_Post_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Post_updated(ctx, field)
-			case "terms":
-				return ec.fieldContext_Post_terms(ctx, field)
 			case "parent":
 				return ec.fieldContext_Post_parent(ctx, field)
 			case "images":
@@ -2505,91 +2085,6 @@ func (ec *executionContext) fieldContext_Entity_findTemplateByID(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Entity_findTemplateByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Entity_findTermByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Entity_findTermByID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Entity().FindTermByID(rctx, fc.Args["id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Term)
-	fc.Result = res
-	return ec.marshalNTerm2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Entity_findTermByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Entity",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Term_id(ctx, field)
-			case "parent":
-				return ec.fieldContext_Term_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Term_children(ctx, field)
-			case "locale":
-				return ec.fieldContext_Term_locale(ctx, field)
-			case "type":
-				return ec.fieldContext_Term_type(ctx, field)
-			case "slug":
-				return ec.fieldContext_Term_slug(ctx, field)
-			case "name":
-				return ec.fieldContext_Term_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Term_description(ctx, field)
-			case "order":
-				return ec.fieldContext_Term_order(ctx, field)
-			case "count":
-				return ec.fieldContext_Term_count(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Term_metadata(ctx, field)
-			case "created":
-				return ec.fieldContext_Term_created(ctx, field)
-			case "updated":
-				return ec.fieldContext_Term_updated(ctx, field)
-			case "images":
-				return ec.fieldContext_Term_images(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Entity_findTermByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4198,8 +3693,6 @@ func (ec *executionContext) fieldContext_Mutation_createPost(ctx context.Context
 				return ec.fieldContext_Post_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Post_updated(ctx, field)
-			case "terms":
-				return ec.fieldContext_Post_terms(ctx, field)
 			case "parent":
 				return ec.fieldContext_Post_parent(ctx, field)
 			case "images":
@@ -4304,8 +3797,6 @@ func (ec *executionContext) fieldContext_Mutation_updatePost(ctx context.Context
 				return ec.fieldContext_Post_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Post_updated(ctx, field)
-			case "terms":
-				return ec.fieldContext_Post_terms(ctx, field)
 			case "parent":
 				return ec.fieldContext_Post_parent(ctx, field)
 			case "images":
@@ -4394,354 +3885,6 @@ func (ec *executionContext) fieldContext_Mutation_deletePost(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deletePost_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createTerm(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createTerm(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().CreateTerm(rctx, fc.Args["input"].(model.NewTerm))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Auth == nil {
-				return nil, errors.New("directive auth is not implemented")
-			}
-			return ec.directives.Auth(ctx, nil, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.Term); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/dailytravel/x/cms/graph/model.Term`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Term)
-	fc.Result = res
-	return ec.marshalOTerm2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createTerm(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Term_id(ctx, field)
-			case "parent":
-				return ec.fieldContext_Term_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Term_children(ctx, field)
-			case "locale":
-				return ec.fieldContext_Term_locale(ctx, field)
-			case "type":
-				return ec.fieldContext_Term_type(ctx, field)
-			case "slug":
-				return ec.fieldContext_Term_slug(ctx, field)
-			case "name":
-				return ec.fieldContext_Term_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Term_description(ctx, field)
-			case "order":
-				return ec.fieldContext_Term_order(ctx, field)
-			case "count":
-				return ec.fieldContext_Term_count(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Term_metadata(ctx, field)
-			case "created":
-				return ec.fieldContext_Term_created(ctx, field)
-			case "updated":
-				return ec.fieldContext_Term_updated(ctx, field)
-			case "images":
-				return ec.fieldContext_Term_images(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createTerm_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updateTerm(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateTerm(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().UpdateTerm(rctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateTerm))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Auth == nil {
-				return nil, errors.New("directive auth is not implemented")
-			}
-			return ec.directives.Auth(ctx, nil, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.Term); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/dailytravel/x/cms/graph/model.Term`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Term)
-	fc.Result = res
-	return ec.marshalOTerm2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateTerm(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Term_id(ctx, field)
-			case "parent":
-				return ec.fieldContext_Term_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Term_children(ctx, field)
-			case "locale":
-				return ec.fieldContext_Term_locale(ctx, field)
-			case "type":
-				return ec.fieldContext_Term_type(ctx, field)
-			case "slug":
-				return ec.fieldContext_Term_slug(ctx, field)
-			case "name":
-				return ec.fieldContext_Term_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Term_description(ctx, field)
-			case "order":
-				return ec.fieldContext_Term_order(ctx, field)
-			case "count":
-				return ec.fieldContext_Term_count(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Term_metadata(ctx, field)
-			case "created":
-				return ec.fieldContext_Term_created(ctx, field)
-			case "updated":
-				return ec.fieldContext_Term_updated(ctx, field)
-			case "images":
-				return ec.fieldContext_Term_images(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateTerm_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteTerm(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteTerm(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().DeleteTerm(rctx, fc.Args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Auth == nil {
-				return nil, errors.New("directive auth is not implemented")
-			}
-			return ec.directives.Auth(ctx, nil, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(map[string]interface{}); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be map[string]interface{}`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(map[string]interface{})
-	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteTerm(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteTerm_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteTerms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteTerms(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().DeleteTerms(rctx, fc.Args["ids"].([]string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Auth == nil {
-				return nil, errors.New("directive auth is not implemented")
-			}
-			return ec.directives.Auth(ctx, nil, directive0, nil)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(map[string]interface{}); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be map[string]interface{}`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(map[string]interface{})
-	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteTerms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteTerms_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5527,77 +4670,6 @@ func (ec *executionContext) fieldContext_Post_updated(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Post_terms(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Post_terms(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Post().Terms(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Term)
-	fc.Result = res
-	return ec.marshalOTerm2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Post_terms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Post",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Term_id(ctx, field)
-			case "parent":
-				return ec.fieldContext_Term_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Term_children(ctx, field)
-			case "locale":
-				return ec.fieldContext_Term_locale(ctx, field)
-			case "type":
-				return ec.fieldContext_Term_type(ctx, field)
-			case "slug":
-				return ec.fieldContext_Term_slug(ctx, field)
-			case "name":
-				return ec.fieldContext_Term_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Term_description(ctx, field)
-			case "order":
-				return ec.fieldContext_Term_order(ctx, field)
-			case "count":
-				return ec.fieldContext_Term_count(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Term_metadata(ctx, field)
-			case "created":
-				return ec.fieldContext_Term_created(ctx, field)
-			case "updated":
-				return ec.fieldContext_Term_updated(ctx, field)
-			case "images":
-				return ec.fieldContext_Term_images(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Post_parent(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Post_parent(ctx, field)
 	if err != nil {
@@ -5660,8 +4732,6 @@ func (ec *executionContext) fieldContext_Post_parent(ctx context.Context, field 
 				return ec.fieldContext_Post_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Post_updated(ctx, field)
-			case "terms":
-				return ec.fieldContext_Post_terms(ctx, field)
 			case "parent":
 				return ec.fieldContext_Post_parent(ctx, field)
 			case "images":
@@ -5840,8 +4910,6 @@ func (ec *executionContext) fieldContext_Posts_data(ctx context.Context, field g
 				return ec.fieldContext_Post_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Post_updated(ctx, field)
-			case "terms":
-				return ec.fieldContext_Post_terms(ctx, field)
 			case "parent":
 				return ec.fieldContext_Post_parent(ctx, field)
 			case "images":
@@ -6180,8 +5248,6 @@ func (ec *executionContext) fieldContext_Query_post(ctx context.Context, field g
 				return ec.fieldContext_Post_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Post_updated(ctx, field)
-			case "terms":
-				return ec.fieldContext_Post_terms(ctx, field)
 			case "parent":
 				return ec.fieldContext_Post_parent(ctx, field)
 			case "images":
@@ -6256,146 +5322,6 @@ func (ec *executionContext) fieldContext_Query_posts(ctx context.Context, field 
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_posts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_term(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_term(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Term(rctx, fc.Args["id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Term)
-	fc.Result = res
-	return ec.marshalOTerm2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_term(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Term_id(ctx, field)
-			case "parent":
-				return ec.fieldContext_Term_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Term_children(ctx, field)
-			case "locale":
-				return ec.fieldContext_Term_locale(ctx, field)
-			case "type":
-				return ec.fieldContext_Term_type(ctx, field)
-			case "slug":
-				return ec.fieldContext_Term_slug(ctx, field)
-			case "name":
-				return ec.fieldContext_Term_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Term_description(ctx, field)
-			case "order":
-				return ec.fieldContext_Term_order(ctx, field)
-			case "count":
-				return ec.fieldContext_Term_count(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Term_metadata(ctx, field)
-			case "created":
-				return ec.fieldContext_Term_created(ctx, field)
-			case "updated":
-				return ec.fieldContext_Term_updated(ctx, field)
-			case "images":
-				return ec.fieldContext_Term_images(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_term_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_terms(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_terms(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Terms(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Terms)
-	fc.Result = res
-	return ec.marshalOTerms2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerms(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_terms(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "count":
-				return ec.fieldContext_Terms_count(ctx, field)
-			case "data":
-				return ec.fieldContext_Terms_data(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Terms", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_terms_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6739,799 +5665,6 @@ func (ec *executionContext) fieldContext_Template_images(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Term_id(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().ID(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_parent(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_parent(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().Parent(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Term)
-	fc.Result = res
-	return ec.marshalOTerm2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_parent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Term_id(ctx, field)
-			case "parent":
-				return ec.fieldContext_Term_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Term_children(ctx, field)
-			case "locale":
-				return ec.fieldContext_Term_locale(ctx, field)
-			case "type":
-				return ec.fieldContext_Term_type(ctx, field)
-			case "slug":
-				return ec.fieldContext_Term_slug(ctx, field)
-			case "name":
-				return ec.fieldContext_Term_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Term_description(ctx, field)
-			case "order":
-				return ec.fieldContext_Term_order(ctx, field)
-			case "count":
-				return ec.fieldContext_Term_count(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Term_metadata(ctx, field)
-			case "created":
-				return ec.fieldContext_Term_created(ctx, field)
-			case "updated":
-				return ec.fieldContext_Term_updated(ctx, field)
-			case "images":
-				return ec.fieldContext_Term_images(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_children(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_children(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().Children(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Term)
-	fc.Result = res
-	return ec.marshalOTerm2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_children(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Term_id(ctx, field)
-			case "parent":
-				return ec.fieldContext_Term_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Term_children(ctx, field)
-			case "locale":
-				return ec.fieldContext_Term_locale(ctx, field)
-			case "type":
-				return ec.fieldContext_Term_type(ctx, field)
-			case "slug":
-				return ec.fieldContext_Term_slug(ctx, field)
-			case "name":
-				return ec.fieldContext_Term_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Term_description(ctx, field)
-			case "order":
-				return ec.fieldContext_Term_order(ctx, field)
-			case "count":
-				return ec.fieldContext_Term_count(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Term_metadata(ctx, field)
-			case "created":
-				return ec.fieldContext_Term_created(ctx, field)
-			case "updated":
-				return ec.fieldContext_Term_updated(ctx, field)
-			case "images":
-				return ec.fieldContext_Term_images(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_locale(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_locale(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Locale, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_locale(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_type(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_type(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Type, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_slug(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_slug(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Slug, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_slug(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_name(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().Name(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_description(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().Description(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_order(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_order(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Order, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_order(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_count(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_count(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_metadata(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_metadata(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().Metadata(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(map[string]interface{})
-	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_created(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_created(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().Created(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_updated(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_updated(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().Updated(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Term_images(ctx context.Context, field graphql.CollectedField, obj *model.Term) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Term_images(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Term().Images(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Image)
-	fc.Result = res
-	return ec.marshalOImage2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐImage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Term_images(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Term",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Image_id(ctx, field)
-			case "type":
-				return ec.fieldContext_Image_type(ctx, field)
-			case "locale":
-				return ec.fieldContext_Image_locale(ctx, field)
-			case "object":
-				return ec.fieldContext_Image_object(ctx, field)
-			case "url":
-				return ec.fieldContext_Image_url(ctx, field)
-			case "title":
-				return ec.fieldContext_Image_title(ctx, field)
-			case "caption":
-				return ec.fieldContext_Image_caption(ctx, field)
-			case "order":
-				return ec.fieldContext_Image_order(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Image_metadata(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Image", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Terms_count(ctx context.Context, field graphql.CollectedField, obj *model.Terms) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Terms_count(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Terms_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Terms",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Terms_data(ctx context.Context, field graphql.CollectedField, obj *model.Terms) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Terms_data(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Data, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Term)
-	fc.Result = res
-	return ec.marshalOTerm2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Terms_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Terms",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Term_id(ctx, field)
-			case "parent":
-				return ec.fieldContext_Term_parent(ctx, field)
-			case "children":
-				return ec.fieldContext_Term_children(ctx, field)
-			case "locale":
-				return ec.fieldContext_Term_locale(ctx, field)
-			case "type":
-				return ec.fieldContext_Term_type(ctx, field)
-			case "slug":
-				return ec.fieldContext_Term_slug(ctx, field)
-			case "name":
-				return ec.fieldContext_Term_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Term_description(ctx, field)
-			case "order":
-				return ec.fieldContext_Term_order(ctx, field)
-			case "count":
-				return ec.fieldContext_Term_count(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Term_metadata(ctx, field)
-			case "created":
-				return ec.fieldContext_Term_created(ctx, field)
-			case "updated":
-				return ec.fieldContext_Term_updated(ctx, field)
-			case "images":
-				return ec.fieldContext_Term_images(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Term", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_id(ctx, field)
 	if err != nil {
@@ -7638,8 +5771,6 @@ func (ec *executionContext) fieldContext_User_posts(ctx context.Context, field g
 				return ec.fieldContext_Post_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Post_updated(ctx, field)
-			case "terms":
-				return ec.fieldContext_Post_terms(ctx, field)
 			case "parent":
 				return ec.fieldContext_Post_parent(ctx, field)
 			case "images":
@@ -9792,98 +7923,6 @@ func (ec *executionContext) unmarshalInputNewPost(ctx context.Context, obj inter
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNewTerm(ctx context.Context, obj interface{}) (model.NewTerm, error) {
-	var it model.NewTerm
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"locale", "name", "slug", "description", "parent", "type", "order", "metadata"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "locale":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locale"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Locale = data
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "slug":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("slug"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Slug = data
-		case "description":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Description = data
-		case "parent":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parent"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Parent = data
-		case "type":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Type = data
-		case "order":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Order = data
-		case "metadata":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
-			data, err := ec.unmarshalOMap2map(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Metadata = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputUpdateFile(ctx context.Context, obj interface{}) (model.UpdateFile, error) {
 	var it model.UpdateFile
 	asMap := map[string]interface{}{}
@@ -10104,107 +8143,6 @@ func (ec *executionContext) unmarshalInputUpdatePost(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateTerm(ctx context.Context, obj interface{}) (model.UpdateTerm, error) {
-	var it model.UpdateTerm
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"id", "locale", "name", "slug", "description", "parent", "type", "order", "metadata"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ID = data
-		case "locale":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locale"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Locale = data
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "slug":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("slug"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Slug = data
-		case "description":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Description = data
-		case "parent":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parent"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Parent = data
-		case "type":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Type = data
-		case "order":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Order = data
-		case "metadata":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
-			data, err := ec.unmarshalOMap2map(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Metadata = data
-		}
-	}
-
-	return it, nil
-}
-
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -10262,13 +8200,6 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 			return graphql.Null
 		}
 		return ec._Template(ctx, sel, obj)
-	case model.Term:
-		return ec._Term(ctx, sel, &obj)
-	case *model.Term:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Term(ctx, sel, obj)
 	case model.User:
 		return ec._User(ctx, sel, &obj)
 	case *model.User:
@@ -10446,28 +8377,6 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 					}
 				}()
 				res = ec._Entity_findTemplateByID(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "findTermByID":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Entity_findTermByID(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -11150,22 +9059,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deletePost(ctx, field)
 			})
-		case "createTerm":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createTerm(ctx, field)
-			})
-		case "updateTerm":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateTerm(ctx, field)
-			})
-		case "deleteTerm":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteTerm(ctx, field)
-			})
-		case "deleteTerms":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteTerms(ctx, field)
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11654,39 +9547,6 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "terms":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Post_terms(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "parent":
 			field := field
 
@@ -11984,44 +9844,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "term":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_term(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "terms":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_terms(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "_entities":
 			field := field
 
@@ -12146,412 +9968,6 @@ func (ec *executionContext) _Template(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var termImplementors = []string{"Term", "_Entity"}
-
-func (ec *executionContext) _Term(ctx context.Context, sel ast.SelectionSet, obj *model.Term) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, termImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Term")
-		case "id":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_id(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "parent":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_parent(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "children":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_children(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "locale":
-			out.Values[i] = ec._Term_locale(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "type":
-			out.Values[i] = ec._Term_type(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "slug":
-			out.Values[i] = ec._Term_slug(ctx, field, obj)
-		case "name":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_name(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "description":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_description(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "order":
-			out.Values[i] = ec._Term_order(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "count":
-			out.Values[i] = ec._Term_count(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "metadata":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_metadata(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "created":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_created(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_updated(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "images":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Term_images(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var termsImplementors = []string{"Terms"}
-
-func (ec *executionContext) _Terms(ctx context.Context, sel ast.SelectionSet, obj *model.Terms) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, termsImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Terms")
-		case "count":
-			out.Values[i] = ec._Terms_count(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "data":
-			out.Values[i] = ec._Terms_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13208,11 +10624,6 @@ func (ec *executionContext) unmarshalNNewPost2githubᚗcomᚋdailytravelᚋxᚋc
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewTerm2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐNewTerm(ctx context.Context, v interface{}) (model.NewTerm, error) {
-	res, err := ec.unmarshalInputNewTerm(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) marshalNPackage2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐPackage(ctx context.Context, sel ast.SelectionSet, v model.Package) graphql.Marshaler {
 	return ec._Package(ctx, sel, &v)
 }
@@ -13319,20 +10730,6 @@ func (ec *executionContext) marshalNTemplate2ᚖgithubᚗcomᚋdailytravelᚋx�
 	return ec._Template(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNTerm2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx context.Context, sel ast.SelectionSet, v model.Term) graphql.Marshaler {
-	return ec._Term(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNTerm2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx context.Context, sel ast.SelectionSet, v *model.Term) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Term(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNUpdateFile2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐUpdateFile(ctx context.Context, v interface{}) (model.UpdateFile, error) {
 	res, err := ec.unmarshalInputUpdateFile(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -13340,11 +10737,6 @@ func (ec *executionContext) unmarshalNUpdateFile2githubᚗcomᚋdailytravelᚋx�
 
 func (ec *executionContext) unmarshalNUpdatePost2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐUpdatePost(ctx context.Context, v interface{}) (model.UpdatePost, error) {
 	res, err := ec.unmarshalInputUpdatePost(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNUpdateTerm2githubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐUpdateTerm(ctx context.Context, v interface{}) (model.UpdateTerm, error) {
-	res, err := ec.unmarshalInputUpdateTerm(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -14084,61 +11476,6 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
-}
-
-func (ec *executionContext) marshalOTerm2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx context.Context, sel ast.SelectionSet, v []*model.Term) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOTerm2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOTerm2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerm(ctx context.Context, sel ast.SelectionSet, v *model.Term) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Term(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOTerms2ᚖgithubᚗcomᚋdailytravelᚋxᚋcmsᚋgraphᚋmodelᚐTerms(ctx context.Context, sel ast.SelectionSet, v *model.Terms) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Terms(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO_Entity2githubᚗcomᚋ99designsᚋgqlgenᚋpluginᚋfederationᚋfedruntimeᚐEntity(ctx context.Context, sel ast.SelectionSet, v fedruntime.Entity) graphql.Marshaler {

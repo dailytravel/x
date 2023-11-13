@@ -55,10 +55,6 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 		}
 	}
 
-	for _, label := range input.Labels {
-		item.Labels = append(item.Labels, *label)
-	}
-
 	if input.Parent != nil {
 		_id, err := primitive.ObjectIDFromHex(*input.Parent)
 		if err != nil {
@@ -76,13 +72,18 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 		item.Start = &dt
 	}
 
-	if input.End != nil {
-		endAt, err := time.Parse(time.RFC3339, *input.End)
-		if err != nil {
-			return nil, fmt.Errorf("invalid End format: %v", err)
+	if input.Order != nil {
+		item.Order = input.Order
+	}
+
+	if input.Metadata != nil {
+		if item.Metadata == nil {
+			item.Metadata = make(map[string]interface{})
 		}
-		dt := primitive.NewDateTimeFromTime(endAt)
-		item.End = &dt
+
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
 	}
 
 	res, err := r.db.Collection(item.Collection()).InsertOne(ctx, item)
@@ -127,10 +128,6 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 		item.Status = *input.Status
 	}
 
-	for _, label := range input.Labels {
-		item.Labels = append(item.Labels, *label)
-	}
-
 	if input.Parent != nil {
 		_id, err := primitive.ObjectIDFromHex(*input.Parent)
 		if err != nil {
@@ -148,13 +145,18 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 		item.Start = &dt
 	}
 
-	if input.End != nil {
-		endAt, err := time.Parse(time.RFC3339, *input.End)
-		if err != nil {
-			return nil, fmt.Errorf("invalid End format: %v", err)
+	if input.Order != nil {
+		item.Order = input.Order
+	}
+
+	if input.Metadata != nil {
+		if item.Metadata == nil {
+			item.Metadata = make(map[string]interface{})
 		}
-		dt := primitive.NewDateTimeFromTime(endAt)
-		item.End = &dt
+
+		for k, v := range input.Metadata {
+			item.Metadata[k] = v
+		}
 	}
 
 	// Update the task in the database
@@ -177,36 +179,31 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (map[strin
 		return nil, err
 	}
 
-	_id, err := primitive.ObjectIDFromHex(id)
+	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 
-	// Retrieve the task using its ID
-	task := &model.Task{}
-	filter := bson.M{"_id": _id}
-	err = r.db.Collection(task.Collection()).FindOne(ctx, filter).Decode(task)
+	filter := bson.M{
+		"_id": objectID,
+		"$or": []bson.M{
+			{"uid": uid},
+			{"collaborators": uid},
+			{"assignments": bson.M{"$elemMatch": bson.M{"uid": uid}}},
+		},
+	}
+
+	result, err := r.db.Collection("tasks").DeleteOne(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
-	// Archive the task by updating its status or setting a "deleted" flag
-	archiveFields := bson.M{
-		"status":     "archived",
-		"updated_by": uid,
-		"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
+	if result.DeletedCount == 0 {
+		return nil, errors.New("task not found or unauthorized to delete")
 	}
 
-	update := bson.M{"$set": archiveFields}
-	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
-
-	var archivedTask model.Task
-	err = r.db.Collection("tasks").FindOneAndUpdate(ctx, filter, update, opts).Decode(&archivedTask)
-	if err != nil {
-		return nil, err
-	}
-
-	return map[string]interface{}{"success": true}, nil
+	response := map[string]interface{}{"success": "Task deleted successfully"}
+	return response, nil
 }
 
 // DeleteTasks is the resolver for the deleteTasks field.
@@ -216,90 +213,110 @@ func (r *mutationResolver) DeleteTasks(ctx context.Context, ids []string) (map[s
 		return nil, err
 	}
 
-	var objectIDs []primitive.ObjectID
-	for _, id := range ids {
-		_id, err := primitive.ObjectIDFromHex(id)
+	objectIDs := make([]primitive.ObjectID, len(ids))
+	for i, id := range ids {
+		objID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
 			return nil, err
 		}
-		objectIDs = append(objectIDs, _id)
+		objectIDs[i] = objID
 	}
 
-	filter := bson.M{"_id": bson.M{"$in": objectIDs}}
-	archiveFields := bson.M{
-		"status":     "archived",
-		"updated_by": uid,
-		"deleted":    primitive.Timestamp{T: uint32(time.Now().Unix())},
+	filter := bson.M{
+		"_id": bson.M{"$in": objectIDs},
+		"$or": []bson.M{
+			{"uid": uid},
+			{"collaborators": uid},
+			{"assignments": bson.M{"$elemMatch": bson.M{"uid": uid}}},
+		},
 	}
-	update := bson.M{"$set": archiveFields}
 
-	_, err = r.db.Collection("tasks").UpdateMany(ctx, filter, update)
+	result, err := r.db.Collection("tasks").DeleteMany(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
-	return map[string]interface{}{"success": true}, nil
+	if result.DeletedCount != int64(len(ids)) {
+		return nil, errors.New("tasks not found or unauthorized to delete")
+	}
+
+	response := map[string]interface{}{"success": "Tasks deleted successfully"}
+	return response, nil
 }
 
 // Task is the resolver for the task field.
 func (r *queryResolver) Task(ctx context.Context, id string) (*model.Task, error) {
-	var item *model.Task
-
-	_id, err := primitive.ObjectIDFromHex(id)
+	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	filter := bson.M{"_id": _id}
-
-	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
+	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
-	return item, nil
+	filter := bson.M{
+		"_id": objectID,
+		"$or": []bson.M{
+			{"UID": uid},
+			{"collaborators": uid},
+			{"assignments": bson.M{"$elemMatch": bson.M{"uid": uid}}},
+		},
+	}
+
+	var task model.Task
+	err = r.db.Collection("tasks").FindOne(ctx, filter).Decode(&task)
+	if err != nil {
+		return nil, err
+	}
+
+	return &task, nil
 }
 
 // Tasks is the resolver for the tasks field.
-func (r *queryResolver) Tasks(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Tasks, error) {
-	var items []*model.Task
-
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+func (r *queryResolver) Tasks(ctx context.Context, stages map[string]interface{}) (*model.Tasks, error) {
+	uid, err := utils.UID(ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	cursor, err := r.db.Collection("tasks").Find(ctx, _filter, opts)
+	matchStage := bson.M{
+		"$match": bson.M{
+			"$and": []interface{}{
+				bson.M{"status": bson.M{"$ne": "ARCHIVED"}},
+				bson.M{"$or": bson.A{
+					bson.M{"uid": uid},
+					bson.M{"collaborators": uid},
+					bson.M{
+						"assignments.task": "$_id",
+						"assignments.uid":  uid,
+					},
+				}},
+			},
+		},
+	}
+
+	pipeline := bson.A{matchStage}
+
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
+	}
+
+	cursor, err := r.db.Collection("tasks").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	for cursor.Next(ctx) {
-		var item model.Task
-		if err := cursor.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, &item)
-	}
-
-	//get total count
-	count, err := r.db.Collection("tasks").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	var items []*model.Task
+	if err = cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Tasks{
-		Count: int(count),
+		Count: len(items),
 		Data:  items,
 	}, nil
 }
@@ -359,15 +376,6 @@ func (r *taskResolver) Start(ctx context.Context, obj *model.Task) (*string, err
 	return pointer.String(obj.Start.Time().Format(time.RFC3339)), nil
 }
 
-// End is the resolver for the end field.
-func (r *taskResolver) End(ctx context.Context, obj *model.Task) (*string, error) {
-	if obj.End == nil {
-		return nil, nil
-	}
-
-	return pointer.String(obj.End.Time().Format(time.RFC3339)), nil
-}
-
 // Metadata is the resolver for the metadata field.
 func (r *taskResolver) Metadata(ctx context.Context, obj *model.Task) (map[string]interface{}, error) {
 	return obj.Metadata, nil
@@ -378,24 +386,17 @@ func (r *taskResolver) UID(ctx context.Context, obj *model.Task) (string, error)
 	return obj.UID.Hex(), nil
 }
 
-// Lists is the resolver for the lists field.
-func (r *taskResolver) Lists(ctx context.Context, obj *model.Task) ([]*model.List, error) {
-	var items []*model.List
+// Assignment is the resolver for the assignment field.
+func (r *taskResolver) Assignment(ctx context.Context, obj *model.Task) (*model.Assignment, error) {
+	var item *model.Assignment
 
-	// filter where list.tasks array contains obj.ID
-	filter := bson.M{"tasks": bson.M{"$in": []primitive.ObjectID{obj.ID}}}
-	cursor, err := r.db.Collection("lists").Find(ctx, filter, nil)
+	filter := bson.M{"task": obj.ID}
+	err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 
-	defer cursor.Close(ctx)
-
-	if err = cursor.All(context.Background(), &items); err != nil {
-		return nil, err
-	}
-
-	return items, nil
+	return item, nil
 }
 
 // Created is the resolver for the created field.

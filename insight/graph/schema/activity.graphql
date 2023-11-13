@@ -1,12 +1,11 @@
 type Activity {
   id: ID!
-  action: String! # The type of action, e.g., "post", "comment", "like", etc.
-  metadata: Map # The metadata for the activity, e.g., the post that was liked.
-  uid: ID! # The user who performed the action
-  object: ID! # ID of the target object, like a post or a comment
-  client_ip: String
-  user_agent: String
-  timestamp: String! # The time the action was performed
+  uid: ID!
+  object: Map!
+  target: Map
+  action: String!
+  metadata: Map
+  timestamp: String!
 }
 
 type Activities {
@@ -16,14 +15,7 @@ type Activities {
 
 extend type Query {
   activity(id: ID!): Activity @auth
-  activities(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Activities @auth
+  activities(stages: Map): Activities @auth
 }
 
 extend type Mutation {

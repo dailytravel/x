@@ -20,8 +20,8 @@ type Share struct {
 func (Share) IsEntity() {}
 
 type Object struct {
-	ID         primitive.ObjectID `json:"id" bson:"_id"`
-	Collection string             `json:"collection" bson:"collection"`
+	ID   primitive.ObjectID `json:"id" bson:"_id"`
+	Type string             `json:"type" bson:"type"`
 }
 
 func (i *Share) MarshalBSON() ([]byte, error) {

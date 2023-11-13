@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dailytravel/x/cms/graph/model"
-	"github.com/dailytravel/x/cms/internal/utils"
-	"github.com/dailytravel/x/cms/pkg/auth"
+	"github.com/dailytravel/x/configuration/graph/model"
+	"github.com/dailytravel/x/configuration/internal/utils"
+	"github.com/dailytravel/x/configuration/pkg/auth"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -275,11 +275,6 @@ func (r *termResolver) Created(ctx context.Context, obj *model.Term) (string, er
 // Updated is the resolver for the updated field.
 func (r *termResolver) Updated(ctx context.Context, obj *model.Term) (string, error) {
 	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
-}
-
-// Images is the resolver for the images field.
-func (r *termResolver) Images(ctx context.Context, obj *model.Term) ([]*model.Image, error) {
-	panic(fmt.Errorf("not implemented: Images - images"))
 }
 
 // Term returns TermResolver implementation.

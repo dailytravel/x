@@ -1,0 +1,4 @@
+extend type Board @key(fields: "id") {
+  id: ID! @external
+  shares: [Share]
+}

@@ -1,7 +1,7 @@
 package model
 
 type Post struct {
-	ID string `json:"id" bson:"_id"`
+	ID string `bson:"_id" json:"id"`
 }
 
 func (Post) IsEntity() {}

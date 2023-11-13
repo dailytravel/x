@@ -38,6 +38,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Board() BoardResolver
 	Comment() CommentResolver
 	Conversation() ConversationResolver
 	Entity() EntityResolver
@@ -49,6 +50,7 @@ type ResolverRoot interface {
 	Reaction() ReactionResolver
 	Recipient() RecipientResolver
 	Share() ShareResolver
+	Task() TaskResolver
 	Template() TemplateResolver
 	User() UserResolver
 }
@@ -62,6 +64,11 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Board struct {
+		ID     func(childComplexity int) int
+		Shares func(childComplexity int) int
+	}
+
 	Comment struct {
 		Body        func(childComplexity int) int
 		Children    func(childComplexity int) int
@@ -114,6 +121,7 @@ type ComplexityRoot struct {
 	}
 
 	Entity struct {
+		FindBoardByID    func(childComplexity int, id string) int
 		FindCommentByID  func(childComplexity int, id string) int
 		FindContactByID  func(childComplexity int, id string) int
 		FindExpenseByID  func(childComplexity int, id string) int
@@ -320,6 +328,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type BoardResolver interface {
+	Shares(ctx context.Context, obj *model.Board) ([]*model.Share, error)
+}
 type CommentResolver interface {
 	ID(ctx context.Context, obj *model.Comment) (string, error)
 	UID(ctx context.Context, obj *model.Comment) (*string, error)
@@ -346,6 +357,7 @@ type ConversationResolver interface {
 	Comments(ctx context.Context, obj *model.Conversation) ([]*model.Comment, error)
 }
 type EntityResolver interface {
+	FindBoardByID(ctx context.Context, id string) (*model.Board, error)
 	FindCommentByID(ctx context.Context, id string) (*model.Comment, error)
 	FindContactByID(ctx context.Context, id string) (*model.Contact, error)
 	FindExpenseByID(ctx context.Context, id string) (*model.Expense, error)
@@ -452,6 +464,10 @@ type ShareResolver interface {
 	Created(ctx context.Context, obj *model.Share) (string, error)
 	Updated(ctx context.Context, obj *model.Share) (string, error)
 }
+type TaskResolver interface {
+	Comments(ctx context.Context, obj *model.Task) ([]*model.Comment, error)
+	Shares(ctx context.Context, obj *model.Task) ([]*model.Share, error)
+}
 type TemplateResolver interface {
 	ID(ctx context.Context, obj *model.Template) (string, error)
 
@@ -484,6 +500,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Board.id":
+		if e.complexity.Board.ID == nil {
+			break
+		}
+
+		return e.complexity.Board.ID(childComplexity), true
+
+	case "Board.shares":
+		if e.complexity.Board.Shares == nil {
+			break
+		}
+
+		return e.complexity.Board.Shares(childComplexity), true
 
 	case "Comment.body":
 		if e.complexity.Comment.Body == nil {
@@ -736,6 +766,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Conversations.Data(childComplexity), true
+
+	case "Entity.findBoardByID":
+		if e.complexity.Entity.FindBoardByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findBoardByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindBoardByID(childComplexity, args["id"].(string)), true
 
 	case "Entity.findCommentByID":
 		if e.complexity.Entity.FindCommentByID == nil {
@@ -2104,7 +2146,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/comment.graphql" "schema/contact.graphql" "schema/conversation.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/message.graphql" "schema/notification.graphql" "schema/place.graphql" "schema/post.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/recipient.graphql" "schema/share.graphql" "schema/task.graphql" "schema/template.graphql" "schema/user.graphql"
+//go:embed "schema.graphqls" "schema/board.graphql" "schema/comment.graphql" "schema/contact.graphql" "schema/conversation.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/message.graphql" "schema/notification.graphql" "schema/place.graphql" "schema/post.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/recipient.graphql" "schema/share.graphql" "schema/task.graphql" "schema/template.graphql" "schema/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2117,6 +2159,7 @@ func sourceData(filename string) string {
 
 var sources = []*ast.Source{
 	{Name: "schema.graphqls", Input: sourceData("schema.graphqls"), BuiltIn: false},
+	{Name: "schema/board.graphql", Input: sourceData("schema/board.graphql"), BuiltIn: false},
 	{Name: "schema/comment.graphql", Input: sourceData("schema/comment.graphql"), BuiltIn: false},
 	{Name: "schema/contact.graphql", Input: sourceData("schema/contact.graphql"), BuiltIn: false},
 	{Name: "schema/conversation.graphql", Input: sourceData("schema/conversation.graphql"), BuiltIn: false},
@@ -2171,11 +2214,12 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Comment | Contact | Expense | File | Place | Post | Quote | Reaction | Share | Task | User
+union _Entity = Board | Comment | Contact | Expense | File | Place | Post | Quote | Reaction | Share | Task | User
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
-		findCommentByID(id: ID!,): Comment!
+		findBoardByID(id: ID!,): Board!
+	findCommentByID(id: ID!,): Comment!
 	findContactByID(id: ID!,): Contact!
 	findExpenseByID(id: ID!,): Expense!
 	findFileByID(id: ID!,): File!
@@ -2247,6 +2291,21 @@ func (ec *executionContext) dir_hasScope_args(ctx context.Context, rawArgs map[s
 		}
 	}
 	args["scope"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findBoardByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -3595,6 +3654,109 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Board_id(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Board_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Board_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Board",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Board_shares(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Board_shares(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Board().Shares(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Share)
+	fc.Result = res
+	return ec.marshalOShare2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐShare(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Board_shares(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Board",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Share_id(ctx, field)
+			case "uid":
+				return ec.fieldContext_Share_uid(ctx, field)
+			case "object":
+				return ec.fieldContext_Share_object(ctx, field)
+			case "permission":
+				return ec.fieldContext_Share_permission(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Share_metadata(ctx, field)
+			case "status":
+				return ec.fieldContext_Share_status(ctx, field)
+			case "created":
+				return ec.fieldContext_Share_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Share_updated(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Share", field.Name)
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Comment_id(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comment_id(ctx, field)
@@ -5393,6 +5555,67 @@ func (ec *executionContext) fieldContext_Conversations_count(ctx context.Context
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Entity_findBoardByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findBoardByID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindBoardByID(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Board)
+	fc.Result = res
+	return ec.marshalNBoard2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐBoard(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findBoardByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Board_id(ctx, field)
+			case "shares":
+				return ec.fieldContext_Board_shares(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findBoardByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12754,7 +12977,7 @@ func (ec *executionContext) _Task_comments(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Comments, nil
+		return ec.resolvers.Task().Comments(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12772,8 +12995,8 @@ func (ec *executionContext) fieldContext_Task_comments(ctx context.Context, fiel
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -12829,7 +13052,7 @@ func (ec *executionContext) _Task_shares(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Shares, nil
+		return ec.resolvers.Task().Shares(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12847,8 +13070,8 @@ func (ec *executionContext) fieldContext_Task_shares(ctx context.Context, field 
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -16476,6 +16699,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case model.Board:
+		return ec._Board(ctx, sel, &obj)
+	case *model.Board:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Board(ctx, sel, obj)
 	case model.Comment:
 		return ec._Comment(ctx, sel, &obj)
 	case *model.Comment:
@@ -16561,6 +16791,78 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var boardImplementors = []string{"Board", "_Entity"}
+
+func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, obj *model.Board) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, boardImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Board")
+		case "id":
+			out.Values[i] = ec._Board_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "shares":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Board_shares(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var commentImplementors = []string{"Comment", "_Entity"}
 
@@ -17426,6 +17728,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Entity")
+		case "findBoardByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findBoardByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "findCommentByID":
 			field := field
 
@@ -19855,12 +20179,74 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._Task_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "comments":
-			out.Values[i] = ec._Task_comments(ctx, field, obj)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_comments(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "shares":
-			out.Values[i] = ec._Task_shares(ctx, field, obj)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_shares(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20752,6 +21138,20 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
+
+func (ec *executionContext) marshalNBoard2githubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐBoard(ctx context.Context, sel ast.SelectionSet, v model.Board) graphql.Marshaler {
+	return ec._Board(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNBoard2ᚖgithubᚗcomᚋdailytravelᚋxᚋcommunityᚋgraphᚋmodelᚐBoard(ctx context.Context, sel ast.SelectionSet, v *model.Board) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Board(ctx, sel, v)
+}
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)

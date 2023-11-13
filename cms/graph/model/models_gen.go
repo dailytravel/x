@@ -43,25 +43,9 @@ type NewPost struct {
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
-type NewTerm struct {
-	Locale      string                 `json:"locale"`
-	Name        string                 `json:"name"`
-	Slug        *string                `json:"slug,omitempty"`
-	Description *string                `json:"description,omitempty"`
-	Parent      *string                `json:"parent,omitempty"`
-	Type        string                 `json:"type"`
-	Order       *int                   `json:"order,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
 type Posts struct {
 	Count int     `json:"count"`
 	Data  []*Post `json:"data,omitempty"`
-}
-
-type Terms struct {
-	Count int     `json:"count"`
-	Data  []*Term `json:"data,omitempty"`
 }
 
 type UpdateFile struct {
@@ -87,18 +71,6 @@ type UpdatePost struct {
 	Images      []*string              `json:"images,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 	Commentable *bool                  `json:"commentable,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type UpdateTerm struct {
-	ID          *string                `json:"id,omitempty"`
-	Locale      string                 `json:"locale"`
-	Name        *string                `json:"name,omitempty"`
-	Slug        *string                `json:"slug,omitempty"`
-	Description *string                `json:"description,omitempty"`
-	Parent      *string                `json:"parent,omitempty"`
-	Type        *string                `json:"type,omitempty"`
-	Order       *int                   `json:"order,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 

@@ -1,0 +1,10 @@
+type Relationship {
+  id: ID!
+  object: Map!
+  target: Map!
+  order: Int
+  metadata: Map
+  status: String
+  created: String!
+  updated: String!
+}

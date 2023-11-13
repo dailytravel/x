@@ -80,6 +80,26 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 		}()
 
 		switch typeName {
+		case "Assignment":
+			resolverName, err := entityResolverNameForAssignment(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Assignment": %w`, err)
+			}
+			switch resolverName {
+
+			case "findAssignmentByUID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["uid"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findAssignmentByUID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindAssignmentByUID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Assignment": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
 		case "Attendance":
 			resolverName, err := entityResolverNameForAttendance(ctx, rep)
 			if err != nil {
@@ -519,6 +539,18 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 
 				list[idx[i]] = entity
 				return nil
+			case "findTaskByCollaborators":
+				id0, err := ec.unmarshalOID2ᚕstringᚄ(ctx, rep["collaborators"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findTaskByCollaborators(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindTaskByCollaborators(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Task": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
 			}
 		case "User":
 			resolverName, err := entityResolverNameForUser(ctx, rep)
@@ -627,6 +659,23 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 		g.Wait()
 		return list
 	}
+}
+
+func entityResolverNameForAssignment(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["uid"]; !ok {
+			break
+		}
+		return "findAssignmentByUID", nil
+	}
+	return "", fmt.Errorf("%w for Assignment", ErrTypeNotFound)
 }
 
 func entityResolverNameForAttendance(ctx context.Context, rep map[string]interface{}) (string, error) {
@@ -999,6 +1048,19 @@ func entityResolverNameForTask(ctx context.Context, rep map[string]interface{}) 
 			break
 		}
 		return "findTaskByUID", nil
+	}
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["collaborators"]; !ok {
+			break
+		}
+		return "findTaskByCollaborators", nil
 	}
 	return "", fmt.Errorf("%w for Task", ErrTypeNotFound)
 }

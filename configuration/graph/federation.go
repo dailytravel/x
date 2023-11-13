@@ -100,6 +100,26 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				list[idx[i]] = entity
 				return nil
 			}
+		case "Term":
+			resolverName, err := entityResolverNameForTerm(ctx, rep)
+			if err != nil {
+				return fmt.Errorf(`finding resolver for Entity "Term": %w`, err)
+			}
+			switch resolverName {
+
+			case "findTermByID":
+				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
+				if err != nil {
+					return fmt.Errorf(`unmarshalling param 0 for findTermByID(): %w`, err)
+				}
+				entity, err := ec.resolvers.Entity().FindTermByID(ctx, id0)
+				if err != nil {
+					return fmt.Errorf(`resolving Entity "Term": %w`, err)
+				}
+
+				list[idx[i]] = entity
+				return nil
+			}
 		case "User":
 			resolverName, err := entityResolverNameForUser(ctx, rep)
 			if err != nil {
@@ -204,6 +224,23 @@ func entityResolverNameForPlace(ctx context.Context, rep map[string]interface{})
 		return "findPlaceByID", nil
 	}
 	return "", fmt.Errorf("%w for Place", ErrTypeNotFound)
+}
+
+func entityResolverNameForTerm(ctx context.Context, rep map[string]interface{}) (string, error) {
+	for {
+		var (
+			m   map[string]interface{}
+			val interface{}
+			ok  bool
+		)
+		_ = val
+		m = rep
+		if _, ok = m["id"]; !ok {
+			break
+		}
+		return "findTermByID", nil
+	}
+	return "", fmt.Errorf("%w for Term", ErrTypeNotFound)
 }
 
 func entityResolverNameForUser(ctx context.Context, rep map[string]interface{}) (string, error) {

@@ -39,6 +39,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Api() ApiResolver
+	Assignment() AssignmentResolver
 	Attendance() AttendanceResolver
 	Board() BoardResolver
 	Campaign() CampaignResolver
@@ -98,6 +99,11 @@ type ComplexityRoot struct {
 	Apis struct {
 		Count func(childComplexity int) int
 		Data  func(childComplexity int) int
+	}
+
+	Assignment struct {
+		Assignee func(childComplexity int) int
+		UID      func(childComplexity int) int
 	}
 
 	Attendance struct {
@@ -195,30 +201,32 @@ type ComplexityRoot struct {
 	}
 
 	Entity struct {
-		FindAttendanceByUID   func(childComplexity int, uid string) int
-		FindBoardByUID        func(childComplexity int, uid string) int
-		FindCampaignByUID     func(childComplexity int, uid string) int
-		FindCommentByUID      func(childComplexity int, uid string) int
-		FindCompanyByUID      func(childComplexity int, uid string) int
-		FindContactByUID      func(childComplexity int, uid string) int
-		FindCouponByUID       func(childComplexity int, uid string) int
-		FindExpenseByUID      func(childComplexity int, uid string) int
-		FindFileByUID         func(childComplexity int, uid string) int
-		FindGoalByUID         func(childComplexity int, uid string) int
-		FindInvoiceByUID      func(childComplexity int, uid string) int
-		FindLinkByUID         func(childComplexity int, uid string) int
-		FindListByUID         func(childComplexity int, uid string) int
-		FindMembershipByUID   func(childComplexity int, uid string) int
-		FindOrderByUID        func(childComplexity int, uid string) int
-		FindOrganizationByUID func(childComplexity int, uid string) int
-		FindPortfolioByUID    func(childComplexity int, uid string) int
-		FindPostByUID         func(childComplexity int, uid string) int
-		FindQuoteByUID        func(childComplexity int, uid string) int
-		FindReactionByUID     func(childComplexity int, uid string) int
-		FindShareByUID        func(childComplexity int, uid string) int
-		FindTaskByUID         func(childComplexity int, uid string) int
-		FindUserByID          func(childComplexity int, id string) int
-		FindWishlistByUID     func(childComplexity int, uid string) int
+		FindAssignmentByUID     func(childComplexity int, uid string) int
+		FindAttendanceByUID     func(childComplexity int, uid string) int
+		FindBoardByUID          func(childComplexity int, uid string) int
+		FindCampaignByUID       func(childComplexity int, uid string) int
+		FindCommentByUID        func(childComplexity int, uid string) int
+		FindCompanyByUID        func(childComplexity int, uid string) int
+		FindContactByUID        func(childComplexity int, uid string) int
+		FindCouponByUID         func(childComplexity int, uid string) int
+		FindExpenseByUID        func(childComplexity int, uid string) int
+		FindFileByUID           func(childComplexity int, uid string) int
+		FindGoalByUID           func(childComplexity int, uid string) int
+		FindInvoiceByUID        func(childComplexity int, uid string) int
+		FindLinkByUID           func(childComplexity int, uid string) int
+		FindListByUID           func(childComplexity int, uid string) int
+		FindMembershipByUID     func(childComplexity int, uid string) int
+		FindOrderByUID          func(childComplexity int, uid string) int
+		FindOrganizationByUID   func(childComplexity int, uid string) int
+		FindPortfolioByUID      func(childComplexity int, uid string) int
+		FindPostByUID           func(childComplexity int, uid string) int
+		FindQuoteByUID          func(childComplexity int, uid string) int
+		FindReactionByUID       func(childComplexity int, uid string) int
+		FindShareByUID          func(childComplexity int, uid string) int
+		FindTaskByCollaborators func(childComplexity int, collaborators []string) int
+		FindTaskByUID           func(childComplexity int, uid string) int
+		FindUserByID            func(childComplexity int, id string) int
+		FindWishlistByUID       func(childComplexity int, uid string) int
 	}
 
 	Expense struct {
@@ -475,8 +483,10 @@ type ComplexityRoot struct {
 	}
 
 	Task struct {
-		UID  func(childComplexity int) int
-		User func(childComplexity int) int
+		Collaborators func(childComplexity int) int
+		Followers     func(childComplexity int) int
+		UID           func(childComplexity int) int
+		User          func(childComplexity int) int
 	}
 
 	Token struct {
@@ -540,6 +550,9 @@ type ApiResolver interface {
 	Created(ctx context.Context, obj *model.Api) (string, error)
 	Updated(ctx context.Context, obj *model.Api) (string, error)
 }
+type AssignmentResolver interface {
+	Assignee(ctx context.Context, obj *model.Assignment) (*model.User, error)
+}
 type AttendanceResolver interface {
 	User(ctx context.Context, obj *model.Attendance) (*model.User, error)
 }
@@ -589,6 +602,7 @@ type CredentialResolver interface {
 	Updated(ctx context.Context, obj *model.Credential) (string, error)
 }
 type EntityResolver interface {
+	FindAssignmentByUID(ctx context.Context, uid string) (*model.Assignment, error)
 	FindAttendanceByUID(ctx context.Context, uid string) (*model.Attendance, error)
 	FindBoardByUID(ctx context.Context, uid string) (*model.Board, error)
 	FindCampaignByUID(ctx context.Context, uid string) (*model.Campaign, error)
@@ -611,6 +625,7 @@ type EntityResolver interface {
 	FindReactionByUID(ctx context.Context, uid string) (*model.Reaction, error)
 	FindShareByUID(ctx context.Context, uid string) (*model.Share, error)
 	FindTaskByUID(ctx context.Context, uid string) (*model.Task, error)
+	FindTaskByCollaborators(ctx context.Context, collaborators []string) (*model.Task, error)
 	FindUserByID(ctx context.Context, id string) (*model.User, error)
 	FindWishlistByUID(ctx context.Context, uid string) (*model.Wishlist, error)
 }
@@ -769,6 +784,7 @@ type ShareResolver interface {
 }
 type TaskResolver interface {
 	User(ctx context.Context, obj *model.Task) (*model.User, error)
+	Followers(ctx context.Context, obj *model.Task) ([]*model.User, error)
 }
 type TokenResolver interface {
 	ID(ctx context.Context, obj *model.Token) (string, error)
@@ -894,6 +910,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Apis.Data(childComplexity), true
+
+	case "Assignment.assignee":
+		if e.complexity.Assignment.Assignee == nil {
+			break
+		}
+
+		return e.complexity.Assignment.Assignee(childComplexity), true
+
+	case "Assignment.uid":
+		if e.complexity.Assignment.UID == nil {
+			break
+		}
+
+		return e.complexity.Assignment.UID(childComplexity), true
 
 	case "Attendance.uid":
 		if e.complexity.Attendance.UID == nil {
@@ -1280,6 +1310,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Credential.User(childComplexity), true
 
+	case "Entity.findAssignmentByUID":
+		if e.complexity.Entity.FindAssignmentByUID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findAssignmentByUID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindAssignmentByUID(childComplexity, args["uid"].(string)), true
+
 	case "Entity.findAttendanceByUID":
 		if e.complexity.Entity.FindAttendanceByUID == nil {
 			break
@@ -1531,6 +1573,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.FindShareByUID(childComplexity, args["uid"].(string)), true
+
+	case "Entity.findTaskByCollaborators":
+		if e.complexity.Entity.FindTaskByCollaborators == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findTaskByCollaborators_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindTaskByCollaborators(childComplexity, args["collaborators"].([]string)), true
 
 	case "Entity.findTaskByUID":
 		if e.complexity.Entity.FindTaskByUID == nil {
@@ -3101,6 +3155,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Share.User(childComplexity), true
 
+	case "Task.collaborators":
+		if e.complexity.Task.Collaborators == nil {
+			break
+		}
+
+		return e.complexity.Task.Collaborators(childComplexity), true
+
+	case "Task.followers":
+		if e.complexity.Task.Followers == nil {
+			break
+		}
+
+		return e.complexity.Task.Followers(childComplexity), true
+
 	case "Task.uid":
 		if e.complexity.Task.UID == nil {
 			break
@@ -3504,7 +3572,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/api.graphql" "schema/attendance.graphql" "schema/board.graphql" "schema/campaign.graphql" "schema/client.graphql" "schema/comment.graphql" "schema/company.graphql" "schema/connection.graphql" "schema/contact.graphql" "schema/coupon.graphql" "schema/credential.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/goal.graphql" "schema/identity.graphql" "schema/integration.graphql" "schema/invitation.graphql" "schema/invoice.graphql" "schema/key.graphql" "schema/link.graphql" "schema/list.graphql" "schema/membership.graphql" "schema/order.graphql" "schema/organization.graphql" "schema/permission.graphql" "schema/portfolio.graphql" "schema/post.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/role.graphql" "schema/share.graphql" "schema/task.graphql" "schema/token.graphql" "schema/user.graphql" "schema/wishlist.graphql"
+//go:embed "schema.graphqls" "schema/api.graphql" "schema/assignment.graphql" "schema/attendance.graphql" "schema/board.graphql" "schema/campaign.graphql" "schema/client.graphql" "schema/comment.graphql" "schema/company.graphql" "schema/connection.graphql" "schema/contact.graphql" "schema/coupon.graphql" "schema/credential.graphql" "schema/expense.graphql" "schema/file.graphql" "schema/goal.graphql" "schema/identity.graphql" "schema/integration.graphql" "schema/invitation.graphql" "schema/invoice.graphql" "schema/key.graphql" "schema/link.graphql" "schema/list.graphql" "schema/membership.graphql" "schema/order.graphql" "schema/organization.graphql" "schema/permission.graphql" "schema/portfolio.graphql" "schema/post.graphql" "schema/quote.graphql" "schema/reaction.graphql" "schema/role.graphql" "schema/share.graphql" "schema/task.graphql" "schema/token.graphql" "schema/user.graphql" "schema/wishlist.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -3518,6 +3586,7 @@ func sourceData(filename string) string {
 var sources = []*ast.Source{
 	{Name: "schema.graphqls", Input: sourceData("schema.graphqls"), BuiltIn: false},
 	{Name: "schema/api.graphql", Input: sourceData("schema/api.graphql"), BuiltIn: false},
+	{Name: "schema/assignment.graphql", Input: sourceData("schema/assignment.graphql"), BuiltIn: false},
 	{Name: "schema/attendance.graphql", Input: sourceData("schema/attendance.graphql"), BuiltIn: false},
 	{Name: "schema/board.graphql", Input: sourceData("schema/board.graphql"), BuiltIn: false},
 	{Name: "schema/campaign.graphql", Input: sourceData("schema/campaign.graphql"), BuiltIn: false},
@@ -3590,11 +3659,12 @@ var sources = []*ast.Source{
 `, BuiltIn: true},
 	{Name: "../federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Attendance | Board | Campaign | Comment | Company | Contact | Coupon | Expense | File | Goal | Invoice | Link | List | Membership | Order | Organization | Portfolio | Post | Quote | Reaction | Share | Task | User | Wishlist
+union _Entity = Assignment | Attendance | Board | Campaign | Comment | Company | Contact | Coupon | Expense | File | Goal | Invoice | Link | List | Membership | Order | Organization | Portfolio | Post | Quote | Reaction | Share | Task | User | Wishlist
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
-		findAttendanceByUID(uid: ID!,): Attendance!
+		findAssignmentByUID(uid: ID!,): Assignment!
+	findAttendanceByUID(uid: ID!,): Attendance!
 	findBoardByUID(uid: ID!,): Board!
 	findCampaignByUID(uid: ID!,): Campaign!
 	findCommentByUID(uid: ID!,): Comment!
@@ -3616,6 +3686,7 @@ type Entity {
 	findReactionByUID(uid: ID!,): Reaction!
 	findShareByUID(uid: ID!,): Share!
 	findTaskByUID(uid: ID!,): Task!
+	findTaskByCollaborators(collaborators: [ID!],): Task!
 	findUserByID(id: ID!,): User!
 	findWishlistByUID(uid: ID!,): Wishlist!
 
@@ -3679,6 +3750,21 @@ func (ec *executionContext) dir_hasScope_args(ctx context.Context, rawArgs map[s
 		}
 	}
 	args["scope"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findAssignmentByUID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["uid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uid"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uid"] = arg0
 	return args, nil
 }
 
@@ -3994,6 +4080,21 @@ func (ec *executionContext) field_Entity_findShareByUID_args(ctx context.Context
 		}
 	}
 	args["uid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Entity_findTaskByCollaborators_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["collaborators"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collaborators"))
+		arg0, err = ec.unmarshalOID2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collaborators"] = arg0
 	return args, nil
 }
 
@@ -6176,6 +6277,133 @@ func (ec *executionContext) fieldContext_Apis_count(ctx context.Context, field g
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Assignment_uid(ctx context.Context, field graphql.CollectedField, obj *model.Assignment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Assignment_uid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Assignment_uid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Assignment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Assignment_assignee(ctx context.Context, field graphql.CollectedField, obj *model.Assignment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Assignment_assignee(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Assignment().Assignee(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Assignment_assignee(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Assignment",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "given_name":
+				return ec.fieldContext_User_given_name(ctx, field)
+			case "family_name":
+				return ec.fieldContext_User_family_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "timezone":
+				return ec.fieldContext_User_timezone(ctx, field)
+			case "locale":
+				return ec.fieldContext_User_locale(ctx, field)
+			case "picture":
+				return ec.fieldContext_User_picture(ctx, field)
+			case "last_login":
+				return ec.fieldContext_User_last_login(ctx, field)
+			case "last_ip":
+				return ec.fieldContext_User_last_ip(ctx, field)
+			case "last_activity":
+				return ec.fieldContext_User_last_activity(ctx, field)
+			case "email_verified":
+				return ec.fieldContext_User_email_verified(ctx, field)
+			case "phone_verified":
+				return ec.fieldContext_User_phone_verified(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
+			case "status":
+				return ec.fieldContext_User_status(ctx, field)
+			case "created":
+				return ec.fieldContext_User_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_User_updated(ctx, field)
+			case "identities":
+				return ec.fieldContext_User_identities(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -9031,6 +9259,67 @@ func (ec *executionContext) fieldContext_Credential_updated(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Entity_findAssignmentByUID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findAssignmentByUID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindAssignmentByUID(rctx, fc.Args["uid"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Assignment)
+	fc.Result = res
+	return ec.marshalNAssignment2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐAssignment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findAssignmentByUID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "uid":
+				return ec.fieldContext_Assignment_uid(ctx, field)
+			case "assignee":
+				return ec.fieldContext_Assignment_assignee(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Assignment", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findAssignmentByUID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Entity_findAttendanceByUID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Entity_findAttendanceByUID(ctx, field)
 	if err != nil {
@@ -10353,8 +10642,12 @@ func (ec *executionContext) fieldContext_Entity_findTaskByUID(ctx context.Contex
 			switch field.Name {
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Task_collaborators(ctx, field)
 			case "user":
 				return ec.fieldContext_Task_user(ctx, field)
+			case "followers":
+				return ec.fieldContext_Task_followers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
 		},
@@ -10367,6 +10660,71 @@ func (ec *executionContext) fieldContext_Entity_findTaskByUID(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Entity_findTaskByUID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Entity_findTaskByCollaborators(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findTaskByCollaborators(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindTaskByCollaborators(rctx, fc.Args["collaborators"].([]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Task)
+	fc.Result = res
+	return ec.marshalNTask2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐTask(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Entity_findTaskByCollaborators(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "uid":
+				return ec.fieldContext_Task_uid(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Task_collaborators(ctx, field)
+			case "user":
+				return ec.fieldContext_Task_user(ctx, field)
+			case "followers":
+				return ec.fieldContext_Task_followers(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Entity_findTaskByCollaborators_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -21461,6 +21819,47 @@ func (ec *executionContext) fieldContext_Task_uid(ctx context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Task_collaborators(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_collaborators(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Collaborators, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOID2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_collaborators(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Task_user(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Task_user(ctx, field)
 	if err != nil {
@@ -21490,6 +21889,89 @@ func (ec *executionContext) _Task_user(ctx context.Context, field graphql.Collec
 }
 
 func (ec *executionContext) fieldContext_Task_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "given_name":
+				return ec.fieldContext_User_given_name(ctx, field)
+			case "family_name":
+				return ec.fieldContext_User_family_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "timezone":
+				return ec.fieldContext_User_timezone(ctx, field)
+			case "locale":
+				return ec.fieldContext_User_locale(ctx, field)
+			case "picture":
+				return ec.fieldContext_User_picture(ctx, field)
+			case "last_login":
+				return ec.fieldContext_User_last_login(ctx, field)
+			case "last_ip":
+				return ec.fieldContext_User_last_ip(ctx, field)
+			case "last_activity":
+				return ec.fieldContext_User_last_activity(ctx, field)
+			case "email_verified":
+				return ec.fieldContext_User_email_verified(ctx, field)
+			case "phone_verified":
+				return ec.fieldContext_User_phone_verified(ctx, field)
+			case "metadata":
+				return ec.fieldContext_User_metadata(ctx, field)
+			case "status":
+				return ec.fieldContext_User_status(ctx, field)
+			case "created":
+				return ec.fieldContext_User_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_User_updated(ctx, field)
+			case "identities":
+				return ec.fieldContext_User_identities(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Task_followers(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_followers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().Followers(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_followers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -26659,6 +27141,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case model.Assignment:
+		return ec._Assignment(ctx, sel, &obj)
+	case *model.Assignment:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Assignment(ctx, sel, obj)
 	case model.Attendance:
 		return ec._Attendance(ctx, sel, &obj)
 	case *model.Attendance:
@@ -27056,6 +27545,78 @@ func (ec *executionContext) _Apis(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var assignmentImplementors = []string{"Assignment", "_Entity"}
+
+func (ec *executionContext) _Assignment(ctx context.Context, sel ast.SelectionSet, obj *model.Assignment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, assignmentImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Assignment")
+		case "uid":
+			out.Values[i] = ec._Assignment_uid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "assignee":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Assignment_assignee(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -28462,6 +29023,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Entity")
+		case "findAssignmentByUID":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findAssignmentByUID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "findAttendanceByUID":
 			field := field
 
@@ -28934,6 +29517,28 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 					}
 				}()
 				res = ec._Entity_findTaskByUID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "findTaskByCollaborators":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findTaskByCollaborators(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -32207,6 +32812,8 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "collaborators":
+			out.Values[i] = ec._Task_collaborators(ctx, field, obj)
 		case "user":
 			field := field
 
@@ -32217,6 +32824,39 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._Task_user(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "followers":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_followers(ctx, field, obj)
 				return res
 			}
 
@@ -33329,6 +33969,20 @@ func (ec *executionContext) unmarshalNAlgorithm2githubᚗcomᚋdailytravelᚋx�
 
 func (ec *executionContext) marshalNAlgorithm2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐAlgorithm(ctx context.Context, sel ast.SelectionSet, v model.Algorithm) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) marshalNAssignment2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐAssignment(ctx context.Context, sel ast.SelectionSet, v model.Assignment) graphql.Marshaler {
+	return ec._Assignment(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAssignment2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐAssignment(ctx context.Context, sel ast.SelectionSet, v *model.Assignment) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Assignment(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNAttendance2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐAttendance(ctx context.Context, sel ast.SelectionSet, v model.Attendance) graphql.Marshaler {
@@ -34630,6 +35284,44 @@ func (ec *executionContext) marshalOCredential2ᚖgithubᚗcomᚋdailytravelᚋx
 		return graphql.Null
 	}
 	return ec._Credential(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNID2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOID2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOID2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {

@@ -40,6 +40,11 @@ func (r *entityResolver) FindBoardByID(ctx context.Context, id string) (*model.B
 	return item, nil
 }
 
+// FindRelationshipByID is the resolver for the findRelationshipByID field.
+func (r *entityResolver) FindRelationshipByID(ctx context.Context, id string) (*model.Relationship, error) {
+	panic(fmt.Errorf("not implemented: FindRelationshipByID - findRelationshipByID"))
+}
+
 // FindUserByID is the resolver for the findUserByID field.
 func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
 	return &model.User{

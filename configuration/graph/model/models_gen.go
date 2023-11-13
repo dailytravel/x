@@ -82,6 +82,17 @@ type NewLocation struct {
 	Metadata    map[string]interface{}   `json:"metadata,omitempty"`
 }
 
+type NewTerm struct {
+	Locale      string                 `json:"locale"`
+	Name        string                 `json:"name"`
+	Slug        *string                `json:"slug,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Parent      *string                `json:"parent,omitempty"`
+	Type        string                 `json:"type"`
+	Order       *int                   `json:"order,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type NewTimezone struct {
 	Locale      string                 `json:"locale"`
 	Name        string                 `json:"name"`
@@ -100,6 +111,11 @@ type NewWebhook struct {
 type Places struct {
 	Data  []*Place `json:"data,omitempty"`
 	Count int      `json:"count"`
+}
+
+type Terms struct {
+	Count int     `json:"count"`
+	Data  []*Term `json:"data,omitempty"`
 }
 
 type Timezones struct {
@@ -151,6 +167,18 @@ type UpdateLocation struct {
 	Popular     *bool                    `json:"popular,omitempty"`
 	Status      *string                  `json:"status,omitempty"`
 	Metadata    map[string]interface{}   `json:"metadata,omitempty"`
+}
+
+type UpdateTerm struct {
+	ID          *string                `json:"id,omitempty"`
+	Locale      string                 `json:"locale"`
+	Name        *string                `json:"name,omitempty"`
+	Slug        *string                `json:"slug,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Parent      *string                `json:"parent,omitempty"`
+	Type        *string                `json:"type,omitempty"`
+	Order       *int                   `json:"order,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateTimezone struct {

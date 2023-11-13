@@ -181,25 +181,6 @@ func (r *postResolver) Updated(ctx context.Context, obj *model.Post) (string, er
 	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
-// Terms is the resolver for the terms field.
-func (r *postResolver) Terms(ctx context.Context, obj *model.Post) ([]*model.Term, error) {
-	var items []*model.Term
-
-	filter := bson.M{"_id": bson.M{"$in": obj.Terms}}
-	options := options.Find().SetProjection(bson.M{"_id": 1, "name": 1, "slug": 1, "post": 1})
-
-	cursor, err := r.db.Collection("terms").Find(ctx, filter, options)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
-
-	return items, nil
-}
-
 // Parent is the resolver for the parent field.
 func (r *postResolver) Parent(ctx context.Context, obj *model.Post) (*model.Post, error) {
 	if obj.Parent == nil {
@@ -310,6 +291,23 @@ type postResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *postResolver) Terms(ctx context.Context, obj *model.Post) ([]*model.Term, error) {
+	var items []*model.Term
+
+	filter := bson.M{"_id": bson.M{"$in": obj.Terms}}
+	options := options.Find().SetProjection(bson.M{"_id": 1, "name": 1, "slug": 1, "post": 1})
+
+	cursor, err := r.db.Collection("terms").Find(ctx, filter, options)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
 func (r *mutationResolver) DeletePosts(ctx context.Context, ids []string) (map[string]interface{}, error) {
 	panic(fmt.Errorf("not implemented: DeletePosts - deletePosts"))
 }

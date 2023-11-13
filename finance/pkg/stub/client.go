@@ -3,9 +3,8 @@ package stub
 import (
 	"flag"
 	"log"
-	"os"
-	"path/filepath"
 
+	"github.com/dailytravel/x/certs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -16,13 +15,9 @@ var (
 )
 
 func ConnectRPC() (*grpc.ClientConn, error) {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
 
 	// Provide the correct paths to your TLS certificate file and the server's hostname
-	creds, err := credentials.NewClientTLSFromFile(filepath.Join(currentDir, "certs", "x509", "ca_cert.pem"), "x.trip.express")
+	creds, err := credentials.NewClientTLSFromFile(certs.Path("x509/ca_cert.pem"), "x.trip.express")
 	if err != nil {
 		log.Fatalf("Failed to load credentials: %v", err)
 	}

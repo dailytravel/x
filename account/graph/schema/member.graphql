@@ -1,0 +1,9 @@
+type Member @key(fields: "id") {
+  id: ID!
+  uid: ID!
+  workspace: ID!
+  metadata: Map
+  status: String
+  created: String!
+  updated: String!
+}

@@ -88,7 +88,24 @@ func (r *entityResolver) FindTemplateByID(ctx context.Context, id string) (*mode
 	}, nil
 }
 
-// FindTermByID is the resolver for the findTermByID field.
+// FindUserByID is the resolver for the findUserByID field.
+func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
+	return &model.User{
+		ID: id,
+	}, nil
+}
+
+// Entity returns EntityResolver implementation.
+func (r *Resolver) Entity() EntityResolver { return &entityResolver{r} }
+
+type entityResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
 func (r *entityResolver) FindTermByID(ctx context.Context, id string) (*model.Term, error) {
 	var item *model.Term
 
@@ -103,15 +120,3 @@ func (r *entityResolver) FindTermByID(ctx context.Context, id string) (*model.Te
 
 	return item, nil
 }
-
-// FindUserByID is the resolver for the findUserByID field.
-func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
-	return &model.User{
-		ID: id,
-	}, nil
-}
-
-// Entity returns EntityResolver implementation.
-func (r *Resolver) Entity() EntityResolver { return &entityResolver{r} }
-
-type entityResolver struct{ *Resolver }

@@ -64,13 +64,12 @@ type ComplexityRoot struct {
 
 	Activity struct {
 		Action    func(childComplexity int) int
-		ClientIP  func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Metadata  func(childComplexity int) int
 		Object    func(childComplexity int) int
+		Target    func(childComplexity int) int
 		Timestamp func(childComplexity int) int
 		UID       func(childComplexity int) int
-		UserAgent func(childComplexity int) int
 	}
 
 	Entity struct {
@@ -124,7 +123,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Activities         func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
+		Activities         func(childComplexity int, stages map[string]interface{}) int
 		Activity           func(childComplexity int, id string) int
 		Log                func(childComplexity int, id string) int
 		Logs               func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
@@ -163,11 +162,11 @@ type ComplexityRoot struct {
 
 type ActivityResolver interface {
 	ID(ctx context.Context, obj *model.Activity) (string, error)
+	UID(ctx context.Context, obj *model.Activity) (string, error)
+	Object(ctx context.Context, obj *model.Activity) (map[string]interface{}, error)
+	Target(ctx context.Context, obj *model.Activity) (map[string]interface{}, error)
 
 	Metadata(ctx context.Context, obj *model.Activity) (map[string]interface{}, error)
-	UID(ctx context.Context, obj *model.Activity) (string, error)
-	Object(ctx context.Context, obj *model.Activity) (string, error)
-
 	Timestamp(ctx context.Context, obj *model.Activity) (string, error)
 }
 type EntityResolver interface {
@@ -203,7 +202,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Activity(ctx context.Context, id string) (*model.Activity, error)
-	Activities(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Activities, error)
+	Activities(ctx context.Context, stages map[string]interface{}) (*model.Activities, error)
 	Log(ctx context.Context, id string) (*model.Log, error)
 	Logs(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Logs, error)
 	Search(ctx context.Context, args map[string]interface{}) (map[string]interface{}, error)
@@ -257,13 +256,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Activity.Action(childComplexity), true
 
-	case "Activity.client_ip":
-		if e.complexity.Activity.ClientIP == nil {
-			break
-		}
-
-		return e.complexity.Activity.ClientIP(childComplexity), true
-
 	case "Activity.id":
 		if e.complexity.Activity.ID == nil {
 			break
@@ -285,6 +277,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Activity.Object(childComplexity), true
 
+	case "Activity.target":
+		if e.complexity.Activity.Target == nil {
+			break
+		}
+
+		return e.complexity.Activity.Target(childComplexity), true
+
 	case "Activity.timestamp":
 		if e.complexity.Activity.Timestamp == nil {
 			break
@@ -298,13 +297,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Activity.UID(childComplexity), true
-
-	case "Activity.user_agent":
-		if e.complexity.Activity.UserAgent == nil {
-			break
-		}
-
-		return e.complexity.Activity.UserAgent(childComplexity), true
 
 	case "Entity.findUserByID":
 		if e.complexity.Entity.FindUserByID == nil {
@@ -611,7 +603,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Activities(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
+		return e.complexity.Query.Activities(childComplexity, args["stages"].(map[string]interface{})), true
 
 	case "Query.activity":
 		if e.complexity.Query.Activity == nil {
@@ -1215,59 +1207,14 @@ func (ec *executionContext) field_Query_activities_args(ctx context.Context, raw
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["stages"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stages"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
+	args["stages"] = arg0
 	return args, nil
 }
 
@@ -1512,18 +1459,16 @@ func (ec *executionContext) fieldContext_Activities_data(ctx context.Context, fi
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Activity_id(ctx, field)
-			case "action":
-				return ec.fieldContext_Activity_action(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Activity_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Activity_uid(ctx, field)
 			case "object":
 				return ec.fieldContext_Activity_object(ctx, field)
-			case "client_ip":
-				return ec.fieldContext_Activity_client_ip(ctx, field)
-			case "user_agent":
-				return ec.fieldContext_Activity_user_agent(ctx, field)
+			case "target":
+				return ec.fieldContext_Activity_target(ctx, field)
+			case "action":
+				return ec.fieldContext_Activity_action(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Activity_metadata(ctx, field)
 			case "timestamp":
 				return ec.fieldContext_Activity_timestamp(ctx, field)
 			}
@@ -1621,6 +1566,138 @@ func (ec *executionContext) fieldContext_Activity_id(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Activity_uid(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Activity_uid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Activity().UID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Activity_uid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_object(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Activity_object(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Activity().Object(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(map[string]interface{})
+	fc.Result = res
+	return ec.marshalNMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Activity_object(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_target(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Activity_target(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Activity().Target(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(map[string]interface{})
+	fc.Result = res
+	return ec.marshalNMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Activity_target(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Activity_action(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Activity_action(ctx, field)
 	if err != nil {
@@ -1701,176 +1778,6 @@ func (ec *executionContext) fieldContext_Activity_metadata(ctx context.Context, 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Map does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Activity_uid(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Activity_uid(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Activity().UID(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Activity_uid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Activity",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Activity_object(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Activity_object(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Activity().Object(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Activity_object(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Activity",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Activity_client_ip(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Activity_client_ip(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ClientIP, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Activity_client_ip(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Activity",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Activity_user_agent(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Activity_user_agent(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UserAgent, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Activity_user_agent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Activity",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3791,18 +3698,16 @@ func (ec *executionContext) fieldContext_Query_activity(ctx context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Activity_id(ctx, field)
-			case "action":
-				return ec.fieldContext_Activity_action(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Activity_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Activity_uid(ctx, field)
 			case "object":
 				return ec.fieldContext_Activity_object(ctx, field)
-			case "client_ip":
-				return ec.fieldContext_Activity_client_ip(ctx, field)
-			case "user_agent":
-				return ec.fieldContext_Activity_user_agent(ctx, field)
+			case "target":
+				return ec.fieldContext_Activity_target(ctx, field)
+			case "action":
+				return ec.fieldContext_Activity_action(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Activity_metadata(ctx, field)
 			case "timestamp":
 				return ec.fieldContext_Activity_timestamp(ctx, field)
 			}
@@ -3838,7 +3743,7 @@ func (ec *executionContext) _Query_activities(ctx context.Context, field graphql
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Activities(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
+			return ec.resolvers.Query().Activities(rctx, fc.Args["stages"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -5000,18 +4905,16 @@ func (ec *executionContext) fieldContext_User_activities(ctx context.Context, fi
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Activity_id(ctx, field)
-			case "action":
-				return ec.fieldContext_Activity_action(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Activity_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Activity_uid(ctx, field)
 			case "object":
 				return ec.fieldContext_Activity_object(ctx, field)
-			case "client_ip":
-				return ec.fieldContext_Activity_client_ip(ctx, field)
-			case "user_agent":
-				return ec.fieldContext_Activity_user_agent(ctx, field)
+			case "target":
+				return ec.fieldContext_Activity_target(ctx, field)
+			case "action":
+				return ec.fieldContext_Activity_action(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Activity_metadata(ctx, field)
 			case "timestamp":
 				return ec.fieldContext_Activity_timestamp(ctx, field)
 			}
@@ -7205,44 +7108,6 @@ func (ec *executionContext) _Activity(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "action":
-			out.Values[i] = ec._Activity_action(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "metadata":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Activity_metadata(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "uid":
 			field := field
 
@@ -7315,10 +7180,80 @@ func (ec *executionContext) _Activity(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "client_ip":
-			out.Values[i] = ec._Activity_client_ip(ctx, field, obj)
-		case "user_agent":
-			out.Values[i] = ec._Activity_user_agent(ctx, field, obj)
+		case "target":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Activity_target(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "action":
+			out.Values[i] = ec._Activity_action(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "metadata":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Activity_metadata(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "timestamp":
 			field := field
 
@@ -9000,6 +8935,27 @@ func (ec *executionContext) unmarshalNMailStatus2githubᚗcomᚋdailytravelᚋx�
 
 func (ec *executionContext) marshalNMailStatus2githubᚗcomᚋdailytravelᚋxᚋinsightᚋgraphᚋmodelᚐMailStatus(ctx context.Context, sel ast.SelectionSet, v model.MailStatus) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNMap2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
+	res, err := graphql.UnmarshalMap(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNMap2map(ctx context.Context, sel ast.SelectionSet, v map[string]interface{}) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	res := graphql.MarshalMap(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNNewLog2githubᚗcomᚋdailytravelᚋxᚋinsightᚋgraphᚋmodelᚐNewLog(ctx context.Context, v interface{}) (model.NewLog, error) {

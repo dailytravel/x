@@ -43,13 +43,31 @@ func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Tas
 		return []*model.Task{}, nil
 	}
 
+	uid, err := utils.UID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	var items []*model.Task
 
-	// Create an aggregation pipeline to sort tasks by list.Tasks index
+	// Create an aggregation pipeline to filter and sort tasks
 	pipeline := []bson.M{
 		{
 			"$match": bson.M{
-				"_id": bson.M{"$in": obj.Tasks},
+				"$and": []interface{}{
+					bson.M{"_id": bson.M{"$in": obj.Tasks}},
+					bson.M{"status": bson.M{"$ne": "ARCHIVED"}},
+					bson.M{"$or": []interface{}{
+						bson.M{"uid": uid},
+						bson.M{"collaborators": uid},
+						bson.M{
+							"$and": []interface{}{
+								bson.M{"assignments.task": bson.M{"$in": obj.Tasks}},
+								bson.M{"assignments.uid": uid},
+							},
+						},
+					}},
+				},
 			},
 		},
 		{
@@ -60,7 +78,7 @@ func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Tas
 			},
 		},
 		{
-			"$sort": bson.M{"order": 1}, // Sort by the "order" field in ascending order
+			"$sort": bson.M{"order": 1},
 		},
 	}
 
@@ -71,7 +89,7 @@ func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Tas
 
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(context.Background(), &items); err != nil {
+	if err = cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 

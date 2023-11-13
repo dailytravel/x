@@ -9,11 +9,38 @@ import (
 	"fmt"
 
 	"github.com/dailytravel/x/community/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Comments is the resolver for the comments field.
 func (r *postResolver) Comments(ctx context.Context, obj *model.Post) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
+	var items []*model.Comment
+
+	_id, err := primitive.ObjectIDFromHex(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	cursor, err := r.db.Collection("comments").Find(ctx, bson.M{"object._id": _id, "object.type": "posts"})
+	if err != nil {
+		return nil, fmt.Errorf("error finding comments: %v", err)
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var comment model.Comment
+		if err := cursor.Decode(&comment); err != nil {
+			return nil, fmt.Errorf("error decoding comment: %v", err)
+		}
+		items = append(items, &comment)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating through comments: %v", err)
+	}
+
+	return items, nil
 }
 
 // Post returns PostResolver implementation.

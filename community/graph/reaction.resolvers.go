@@ -37,7 +37,7 @@ func (r *mutationResolver) CreateReaction(ctx context.Context, input model.NewRe
 	reaction := &model.Reaction{
 		UID:    *uid,
 		Action: input.Action,
-		Object: model.Object{ID: _id, Collection: input.Object["collection"].(string)},
+		Object: model.Object{ID: _id, Type: input.Object["type"].(string)},
 	}
 
 	// Perform the insertion into the database

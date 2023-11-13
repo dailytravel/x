@@ -137,8 +137,8 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 		Email:  input.Email,
 		Locale: input.Locale,
 		Object: model.Object{
-			ID:         _id,
-			Collection: input.Object["collection"].(string),
+			ID:   _id,
+			Type: input.Object["type"].(string),
 		},
 	}
 

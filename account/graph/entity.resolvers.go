@@ -12,6 +12,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// FindAssignmentByUID is the resolver for the findAssignmentByUID field.
+func (r *entityResolver) FindAssignmentByUID(ctx context.Context, uid string) (*model.Assignment, error) {
+	return &model.Assignment{
+		UID: uid,
+	}, nil
+}
+
 // FindAttendanceByUID is the resolver for the findAttendanceByUID field.
 func (r *entityResolver) FindAttendanceByUID(ctx context.Context, uid string) (*model.Attendance, error) {
 	return &model.Attendance{
@@ -163,6 +170,13 @@ func (r *entityResolver) FindShareByUID(ctx context.Context, uid string) (*model
 func (r *entityResolver) FindTaskByUID(ctx context.Context, uid string) (*model.Task, error) {
 	return &model.Task{
 		UID: uid,
+	}, nil
+}
+
+// FindTaskByCollaborators is the resolver for the findTaskByCollaborators field.
+func (r *entityResolver) FindTaskByCollaborators(ctx context.Context, collaborators []string) (*model.Task, error) {
+	return &model.Task{
+		Collaborators: collaborators,
 	}, nil
 }
 

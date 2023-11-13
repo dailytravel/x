@@ -16,6 +16,11 @@ func (r *entityResolver) FindPlaceByID(ctx context.Context, id string) (*model.P
 	panic(fmt.Errorf("not implemented: FindPlaceByID - findPlaceByID"))
 }
 
+// FindTermByID is the resolver for the findTermByID field.
+func (r *entityResolver) FindTermByID(ctx context.Context, id string) (*model.Term, error) {
+	panic(fmt.Errorf("not implemented: FindTermByID - findTermByID"))
+}
+
 // FindUserByID is the resolver for the findUserByID field.
 func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
 	return &model.User{

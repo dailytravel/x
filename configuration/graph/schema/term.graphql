@@ -12,7 +12,6 @@ type Term @key(fields: "id") {
   metadata: Map
   created: String!
   updated: String!
-  images: [Image]
 }
 
 type Terms {

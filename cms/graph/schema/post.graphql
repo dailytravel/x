@@ -12,7 +12,6 @@ type Post @key(fields: "id") {
   uid: ID!
   created: String!
   updated: String!
-  terms: [Term]
   parent: Post
   images: [Image]
 }

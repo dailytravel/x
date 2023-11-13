@@ -15,6 +15,7 @@ const (
 
 type Model struct {
 	ID        primitive.ObjectID  `json:"id,omitempty" bson:"_id,omitempty"`
+	Workspace primitive.ObjectID  `json:"workspace,omitempty" bson:"workspace,omitempty"`
 	Metadata  primitive.M         `json:"metadata,omitempty" bson:"metadata,omitempty"`
 	Created   primitive.Timestamp `json:"created,omitempty" bson:"created,omitempty"`
 	Updated   primitive.Timestamp `json:"updated,omitempty" bson:"updated,omitempty"`

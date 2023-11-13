@@ -21,19 +21,24 @@ func (r *activityResolver) ID(ctx context.Context, obj *model.Activity) (string,
 	return obj.ID.Hex(), nil
 }
 
-// Metadata is the resolver for the metadata field.
-func (r *activityResolver) Metadata(ctx context.Context, obj *model.Activity) (map[string]interface{}, error) {
-	return obj.Metadata, nil
-}
-
 // UID is the resolver for the uid field.
 func (r *activityResolver) UID(ctx context.Context, obj *model.Activity) (string, error) {
 	return obj.ID.Hex(), nil
 }
 
 // Object is the resolver for the object field.
-func (r *activityResolver) Object(ctx context.Context, obj *model.Activity) (string, error) {
+func (r *activityResolver) Object(ctx context.Context, obj *model.Activity) (map[string]interface{}, error) {
 	panic(fmt.Errorf("not implemented: Object - object"))
+}
+
+// Target is the resolver for the target field.
+func (r *activityResolver) Target(ctx context.Context, obj *model.Activity) (map[string]interface{}, error) {
+	panic(fmt.Errorf("not implemented: Target - target"))
+}
+
+// Metadata is the resolver for the metadata field.
+func (r *activityResolver) Metadata(ctx context.Context, obj *model.Activity) (map[string]interface{}, error) {
+	return obj.Metadata, nil
 }
 
 // Timestamp is the resolver for the timestamp field.
@@ -75,12 +80,51 @@ func (r *mutationResolver) DeleteActivities(ctx context.Context, filter map[stri
 
 // Activity is the resolver for the activity field.
 func (r *queryResolver) Activity(ctx context.Context, id string) (*model.Activity, error) {
-	panic(fmt.Errorf("not implemented: Activities - activities"))
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	var item model.Activity
+	if err := r.db.Collection("activities").FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+	return &item, nil
 }
 
 // Activities is the resolver for the activities field.
-func (r *queryResolver) Activities(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Activities, error) {
-	panic(fmt.Errorf("not implemented: Activities - activities"))
+func (r *queryResolver) Activities(ctx context.Context, stages map[string]interface{}) (*model.Activities, error) {
+	pipeline := make(bson.A, 0)
+
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
+	}
+
+	cursor, err := r.db.Collection("activities").Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var items []*model.Activity
+
+	for cursor.Next(ctx) {
+		var item model.Activity
+		if err := cursor.Decode(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, &item)
+	}
+
+	count, err := r.db.Collection("activities").CountDocuments(ctx, bson.D{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Activities{
+		Count: int(count),
+		Data:  items,
+	}, nil
 }
 
 // Activity returns ActivityResolver implementation.

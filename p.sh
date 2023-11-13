@@ -5,6 +5,8 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
+export PATH="$PATH:$(go env GOPATH)/bin"
+
 for s in "$@"; do
   if [ -n "$s" ]; then
     protoc --go_out=. --go_opt=paths=source_relative \
