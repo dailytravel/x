@@ -148,6 +148,12 @@ type NewUserInput struct {
 	Status     *string   `json:"status,omitempty"`
 }
 
+type NewWorkspace struct {
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type Order struct {
 	UID  string `json:"uid"`
 	User *User  `json:"user,omitempty"`
@@ -284,6 +290,12 @@ type UpdateUserInput struct {
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
+type UpdateWorkspace struct {
+	Name        *string                `json:"name,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type Users struct {
 	Count int     `json:"count"`
 	Data  []*User `json:"data,omitempty"`
@@ -300,6 +312,11 @@ type Wishlist struct {
 }
 
 func (Wishlist) IsEntity() {}
+
+type Workspaces struct {
+	Data  []*Workspace `json:"data,omitempty"`
+	Count int          `json:"count"`
+}
 
 type Algorithm string
 

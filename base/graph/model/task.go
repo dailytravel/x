@@ -10,17 +10,18 @@ import (
 )
 
 type Task struct {
-	Model         `bson:",inline"`
-	UID           primitive.ObjectID    `json:"uid" bson:"uid"`
-	Parent        *primitive.ObjectID   `json:"parent,omitempty" bson:"parent,omitempty"`
-	Name          string                `json:"name" bson:"name"`
-	Notes         *string               `json:"notes,omitempty" bson:"notes,omitempty"`
-	Priority      *string               `json:"priority,omitempty" bson:"priority,omitempty"`
-	Start         *primitive.DateTime   `json:"start" bson:"start"`
-	End           *primitive.DateTime   `json:"end,omitempty" bson:"end,omitempty"`
-	Order         *int                  `json:"order,omitempty" bson:"order,omitempty"`
-	Status        string                `json:"status" bson:"status"`
-	Collaborators []*primitive.ObjectID `json:"collaborators,omitempty" bson:"collaborators,omitempty"`
+	Model    `bson:",inline"`
+	UID      primitive.ObjectID    `json:"uid" bson:"uid"`
+	Assignee *primitive.ObjectID   `json:"assignee,omitempty" bson:"assignee,omitempty"`
+	Parent   *primitive.ObjectID   `json:"parent,omitempty" bson:"parent,omitempty"`
+	Name     string                `json:"name" bson:"name"`
+	Notes    *string               `json:"notes,omitempty" bson:"notes,omitempty"`
+	Priority *string               `json:"priority,omitempty" bson:"priority,omitempty"`
+	Start    *primitive.DateTime   `json:"start" bson:"start"`
+	End      *primitive.DateTime   `json:"end,omitempty" bson:"end,omitempty"`
+	Order    *int                  `json:"order,omitempty" bson:"order,omitempty"`
+	Status   string                `json:"status" bson:"status"`
+	Members  []*primitive.ObjectID `json:"members,omitempty" bson:"members,omitempty"`
 }
 
 func (i *Task) MarshalBSON() ([]byte, error) {
@@ -49,6 +50,7 @@ func (i *Task) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "start", Value: 1}}},
 		{Keys: bson.D{{Key: "end", Value: 1}}},
+		{Keys: bson.D{{Key: "assignee", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},
 		{Keys: bson.D{{Key: "updated", Value: 1}}},
 	}

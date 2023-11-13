@@ -68,6 +68,11 @@ func (r *goalResolver) Organization(ctx context.Context, obj *model.Goal) (*stri
 	return &org, nil
 }
 
+// Members is the resolver for the members field.
+func (r *goalResolver) Members(ctx context.Context, obj *model.Goal) ([]*string, error) {
+	panic(fmt.Errorf("not implemented: Members - members"))
+}
+
 // Created is the resolver for the created field.
 func (r *goalResolver) Created(ctx context.Context, obj *model.Goal) (string, error) {
 	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil

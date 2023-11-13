@@ -1,9 +1,0 @@
-type Assignment {
-  id: ID!
-  uid: ID!
-  task: ID!
-  metadata: Map
-  status: String
-  created: String!
-  updated: String!
-}

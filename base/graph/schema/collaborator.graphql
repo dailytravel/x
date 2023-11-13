@@ -1,0 +1,10 @@
+type Collaborator {
+  id: ID!
+  uid: ID!
+  board: Board!
+  permission: String!
+  metadata: Map
+  status: String!
+  created: String!
+  updated: String!
+}

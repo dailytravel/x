@@ -89,6 +89,7 @@ type NewTask struct {
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`
 	Start    *string                `json:"start,omitempty"`
+	End      *string                `json:"end,omitempty"`
 	Order    *int                   `json:"order,omitempty"`
 	Status   *string                `json:"status,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
@@ -176,6 +177,7 @@ type UpdateTask struct {
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`
 	Start    *string                `json:"start,omitempty"`
+	End      *string                `json:"end,omitempty"`
 	Order    *int                   `json:"order,omitempty"`
 	Status   *string                `json:"status,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`

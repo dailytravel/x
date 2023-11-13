@@ -38,8 +38,8 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	Assignment() AssignmentResolver
 	Board() BoardResolver
+	Collaborator() CollaboratorResolver
 	Entity() EntityResolver
 	Goal() GoalResolver
 	List() ListResolver
@@ -60,37 +60,40 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Assignment struct {
-		Created  func(childComplexity int) int
-		DueDate  func(childComplexity int) int
-		ID       func(childComplexity int) int
-		Metadata func(childComplexity int) int
-		Status   func(childComplexity int) int
-		Updated  func(childComplexity int) int
-	}
-
 	Board struct {
-		Background  func(childComplexity int) int
-		Created     func(childComplexity int) int
-		Description func(childComplexity int) int
-		End         func(childComplexity int) int
-		ID          func(childComplexity int) int
-		IsTemplate  func(childComplexity int) int
-		Lists       func(childComplexity int) int
-		Metadata    func(childComplexity int) int
-		Order       func(childComplexity int) int
-		Portfolio   func(childComplexity int) int
-		Starred     func(childComplexity int) int
-		Status      func(childComplexity int) int
-		Title       func(childComplexity int) int
-		Type        func(childComplexity int) int
-		UID         func(childComplexity int) int
-		Updated     func(childComplexity int) int
+		Background    func(childComplexity int) int
+		Collaborators func(childComplexity int) int
+		Created       func(childComplexity int) int
+		Description   func(childComplexity int) int
+		End           func(childComplexity int) int
+		ID            func(childComplexity int) int
+		IsTemplate    func(childComplexity int) int
+		Lists         func(childComplexity int) int
+		Metadata      func(childComplexity int) int
+		Order         func(childComplexity int) int
+		Portfolio     func(childComplexity int) int
+		Starred       func(childComplexity int) int
+		Status        func(childComplexity int) int
+		Title         func(childComplexity int) int
+		Type          func(childComplexity int) int
+		UID           func(childComplexity int) int
+		Updated       func(childComplexity int) int
 	}
 
 	Boards struct {
 		Count func(childComplexity int) int
 		Data  func(childComplexity int) int
+	}
+
+	Collaborator struct {
+		Board      func(childComplexity int) int
+		Created    func(childComplexity int) int
+		ID         func(childComplexity int) int
+		Metadata   func(childComplexity int) int
+		Permission func(childComplexity int) int
+		Status     func(childComplexity int) int
+		UID        func(childComplexity int) int
+		Updated    func(childComplexity int) int
 	}
 
 	Comment struct {
@@ -107,6 +110,7 @@ type ComplexityRoot struct {
 		Created      func(childComplexity int) int
 		End          func(childComplexity int) int
 		ID           func(childComplexity int) int
+		Members      func(childComplexity int) int
 		Metadata     func(childComplexity int) int
 		Name         func(childComplexity int) int
 		Notes        func(childComplexity int) int
@@ -231,20 +235,22 @@ type ComplexityRoot struct {
 	}
 
 	Task struct {
-		Assignment func(childComplexity int) int
-		Created    func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Name       func(childComplexity int) int
-		Notes      func(childComplexity int) int
-		Order      func(childComplexity int) int
-		Parent     func(childComplexity int) int
-		Priority   func(childComplexity int) int
-		Start      func(childComplexity int) int
-		Status     func(childComplexity int) int
-		Subtasks   func(childComplexity int) int
-		UID        func(childComplexity int) int
-		Updated    func(childComplexity int) int
+		Assignee func(childComplexity int) int
+		Created  func(childComplexity int) int
+		End      func(childComplexity int) int
+		ID       func(childComplexity int) int
+		Members  func(childComplexity int) int
+		Metadata func(childComplexity int) int
+		Name     func(childComplexity int) int
+		Notes    func(childComplexity int) int
+		Order    func(childComplexity int) int
+		Parent   func(childComplexity int) int
+		Priority func(childComplexity int) int
+		Start    func(childComplexity int) int
+		Status   func(childComplexity int) int
+		Subtasks func(childComplexity int) int
+		UID      func(childComplexity int) int
+		Updated  func(childComplexity int) int
 	}
 
 	Tasks struct {
@@ -271,14 +277,6 @@ type ComplexityRoot struct {
 	}
 }
 
-type AssignmentResolver interface {
-	ID(ctx context.Context, obj *model.Assignment) (string, error)
-	DueDate(ctx context.Context, obj *model.Assignment) (*string, error)
-	Metadata(ctx context.Context, obj *model.Assignment) (map[string]interface{}, error)
-
-	Created(ctx context.Context, obj *model.Assignment) (string, error)
-	Updated(ctx context.Context, obj *model.Assignment) (string, error)
-}
 type BoardResolver interface {
 	ID(ctx context.Context, obj *model.Board) (string, error)
 	Portfolio(ctx context.Context, obj *model.Board) (*model.Portfolio, error)
@@ -291,6 +289,17 @@ type BoardResolver interface {
 	UID(ctx context.Context, obj *model.Board) (string, error)
 	Created(ctx context.Context, obj *model.Board) (string, error)
 	Updated(ctx context.Context, obj *model.Board) (string, error)
+	Collaborators(ctx context.Context, obj *model.Board) ([]*model.Collaborator, error)
+}
+type CollaboratorResolver interface {
+	ID(ctx context.Context, obj *model.Collaborator) (string, error)
+	UID(ctx context.Context, obj *model.Collaborator) (string, error)
+	Board(ctx context.Context, obj *model.Collaborator) (*model.Board, error)
+
+	Metadata(ctx context.Context, obj *model.Collaborator) (map[string]interface{}, error)
+
+	Created(ctx context.Context, obj *model.Collaborator) (string, error)
+	Updated(ctx context.Context, obj *model.Collaborator) (string, error)
 }
 type EntityResolver interface {
 	FindBoardByID(ctx context.Context, id string) (*model.Board, error)
@@ -309,6 +318,7 @@ type GoalResolver interface {
 	Phase(ctx context.Context, obj *model.Goal) (*model.Phase, error)
 	UID(ctx context.Context, obj *model.Goal) (string, error)
 	Organization(ctx context.Context, obj *model.Goal) (*string, error)
+	Members(ctx context.Context, obj *model.Goal) ([]*string, error)
 	Created(ctx context.Context, obj *model.Goal) (string, error)
 	Updated(ctx context.Context, obj *model.Goal) (string, error)
 }
@@ -390,10 +400,12 @@ type TaskResolver interface {
 	Subtasks(ctx context.Context, obj *model.Task) ([]*model.Task, error)
 
 	Start(ctx context.Context, obj *model.Task) (*string, error)
+	End(ctx context.Context, obj *model.Task) (*string, error)
 
 	Metadata(ctx context.Context, obj *model.Task) (map[string]interface{}, error)
 	UID(ctx context.Context, obj *model.Task) (string, error)
-	Assignment(ctx context.Context, obj *model.Task) (*model.Assignment, error)
+	Assignee(ctx context.Context, obj *model.Task) (*string, error)
+	Members(ctx context.Context, obj *model.Task) ([]string, error)
 	Created(ctx context.Context, obj *model.Task) (string, error)
 	Updated(ctx context.Context, obj *model.Task) (string, error)
 }
@@ -420,54 +432,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Assignment.created":
-		if e.complexity.Assignment.Created == nil {
-			break
-		}
-
-		return e.complexity.Assignment.Created(childComplexity), true
-
-	case "Assignment.due_date":
-		if e.complexity.Assignment.DueDate == nil {
-			break
-		}
-
-		return e.complexity.Assignment.DueDate(childComplexity), true
-
-	case "Assignment.id":
-		if e.complexity.Assignment.ID == nil {
-			break
-		}
-
-		return e.complexity.Assignment.ID(childComplexity), true
-
-	case "Assignment.metadata":
-		if e.complexity.Assignment.Metadata == nil {
-			break
-		}
-
-		return e.complexity.Assignment.Metadata(childComplexity), true
-
-	case "Assignment.status":
-		if e.complexity.Assignment.Status == nil {
-			break
-		}
-
-		return e.complexity.Assignment.Status(childComplexity), true
-
-	case "Assignment.updated":
-		if e.complexity.Assignment.Updated == nil {
-			break
-		}
-
-		return e.complexity.Assignment.Updated(childComplexity), true
-
 	case "Board.background":
 		if e.complexity.Board.Background == nil {
 			break
 		}
 
 		return e.complexity.Board.Background(childComplexity), true
+
+	case "Board.collaborators":
+		if e.complexity.Board.Collaborators == nil {
+			break
+		}
+
+		return e.complexity.Board.Collaborators(childComplexity), true
 
 	case "Board.created":
 		if e.complexity.Board.Created == nil {
@@ -588,6 +565,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Boards.Data(childComplexity), true
 
+	case "Collaborator.board":
+		if e.complexity.Collaborator.Board == nil {
+			break
+		}
+
+		return e.complexity.Collaborator.Board(childComplexity), true
+
+	case "Collaborator.created":
+		if e.complexity.Collaborator.Created == nil {
+			break
+		}
+
+		return e.complexity.Collaborator.Created(childComplexity), true
+
+	case "Collaborator.id":
+		if e.complexity.Collaborator.ID == nil {
+			break
+		}
+
+		return e.complexity.Collaborator.ID(childComplexity), true
+
+	case "Collaborator.metadata":
+		if e.complexity.Collaborator.Metadata == nil {
+			break
+		}
+
+		return e.complexity.Collaborator.Metadata(childComplexity), true
+
+	case "Collaborator.permission":
+		if e.complexity.Collaborator.Permission == nil {
+			break
+		}
+
+		return e.complexity.Collaborator.Permission(childComplexity), true
+
+	case "Collaborator.status":
+		if e.complexity.Collaborator.Status == nil {
+			break
+		}
+
+		return e.complexity.Collaborator.Status(childComplexity), true
+
+	case "Collaborator.uid":
+		if e.complexity.Collaborator.UID == nil {
+			break
+		}
+
+		return e.complexity.Collaborator.UID(childComplexity), true
+
+	case "Collaborator.updated":
+		if e.complexity.Collaborator.Updated == nil {
+			break
+		}
+
+		return e.complexity.Collaborator.Updated(childComplexity), true
+
 	case "Comment.id":
 		if e.complexity.Comment.ID == nil {
 			break
@@ -651,6 +684,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Goal.ID(childComplexity), true
+
+	case "Goal.members":
+		if e.complexity.Goal.Members == nil {
+			break
+		}
+
+		return e.complexity.Goal.Members(childComplexity), true
 
 	case "Goal.metadata":
 		if e.complexity.Goal.Metadata == nil {
@@ -1474,12 +1514,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Relationship.Tasks(childComplexity), true
 
-	case "Task.assignment":
-		if e.complexity.Task.Assignment == nil {
+	case "Task.assignee":
+		if e.complexity.Task.Assignee == nil {
 			break
 		}
 
-		return e.complexity.Task.Assignment(childComplexity), true
+		return e.complexity.Task.Assignee(childComplexity), true
 
 	case "Task.created":
 		if e.complexity.Task.Created == nil {
@@ -1488,12 +1528,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.Created(childComplexity), true
 
+	case "Task.end":
+		if e.complexity.Task.End == nil {
+			break
+		}
+
+		return e.complexity.Task.End(childComplexity), true
+
 	case "Task.id":
 		if e.complexity.Task.ID == nil {
 			break
 		}
 
 		return e.complexity.Task.ID(childComplexity), true
+
+	case "Task.members":
+		if e.complexity.Task.Members == nil {
+			break
+		}
+
+		return e.complexity.Task.Members(childComplexity), true
 
 	case "Task.metadata":
 		if e.complexity.Task.Metadata == nil {
@@ -1765,7 +1819,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema.graphqls" "schema/assignment.graphql" "schema/board.graphql" "schema/comment.graphql" "schema/goal.graphql" "schema/list.graphql" "schema/phase.graphql" "schema/portfolio.graphql" "schema/relationship.graphql" "schema/task.graphql" "schema/user.graphql"
+//go:embed "schema.graphqls" "schema/board.graphql" "schema/collaborator.graphql" "schema/comment.graphql" "schema/goal.graphql" "schema/list.graphql" "schema/phase.graphql" "schema/portfolio.graphql" "schema/relationship.graphql" "schema/task.graphql" "schema/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1778,8 +1832,8 @@ func sourceData(filename string) string {
 
 var sources = []*ast.Source{
 	{Name: "schema.graphqls", Input: sourceData("schema.graphqls"), BuiltIn: false},
-	{Name: "schema/assignment.graphql", Input: sourceData("schema/assignment.graphql"), BuiltIn: false},
 	{Name: "schema/board.graphql", Input: sourceData("schema/board.graphql"), BuiltIn: false},
+	{Name: "schema/collaborator.graphql", Input: sourceData("schema/collaborator.graphql"), BuiltIn: false},
 	{Name: "schema/comment.graphql", Input: sourceData("schema/comment.graphql"), BuiltIn: false},
 	{Name: "schema/goal.graphql", Input: sourceData("schema/goal.graphql"), BuiltIn: false},
 	{Name: "schema/list.graphql", Input: sourceData("schema/list.graphql"), BuiltIn: false},
@@ -2739,261 +2793,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Assignment_id(ctx context.Context, field graphql.CollectedField, obj *model.Assignment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Assignment_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Assignment().ID(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Assignment_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Assignment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Assignment_due_date(ctx context.Context, field graphql.CollectedField, obj *model.Assignment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Assignment_due_date(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Assignment().DueDate(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Assignment_due_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Assignment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Assignment_metadata(ctx context.Context, field graphql.CollectedField, obj *model.Assignment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Assignment_metadata(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Assignment().Metadata(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(map[string]interface{})
-	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Assignment_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Assignment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Assignment_status(ctx context.Context, field graphql.CollectedField, obj *model.Assignment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Assignment_status(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Assignment_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Assignment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Assignment_created(ctx context.Context, field graphql.CollectedField, obj *model.Assignment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Assignment_created(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Assignment().Created(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Assignment_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Assignment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Assignment_updated(ctx context.Context, field graphql.CollectedField, obj *model.Assignment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Assignment_updated(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Assignment().Updated(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Assignment_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Assignment",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Board_id(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Board_id(ctx, field)
 	if err != nil {
@@ -3719,6 +3518,65 @@ func (ec *executionContext) fieldContext_Board_updated(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Board_collaborators(ctx context.Context, field graphql.CollectedField, obj *model.Board) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Board_collaborators(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Board().Collaborators(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Collaborator)
+	fc.Result = res
+	return ec.marshalOCollaborator2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋbaseᚋgraphᚋmodelᚐCollaborator(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Board_collaborators(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Board",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Collaborator_id(ctx, field)
+			case "uid":
+				return ec.fieldContext_Collaborator_uid(ctx, field)
+			case "board":
+				return ec.fieldContext_Collaborator_board(ctx, field)
+			case "permission":
+				return ec.fieldContext_Collaborator_permission(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Collaborator_metadata(ctx, field)
+			case "status":
+				return ec.fieldContext_Collaborator_status(ctx, field)
+			case "created":
+				return ec.fieldContext_Collaborator_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Collaborator_updated(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Collaborator", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Boards_data(ctx context.Context, field graphql.CollectedField, obj *model.Boards) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Boards_data(ctx, field)
 	if err != nil {
@@ -3787,6 +3645,8 @@ func (ec *executionContext) fieldContext_Boards_data(ctx context.Context, field 
 				return ec.fieldContext_Board_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Board_updated(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Board_collaborators(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -3833,6 +3693,391 @@ func (ec *executionContext) fieldContext_Boards_count(ctx context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collaborator_id(ctx context.Context, field graphql.CollectedField, obj *model.Collaborator) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collaborator_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collaborator().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collaborator_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collaborator",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collaborator_uid(ctx context.Context, field graphql.CollectedField, obj *model.Collaborator) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collaborator_uid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collaborator().UID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collaborator_uid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collaborator",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collaborator_board(ctx context.Context, field graphql.CollectedField, obj *model.Collaborator) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collaborator_board(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collaborator().Board(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Board)
+	fc.Result = res
+	return ec.marshalNBoard2ᚖgithubᚗcomᚋdailytravelᚋxᚋbaseᚋgraphᚋmodelᚐBoard(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collaborator_board(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collaborator",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Board_id(ctx, field)
+			case "portfolio":
+				return ec.fieldContext_Board_portfolio(ctx, field)
+			case "type":
+				return ec.fieldContext_Board_type(ctx, field)
+			case "title":
+				return ec.fieldContext_Board_title(ctx, field)
+			case "description":
+				return ec.fieldContext_Board_description(ctx, field)
+			case "end":
+				return ec.fieldContext_Board_end(ctx, field)
+			case "is_template":
+				return ec.fieldContext_Board_is_template(ctx, field)
+			case "background":
+				return ec.fieldContext_Board_background(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Board_metadata(ctx, field)
+			case "starred":
+				return ec.fieldContext_Board_starred(ctx, field)
+			case "order":
+				return ec.fieldContext_Board_order(ctx, field)
+			case "status":
+				return ec.fieldContext_Board_status(ctx, field)
+			case "lists":
+				return ec.fieldContext_Board_lists(ctx, field)
+			case "uid":
+				return ec.fieldContext_Board_uid(ctx, field)
+			case "created":
+				return ec.fieldContext_Board_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Board_updated(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Board_collaborators(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collaborator_permission(ctx context.Context, field graphql.CollectedField, obj *model.Collaborator) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collaborator_permission(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Permission, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collaborator_permission(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collaborator",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collaborator_metadata(ctx context.Context, field graphql.CollectedField, obj *model.Collaborator) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collaborator_metadata(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collaborator().Metadata(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(map[string]interface{})
+	fc.Result = res
+	return ec.marshalOMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collaborator_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collaborator",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collaborator_status(ctx context.Context, field graphql.CollectedField, obj *model.Collaborator) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collaborator_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collaborator_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collaborator",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collaborator_created(ctx context.Context, field graphql.CollectedField, obj *model.Collaborator) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collaborator_created(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collaborator().Created(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collaborator_created(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collaborator",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collaborator_updated(ctx context.Context, field graphql.CollectedField, obj *model.Collaborator) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collaborator_updated(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collaborator().Updated(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collaborator_updated(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collaborator",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3953,6 +4198,8 @@ func (ec *executionContext) fieldContext_Entity_findBoardByID(ctx context.Contex
 				return ec.fieldContext_Board_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Board_updated(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Board_collaborators(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -4454,6 +4701,8 @@ func (ec *executionContext) fieldContext_Goal_parent(ctx context.Context, field 
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
+			case "members":
+				return ec.fieldContext_Goal_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Goal_created(ctx, field)
 			case "updated":
@@ -4602,6 +4851,47 @@ func (ec *executionContext) _Goal_organization(ctx context.Context, field graphq
 }
 
 func (ec *executionContext) fieldContext_Goal_organization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Goal",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Goal_members(ctx context.Context, field graphql.CollectedField, obj *model.Goal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Goal_members(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Goal().Members(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*string)
+	fc.Result = res
+	return ec.marshalOID2ᚕᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Goal_members(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Goal",
 		Field:      field,
@@ -4804,6 +5094,8 @@ func (ec *executionContext) fieldContext_Goals_data(ctx context.Context, field g
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
+			case "members":
+				return ec.fieldContext_Goal_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Goal_created(ctx, field)
 			case "updated":
@@ -4974,6 +5266,8 @@ func (ec *executionContext) fieldContext_List_board(ctx context.Context, field g
 				return ec.fieldContext_Board_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Board_updated(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Board_collaborators(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -5116,6 +5410,8 @@ func (ec *executionContext) fieldContext_List_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_priority(ctx, field)
 			case "start":
 				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "order":
 				return ec.fieldContext_Task_order(ctx, field)
 			case "status":
@@ -5124,8 +5420,10 @@ func (ec *executionContext) fieldContext_List_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignment":
-				return ec.fieldContext_Task_assignment(ctx, field)
+			case "assignee":
+				return ec.fieldContext_Task_assignee(ctx, field)
+			case "members":
+				return ec.fieldContext_Task_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Task_created(ctx, field)
 			case "updated":
@@ -5711,6 +6009,8 @@ func (ec *executionContext) fieldContext_Mutation_createBoard(ctx context.Contex
 				return ec.fieldContext_Board_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Board_updated(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Board_collaborators(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -5820,6 +6120,8 @@ func (ec *executionContext) fieldContext_Mutation_updateBoard(ctx context.Contex
 				return ec.fieldContext_Board_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Board_updated(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Board_collaborators(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -6066,6 +6368,8 @@ func (ec *executionContext) fieldContext_Mutation_createGoal(ctx context.Context
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
+			case "members":
+				return ec.fieldContext_Goal_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Goal_created(ctx, field)
 			case "updated":
@@ -6166,6 +6470,8 @@ func (ec *executionContext) fieldContext_Mutation_updateGoal(ctx context.Context
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
+			case "members":
+				return ec.fieldContext_Goal_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Goal_created(ctx, field)
 			case "updated":
@@ -7236,6 +7542,8 @@ func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context
 				return ec.fieldContext_Task_priority(ctx, field)
 			case "start":
 				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "order":
 				return ec.fieldContext_Task_order(ctx, field)
 			case "status":
@@ -7244,8 +7552,10 @@ func (ec *executionContext) fieldContext_Mutation_createTask(ctx context.Context
 				return ec.fieldContext_Task_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignment":
-				return ec.fieldContext_Task_assignment(ctx, field)
+			case "assignee":
+				return ec.fieldContext_Task_assignee(ctx, field)
+			case "members":
+				return ec.fieldContext_Task_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Task_created(ctx, field)
 			case "updated":
@@ -7338,6 +7648,8 @@ func (ec *executionContext) fieldContext_Mutation_updateTask(ctx context.Context
 				return ec.fieldContext_Task_priority(ctx, field)
 			case "start":
 				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "order":
 				return ec.fieldContext_Task_order(ctx, field)
 			case "status":
@@ -7346,8 +7658,10 @@ func (ec *executionContext) fieldContext_Mutation_updateTask(ctx context.Context
 				return ec.fieldContext_Task_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignment":
-				return ec.fieldContext_Task_assignment(ctx, field)
+			case "assignee":
+				return ec.fieldContext_Task_assignee(ctx, field)
+			case "members":
+				return ec.fieldContext_Task_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Task_created(ctx, field)
 			case "updated":
@@ -8168,6 +8482,8 @@ func (ec *executionContext) fieldContext_Portfolio_boards(ctx context.Context, f
 				return ec.fieldContext_Board_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Board_updated(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Board_collaborators(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -8587,6 +8903,8 @@ func (ec *executionContext) fieldContext_Query_board(ctx context.Context, field 
 				return ec.fieldContext_Board_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Board_updated(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Board_collaborators(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -8761,6 +9079,8 @@ func (ec *executionContext) fieldContext_Query_goal(ctx context.Context, field g
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
+			case "members":
+				return ec.fieldContext_Goal_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Goal_created(ctx, field)
 			case "updated":
@@ -9363,6 +9683,8 @@ func (ec *executionContext) fieldContext_Query_task(ctx context.Context, field g
 				return ec.fieldContext_Task_priority(ctx, field)
 			case "start":
 				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "order":
 				return ec.fieldContext_Task_order(ctx, field)
 			case "status":
@@ -9371,8 +9693,10 @@ func (ec *executionContext) fieldContext_Query_task(ctx context.Context, field g
 				return ec.fieldContext_Task_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignment":
-				return ec.fieldContext_Task_assignment(ctx, field)
+			case "assignee":
+				return ec.fieldContext_Task_assignee(ctx, field)
+			case "members":
+				return ec.fieldContext_Task_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Task_created(ctx, field)
 			case "updated":
@@ -9860,6 +10184,8 @@ func (ec *executionContext) fieldContext_Relationship_tasks(ctx context.Context,
 				return ec.fieldContext_Task_priority(ctx, field)
 			case "start":
 				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "order":
 				return ec.fieldContext_Task_order(ctx, field)
 			case "status":
@@ -9868,8 +10194,10 @@ func (ec *executionContext) fieldContext_Relationship_tasks(ctx context.Context,
 				return ec.fieldContext_Task_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignment":
-				return ec.fieldContext_Task_assignment(ctx, field)
+			case "assignee":
+				return ec.fieldContext_Task_assignee(ctx, field)
+			case "members":
+				return ec.fieldContext_Task_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Task_created(ctx, field)
 			case "updated":
@@ -10019,6 +10347,8 @@ func (ec *executionContext) fieldContext_Task_parent(ctx context.Context, field 
 				return ec.fieldContext_Task_priority(ctx, field)
 			case "start":
 				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "order":
 				return ec.fieldContext_Task_order(ctx, field)
 			case "status":
@@ -10027,8 +10357,10 @@ func (ec *executionContext) fieldContext_Task_parent(ctx context.Context, field 
 				return ec.fieldContext_Task_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignment":
-				return ec.fieldContext_Task_assignment(ctx, field)
+			case "assignee":
+				return ec.fieldContext_Task_assignee(ctx, field)
+			case "members":
+				return ec.fieldContext_Task_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Task_created(ctx, field)
 			case "updated":
@@ -10090,6 +10422,8 @@ func (ec *executionContext) fieldContext_Task_subtasks(ctx context.Context, fiel
 				return ec.fieldContext_Task_priority(ctx, field)
 			case "start":
 				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "order":
 				return ec.fieldContext_Task_order(ctx, field)
 			case "status":
@@ -10098,8 +10432,10 @@ func (ec *executionContext) fieldContext_Task_subtasks(ctx context.Context, fiel
 				return ec.fieldContext_Task_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignment":
-				return ec.fieldContext_Task_assignment(ctx, field)
+			case "assignee":
+				return ec.fieldContext_Task_assignee(ctx, field)
+			case "members":
+				return ec.fieldContext_Task_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Task_created(ctx, field)
 			case "updated":
@@ -10225,6 +10561,47 @@ func (ec *executionContext) _Task_start(ctx context.Context, field graphql.Colle
 }
 
 func (ec *executionContext) fieldContext_Task_start(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Task_end(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_end(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().End(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_end(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -10407,8 +10784,8 @@ func (ec *executionContext) fieldContext_Task_uid(ctx context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_assignment(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_assignment(ctx, field)
+func (ec *executionContext) _Task_assignee(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_assignee(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10421,7 +10798,7 @@ func (ec *executionContext) _Task_assignment(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Task().Assignment(rctx, obj)
+		return ec.resolvers.Task().Assignee(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10430,33 +10807,60 @@ func (ec *executionContext) _Task_assignment(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Assignment)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOAssignment2ᚖgithubᚗcomᚋdailytravelᚋxᚋbaseᚋgraphᚋmodelᚐAssignment(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_assignment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_assignee(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Assignment_id(ctx, field)
-			case "due_date":
-				return ec.fieldContext_Assignment_due_date(ctx, field)
-			case "metadata":
-				return ec.fieldContext_Assignment_metadata(ctx, field)
-			case "status":
-				return ec.fieldContext_Assignment_status(ctx, field)
-			case "created":
-				return ec.fieldContext_Assignment_created(ctx, field)
-			case "updated":
-				return ec.fieldContext_Assignment_updated(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Assignment", field.Name)
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Task_members(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_members(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().Members(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOID2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Task_members(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Task",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -10600,6 +11004,8 @@ func (ec *executionContext) fieldContext_Tasks_data(ctx context.Context, field g
 				return ec.fieldContext_Task_priority(ctx, field)
 			case "start":
 				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "order":
 				return ec.fieldContext_Task_order(ctx, field)
 			case "status":
@@ -10608,8 +11014,10 @@ func (ec *executionContext) fieldContext_Tasks_data(ctx context.Context, field g
 				return ec.fieldContext_Task_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignment":
-				return ec.fieldContext_Task_assignment(ctx, field)
+			case "assignee":
+				return ec.fieldContext_Task_assignee(ctx, field)
+			case "members":
+				return ec.fieldContext_Task_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Task_created(ctx, field)
 			case "updated":
@@ -10872,6 +11280,8 @@ func (ec *executionContext) fieldContext_User_goals(ctx context.Context, field g
 				return ec.fieldContext_Goal_uid(ctx, field)
 			case "organization":
 				return ec.fieldContext_Goal_organization(ctx, field)
+			case "members":
+				return ec.fieldContext_Goal_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Goal_created(ctx, field)
 			case "updated":
@@ -11014,6 +11424,8 @@ func (ec *executionContext) fieldContext_User_boards(ctx context.Context, field 
 				return ec.fieldContext_Board_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Board_updated(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Board_collaborators(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
@@ -11132,6 +11544,8 @@ func (ec *executionContext) fieldContext_User_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_priority(ctx, field)
 			case "start":
 				return ec.fieldContext_Task_start(ctx, field)
+			case "end":
+				return ec.fieldContext_Task_end(ctx, field)
 			case "order":
 				return ec.fieldContext_Task_order(ctx, field)
 			case "status":
@@ -11140,8 +11554,10 @@ func (ec *executionContext) fieldContext_User_tasks(ctx context.Context, field g
 				return ec.fieldContext_Task_metadata(ctx, field)
 			case "uid":
 				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignment":
-				return ec.fieldContext_Task_assignment(ctx, field)
+			case "assignee":
+				return ec.fieldContext_Task_assignee(ctx, field)
+			case "members":
+				return ec.fieldContext_Task_members(ctx, field)
 			case "created":
 				return ec.fieldContext_Task_created(ctx, field)
 			case "updated":
@@ -13333,7 +13749,7 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "start", "order", "status", "metadata"}
+	fieldsInOrder := [...]string{"user", "parent", "list", "name", "notes", "priority", "start", "end", "order", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13403,6 +13819,15 @@ func (ec *executionContext) unmarshalInputNewTask(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Start = data
+		case "end":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.End = data
 		case "order":
 			var err error
 
@@ -13876,7 +14301,7 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"user", "parent", "name", "notes", "priority", "start", "order", "status", "metadata"}
+	fieldsInOrder := [...]string{"user", "parent", "name", "notes", "priority", "start", "end", "order", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13937,6 +14362,15 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 				return it, err
 			}
 			it.Start = data
+		case "end":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.End = data
 		case "order":
 			var err error
 
@@ -14079,216 +14513,6 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
-
-var assignmentImplementors = []string{"Assignment"}
-
-func (ec *executionContext) _Assignment(ctx context.Context, sel ast.SelectionSet, obj *model.Assignment) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, assignmentImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Assignment")
-		case "id":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Assignment_id(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "due_date":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Assignment_due_date(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "metadata":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Assignment_metadata(ctx, field, obj)
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "status":
-			out.Values[i] = ec._Assignment_status(ctx, field, obj)
-		case "created":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Assignment_created(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "updated":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Assignment_updated(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
 
 var boardImplementors = []string{"Board", "_Entity"}
 
@@ -14608,6 +14832,39 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "collaborators":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Board_collaborators(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -14649,6 +14906,263 @@ func (ec *executionContext) _Boards(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var collaboratorImplementors = []string{"Collaborator"}
+
+func (ec *executionContext) _Collaborator(ctx context.Context, sel ast.SelectionSet, obj *model.Collaborator) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, collaboratorImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Collaborator")
+		case "id":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collaborator_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "uid":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collaborator_uid(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "board":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collaborator_board(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "permission":
+			out.Values[i] = ec._Collaborator_permission(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "metadata":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collaborator_metadata(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "status":
+			out.Values[i] = ec._Collaborator_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "created":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collaborator_created(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "updated":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collaborator_updated(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15089,6 +15603,39 @@ func (ec *executionContext) _Goal(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._Goal_organization(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "members":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Goal_members(ctx, field, obj)
 				return res
 			}
 
@@ -16899,6 +17446,39 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "end":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_end(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "order":
 			out.Values[i] = ec._Task_order(ctx, field, obj)
 		case "status":
@@ -16975,7 +17555,7 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "assignment":
+		case "assignee":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -16984,7 +17564,40 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Task_assignment(ctx, field, obj)
+				res = ec._Task_assignee(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "members":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_members(ctx, field, obj)
 				return res
 			}
 
@@ -18422,13 +19035,6 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOAssignment2ᚖgithubᚗcomᚋdailytravelᚋxᚋbaseᚋgraphᚋmodelᚐAssignment(ctx context.Context, sel ast.SelectionSet, v *model.Assignment) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Assignment(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalOBoard2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋbaseᚋgraphᚋmodelᚐBoard(ctx context.Context, sel ast.SelectionSet, v []*model.Board) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -18510,6 +19116,54 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) marshalOCollaborator2ᚕᚖgithubᚗcomᚋdailytravelᚋxᚋbaseᚋgraphᚋmodelᚐCollaborator(ctx context.Context, sel ast.SelectionSet, v []*model.Collaborator) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCollaborator2ᚖgithubᚗcomᚋdailytravelᚋxᚋbaseᚋgraphᚋmodelᚐCollaborator(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOCollaborator2ᚖgithubᚗcomᚋdailytravelᚋxᚋbaseᚋgraphᚋmodelᚐCollaborator(ctx context.Context, sel ast.SelectionSet, v *model.Collaborator) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Collaborator(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
 	if v == nil {
 		return nil, nil
@@ -18579,6 +19233,44 @@ func (ec *executionContext) marshalOGoals2ᚖgithubᚗcomᚋdailytravelᚋxᚋba
 		return graphql.Null
 	}
 	return ec._Goals(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNID2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOID2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOID2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {

@@ -12,13 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// FindAssignmentByUID is the resolver for the findAssignmentByUID field.
-func (r *entityResolver) FindAssignmentByUID(ctx context.Context, uid string) (*model.Assignment, error) {
-	return &model.Assignment{
-		UID: uid,
-	}, nil
-}
-
 // FindAttendanceByUID is the resolver for the findAttendanceByUID field.
 func (r *entityResolver) FindAttendanceByUID(ctx context.Context, uid string) (*model.Attendance, error) {
 	return &model.Attendance{
@@ -110,6 +103,22 @@ func (r *entityResolver) FindListByUID(ctx context.Context, uid string) (*model.
 	}, nil
 }
 
+// FindMemberByID is the resolver for the findMemberByID field.
+func (r *entityResolver) FindMemberByID(ctx context.Context, id string) (*model.Member, error) {
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var item *model.Member
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, bson.M{"_id": _id}).Decode(&item); err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}
+
 // FindMembershipByUID is the resolver for the findMembershipByUID field.
 func (r *entityResolver) FindMembershipByUID(ctx context.Context, uid string) (*model.Membership, error) {
 	return &model.Membership{
@@ -173,10 +182,17 @@ func (r *entityResolver) FindTaskByUID(ctx context.Context, uid string) (*model.
 	}, nil
 }
 
-// FindTaskByCollaborators is the resolver for the findTaskByCollaborators field.
-func (r *entityResolver) FindTaskByCollaborators(ctx context.Context, collaborators []string) (*model.Task, error) {
+// FindTaskByMembers is the resolver for the findTaskByMembers field.
+func (r *entityResolver) FindTaskByMembers(ctx context.Context, members []string) (*model.Task, error) {
 	return &model.Task{
-		Collaborators: collaborators,
+		Members: members,
+	}, nil
+}
+
+// FindTaskByAssignee is the resolver for the findTaskByAssignee field.
+func (r *entityResolver) FindTaskByAssignee(ctx context.Context, assignee string) (*model.Task, error) {
+	return &model.Task{
+		Assignee: assignee,
 	}, nil
 }
 

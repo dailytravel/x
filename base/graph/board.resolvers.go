@@ -89,6 +89,11 @@ func (r *boardResolver) Updated(ctx context.Context, obj *model.Board) (string, 
 	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
+// Collaborators is the resolver for the collaborators field.
+func (r *boardResolver) Collaborators(ctx context.Context, obj *model.Board) ([]*model.Collaborator, error) {
+	panic(fmt.Errorf("not implemented: Collaborators - collaborators"))
+}
+
 // CreateBoard is the resolver for the createBoard field.
 func (r *mutationResolver) CreateBoard(ctx context.Context, input model.NewBoard) (*model.Board, error) {
 	uid, err := utils.UID(ctx)

@@ -11,8 +11,8 @@ type Task {
   status: String!
   metadata: Map
   uid: ID!
-  assignment: Assignment
-  collaborators: [ID!]
+  assignee: ID
+  members: [ID!]
   created: String!
   updated: String!
 }

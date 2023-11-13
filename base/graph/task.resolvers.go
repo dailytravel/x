@@ -376,6 +376,15 @@ func (r *taskResolver) Start(ctx context.Context, obj *model.Task) (*string, err
 	return pointer.String(obj.Start.Time().Format(time.RFC3339)), nil
 }
 
+// End is the resolver for the end field.
+func (r *taskResolver) End(ctx context.Context, obj *model.Task) (*string, error) {
+	if obj.End == nil {
+		return nil, nil
+	}
+
+	return pointer.String(obj.End.Time().Format(time.RFC3339)), nil
+}
+
 // Metadata is the resolver for the metadata field.
 func (r *taskResolver) Metadata(ctx context.Context, obj *model.Task) (map[string]interface{}, error) {
 	return obj.Metadata, nil
@@ -386,17 +395,24 @@ func (r *taskResolver) UID(ctx context.Context, obj *model.Task) (string, error)
 	return obj.UID.Hex(), nil
 }
 
-// Assignment is the resolver for the assignment field.
-func (r *taskResolver) Assignment(ctx context.Context, obj *model.Task) (*model.Assignment, error) {
-	var item *model.Assignment
-
-	filter := bson.M{"task": obj.ID}
-	err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
-	if err != nil {
+// Assignee is the resolver for the assignee field.
+func (r *taskResolver) Assignee(ctx context.Context, obj *model.Task) (*string, error) {
+	if obj.Assignee == nil {
 		return nil, nil
 	}
 
-	return item, nil
+	return pointer.String(obj.Assignee.Hex()), nil
+}
+
+// Members is the resolver for the members field.
+func (r *taskResolver) Members(ctx context.Context, obj *model.Task) ([]string, error) {
+	var members []string
+
+	for _, member := range obj.Members {
+		members = append(members, member.Hex())
+	}
+
+	return members, nil
 }
 
 // Created is the resolver for the created field.

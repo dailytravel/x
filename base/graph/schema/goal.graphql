@@ -10,6 +10,7 @@ type Goal {
   phase: Phase!
   uid: ID!
   organization: ID
+  members: [ID]
   created: String!
   updated: String!
 }

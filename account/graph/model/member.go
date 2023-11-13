@@ -16,6 +16,8 @@ type Member struct {
 	Status    string             `json:"status" bson:"status"`
 }
 
+func (Member) IsEntity() {}
+
 func (i *Member) MarshalBSON() ([]byte, error) {
 	now := primitive.Timestamp{T: uint32(time.Now().Unix())}
 

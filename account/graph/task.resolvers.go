@@ -34,13 +34,33 @@ func (r *taskResolver) User(ctx context.Context, obj *model.Task) (*model.User, 
 	return item, nil
 }
 
+// Lead is the resolver for the lead field.
+func (r *taskResolver) Lead(ctx context.Context, obj *model.Task) (*model.User, error) {
+	_id, err := primitive.ObjectIDFromHex(obj.Assignee)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert UID to ObjectID: %w", err)
+	}
+
+	var item *model.User
+
+	filter := bson.M{"_id": _id}
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // Return nil if no user is found, rather than an error.
+		}
+		return nil, fmt.Errorf("failed to fetch user from database: %w", err)
+	}
+
+	return item, nil
+}
+
 // Followers is the resolver for the followers field.
 func (r *taskResolver) Followers(ctx context.Context, obj *model.Task) ([]*model.User, error) {
 	var items []*model.User
 
 	var ids []primitive.ObjectID
 
-	for _, id := range obj.Collaborators {
+	for _, id := range obj.Members {
 		_id, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert UID to ObjectID: %w", err)

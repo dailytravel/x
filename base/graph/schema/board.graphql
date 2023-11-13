@@ -15,6 +15,7 @@ type Board @key(fields: "id") {
   uid: ID!
   created: String!
   updated: String!
+  collaborators: [Collaborator]
 }
 
 enum BoardType {

@@ -29,7 +29,7 @@ input UpdateWorkspace {
 
 extend type Query {
   workspace(id: ID!): Workspace
-  workspaces: Workspaces
+  workspaces(stages: Map): Workspaces
 }
 
 extend type Mutation {

@@ -1,6 +1,11 @@
-extend type Task @key(fields: "uid") @key(fields: "collaborators") {
+extend type Task
+  @key(fields: "uid")
+  @key(fields: "members")
+  @key(fields: "assignee") {
   uid: ID! @external
-  collaborators: [ID!] @external
+  assignee: ID! @external
+  members: [ID!] @external
   user: User
+  lead: User #this is assignee
   followers: [User]
 }
