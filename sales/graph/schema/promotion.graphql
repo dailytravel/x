@@ -43,14 +43,7 @@ input UpdatePromotion {
 
 extend type Query {
   promotion(id: ID!): Promotion @auth
-  promotions(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Promotions @auth
+  promotions(stages: Map): Promotions @auth
 }
 
 extend type Mutation {

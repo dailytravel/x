@@ -153,7 +153,7 @@ func (r *notificationResolver) Updated(ctx context.Context, obj *model.Notificat
 }
 
 // Notifications is the resolver for the notifications field.
-func (r *queryResolver) Notifications(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Notifications, error) {
+func (r *queryResolver) Notifications(ctx context.Context, stages map[string]interface{}) (*model.Notifications, error) {
 	var items []*model.Notification
 	//find all items
 	cur, err := r.db.Collection("notifications").Find(ctx, nil)

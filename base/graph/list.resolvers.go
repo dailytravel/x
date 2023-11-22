@@ -59,13 +59,7 @@ func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Tas
 					bson.M{"status": bson.M{"$ne": "ARCHIVED"}},
 					bson.M{"$or": []interface{}{
 						bson.M{"uid": uid},
-						bson.M{"collaborators": uid},
-						bson.M{
-							"$and": []interface{}{
-								bson.M{"assignments.task": bson.M{"$in": obj.Tasks}},
-								bson.M{"assignments.uid": uid},
-							},
-						},
+						bson.M{"shares": uid},
 					}},
 				},
 			},

@@ -53,14 +53,7 @@ input UpdateTransaction {
 }
 
 extend type Query {
-  transactions(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Transactions @auth
+  transactions(stages: Map): Transactions @auth
   transaction(id: ID!): Transaction @auth
 }
 

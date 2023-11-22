@@ -61,14 +61,7 @@ input UpdateJob {
 
 extend type Query {
   job(id: ID!): Job
-  jobs(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Jobs
+  jobs(stages: Map): Jobs
 }
 
 extend type Mutation {

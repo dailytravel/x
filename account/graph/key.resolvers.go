@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/dailytravel/x/account/internal/utils"
 	"github.com/dailytravel/x/account/pkg/auth"
 	"github.com/typesense/typesense-go/typesense/api/pointer"
 	"go.mongodb.org/mongo-driver/bson"
@@ -219,40 +218,29 @@ func (r *mutationResolver) RotateKey(ctx context.Context) (*model.Key, error) {
 }
 
 // Keys is the resolver for the keys field.
-func (r *queryResolver) Keys(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Keys, error) {
-	var items []*model.Key
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
+func (r *queryResolver) Keys(ctx context.Context, stages map[string]interface{}) (*model.Keys, error) {
+	pipeline := bson.A{}
 
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("keys").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("keys").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Key
 
-	//get total count
-	count, err := r.db.Collection("keys").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Keys{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

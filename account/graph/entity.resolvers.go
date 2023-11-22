@@ -182,24 +182,12 @@ func (r *entityResolver) FindShareByUID(ctx context.Context, uid string) (*model
 	}, nil
 }
 
-// FindTaskByUID is the resolver for the findTaskByUID field.
-func (r *entityResolver) FindTaskByUID(ctx context.Context, uid string) (*model.Task, error) {
+// FindTaskByUIDAndSharesAndAssignee is the resolver for the findTaskByUIDAndSharesAndAssignee field.
+func (r *entityResolver) FindTaskByUIDAndSharesAndAssignee(ctx context.Context, uid string, shares []string, assignee string) (*model.Task, error) {
 	return &model.Task{
-		UID: uid,
-	}, nil
-}
-
-// FindTaskByMembers is the resolver for the findTaskByMembers field.
-func (r *entityResolver) FindTaskByMembers(ctx context.Context, members []string) (*model.Task, error) {
-	return &model.Task{
-		Members: members,
-	}, nil
-}
-
-// FindTaskByAssignee is the resolver for the findTaskByAssignee field.
-func (r *entityResolver) FindTaskByAssignee(ctx context.Context, assignee string) (*model.Task, error) {
-	return &model.Task{
+		UID:      uid,
 		Assignee: assignee,
+		Shares:   shares,
 	}, nil
 }
 

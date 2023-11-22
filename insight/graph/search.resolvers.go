@@ -140,43 +140,29 @@ func (r *queryResolver) Search(ctx context.Context, args map[string]interface{})
 }
 
 // Searches is the resolver for the searches field.
-func (r *queryResolver) Searches(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Searches, error) {
-	var items []*model.Search
+func (r *queryResolver) Searches(ctx context.Context, stages map[string]interface{}) (*model.Searches, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
-	}
-
-	cursor, err := r.db.Collection("timezones").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("searches").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Search
 
-	//get total count
-	count, err := r.db.Collection("timezones").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Searches{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

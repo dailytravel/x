@@ -131,14 +131,7 @@ input SkillInput {
 
 extend type Query {
   resume(id: ID!): Resume
-  resumes(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Resumes
+  resumes(stages: Map): Resumes
 }
 
 extend type Mutation {

@@ -63,6 +63,26 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 		item.Parent = &_id
 	}
 
+	if input.Assignee != nil {
+		_id, err := primitive.ObjectIDFromHex(*input.Assignee)
+		if err != nil {
+			return nil, err
+		}
+
+		item.Assignee = &_id
+	}
+
+	if input.Shares != nil {
+		for _, share := range input.Shares {
+			_id, err := primitive.ObjectIDFromHex(share)
+			if err != nil {
+				return nil, err
+			}
+
+			item.Shares = append(item.Shares, &_id)
+		}
+	}
+
 	if input.Start != nil {
 		startAt, err := time.Parse(time.RFC3339, *input.Start)
 		if err != nil {
@@ -70,6 +90,15 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 		}
 		dt := primitive.NewDateTimeFromTime(startAt)
 		item.Start = &dt
+	}
+
+	if input.End != nil {
+		endAt, err := time.Parse(time.RFC3339, *input.End)
+		if err != nil {
+			return nil, fmt.Errorf("invalid End format: %v", err)
+		}
+		dt := primitive.NewDateTimeFromTime(endAt)
+		item.End = &dt
 	}
 
 	if input.Order != nil {
@@ -136,6 +165,26 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 		item.Parent = &_id
 	}
 
+	if input.Assignee != nil {
+		_id, err := primitive.ObjectIDFromHex(*input.Assignee)
+		if err != nil {
+			return nil, err
+		}
+
+		item.Assignee = &_id
+	}
+
+	if input.Shares != nil {
+		for _, share := range input.Shares {
+			_id, err := primitive.ObjectIDFromHex(share)
+			if err != nil {
+				return nil, err
+			}
+
+			item.Shares = append(item.Shares, &_id)
+		}
+	}
+
 	if input.Start != nil {
 		startAt, err := time.Parse(time.RFC3339, *input.Start)
 		if err != nil {
@@ -143,6 +192,15 @@ func (r *mutationResolver) UpdateTask(ctx context.Context, id string, input mode
 		}
 		dt := primitive.NewDateTimeFromTime(startAt)
 		item.Start = &dt
+	}
+
+	if input.End != nil {
+		endAt, err := time.Parse(time.RFC3339, *input.End)
+		if err != nil {
+			return nil, fmt.Errorf("invalid End format: %v", err)
+		}
+		dt := primitive.NewDateTimeFromTime(endAt)
+		item.End = &dt
 	}
 
 	if input.Order != nil {
@@ -186,11 +244,7 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (map[strin
 
 	filter := bson.M{
 		"_id": objectID,
-		"$or": []bson.M{
-			{"uid": uid},
-			{"collaborators": uid},
-			{"assignments": bson.M{"$elemMatch": bson.M{"uid": uid}}},
-		},
+		"uid": uid,
 	}
 
 	result, err := r.db.Collection("tasks").DeleteOne(ctx, filter)
@@ -224,11 +278,7 @@ func (r *mutationResolver) DeleteTasks(ctx context.Context, ids []string) (map[s
 
 	filter := bson.M{
 		"_id": bson.M{"$in": objectIDs},
-		"$or": []bson.M{
-			{"uid": uid},
-			{"collaborators": uid},
-			{"assignments": bson.M{"$elemMatch": bson.M{"uid": uid}}},
-		},
+		"uid": uid,
 	}
 
 	result, err := r.db.Collection("tasks").DeleteMany(ctx, filter)
@@ -259,9 +309,9 @@ func (r *queryResolver) Task(ctx context.Context, id string) (*model.Task, error
 	filter := bson.M{
 		"_id": objectID,
 		"$or": []bson.M{
-			{"UID": uid},
-			{"collaborators": uid},
-			{"assignments": bson.M{"$elemMatch": bson.M{"uid": uid}}},
+			{"uid": uid},
+			{"assignee": uid},
+			{"shares": bson.M{"$elemMatch": bson.M{"uid": uid}}},
 		},
 	}
 
@@ -283,15 +333,12 @@ func (r *queryResolver) Tasks(ctx context.Context, stages map[string]interface{}
 
 	matchStage := bson.M{
 		"$match": bson.M{
-			"$and": []interface{}{
-				bson.M{"status": bson.M{"$ne": "ARCHIVED"}},
-				bson.M{"$or": bson.A{
-					bson.M{"uid": uid},
-					bson.M{"collaborators": uid},
-					bson.M{
-						"assignments.task": "$_id",
-						"assignments.uid":  uid,
-					},
+			"$and": []bson.M{
+				{"status": bson.M{"$ne": "ARCHIVED"}},
+				{"$or": []bson.M{
+					{"uid": uid},
+					{"assignee": uid},
+					{"shares": bson.M{"$elemMatch": bson.M{"uid": uid}}},
 				}},
 			},
 		},
@@ -404,15 +451,15 @@ func (r *taskResolver) Assignee(ctx context.Context, obj *model.Task) (*string, 
 	return pointer.String(obj.Assignee.Hex()), nil
 }
 
-// Members is the resolver for the members field.
-func (r *taskResolver) Members(ctx context.Context, obj *model.Task) ([]string, error) {
-	var members []string
+// Shares is the resolver for the shares field.
+func (r *taskResolver) Shares(ctx context.Context, obj *model.Task) ([]string, error) {
+	var items []string
 
-	for _, member := range obj.Members {
-		members = append(members, member.Hex())
+	for _, item := range obj.Shares {
+		items = append(items, item.Hex())
 	}
 
-	return members, nil
+	return items, nil
 }
 
 // Created is the resolver for the created field.

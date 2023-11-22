@@ -32,7 +32,7 @@ func (r *mutationResolver) DeleteWebhooks(ctx context.Context, ids []string) (ma
 }
 
 // Webhooks is the resolver for the webhooks field.
-func (r *queryResolver) Webhooks(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) ([]*model.Webhook, error) {
+func (r *queryResolver) Webhooks(ctx context.Context, stages map[string]interface{}) ([]*model.Webhook, error) {
 	panic(fmt.Errorf("not implemented: Webhooks - webhooks"))
 }
 

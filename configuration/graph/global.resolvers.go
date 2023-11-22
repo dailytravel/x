@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/configuration/graph/model"
-	"github.com/dailytravel/x/configuration/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -156,41 +155,29 @@ func (r *queryResolver) Global(ctx context.Context, name string) (*model.Global,
 }
 
 // Globals is the resolver for the options field.
-func (r *queryResolver) Globals(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Globals, error) {
-	var items []*model.Global
+func (r *queryResolver) Globals(ctx context.Context, stages map[string]interface{}) (*model.Globals, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("globals").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("globals").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Global
 
-	//get total count
-	count, err := r.db.Collection("globals").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Globals{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

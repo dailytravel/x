@@ -23,19 +23,8 @@ type Product struct {
 	Type        string                `json:"type" bson:"type"`
 	Name        primitive.M           `json:"name" bson:"name"`
 	Description primitive.M           `json:"description" bson:"description"`
-	Duration    int32                 `json:"duration" bson:"duration"`
-	Notes       primitive.M           `json:"notes" bson:"notes"`
-	Tips        primitive.M           `json:"tips" bson:"tips"`
-	Highlights  primitive.M           `json:"highlights" bson:"highlights"`
-	Expectation primitive.M           `json:"expectation" bson:"expectation"`
-	Faqs        primitive.M           `json:"faqs" bson:"faqs"`
-	Reviews     int32                 `json:"reviews" bson:"reviews"`
-	Booked      int32                 `json:"booked" bson:"booked"`
-	Rating      float32               `json:"rating" bson:"rating"`
+	Duration    string                `json:"duration" bson:"duration"`
 	Reviewable  bool                  `json:"reviewable" bson:"reviewable"`
-	Price       float64               `json:"price" bson:"price"`
-	Discount    float64               `json:"discount,omitempty" bson:"discount,omitempty"`
-	Currency    string                `json:"currency" bson:"currency"`
 	Status      string                `json:"status" bson:"status"`
 	Terms       []*primitive.ObjectID `json:"terms,omitempty" bson:"terms,omitempty"`
 	Places      []*primitive.ObjectID `json:"places,omitempty" bson:"places,omitempty"`
@@ -66,8 +55,6 @@ func (i *Product) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "duration", Value: 1}}},
-		{Keys: bson.D{{Key: "rating", Value: 1}}},
-		{Keys: bson.D{{Key: "booked", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "created ", Value: 1}}},
 		{Keys: bson.D{{Key: "updated ", Value: 1}}},

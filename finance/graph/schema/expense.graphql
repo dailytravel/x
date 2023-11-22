@@ -66,14 +66,7 @@ input UpdateExpense {
 }
 
 extend type Query {
-  expenses(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Expenses @auth
+  expenses(stages: Map): Expenses @auth
   expense(id: ID!): Expense @auth
 }
 

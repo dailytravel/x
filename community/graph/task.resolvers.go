@@ -43,36 +43,6 @@ func (r *taskResolver) Comments(ctx context.Context, obj *model.Task) ([]*model.
 	return items, nil
 }
 
-// Shares is the resolver for the shares field.
-func (r *taskResolver) Shares(ctx context.Context, obj *model.Task) ([]*model.Share, error) {
-	var items []*model.Share
-
-	_id, err := primitive.ObjectIDFromHex(obj.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	cursor, err := r.db.Collection("shares").Find(ctx, bson.M{"object._id": _id, "object.type": "tasks"})
-	if err != nil {
-		return nil, fmt.Errorf("error finding shares: %v", err)
-	}
-	defer cursor.Close(ctx)
-
-	for cursor.Next(ctx) {
-		var share model.Share
-		if err := cursor.Decode(&share); err != nil {
-			return nil, fmt.Errorf("error decoding share: %v", err)
-		}
-		items = append(items, &share)
-	}
-
-	if err := cursor.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating through shares: %v", err)
-	}
-
-	return items, nil
-}
-
 // Task returns TaskResolver implementation.
 func (r *Resolver) Task() TaskResolver { return &taskResolver{r} }
 

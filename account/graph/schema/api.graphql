@@ -51,14 +51,7 @@ input UpdateApi {
 
 extend type Query {
   api(id: ID!): Api
-  apis(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Apis
+  apis(stages: Map): Apis
 }
 
 extend type Mutation {

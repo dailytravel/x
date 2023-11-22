@@ -116,45 +116,29 @@ func (r *queryResolver) Reaction(ctx context.Context, object map[string]interfac
 }
 
 // Reactions is the resolver for the reactions field.
-func (r *queryResolver) Reactions(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Reactions, error) {
-	var items []*model.Reaction
+func (r *queryResolver) Reactions(ctx context.Context, stages map[string]interface{}) (*model.Reactions, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("reactions").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("reactions").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	for cursor.Next(ctx) {
-		item := &model.Reaction{}
-		if err := cursor.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
+	var items []*model.Reaction
 
-	//get total count
-	count, err := r.db.Collection("reactions").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Reactions{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

@@ -19,6 +19,7 @@ type Quote {
   created: String!
   updated: String!
   uid: ID!
+  shares: [ID]
 }
 
 type Quotes {
@@ -43,6 +44,7 @@ input NewQuote {
   billing: Map!
   metadata: Map
   status: String
+  shares: [ID]
 }
 
 input UpdateQuote {
@@ -62,17 +64,11 @@ input UpdateQuote {
   billing: Map
   metadata: Map
   status: String
+  shares: [ID]
 }
 
 extend type Query {
-  quotes(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Quotes @auth
+  quotes(stages: Map): Quotes @auth
   quote(id: ID!): Quote @auth
 }
 

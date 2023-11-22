@@ -33,14 +33,7 @@ input UpdateTime {
 
 extend type Query {
   time(id: ID!): Phase
-  times(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Times
+  times(stages: Map): Times
 }
 
 extend type Mutation {

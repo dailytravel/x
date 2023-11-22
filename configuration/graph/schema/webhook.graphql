@@ -59,14 +59,7 @@ input WebhookEventInput {
 }
 
 extend type Query {
-  webhooks(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): [Webhook]
+  webhooks(stages: Map): [Webhook]
   webhook(id: ID!): Webhook
 }
 

@@ -23,14 +23,7 @@ input NewKey {
 }
 
 extend type Query {
-  keys(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Keys @auth(roles: [admin])
+  keys(stages: Map): Keys @auth(roles: [admin])
   key(id: ID!): Key @auth(roles: [admin])
 }
 

@@ -37,6 +37,6 @@ func (r *queryResolver) Segment(ctx context.Context, id string) (*model.Segment,
 }
 
 // Segments is the resolver for the segments field.
-func (r *queryResolver) Segments(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Segments, error) {
+func (r *queryResolver) Segments(ctx context.Context, stages map[string]interface{}) (*model.Segments, error) {
 	panic(fmt.Errorf("not implemented: Segments - segments"))
 }

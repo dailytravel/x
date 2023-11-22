@@ -41,14 +41,7 @@ input UpdateReward {
 }
 
 extend type Query {
-  rewards(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Rewards @auth
+  rewards(stages: Map): Rewards @auth
   reward(id: ID!): Reward @auth
 }
 

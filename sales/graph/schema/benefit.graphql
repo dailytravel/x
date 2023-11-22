@@ -27,14 +27,7 @@ input UpdateBenefit {
 }
 
 extend type Query {
-  benefits(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Benefits
+  benefits(stages: Map): Benefits
   benefit(id: ID!): Benefit
 }
 

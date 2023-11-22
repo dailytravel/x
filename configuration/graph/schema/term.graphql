@@ -44,14 +44,7 @@ input UpdateTerm {
 
 extend type Query {
   term(id: ID!): Term
-  terms(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Terms
+  terms(stages: Map): Terms
 }
 
 extend type Mutation {

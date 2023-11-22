@@ -241,41 +241,29 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 }
 
 // Posts is the resolver for the posts field.
-func (r *queryResolver) Posts(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Posts, error) {
-	var items []*model.Post
+func (r *queryResolver) Posts(ctx context.Context, stages map[string]interface{}) (*model.Posts, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("posts").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("posts").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Post
 
-	//get total count
-	count, err := r.db.Collection("posts").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Posts{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }
@@ -284,30 +272,3 @@ func (r *queryResolver) Posts(ctx context.Context, filter map[string]interface{}
 func (r *Resolver) Post() PostResolver { return &postResolver{r} }
 
 type postResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *postResolver) Terms(ctx context.Context, obj *model.Post) ([]*model.Term, error) {
-	var items []*model.Term
-
-	filter := bson.M{"_id": bson.M{"$in": obj.Terms}}
-	options := options.Find().SetProjection(bson.M{"_id": 1, "name": 1, "slug": 1, "post": 1})
-
-	cursor, err := r.db.Collection("terms").Find(ctx, filter, options)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
-
-	return items, nil
-}
-func (r *mutationResolver) DeletePosts(ctx context.Context, ids []string) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: DeletePosts - deletePosts"))
-}

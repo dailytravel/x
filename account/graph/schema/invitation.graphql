@@ -33,14 +33,7 @@ input UpdateInvitation {
 }
 
 extend type Query {
-  invitations(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Invitations @auth
+  invitations(stages: Map): Invitations @auth
   invitation(id: ID!): Invitation
 }
 

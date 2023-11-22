@@ -12,7 +12,6 @@ import (
 
 	"github.com/dailytravel/x/sales/graph/model"
 	"github.com/dailytravel/x/sales/internal/utils"
-	"github.com/dailytravel/x/sales/pkg/auth"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -23,31 +22,29 @@ func (r *couponResolver) ID(ctx context.Context, obj *model.Coupon) (string, err
 	return obj.ID.Hex(), nil
 }
 
-// Description is the resolver for the description field.
-func (r *couponResolver) Description(ctx context.Context, obj *model.Coupon) (string, error) {
-	// Get the locale from the context
-	locale := auth.Locale(ctx)
-	if locale == nil {
-		locale = &obj.Locale
-	}
-
-	// Try to retrieve the description for the requested locale
-	if description, ok := obj.Description[*locale].(string); ok {
-		return description, nil
-	}
-
-	// Return an error if the name is not found for any locale
-	return obj.Description[obj.Locale].(string), nil
+// Name is the resolver for the name field.
+func (r *couponResolver) Name(ctx context.Context, obj *model.Coupon) (string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
 }
 
-// Expiration is the resolver for the expiration field.
-func (r *couponResolver) Expiration(ctx context.Context, obj *model.Coupon) (*string, error) {
-	panic(fmt.Errorf("not implemented: Expiration - expiration"))
+// Description is the resolver for the description field.
+func (r *couponResolver) Description(ctx context.Context, obj *model.Coupon) (*string, error) {
+	panic(fmt.Errorf("not implemented: Name - name"))
 }
 
 // Metadata is the resolver for the metadata field.
 func (r *couponResolver) Metadata(ctx context.Context, obj *model.Coupon) (map[string]interface{}, error) {
 	return obj.Metadata, nil
+}
+
+// Starts is the resolver for the starts field.
+func (r *couponResolver) Starts(ctx context.Context, obj *model.Coupon) (*string, error) {
+	panic(fmt.Errorf("not implemented: Starts - starts"))
+}
+
+// Expires is the resolver for the expires field.
+func (r *couponResolver) Expires(ctx context.Context, obj *model.Coupon) (*string, error) {
+	panic(fmt.Errorf("not implemented: Expires - expires"))
 }
 
 // Created is the resolver for the created field.
@@ -63,6 +60,11 @@ func (r *couponResolver) Updated(ctx context.Context, obj *model.Coupon) (string
 // UID is the resolver for the uid field.
 func (r *couponResolver) UID(ctx context.Context, obj *model.Coupon) (*string, error) {
 	panic(fmt.Errorf("not implemented: UID - uid"))
+}
+
+// Products is the resolver for the products field.
+func (r *couponResolver) Products(ctx context.Context, obj *model.Coupon) ([]*model.Product, error) {
+	panic(fmt.Errorf("not implemented: Products - products"))
 }
 
 // CreateCoupon is the resolver for the createCoupon field.
@@ -277,7 +279,7 @@ func (r *queryResolver) Coupon(ctx context.Context, id string) (*model.Coupon, e
 }
 
 // Coupons is the resolver for the coupons field.
-func (r *queryResolver) Coupons(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Coupons, error) {
+func (r *queryResolver) Coupons(ctx context.Context, stages map[string]interface{}) (*model.Coupons, error) {
 	var items []*model.Coupon
 	//find all items
 	cur, err := r.db.Collection("coupons").Find(ctx, nil)
@@ -316,6 +318,9 @@ type couponResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *couponResolver) Expiration(ctx context.Context, obj *model.Coupon) (*string, error) {
+	panic(fmt.Errorf("not implemented: Expiration - expiration"))
+}
 func (r *couponResolver) Start(ctx context.Context, obj *model.Coupon) (string, error) {
 	panic(fmt.Errorf("not implemented: Start - start"))
 }

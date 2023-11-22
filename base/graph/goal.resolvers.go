@@ -118,7 +118,7 @@ func (r *queryResolver) Goal(ctx context.Context, id string) (*model.Goal, error
 }
 
 // Goals is the resolver for the goals field.
-func (r *queryResolver) Goals(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Goals, error) {
+func (r *queryResolver) Goals(ctx context.Context, stages map[string]interface{}) (*model.Goals, error) {
 	panic(fmt.Errorf("not implemented: Goals - goals"))
 }
 

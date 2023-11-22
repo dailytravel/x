@@ -48,7 +48,7 @@ type Payload {
   user: User!
 }
 
-input NewUserInput {
+input NewUser {
   name: String!
   given_name: String
   family_name: String
@@ -62,11 +62,10 @@ input NewUserInput {
   status: String
 }
 
-input UpdateUserInput {
+input UpdateUser {
   name: String
   given_name: String
   family_name: String
-  password: String
   roles: [String]
   timezone: String
   locale: String
@@ -75,7 +74,7 @@ input UpdateUserInput {
   metadata: Map
 }
 
-input LoginInput {
+input Login {
   username: String!
   password: String!
   grant_type: String
@@ -84,14 +83,14 @@ input LoginInput {
   client_secret: String
 }
 
-input SocialLoginInput {
+input SocialLogin {
   client_id: String!
   client_secret: String
   provider: String!
   token: String!
 }
 
-input RegisterInput {
+input Register {
   name: String!
   email: String!
   password: String!
@@ -99,19 +98,19 @@ input RegisterInput {
   client_id: String
 }
 
-input UpdatePasswordInput {
+input UpdatePassword {
   old_password: String!
   password: String!
   password_confirmation: String
 }
 
-input ResetPasswordInput {
+input ResetPassword {
   token: String!
   password: String!
   password_confirmation: String!
 }
 
-input VerifyInput {
+input Verify {
   code: String!
   type: String!
 }
@@ -125,33 +124,26 @@ type AuthPayload {
 }
 
 extend type Query {
-  users(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Users @auth(roles: [ADMIN]) #for search users on typesense
+  users(stages: Map): Users @auth(roles: [ADMIN]) #for search users on typesense
   user(id: ID!): User @auth(roles: [ADMIN])
   owners(ids: [String!]!, limit: Int, offset: Int): Users @auth
   me: User @auth
 }
 
 extend type Mutation {
-  createUser(input: NewUserInput!): User @auth(roles: [ADMIN])
-  updateUser(id: ID!, input: UpdateUserInput!): User
-  register(input: RegisterInput!): AuthPayload
+  createUser(input: NewUser!): User @auth(roles: [ADMIN])
+  updateUser(id: ID!, input: UpdateUser!): User
+  register(input: Register!): AuthPayload
   verifyEmail(token: String!): Map
   verifyPhone(token: String!): Map
-  login(input: LoginInput!): AuthPayload
-  verify(input: VerifyInput!): Map
-  socialLogin(input: SocialLoginInput!): AuthPayload
+  login(input: Login!): AuthPayload
+  verify(input: Verify!): Map
+  socialLogin(input: SocialLogin!): AuthPayload
   refreshToken(token: String!): AuthPayload
   logout(all: Boolean): Map @auth
   forgotPassword(email: String!): Map
-  resetPassword(input: ResetPasswordInput!): Map
-  updatePassword(input: UpdatePasswordInput!): Map @auth
+  resetPassword(input: ResetPassword!): Map
+  updatePassword(password: String!): Map @auth
   deactivate: User @auth
   deleteUser(id: ID!): Boolean
   deleteUsers(ids: [ID!]!): Boolean

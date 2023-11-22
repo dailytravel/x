@@ -267,7 +267,7 @@ func (r *queryResolver) Conversation(ctx context.Context, id string) (*model.Con
 }
 
 // Conversations is the resolver for the conversations field.
-func (r *queryResolver) Conversations(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Conversations, error) {
+func (r *queryResolver) Conversations(ctx context.Context, stages map[string]interface{}) (*model.Conversations, error) {
 	var items []*model.Conversation
 	//find all items
 	cur, err := r.db.Collection("conversations").Find(ctx, nil)

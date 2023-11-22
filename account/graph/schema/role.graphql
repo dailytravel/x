@@ -26,14 +26,7 @@ input UpdateRole {
 
 extend type Query {
   role(id: ID!): Role @auth(roles: [ADMIN])
-  roles(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Roles @auth(roles: [ADMIN])
+  roles(stages: Map): Roles @auth(roles: [ADMIN])
 }
 
 extend type Mutation {

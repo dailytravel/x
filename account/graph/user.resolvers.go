@@ -26,7 +26,7 @@ import (
 )
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUserInput) (*model.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	// Check if a user with the same email already exists
 	var existingUser model.User
 	if err := r.db.Collection("users").FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingUser); err != nil {
@@ -73,7 +73,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUserIn
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUserInput) (*model.User, error) {
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUser) (*model.User, error) {
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -93,6 +93,14 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 
 	if input.Name != nil {
 		user.Name = *input.Name
+	}
+
+	if input.GivenName != nil {
+		user.GivenName = input.GivenName
+	}
+
+	if input.FamilyName != nil {
+		user.FamilyName = input.FamilyName
 	}
 
 	if input.Picture != nil {
@@ -135,7 +143,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input mode
 }
 
 // Register is the resolver for the register field.
-func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.AuthPayload, error) {
+func (r *mutationResolver) Register(ctx context.Context, input model.Register) (*model.AuthPayload, error) {
 	clientID, err := primitive.ObjectIDFromHex(*input.ClientID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid client ID: %v", err)
@@ -354,7 +362,7 @@ func (r *mutationResolver) VerifyPhone(ctx context.Context, token string) (map[s
 }
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error) {
+func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.AuthPayload, error) {
 	clientID, err := primitive.ObjectIDFromHex(*input.ClientID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid client ID: %v", err)
@@ -433,7 +441,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 }
 
 // Verify 2FA is the resolver for the verify field.
-func (r *mutationResolver) Verify(ctx context.Context, input model.VerifyInput) (map[string]interface{}, error) {
+func (r *mutationResolver) Verify(ctx context.Context, input model.Verify) (map[string]interface{}, error) {
 	// Retrieve the token's ID from the cache (e.g., Redis).
 	tokenID, err := r.redis.Get(ctx, input.Code).Result()
 	if err == redis.Nil {
@@ -473,7 +481,7 @@ func (r *mutationResolver) Verify(ctx context.Context, input model.VerifyInput) 
 }
 
 // SocialLogin is the resolver for the socialLogin field.
-func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLoginInput) (*model.AuthPayload, error) {
+func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLogin) (*model.AuthPayload, error) {
 	var user *model.User
 	var client *model.Client
 	var identity *model.Identity
@@ -754,7 +762,7 @@ func (r *mutationResolver) ForgotPassword(ctx context.Context, email string) (ma
 }
 
 // ResetPassword is the resolver for the resetPassword field.
-func (r *mutationResolver) ResetPassword(ctx context.Context, input model.ResetPasswordInput) (map[string]interface{}, error) {
+func (r *mutationResolver) ResetPassword(ctx context.Context, input model.ResetPassword) (map[string]interface{}, error) {
 	var credentials []*model.Credential
 	// Retrieve userId from Redis
 	userId, err := r.redis.Get(ctx, input.Token).Result()
@@ -836,15 +844,10 @@ func (r *mutationResolver) ResetPassword(ctx context.Context, input model.ResetP
 }
 
 // UpdatePassword is the resolver for the UpdatePassword field.
-func (r *mutationResolver) UpdatePassword(ctx context.Context, input model.UpdatePasswordInput) (map[string]interface{}, error) {
+func (r *mutationResolver) UpdatePassword(ctx context.Context, password string) (map[string]interface{}, error) {
 	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
-	}
-
-	//check password and password confirmation
-	if input.PasswordConfirmation != nil && input.Password != *input.PasswordConfirmation {
-		return nil, errors.New("passwords do not match")
 	}
 
 	var credentials []*model.Credential
@@ -867,19 +870,14 @@ func (r *mutationResolver) UpdatePassword(ctx context.Context, input model.Updat
 
 	//check old password
 	for _, credential := range credentials {
-		//check existing password
-		if err := bcrypt.CompareHashAndPassword([]byte(credential.Secret), []byte(input.OldPassword)); err != nil {
-			return nil, fmt.Errorf("old password is not correct")
-		}
-
 		//check new password
-		if err := bcrypt.CompareHashAndPassword([]byte(credential.Secret), []byte(input.Password)); err == nil {
+		if err := bcrypt.CompareHashAndPassword([]byte(credential.Secret), []byte(password)); err == nil {
 			return nil, fmt.Errorf("new password cannot be the same as the previous passwords")
 		}
 	}
 
 	// Hash the new password
-	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
@@ -992,54 +990,29 @@ func (r *mutationResolver) DeleteUsers(ctx context.Context, ids []string) (*bool
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Users, error) {
-	var items []*model.User
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
+func (r *queryResolver) Users(ctx context.Context, stages map[string]interface{}) (*model.Users, error) {
+	pipeline := bson.A{}
 
-	opts := options.Find()
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if sort != nil {
-		opts.SetSort(sort)
-	}
-	if collation != nil {
-		col := &options.Collation{
-			// you can set collation fields here...
-		}
-		opts.SetCollation(col)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("users").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("users").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	for cursor.Next(ctx) {
-		var user model.User
-		if err := cursor.Decode(&user); err != nil {
-			return nil, err
-		}
-		items = append(items, &user)
-	}
+	var items []*model.User
 
-	//get total count
-	count, err := r.db.Collection("users").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Users{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

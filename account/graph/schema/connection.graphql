@@ -32,14 +32,7 @@ input UpdateConnection {
 }
 
 extend type Query {
-  connections(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Connections
+  connections(stages: Map): Connections
   connection(id: ID!): Connection
 }
 

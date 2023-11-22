@@ -16,7 +16,6 @@ type Comments struct {
 type Contact struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`
-	Shares   []*Share   `json:"shares,omitempty"`
 }
 
 func (Contact) IsEntity() {}
@@ -29,7 +28,6 @@ type Conversations struct {
 type Expense struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`
-	Shares   []*Share   `json:"shares,omitempty"`
 }
 
 func (Expense) IsEntity() {}
@@ -37,7 +35,6 @@ func (Expense) IsEntity() {}
 type File struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`
-	Shares   []*Share   `json:"shares,omitempty"`
 }
 
 func (File) IsEntity() {}
@@ -110,7 +107,6 @@ func (Place) IsEntity() {}
 type Quote struct {
 	ID       string     `json:"id"`
 	Comments []*Comment `json:"comments,omitempty"`
-	Shares   []*Share   `json:"shares,omitempty"`
 }
 
 func (Quote) IsEntity() {}

@@ -16,14 +16,6 @@ type Address struct {
 	Country string `json:"country"`
 }
 
-type AddressInput struct {
-	Street  string `json:"street"`
-	City    string `json:"city"`
-	State   string `json:"state"`
-	Zip     string `json:"zip"`
-	Country string `json:"country"`
-}
-
 type Cards struct {
 	Count int     `json:"count"`
 	Data  []*Card `json:"data,omitempty"`
@@ -32,8 +24,8 @@ type Cards struct {
 type NewCardInput struct {
 	Name     string                 `json:"name"`
 	Number   string                 `json:"number"`
-	ExpMonth int                    `json:"expMonth"`
-	ExpYear  int                    `json:"expYear"`
+	ExpMonth int                    `json:"exp_month"`
+	ExpYear  int                    `json:"exp_year"`
 	Cvv      string                 `json:"cvv"`
 	Billing  map[string]interface{} `json:"billing"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
@@ -65,8 +57,8 @@ type Transactions struct {
 
 type UpdateCardInput struct {
 	Name     *string                `json:"name,omitempty"`
-	ExpMonth *int                   `json:"expMonth,omitempty"`
-	ExpYear  *int                   `json:"expYear,omitempty"`
+	ExpMonth *int                   `json:"exp_month,omitempty"`
+	ExpYear  *int                   `json:"exp_year,omitempty"`
 	Cvv      *string                `json:"cvv,omitempty"`
 	Billing  map[string]interface{} `json:"billing,omitempty"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`

@@ -194,41 +194,29 @@ func (r *mutationResolver) DeleteFiles(ctx context.Context, ids []string) (map[s
 }
 
 // Files is the resolver for the files field.
-func (r *queryResolver) Files(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Files, error) {
-	var items []*model.File
+func (r *queryResolver) Files(ctx context.Context, stages map[string]interface{}) (*model.Files, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("files").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("files").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.File
 
-	//get total count
-	count, err := r.db.Collection("files").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Files{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

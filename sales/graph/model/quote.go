@@ -11,20 +11,21 @@ import (
 
 type Quote struct {
 	Model
-	UID         primitive.ObjectID  `json:"uid" bson:"uid"`
-	Contact     primitive.ObjectID  `json:"contacts" bson:"contacts"`
-	Code        string              `json:"code" bson:"code"`
-	Purchase    *string             `json:"purchase,omitempty" bson:"purchase,omitempty"`
-	Locale      string              `json:"locale" bson:"locale"`
-	Name        string              `json:"name" bson:"name"`
-	Description *string             `json:"description,omitempty" bson:"description,omitempty"`
-	Template    string              `json:"template" bson:"template"`
-	ValidUntil  primitive.Timestamp `json:"validUntil" bson:"valid_until"`
-	Terms       string              `json:"terms" bson:"terms"`
-	Payment     string              `json:"payment" bson:"payment"`
-	Notes       string              `json:"notes,omitempty" bson:"notes,omitempty"`
-	Billing     primitive.M         `json:"billing,omitempty" bson:"billing,omitempty"`
-	Status      string              `json:"status" bson:"status"`
+	UID         primitive.ObjectID    `json:"uid" bson:"uid"`
+	Contact     primitive.ObjectID    `json:"contacts" bson:"contacts"`
+	Code        string                `json:"code" bson:"code"`
+	Purchase    *string               `json:"purchase,omitempty" bson:"purchase,omitempty"`
+	Locale      string                `json:"locale" bson:"locale"`
+	Name        string                `json:"name" bson:"name"`
+	Description *string               `json:"description,omitempty" bson:"description,omitempty"`
+	Template    string                `json:"template" bson:"template"`
+	ValidUntil  primitive.Timestamp   `json:"validUntil" bson:"valid_until"`
+	Terms       string                `json:"terms" bson:"terms"`
+	Payment     string                `json:"payment" bson:"payment"`
+	Notes       string                `json:"notes,omitempty" bson:"notes,omitempty"`
+	Billing     primitive.M           `json:"billing,omitempty" bson:"billing,omitempty"`
+	Status      string                `json:"status" bson:"status"`
+	Shares      []*primitive.ObjectID `json:"shares,omitempty" bson:"shares,omitempty"`
 }
 
 func (i *Quote) MarshalBSON() ([]byte, error) {

@@ -37,14 +37,7 @@ input UpdateClient {
 
 extend type Query {
   client(id: ID!): Client @auth(roles: [ADMIN])
-  clients(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Clients @auth(roles: [ADMIN])
+  clients(stages: Map): Clients @auth(roles: [ADMIN])
 }
 
 extend type Mutation {

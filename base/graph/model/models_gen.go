@@ -84,7 +84,8 @@ type NewPortfolio struct {
 type NewTask struct {
 	User     *string                `json:"user,omitempty"`
 	Parent   *string                `json:"parent,omitempty"`
-	List     *string                `json:"list,omitempty"`
+	Assignee *string                `json:"assignee,omitempty"`
+	Shares   []string               `json:"shares,omitempty"`
 	Name     string                 `json:"name"`
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`
@@ -107,14 +108,6 @@ type Portfolios struct {
 	Data  []*Portfolio `json:"data,omitempty"`
 	Count int          `json:"count"`
 }
-
-type Relationship struct {
-	ID    string  `json:"id"`
-	Lists []*List `json:"lists,omitempty"`
-	Tasks []*Task `json:"tasks,omitempty"`
-}
-
-func (Relationship) IsEntity() {}
 
 type Tasks struct {
 	Data  []*Task `json:"data,omitempty"`
@@ -173,6 +166,8 @@ type UpdatePortfolio struct {
 type UpdateTask struct {
 	User     *string                `json:"user,omitempty"`
 	Parent   *string                `json:"parent,omitempty"`
+	Assignee *string                `json:"assignee,omitempty"`
+	Shares   []string               `json:"shares,omitempty"`
 	Name     *string                `json:"name,omitempty"`
 	Notes    *string                `json:"notes,omitempty"`
 	Priority *string                `json:"priority,omitempty"`

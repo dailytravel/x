@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/dailytravel/x/account/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -143,41 +142,29 @@ func (r *queryResolver) API(ctx context.Context, id string) (*model.Api, error) 
 }
 
 // Apis is the resolver for the apis field.
-func (r *queryResolver) Apis(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Apis, error) {
-	var items []*model.Api
+func (r *queryResolver) Apis(ctx context.Context, stages map[string]interface{}) (*model.Apis, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("apis").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("apis").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Api
 
-	//get total count
-	count, err := r.db.Collection("apis").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Apis{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

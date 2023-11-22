@@ -80,26 +80,6 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 		}()
 
 		switch typeName {
-		case "Board":
-			resolverName, err := entityResolverNameForBoard(ctx, rep)
-			if err != nil {
-				return fmt.Errorf(`finding resolver for Entity "Board": %w`, err)
-			}
-			switch resolverName {
-
-			case "findBoardByID":
-				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
-				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findBoardByID(): %w`, err)
-				}
-				entity, err := ec.resolvers.Entity().FindBoardByID(ctx, id0)
-				if err != nil {
-					return fmt.Errorf(`resolving Entity "Board": %w`, err)
-				}
-
-				list[idx[i]] = entity
-				return nil
-			}
 		case "Comment":
 			resolverName, err := entityResolverNameForComment(ctx, rep)
 			if err != nil {
@@ -387,23 +367,6 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 		g.Wait()
 		return list
 	}
-}
-
-func entityResolverNameForBoard(ctx context.Context, rep map[string]interface{}) (string, error) {
-	for {
-		var (
-			m   map[string]interface{}
-			val interface{}
-			ok  bool
-		)
-		_ = val
-		m = rep
-		if _, ok = m["id"]; !ok {
-			break
-		}
-		return "findBoardByID", nil
-	}
-	return "", fmt.Errorf("%w for Board", ErrTypeNotFound)
 }
 
 func entityResolverNameForComment(ctx context.Context, rep map[string]interface{}) (string, error) {

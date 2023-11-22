@@ -21,6 +21,11 @@ func (r *companyResolver) ID(ctx context.Context, obj *model.Company) (string, e
 	return obj.ID.Hex(), nil
 }
 
+// Currency is the resolver for the currency field.
+func (r *companyResolver) Currency(ctx context.Context, obj *model.Company) (*string, error) {
+	panic(fmt.Errorf("not implemented: Currency - currency"))
+}
+
 // Metadata is the resolver for the metadata field.
 func (r *companyResolver) Metadata(ctx context.Context, obj *model.Company) (map[string]interface{}, error) {
 	return obj.Metadata, nil
@@ -55,14 +60,10 @@ func (r *mutationResolver) CreateCompany(ctx context.Context, input model.NewCom
 		Industry:    input.Industry,
 		Employees:   input.Employees,
 		Revenue:     input.Revenue,
-		City:        input.City,
-		Zip:         input.Zip,
-		State:       input.State,
-		Country:     input.Country,
-		Timezone:    input.Timezone,
-		Phone:       input.Phone,
-		Website:     input.Website,
-		Status:      input.Status,
+
+		Phone:   input.Phone,
+		Website: input.Website,
+		Status:  input.Status,
 		Model: model.Model{
 			Metadata: input.Metadata,
 		},
@@ -119,26 +120,6 @@ func (r *mutationResolver) UpdateCompany(ctx context.Context, id string, input m
 
 	if input.Revenue != nil {
 		item.Revenue = input.Revenue
-	}
-
-	if input.City != nil {
-		item.City = input.City
-	}
-
-	if input.Zip != nil {
-		item.Zip = input.Zip
-	}
-
-	if input.State != nil {
-		item.State = input.State
-	}
-
-	if input.Country != nil {
-		item.Country = input.Country
-	}
-
-	if input.Timezone != nil {
-		item.Timezone = input.Timezone
 	}
 
 	if input.Phone != nil {
@@ -218,7 +199,7 @@ func (r *mutationResolver) DeleteCompanies(ctx context.Context, ids []*string) (
 }
 
 // Companies is the resolver for the companies field.
-func (r *queryResolver) Companies(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Companies, error) {
+func (r *queryResolver) Companies(ctx context.Context, stages map[string]interface{}) (*model.Companies, error) {
 	var items []*model.Company
 	//find all items
 	cur, err := r.db.Collection("companies").Find(ctx, nil)

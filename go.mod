@@ -12,9 +12,10 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.3.1
 	github.com/gorilla/websocket v1.5.0
+	github.com/gosimple/slug v1.13.1
 	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/robfig/cron v1.2.0
-	github.com/typesense/typesense-go v0.7.0
+	github.com/typesense/typesense-go v0.8.0
 	github.com/vektah/gqlparser/v2 v2.5.10
 	go.mongodb.org/mongo-driver v1.12.0
 	golang.org/x/crypto v0.14.0
@@ -45,6 +46,7 @@ require (
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.1 // indirect
+	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.3 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect

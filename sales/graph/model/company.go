@@ -22,11 +22,8 @@ type Company struct {
 	Industry    *string            `json:"industry,omitempty" bson:"industry,omitempty"`
 	Employees   *int               `json:"employees,omitempty" bson:"employees,omitempty"`
 	Revenue     *float64           `json:"revenue,omitempty" bson:"revenue,omitempty"`
-	City        *string            `json:"city,omitempty" bson:"city,omitempty"`
-	Zip         *string            `json:"zip,omitempty" bson:"zip,omitempty"`
-	State       *string            `json:"state,omitempty" bson:"state,omitempty"`
-	Country     *string            `json:"country,omitempty" bson:"country,omitempty"`
-	Timezone    *string            `json:"timezone,omitempty" bson:"timezone,omitempty"`
+	Address     *Address           `json:"address,omitempty" bson:"address,omitempty"`
+	Email       *string            `json:"email,omitempty" bson:"email,omitempty"`
 	Phone       *string            `json:"phone,omitempty" bson:"phone,omitempty"`
 	Website     *string            `json:"website,omitempty" bson:"website,omitempty"`
 	Status      string             `json:"status" bson:"status"`

@@ -194,45 +194,29 @@ func (r *queryResolver) Message(ctx context.Context, id string) (*model.Message,
 }
 
 // Messages is the resolver for the messages field.
-func (r *queryResolver) Messages(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Messages, error) {
-	var items []*model.Message
+func (r *queryResolver) Messages(ctx context.Context, stages map[string]interface{}) (*model.Messages, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("messages").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("messages").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	for cursor.Next(ctx) {
-		item := &model.Message{}
-		if err := cursor.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
+	var items []*model.Message
 
-	//get total count
-	count, err := r.db.Collection("messages").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Messages{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

@@ -34,14 +34,7 @@ input UpdateBalance {
 
 extend type Query {
   balance(id: ID!): Balance @auth
-  balances(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Balances @auth
+  balances(stages: Map): Balances @auth
 }
 
 extend type Mutation {

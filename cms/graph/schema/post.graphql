@@ -70,14 +70,7 @@ input UpdatePost {
 
 extend type Query {
   post(id: ID!): Post
-  posts(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Posts
+  posts(stages: Map): Posts
 }
 
 extend type Mutation {

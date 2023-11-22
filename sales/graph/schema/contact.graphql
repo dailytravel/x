@@ -1,20 +1,14 @@
 type Contact @key(fields: "id") {
   id: ID!
-  firstName: String
-  lastName: String
+  first_name: String
+  last_name: String
   email: String
   phone: String
   picture: String
-  street: String
-  city: String
-  state: String
-  zip: String
-  country: String
-  website: String
-  gender: String
+  address: Address
   birthday: String
   company: Company
-  jobTitle: String
+  job_title: String
   timezone: String
   language: String
   source: String
@@ -24,36 +18,18 @@ type Contact @key(fields: "id") {
   status: String
   labels: [String]
   metadata: Map
-  lastActivity: String
+  last_activity: String
   created: String!
   updated: String!
   uid: ID!
 }
 
-type Phone {
-  mobile: String
-  work: String
-  home: String
-  other: String
-}
-
-input PhoneInput {
-  mobile: String
-  work: String
-  home: String
-  other: String
-}
-
-type Email {
-  personal: String
-  work: String
-  other: String
-}
-
-input EmailInput {
-  personal: String
-  work: String
-  other: String
+type Address {
+  street: String
+  city: String
+  state: String
+  zip: String
+  country: String
 }
 
 type Contacts {
@@ -95,70 +71,57 @@ enum ContactStatus {
 }
 
 input NewContact {
-  company: ID
-  uid: ID
-  firstName: String
-  lastName: String
-  picture: String
-  email: String!
-  phone: String
-  street: String
-  city: String
-  state: String
-  zip: String
-  country: String
-  website: String
-  birthday: String
-  jobTitle: String
-  gender: String
-  timezone: String
-  language: String
-  source: String!
-  rating: Int
-  notes: String
-  stage: String
-  status: String
-  labels: [String]
-  metadata: Map
-}
-
-input UpdateContact {
-  company: ID
-  uid: ID
-  firstName: String
-  lastName: String
-  picture: String
+  first_name: String
+  last_name: String
   email: String
   phone: String
-  street: String
-  city: String
-  state: String
-  zip: String
-  country: String
-  website: String
+  picture: String
+  address: Map
   birthday: String
-  jobTitle: String
-  gender: String
+  company: String
+  job_title: String
   timezone: String
   language: String
   source: String
+  subscribed: Boolean
   rating: Int
   notes: String
-  stage: String
   status: String
   labels: [String]
   metadata: Map
+  last_activity: String
+  created: String!
+  updated: String!
+  uid: ID
+}
+
+input UpdateContact {
+  first_name: String
+  last_name: String
+  email: String
+  phone: String
+  picture: String
+  address: Map
+  birthday: String
+  company: String
+  job_title: String
+  timezone: String
+  language: String
+  source: String
+  subscribed: Boolean
+  rating: Int
+  notes: String
+  status: String
+  labels: [String]
+  metadata: Map
+  last_activity: String
+  created: String!
+  updated: String!
+  uid: ID!
 }
 
 extend type Query {
-  contacts(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Contacts @auth @api
+  contacts(stages: Map): Contacts @auth @api
   contact(id: ID!): Contact @auth
 }
 

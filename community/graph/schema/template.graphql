@@ -35,14 +35,7 @@ input UpdateTemplate {
 
 extend type Query {
   template(name: String!): Template
-  templates(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Templates
+  templates(stages: Map): Templates
 }
 
 extend type Mutation {

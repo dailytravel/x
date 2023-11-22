@@ -30,14 +30,7 @@ input UpdateWallet {
 
 extend type Query {
   wallet(id: ID!): Wallet @auth
-  wallets(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Wallets @auth
+  wallets(stages: Map): Wallets @auth
 }
 
 extend type Mutation {

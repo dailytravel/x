@@ -45,14 +45,7 @@ input UpdateCampaign {
 }
 
 extend type Query {
-  campaigns(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): [Campaign] @auth
+  campaigns(stages: Map): [Campaign] @auth
   campaign(id: ID!): Campaign @auth
 }
 

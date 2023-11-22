@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/dailytravel/x/configuration/graph/model"
+	"github.com/gosimple/slug"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -105,6 +106,7 @@ func (m *Place) Migrate() error {
 					Locale: defaultLocale,
 					Type:   "country",
 					Name:   map[string]interface{}{defaultLocale: row[0]},
+					Slug:   slug.Make(row[0]),
 					Status: "ACTIVE",
 					Model: model.Model{
 						Metadata: map[string]interface{}{

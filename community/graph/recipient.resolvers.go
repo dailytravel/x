@@ -136,7 +136,7 @@ func (r *queryResolver) Recipient(ctx context.Context, id string) (*model.Recipi
 }
 
 // Recipients is the resolver for the recipients field.
-func (r *queryResolver) Recipients(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Recipients, error) {
+func (r *queryResolver) Recipients(ctx context.Context, stages map[string]interface{}) (*model.Recipients, error) {
 	var items []*model.Recipient
 	//find all items
 	cur, err := r.db.Collection("recipients").Find(ctx, nil)

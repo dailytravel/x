@@ -42,14 +42,7 @@ input UpdateLog {
 
 extend type Query {
   log(id: ID!): Log @auth(roles: [ADMIN])
-  logs(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Logs
+  logs(stages: Map): Logs
 }
 
 extend type Mutation {

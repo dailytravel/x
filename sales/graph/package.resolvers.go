@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
 )
@@ -28,7 +29,7 @@ func (r *mutationResolver) DeletePackage(ctx context.Context, id string) (*model
 
 // ID is the resolver for the id field.
 func (r *packageResolver) ID(ctx context.Context, obj *model.Package) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // Name is the resolver for the name field.
@@ -63,17 +64,17 @@ func (r *packageResolver) Cancellation(ctx context.Context, obj *model.Package) 
 
 // Metadata is the resolver for the metadata field.
 func (r *packageResolver) Metadata(ctx context.Context, obj *model.Package) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Created is the resolver for the created field.
 func (r *packageResolver) Created(ctx context.Context, obj *model.Package) (string, error) {
-	panic(fmt.Errorf("not implemented: Created - created"))
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
 // Updated is the resolver for the updated field.
 func (r *packageResolver) Updated(ctx context.Context, obj *model.Package) (string, error) {
-	panic(fmt.Errorf("not implemented: Updated - updated"))
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Product is the resolver for the product field.
@@ -92,7 +93,7 @@ func (r *queryResolver) Package(ctx context.Context, id string) (*model.Package,
 }
 
 // Packages is the resolver for the packages field.
-func (r *queryResolver) Packages(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Packages, error) {
+func (r *queryResolver) Packages(ctx context.Context, stages map[string]interface{}) (*model.Packages, error) {
 	panic(fmt.Errorf("not implemented: Packages - packages"))
 }
 
@@ -100,19 +101,3 @@ func (r *queryResolver) Packages(ctx context.Context, filter map[string]interfac
 func (r *Resolver) Package() PackageResolver { return &packageResolver{r} }
 
 type packageResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *packageResolver) Details(ctx context.Context, obj *model.Package) ([]string, error) {
-	panic(fmt.Errorf("not implemented: Details - details"))
-}
-func (r *packageResolver) Variants(ctx context.Context, obj *model.Package) ([]*model.Voucher, error) {
-	panic(fmt.Errorf("not implemented: Variants - variants"))
-}
-func (r *packageResolver) Images(ctx context.Context, obj *model.Package) ([]string, error) {
-	panic(fmt.Errorf("not implemented: Images - images"))
-}

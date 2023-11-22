@@ -28,7 +28,7 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.NewOrder
 		UID:         *uid,
 		Code:        utils.String(8),
 		Cancellable: input.Cancellable,
-		Status:      input.Status,
+		Status:      *input.Status,
 		Model: model.Model{
 			Metadata: input.Metadata,
 		},
@@ -203,6 +203,11 @@ func (r *orderResolver) Updated(ctx context.Context, obj *model.Order) (string, 
 	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
+// Shares is the resolver for the shares field.
+func (r *orderResolver) Shares(ctx context.Context, obj *model.Order) ([]*string, error) {
+	panic(fmt.Errorf("not implemented: Shares - shares"))
+}
+
 // Order is the resolver for the order field.
 func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, error) {
 	var item *model.Order
@@ -224,7 +229,7 @@ func (r *queryResolver) Order(ctx context.Context, id string) (*model.Order, err
 }
 
 // Orders is the resolver for the orders field.
-func (r *queryResolver) Orders(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Orders, error) {
+func (r *queryResolver) Orders(ctx context.Context, stages map[string]interface{}) (*model.Orders, error) {
 	var items []*model.Order
 	//find all items
 	cur, err := r.db.Collection("orders").Find(ctx, nil)

@@ -46,7 +46,7 @@ type Keys struct {
 	Count int    `json:"count"`
 }
 
-type LoginInput struct {
+type Login struct {
 	Username     string  `json:"username"`
 	Password     string  `json:"password"`
 	GrantType    *string `json:"grant_type,omitempty"`
@@ -134,7 +134,7 @@ type NewRole struct {
 	Permissions []*string `json:"permissions,omitempty"`
 }
 
-type NewUserInput struct {
+type NewUser struct {
 	Name       string    `json:"name"`
 	GivenName  *string   `json:"given_name,omitempty"`
 	FamilyName *string   `json:"family_name,omitempty"`
@@ -188,7 +188,7 @@ type Quote struct {
 
 func (Quote) IsEntity() {}
 
-type RegisterInput struct {
+type Register struct {
 	Name                 string  `json:"name"`
 	Email                string  `json:"email"`
 	Password             string  `json:"password"`
@@ -196,7 +196,7 @@ type RegisterInput struct {
 	ClientID             *string `json:"client_id,omitempty"`
 }
 
-type ResetPasswordInput struct {
+type ResetPassword struct {
 	Token                string `json:"token"`
 	Password             string `json:"password"`
 	PasswordConfirmation string `json:"password_confirmation"`
@@ -207,7 +207,7 @@ type Roles struct {
 	Count int     `json:"count"`
 }
 
-type SocialLoginInput struct {
+type SocialLogin struct {
 	ClientID     string  `json:"client_id"`
 	ClientSecret *string `json:"client_secret,omitempty"`
 	Provider     string  `json:"provider"`
@@ -260,7 +260,7 @@ type UpdateInvitation struct {
 	Status *string  `json:"status,omitempty"`
 }
 
-type UpdatePasswordInput struct {
+type UpdatePassword struct {
 	OldPassword          string  `json:"old_password"`
 	Password             string  `json:"password"`
 	PasswordConfirmation *string `json:"password_confirmation,omitempty"`
@@ -277,11 +277,10 @@ type UpdateRole struct {
 	Permissions []*string `json:"permissions,omitempty"`
 }
 
-type UpdateUserInput struct {
+type UpdateUser struct {
 	Name       *string                `json:"name,omitempty"`
 	GivenName  *string                `json:"given_name,omitempty"`
 	FamilyName *string                `json:"family_name,omitempty"`
-	Password   *string                `json:"password,omitempty"`
 	Roles      []*string              `json:"roles,omitempty"`
 	Timezone   *string                `json:"timezone,omitempty"`
 	Locale     *string                `json:"locale,omitempty"`
@@ -301,7 +300,7 @@ type Users struct {
 	Data  []*User `json:"data,omitempty"`
 }
 
-type VerifyInput struct {
+type Verify struct {
 	Code string `json:"code"`
 	Type string `json:"type"`
 }

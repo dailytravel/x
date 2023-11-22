@@ -43,14 +43,7 @@ input ShareUpdateInput {
 
 extend type Query {
   share(id: ID!): Share
-  shares(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Shares
+  shares(stages: Map): Shares
 }
 
 extend type Mutation {

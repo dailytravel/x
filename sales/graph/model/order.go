@@ -11,16 +11,17 @@ import (
 
 type Order struct {
 	Model       `bson:",inline"`
-	UID         primitive.ObjectID   `bson:"uid" json:"uid"`
-	Contact     primitive.ObjectID   `json:"contact" bson:"contact"`
-	Locale      string               `json:"locale" bson:"locale"`
-	Type        string               `json:"type" bson:"type"`
-	Code        string               `json:"code" bson:"code"`
-	Coupon      *string              `json:"coupon,omitempty" bson:"coupon,omitempty"`
-	Cancellable bool                 `json:"cancellable" bson:"cancellable"`
-	Payment     string               `json:"payment" bson:"payment"`
-	Items       []primitive.ObjectID `json:"items" bson:"items"`
-	Status      string               `json:"status" bson:"status"`
+	UID         primitive.ObjectID    `bson:"uid" json:"uid"`
+	Contact     primitive.ObjectID    `json:"contact" bson:"contact"`
+	Locale      string                `json:"locale" bson:"locale"`
+	Type        string                `json:"type" bson:"type"`
+	Code        string                `json:"code" bson:"code"`
+	Coupon      *string               `json:"coupon,omitempty" bson:"coupon,omitempty"`
+	Cancellable bool                  `json:"cancellable" bson:"cancellable"`
+	Payment     string                `json:"payment" bson:"payment"`
+	Items       []primitive.ObjectID  `json:"items" bson:"items"`
+	Status      string                `json:"status" bson:"status"`
+	Shares      []*primitive.ObjectID `json:"shares,omitempty" bson:"shares,omitempty"`
 }
 
 func (i *Order) MarshalBSON() ([]byte, error) {

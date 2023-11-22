@@ -164,7 +164,7 @@ func (r *mutationResolver) DeleteRewards(ctx context.Context, ids []string) (map
 }
 
 // Rewards is the resolver for the rewards field.
-func (r *queryResolver) Rewards(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Rewards, error) {
+func (r *queryResolver) Rewards(ctx context.Context, stages map[string]interface{}) (*model.Rewards, error) {
 	var items []*model.Reward
 	//find all items
 	cur, err := r.db.Collection("rewards").Find(ctx, nil)
@@ -273,7 +273,12 @@ func (r *rewardResolver) Metadata(ctx context.Context, obj *model.Reward) (map[s
 
 // Expires is the resolver for the expires field.
 func (r *rewardResolver) Expires(ctx context.Context, obj *model.Reward) (*string, error) {
-	panic(fmt.Errorf("not implemented: Expires - expires"))
+	if obj.Expires == nil {
+		return nil, nil
+	}
+
+	expires := time.Unix(int64(obj.Expires.T), 0).Format(time.RFC3339)
+	return &expires, nil
 }
 
 // Created is the resolver for the created field.

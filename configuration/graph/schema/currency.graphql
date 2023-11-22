@@ -54,14 +54,7 @@ input UpdateCurrency {
 
 extend type Query {
   currency(code: String!): Currency
-  currencies(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Currencies
+  currencies(stages: Map): Currencies
 }
 
 extend type Mutation {

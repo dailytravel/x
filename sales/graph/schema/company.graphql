@@ -6,11 +6,9 @@ type Company @key(fields: "id") {
   industry: String
   employees: Int
   revenue: Float
-  city: String
-  state: String
-  zip: String
-  country: String
-  timezone: String
+  currency: String
+  address: Address
+  email: String
   phone: String
   website: String
   metadata: Map
@@ -33,11 +31,9 @@ input NewCompany {
   industry: String
   employees: Int
   revenue: Float
-  city: String
-  state: String
-  zip: String
-  country: String
-  timezone: String
+  currency: String
+  address: Map
+  email: String
   phone: String
   website: String
   metadata: Map
@@ -52,11 +48,8 @@ input UpdateCompany {
   industry: String
   employees: Int
   revenue: Float
-  city: String
-  zip: String
-  state: String
-  country: String
-  timezone: String
+  address: Map
+  email: String
   phone: String
   website: String
   metadata: Map
@@ -64,14 +57,7 @@ input UpdateCompany {
 }
 
 extend type Query {
-  companies(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Companies
+  companies(stages: Map): Companies
   company(id: ID!): Company @api
 }
 

@@ -10,10 +10,8 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/account/graph/model"
-	"github.com/dailytravel/x/account/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ID is the resolver for the id field.
@@ -144,50 +142,29 @@ func (r *mutationResolver) DeleteConnections(ctx context.Context, ids []string) 
 }
 
 // Connections is the resolver for the connections field.
-func (r *queryResolver) Connections(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Connections, error) {
-	var items []*model.Connection
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
+func (r *queryResolver) Connections(ctx context.Context, stages map[string]interface{}) (*model.Connections, error) {
+	pipeline := bson.A{}
 
-	opts := options.Find()
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if sort != nil {
-		opts.SetSort(sort)
-	}
-	if collation != nil {
-		col := &options.Collation{
-			// you can set collation fields here...
-		}
-		opts.SetCollation(col)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("connections").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("connections").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Connection
 
-	//get total count
-	count, err := r.db.Collection("connections").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Connections{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

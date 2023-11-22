@@ -7,18 +7,19 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
 )
 
 // ID is the resolver for the id field.
 func (r *itemResolver) ID(ctx context.Context, obj *model.Item) (string, error) {
-	panic(fmt.Errorf("not implemented: ID - id"))
+	return obj.ID.Hex(), nil
 }
 
 // UID is the resolver for the uid field.
 func (r *itemResolver) UID(ctx context.Context, obj *model.Item) (string, error) {
-	panic(fmt.Errorf("not implemented: UID - uid"))
+	return obj.UID.Hex(), nil
 }
 
 // Package is the resolver for the package field.
@@ -53,12 +54,12 @@ func (r *itemResolver) Status(ctx context.Context, obj *model.Item) (*string, er
 
 // Created is the resolver for the created field.
 func (r *itemResolver) Created(ctx context.Context, obj *model.Item) (string, error) {
-	panic(fmt.Errorf("not implemented: Created - created"))
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
 // Updated is the resolver for the updated field.
 func (r *itemResolver) Updated(ctx context.Context, obj *model.Item) (string, error) {
-	panic(fmt.Errorf("not implemented: Updated - updated"))
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // CreateItem is the resolver for the createItem field.
@@ -82,7 +83,7 @@ func (r *mutationResolver) DeleteItems(ctx context.Context, filter map[string]in
 }
 
 // Items is the resolver for the items field.
-func (r *queryResolver) Items(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Items, error) {
+func (r *queryResolver) Items(ctx context.Context, stages map[string]interface{}) (*model.Items, error) {
 	panic(fmt.Errorf("not implemented: Items - items"))
 }
 

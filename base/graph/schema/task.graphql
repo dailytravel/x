@@ -1,18 +1,19 @@
-type Task {
+type Task @key(fields: "id") {
   id: ID!
   name: String!
   parent: Task
   subtasks: [Task]
   notes: String
-  priority: String! # enum of low, medium, high
+  priority: String
   start: String
   end: String
   order: Int
+  completed: Boolean!
   status: String!
   metadata: Map
   uid: ID!
   assignee: ID
-  members: [ID!]
+  shares: [ID!]
   created: String!
   updated: String!
 }
@@ -31,13 +32,15 @@ type Tasks {
 input NewTask {
   user: ID
   parent: ID
-  list: ID
+  assignee: ID
+  shares: [ID!]
   name: String!
   notes: String
   priority: String
   start: String
   end: String
   order: Int
+  completed: Boolean
   status: String
   metadata: Map
 }
@@ -45,12 +48,15 @@ input NewTask {
 input UpdateTask {
   user: ID
   parent: ID
+  assignee: ID
+  shares: [ID!]
   name: String
   notes: String
   priority: String
   start: String
   end: String
   order: Int
+  completed: Boolean
   status: String
   metadata: Map
 }

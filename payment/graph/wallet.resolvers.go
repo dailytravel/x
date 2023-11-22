@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/payment/graph/model"
-	"github.com/dailytravel/x/payment/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -40,41 +39,29 @@ func (r *queryResolver) Wallet(ctx context.Context, id string) (*model.Wallet, e
 }
 
 // Wallets is the resolver for the wallets field.
-func (r *queryResolver) Wallets(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Wallets, error) {
-	var items []*model.Wallet
+func (r *queryResolver) Wallets(ctx context.Context, stages map[string]interface{}) (*model.Wallets, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("wallets").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("wallets").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Wallet
 
-	//get total count
-	count, err := r.db.Collection("wallets").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Wallets{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

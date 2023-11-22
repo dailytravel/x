@@ -40,14 +40,7 @@ input UpdateLocale {
 }
 
 extend type Query {
-  locales(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Locales
+  locales(stages: Map): Locales
   locale(code: String!): Locale
 }
 

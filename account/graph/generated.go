@@ -203,34 +203,32 @@ type ComplexityRoot struct {
 	}
 
 	Entity struct {
-		FindAttendanceByUID   func(childComplexity int, uid string) int
-		FindBoardByUID        func(childComplexity int, uid string) int
-		FindCampaignByUID     func(childComplexity int, uid string) int
-		FindCollaboratorByUID func(childComplexity int, uid string) int
-		FindCommentByUID      func(childComplexity int, uid string) int
-		FindCompanyByUID      func(childComplexity int, uid string) int
-		FindContactByUID      func(childComplexity int, uid string) int
-		FindCouponByUID       func(childComplexity int, uid string) int
-		FindExpenseByUID      func(childComplexity int, uid string) int
-		FindFileByUID         func(childComplexity int, uid string) int
-		FindGoalByUID         func(childComplexity int, uid string) int
-		FindInvoiceByUID      func(childComplexity int, uid string) int
-		FindLinkByUID         func(childComplexity int, uid string) int
-		FindListByUID         func(childComplexity int, uid string) int
-		FindMemberByID        func(childComplexity int, id string) int
-		FindMembershipByUID   func(childComplexity int, uid string) int
-		FindOrderByUID        func(childComplexity int, uid string) int
-		FindOrganizationByUID func(childComplexity int, uid string) int
-		FindPortfolioByUID    func(childComplexity int, uid string) int
-		FindPostByUID         func(childComplexity int, uid string) int
-		FindQuoteByUID        func(childComplexity int, uid string) int
-		FindReactionByUID     func(childComplexity int, uid string) int
-		FindShareByUID        func(childComplexity int, uid string) int
-		FindTaskByAssignee    func(childComplexity int, assignee string) int
-		FindTaskByMembers     func(childComplexity int, members []string) int
-		FindTaskByUID         func(childComplexity int, uid string) int
-		FindUserByID          func(childComplexity int, id string) int
-		FindWishlistByUID     func(childComplexity int, uid string) int
+		FindAttendanceByUID               func(childComplexity int, uid string) int
+		FindBoardByUID                    func(childComplexity int, uid string) int
+		FindCampaignByUID                 func(childComplexity int, uid string) int
+		FindCollaboratorByUID             func(childComplexity int, uid string) int
+		FindCommentByUID                  func(childComplexity int, uid string) int
+		FindCompanyByUID                  func(childComplexity int, uid string) int
+		FindContactByUID                  func(childComplexity int, uid string) int
+		FindCouponByUID                   func(childComplexity int, uid string) int
+		FindExpenseByUID                  func(childComplexity int, uid string) int
+		FindFileByUID                     func(childComplexity int, uid string) int
+		FindGoalByUID                     func(childComplexity int, uid string) int
+		FindInvoiceByUID                  func(childComplexity int, uid string) int
+		FindLinkByUID                     func(childComplexity int, uid string) int
+		FindListByUID                     func(childComplexity int, uid string) int
+		FindMemberByID                    func(childComplexity int, id string) int
+		FindMembershipByUID               func(childComplexity int, uid string) int
+		FindOrderByUID                    func(childComplexity int, uid string) int
+		FindOrganizationByUID             func(childComplexity int, uid string) int
+		FindPortfolioByUID                func(childComplexity int, uid string) int
+		FindPostByUID                     func(childComplexity int, uid string) int
+		FindQuoteByUID                    func(childComplexity int, uid string) int
+		FindReactionByUID                 func(childComplexity int, uid string) int
+		FindShareByUID                    func(childComplexity int, uid string) int
+		FindTaskByUIDAndSharesAndAssignee func(childComplexity int, uid string, shares []string, assignee string) int
+		FindUserByID                      func(childComplexity int, id string) int
+		FindWishlistByUID                 func(childComplexity int, uid string) int
 	}
 
 	Expense struct {
@@ -351,7 +349,7 @@ type ComplexityRoot struct {
 		CreateIntegration  func(childComplexity int, input model.NewIntegration) int
 		CreatePermission   func(childComplexity int, input model.NewPermission) int
 		CreateRole         func(childComplexity int, input model.NewRole) int
-		CreateUser         func(childComplexity int, input model.NewUserInput) int
+		CreateUser         func(childComplexity int, input model.NewUser) int
 		CreateWorkspace    func(childComplexity int, input model.NewWorkspace) int
 		Deactivate         func(childComplexity int) int
 		DeleteAPI          func(childComplexity int, id string) int
@@ -375,26 +373,26 @@ type ComplexityRoot struct {
 		ForgotPassword     func(childComplexity int, email string) int
 		Invite             func(childComplexity int, input model.NewInvitation) int
 		LinkIdentity       func(childComplexity int, input model.NewIdentity) int
-		Login              func(childComplexity int, input model.LoginInput) int
+		Login              func(childComplexity int, input model.Login) int
 		Logout             func(childComplexity int, all *bool) int
 		RefreshToken       func(childComplexity int, token string) int
-		Register           func(childComplexity int, input model.RegisterInput) int
-		ResetPassword      func(childComplexity int, input model.ResetPasswordInput) int
+		Register           func(childComplexity int, input model.Register) int
+		ResetPassword      func(childComplexity int, input model.ResetPassword) int
 		RevokeKey          func(childComplexity int) int
 		RotateKey          func(childComplexity int) int
-		SocialLogin        func(childComplexity int, input model.SocialLoginInput) int
+		SocialLogin        func(childComplexity int, input model.SocialLogin) int
 		UnlinkIdentity     func(childComplexity int, id string) int
 		UpdateAPI          func(childComplexity int, id string, input model.UpdateAPI) int
 		UpdateClient       func(childComplexity int, id string, input model.UpdateClient) int
 		UpdateConnection   func(childComplexity int, id string, input model.UpdateConnection) int
 		UpdateCredential   func(childComplexity int, id string, input model.UpdateCredential) int
 		UpdateIntegration  func(childComplexity int, id string, input model.UpdateIntegration) int
-		UpdatePassword     func(childComplexity int, input model.UpdatePasswordInput) int
+		UpdatePassword     func(childComplexity int, password string) int
 		UpdatePermission   func(childComplexity int, id string, input model.UpdatePermission) int
 		UpdateRole         func(childComplexity int, id string, input model.UpdateRole) int
-		UpdateUser         func(childComplexity int, id string, input model.UpdateUserInput) int
+		UpdateUser         func(childComplexity int, id string, input model.UpdateUser) int
 		UpdateWorkspace    func(childComplexity int, id string, input model.UpdateWorkspace) int
-		Verify             func(childComplexity int, input model.VerifyInput) int
+		Verify             func(childComplexity int, input model.Verify) int
 		VerifyEmail        func(childComplexity int, token string) int
 		VerifyPhone        func(childComplexity int, token string) int
 	}
@@ -443,29 +441,29 @@ type ComplexityRoot struct {
 
 	Query struct {
 		API                func(childComplexity int, id string) int
-		Apis               func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
+		Apis               func(childComplexity int, stages map[string]interface{}) int
 		Client             func(childComplexity int, id string) int
-		Clients            func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
+		Clients            func(childComplexity int, stages map[string]interface{}) int
 		Connection         func(childComplexity int, id string) int
-		Connections        func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
+		Connections        func(childComplexity int, stages map[string]interface{}) int
 		Credential         func(childComplexity int, id string) int
 		Credentials        func(childComplexity int) int
 		Identities         func(childComplexity int) int
 		Identity           func(childComplexity int, id string) int
 		Integration        func(childComplexity int, id string) int
-		Integrations       func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
+		Integrations       func(childComplexity int, stages map[string]interface{}) int
 		Invitation         func(childComplexity int, id string) int
-		Invitations        func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
+		Invitations        func(childComplexity int, stages map[string]interface{}) int
 		Key                func(childComplexity int, id string) int
-		Keys               func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
+		Keys               func(childComplexity int, stages map[string]interface{}) int
 		Me                 func(childComplexity int) int
 		Owners             func(childComplexity int, ids []string, limit *int, offset *int) int
 		Permission         func(childComplexity int, id string) int
-		Permissions        func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
+		Permissions        func(childComplexity int, stages map[string]interface{}) int
 		Role               func(childComplexity int, id string) int
-		Roles              func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
+		Roles              func(childComplexity int, stages map[string]interface{}) int
 		User               func(childComplexity int, id string) int
-		Users              func(childComplexity int, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) int
+		Users              func(childComplexity int, stages map[string]interface{}) int
 		Workspace          func(childComplexity int, id string) int
 		Workspaces         func(childComplexity int, stages map[string]interface{}) int
 		__resolve__service func(childComplexity int) int
@@ -505,7 +503,7 @@ type ComplexityRoot struct {
 		Assignee  func(childComplexity int) int
 		Followers func(childComplexity int) int
 		Lead      func(childComplexity int) int
-		Members   func(childComplexity int) int
+		Shares    func(childComplexity int) int
 		UID       func(childComplexity int) int
 		User      func(childComplexity int) int
 	}
@@ -663,9 +661,7 @@ type EntityResolver interface {
 	FindQuoteByUID(ctx context.Context, uid string) (*model.Quote, error)
 	FindReactionByUID(ctx context.Context, uid string) (*model.Reaction, error)
 	FindShareByUID(ctx context.Context, uid string) (*model.Share, error)
-	FindTaskByUID(ctx context.Context, uid string) (*model.Task, error)
-	FindTaskByMembers(ctx context.Context, members []string) (*model.Task, error)
-	FindTaskByAssignee(ctx context.Context, assignee string) (*model.Task, error)
+	FindTaskByUIDAndSharesAndAssignee(ctx context.Context, uid string, shares []string, assignee string) (*model.Task, error)
 	FindUserByID(ctx context.Context, id string) (*model.User, error)
 	FindWishlistByUID(ctx context.Context, uid string) (*model.Wishlist, error)
 }
@@ -762,19 +758,19 @@ type MutationResolver interface {
 	UpdateRole(ctx context.Context, id string, input model.UpdateRole) (*model.Role, error)
 	DeleteRole(ctx context.Context, id string) (map[string]interface{}, error)
 	DeleteRoles(ctx context.Context, ids []string) (map[string]interface{}, error)
-	CreateUser(ctx context.Context, input model.NewUserInput) (*model.User, error)
-	UpdateUser(ctx context.Context, id string, input model.UpdateUserInput) (*model.User, error)
-	Register(ctx context.Context, input model.RegisterInput) (*model.AuthPayload, error)
+	CreateUser(ctx context.Context, input model.NewUser) (*model.User, error)
+	UpdateUser(ctx context.Context, id string, input model.UpdateUser) (*model.User, error)
+	Register(ctx context.Context, input model.Register) (*model.AuthPayload, error)
 	VerifyEmail(ctx context.Context, token string) (map[string]interface{}, error)
 	VerifyPhone(ctx context.Context, token string) (map[string]interface{}, error)
-	Login(ctx context.Context, input model.LoginInput) (*model.AuthPayload, error)
-	Verify(ctx context.Context, input model.VerifyInput) (map[string]interface{}, error)
-	SocialLogin(ctx context.Context, input model.SocialLoginInput) (*model.AuthPayload, error)
+	Login(ctx context.Context, input model.Login) (*model.AuthPayload, error)
+	Verify(ctx context.Context, input model.Verify) (map[string]interface{}, error)
+	SocialLogin(ctx context.Context, input model.SocialLogin) (*model.AuthPayload, error)
 	RefreshToken(ctx context.Context, token string) (*model.AuthPayload, error)
 	Logout(ctx context.Context, all *bool) (map[string]interface{}, error)
 	ForgotPassword(ctx context.Context, email string) (map[string]interface{}, error)
-	ResetPassword(ctx context.Context, input model.ResetPasswordInput) (map[string]interface{}, error)
-	UpdatePassword(ctx context.Context, input model.UpdatePasswordInput) (map[string]interface{}, error)
+	ResetPassword(ctx context.Context, input model.ResetPassword) (map[string]interface{}, error)
+	UpdatePassword(ctx context.Context, password string) (map[string]interface{}, error)
 	Deactivate(ctx context.Context) (*model.User, error)
 	DeleteUser(ctx context.Context, id string) (*bool, error)
 	DeleteUsers(ctx context.Context, ids []string) (*bool, error)
@@ -797,26 +793,26 @@ type PostResolver interface {
 }
 type QueryResolver interface {
 	API(ctx context.Context, id string) (*model.Api, error)
-	Apis(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Apis, error)
+	Apis(ctx context.Context, stages map[string]interface{}) (*model.Apis, error)
 	Client(ctx context.Context, id string) (*model.Client, error)
-	Clients(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Clients, error)
-	Connections(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Connections, error)
+	Clients(ctx context.Context, stages map[string]interface{}) (*model.Clients, error)
+	Connections(ctx context.Context, stages map[string]interface{}) (*model.Connections, error)
 	Connection(ctx context.Context, id string) (*model.Connection, error)
 	Credential(ctx context.Context, id string) (*model.Credential, error)
 	Credentials(ctx context.Context) ([]*model.Credential, error)
 	Identity(ctx context.Context, id string) (*model.Identity, error)
 	Identities(ctx context.Context) ([]*model.Identity, error)
-	Integrations(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Integrations, error)
+	Integrations(ctx context.Context, stages map[string]interface{}) (*model.Integrations, error)
 	Integration(ctx context.Context, id string) (*model.Integration, error)
-	Invitations(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Invitations, error)
+	Invitations(ctx context.Context, stages map[string]interface{}) (*model.Invitations, error)
 	Invitation(ctx context.Context, id string) (*model.Invitation, error)
-	Keys(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Keys, error)
+	Keys(ctx context.Context, stages map[string]interface{}) (*model.Keys, error)
 	Key(ctx context.Context, id string) (*model.Key, error)
-	Permissions(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Permissions, error)
+	Permissions(ctx context.Context, stages map[string]interface{}) (*model.Permissions, error)
 	Permission(ctx context.Context, id string) (*model.Permission, error)
 	Role(ctx context.Context, id string) (*model.Role, error)
-	Roles(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Roles, error)
-	Users(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Users, error)
+	Roles(ctx context.Context, stages map[string]interface{}) (*model.Roles, error)
+	Users(ctx context.Context, stages map[string]interface{}) (*model.Users, error)
 	User(ctx context.Context, id string) (*model.User, error)
 	Owners(ctx context.Context, ids []string, limit *int, offset *int) (*model.Users, error)
 	Me(ctx context.Context) (*model.User, error)
@@ -1651,41 +1647,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.FindShareByUID(childComplexity, args["uid"].(string)), true
 
-	case "Entity.findTaskByAssignee":
-		if e.complexity.Entity.FindTaskByAssignee == nil {
+	case "Entity.findTaskByUIDAndSharesAndAssignee":
+		if e.complexity.Entity.FindTaskByUIDAndSharesAndAssignee == nil {
 			break
 		}
 
-		args, err := ec.field_Entity_findTaskByAssignee_args(context.TODO(), rawArgs)
+		args, err := ec.field_Entity_findTaskByUIDAndSharesAndAssignee_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Entity.FindTaskByAssignee(childComplexity, args["assignee"].(string)), true
-
-	case "Entity.findTaskByMembers":
-		if e.complexity.Entity.FindTaskByMembers == nil {
-			break
-		}
-
-		args, err := ec.field_Entity_findTaskByMembers_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Entity.FindTaskByMembers(childComplexity, args["members"].([]string)), true
-
-	case "Entity.findTaskByUID":
-		if e.complexity.Entity.FindTaskByUID == nil {
-			break
-		}
-
-		args, err := ec.field_Entity_findTaskByUID_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Entity.FindTaskByUID(childComplexity, args["uid"].(string)), true
+		return e.complexity.Entity.FindTaskByUIDAndSharesAndAssignee(childComplexity, args["uid"].(string), args["shares"].([]string), args["assignee"].(string)), true
 
 	case "Entity.findUserByID":
 		if e.complexity.Entity.FindUserByID == nil {
@@ -2265,7 +2237,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.NewUserInput)), true
+		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.NewUser)), true
 
 	case "Mutation.createWorkspace":
 		if e.complexity.Mutation.CreateWorkspace == nil {
@@ -2548,7 +2520,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.LoginInput)), true
+		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.Login)), true
 
 	case "Mutation.logout":
 		if e.complexity.Mutation.Logout == nil {
@@ -2584,7 +2556,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Register(childComplexity, args["input"].(model.RegisterInput)), true
+		return e.complexity.Mutation.Register(childComplexity, args["input"].(model.Register)), true
 
 	case "Mutation.resetPassword":
 		if e.complexity.Mutation.ResetPassword == nil {
@@ -2596,7 +2568,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.ResetPassword(childComplexity, args["input"].(model.ResetPasswordInput)), true
+		return e.complexity.Mutation.ResetPassword(childComplexity, args["input"].(model.ResetPassword)), true
 
 	case "Mutation.revokeKey":
 		if e.complexity.Mutation.RevokeKey == nil {
@@ -2622,7 +2594,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SocialLogin(childComplexity, args["input"].(model.SocialLoginInput)), true
+		return e.complexity.Mutation.SocialLogin(childComplexity, args["input"].(model.SocialLogin)), true
 
 	case "Mutation.unlinkIdentity":
 		if e.complexity.Mutation.UnlinkIdentity == nil {
@@ -2706,7 +2678,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdatePassword(childComplexity, args["input"].(model.UpdatePasswordInput)), true
+		return e.complexity.Mutation.UpdatePassword(childComplexity, args["password"].(string)), true
 
 	case "Mutation.updatePermission":
 		if e.complexity.Mutation.UpdatePermission == nil {
@@ -2742,7 +2714,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(string), args["input"].(model.UpdateUserInput)), true
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(string), args["input"].(model.UpdateUser)), true
 
 	case "Mutation.updateWorkspace":
 		if e.complexity.Mutation.UpdateWorkspace == nil {
@@ -2766,7 +2738,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Verify(childComplexity, args["input"].(model.VerifyInput)), true
+		return e.complexity.Mutation.Verify(childComplexity, args["input"].(model.Verify)), true
 
 	case "Mutation.verifyEmail":
 		if e.complexity.Mutation.VerifyEmail == nil {
@@ -2961,7 +2933,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Apis(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
+		return e.complexity.Query.Apis(childComplexity, args["stages"].(map[string]interface{})), true
 
 	case "Query.client":
 		if e.complexity.Query.Client == nil {
@@ -2985,7 +2957,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Clients(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
+		return e.complexity.Query.Clients(childComplexity, args["stages"].(map[string]interface{})), true
 
 	case "Query.connection":
 		if e.complexity.Query.Connection == nil {
@@ -3009,7 +2981,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Connections(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
+		return e.complexity.Query.Connections(childComplexity, args["stages"].(map[string]interface{})), true
 
 	case "Query.credential":
 		if e.complexity.Query.Credential == nil {
@@ -3071,7 +3043,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Integrations(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
+		return e.complexity.Query.Integrations(childComplexity, args["stages"].(map[string]interface{})), true
 
 	case "Query.invitation":
 		if e.complexity.Query.Invitation == nil {
@@ -3095,7 +3067,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Invitations(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
+		return e.complexity.Query.Invitations(childComplexity, args["stages"].(map[string]interface{})), true
 
 	case "Query.key":
 		if e.complexity.Query.Key == nil {
@@ -3119,7 +3091,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Keys(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
+		return e.complexity.Query.Keys(childComplexity, args["stages"].(map[string]interface{})), true
 
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
@@ -3162,7 +3134,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Permissions(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
+		return e.complexity.Query.Permissions(childComplexity, args["stages"].(map[string]interface{})), true
 
 	case "Query.role":
 		if e.complexity.Query.Role == nil {
@@ -3186,7 +3158,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Roles(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
+		return e.complexity.Query.Roles(childComplexity, args["stages"].(map[string]interface{})), true
 
 	case "Query.user":
 		if e.complexity.Query.User == nil {
@@ -3210,7 +3182,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Users(childComplexity, args["filter"].(map[string]interface{}), args["project"].(map[string]interface{}), args["sort"].(map[string]interface{}), args["collation"].(map[string]interface{}), args["limit"].(*int), args["skip"].(*int)), true
+		return e.complexity.Query.Users(childComplexity, args["stages"].(map[string]interface{})), true
 
 	case "Query.workspace":
 		if e.complexity.Query.Workspace == nil {
@@ -3374,12 +3346,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.Lead(childComplexity), true
 
-	case "Task.members":
-		if e.complexity.Task.Members == nil {
+	case "Task.shares":
+		if e.complexity.Task.Shares == nil {
 			break
 		}
 
-		return e.complexity.Task.Members(childComplexity), true
+		return e.complexity.Task.Shares(childComplexity), true
 
 	case "Task.uid":
 		if e.complexity.Task.UID == nil {
@@ -3739,7 +3711,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputLoginInput,
+		ec.unmarshalInputLogin,
 		ec.unmarshalInputNewApi,
 		ec.unmarshalInputNewClient,
 		ec.unmarshalInputNewConnection,
@@ -3750,23 +3722,23 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNewKey,
 		ec.unmarshalInputNewPermission,
 		ec.unmarshalInputNewRole,
-		ec.unmarshalInputNewUserInput,
+		ec.unmarshalInputNewUser,
 		ec.unmarshalInputNewWorkspace,
-		ec.unmarshalInputRegisterInput,
-		ec.unmarshalInputResetPasswordInput,
-		ec.unmarshalInputSocialLoginInput,
+		ec.unmarshalInputRegister,
+		ec.unmarshalInputResetPassword,
+		ec.unmarshalInputSocialLogin,
 		ec.unmarshalInputUpdateApi,
 		ec.unmarshalInputUpdateClient,
 		ec.unmarshalInputUpdateConnection,
 		ec.unmarshalInputUpdateCredential,
 		ec.unmarshalInputUpdateIntegration,
 		ec.unmarshalInputUpdateInvitation,
-		ec.unmarshalInputUpdatePasswordInput,
+		ec.unmarshalInputUpdatePassword,
 		ec.unmarshalInputUpdatePermission,
 		ec.unmarshalInputUpdateRole,
-		ec.unmarshalInputUpdateUserInput,
+		ec.unmarshalInputUpdateUser,
 		ec.unmarshalInputUpdateWorkspace,
-		ec.unmarshalInputVerifyInput,
+		ec.unmarshalInputVerify,
 	)
 	first := true
 
@@ -3979,9 +3951,7 @@ type Entity {
 	findQuoteByUID(uid: ID!,): Quote!
 	findReactionByUID(uid: ID!,): Reaction!
 	findShareByUID(uid: ID!,): Share!
-	findTaskByUID(uid: ID!,): Task!
-	findTaskByMembers(members: [ID!],): Task!
-	findTaskByAssignee(assignee: ID!,): Task!
+	findTaskByUIDAndSharesAndAssignee(uid: ID!,shares: [ID!],assignee: ID!,): Task!
 	findUserByID(id: ID!,): User!
 	findWishlistByUID(uid: ID!,): Wishlist!
 
@@ -4393,37 +4363,7 @@ func (ec *executionContext) field_Entity_findShareByUID_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_Entity_findTaskByAssignee_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["assignee"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignee"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["assignee"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Entity_findTaskByMembers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 []string
-	if tmp, ok := rawArgs["members"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("members"))
-		arg0, err = ec.unmarshalOID2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["members"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Entity_findTaskByUID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Entity_findTaskByUIDAndSharesAndAssignee_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -4435,6 +4375,24 @@ func (ec *executionContext) field_Entity_findTaskByUID_args(ctx context.Context,
 		}
 	}
 	args["uid"] = arg0
+	var arg1 []string
+	if tmp, ok := rawArgs["shares"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("shares"))
+		arg1, err = ec.unmarshalOID2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["shares"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["assignee"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignee"))
+		arg2, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["assignee"] = arg2
 	return args, nil
 }
 
@@ -4591,10 +4549,10 @@ func (ec *executionContext) field_Mutation_createRole_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.NewUserInput
+	var arg0 model.NewUser
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewUserInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐNewUserInput(ctx, tmp)
+		arg0, err = ec.unmarshalNNewUser2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐNewUser(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4936,10 +4894,10 @@ func (ec *executionContext) field_Mutation_linkIdentity_args(ctx context.Context
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.LoginInput
+	var arg0 model.Login
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNLoginInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐLoginInput(ctx, tmp)
+		arg0, err = ec.unmarshalNLogin2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐLogin(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4981,10 +4939,10 @@ func (ec *executionContext) field_Mutation_refreshToken_args(ctx context.Context
 func (ec *executionContext) field_Mutation_register_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.RegisterInput
+	var arg0 model.Register
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNRegisterInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐRegisterInput(ctx, tmp)
+		arg0, err = ec.unmarshalNRegister2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐRegister(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4996,10 +4954,10 @@ func (ec *executionContext) field_Mutation_register_args(ctx context.Context, ra
 func (ec *executionContext) field_Mutation_resetPassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.ResetPasswordInput
+	var arg0 model.ResetPassword
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNResetPasswordInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐResetPasswordInput(ctx, tmp)
+		arg0, err = ec.unmarshalNResetPassword2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐResetPassword(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5011,10 +4969,10 @@ func (ec *executionContext) field_Mutation_resetPassword_args(ctx context.Contex
 func (ec *executionContext) field_Mutation_socialLogin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.SocialLoginInput
+	var arg0 model.SocialLogin
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNSocialLoginInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐSocialLoginInput(ctx, tmp)
+		arg0, err = ec.unmarshalNSocialLogin2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐSocialLogin(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5161,15 +5119,15 @@ func (ec *executionContext) field_Mutation_updateIntegration_args(ctx context.Co
 func (ec *executionContext) field_Mutation_updatePassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.UpdatePasswordInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdatePasswordInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUpdatePasswordInput(ctx, tmp)
+	var arg0 string
+	if tmp, ok := rawArgs["password"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["input"] = arg0
+	args["password"] = arg0
 	return args, nil
 }
 
@@ -5233,10 +5191,10 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 		}
 	}
 	args["id"] = arg0
-	var arg1 model.UpdateUserInput
+	var arg1 model.UpdateUser
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUpdateUserInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateUser2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUpdateUser(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5302,10 +5260,10 @@ func (ec *executionContext) field_Mutation_verifyPhone_args(ctx context.Context,
 func (ec *executionContext) field_Mutation_verify_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.VerifyInput
+	var arg0 model.Verify
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNVerifyInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐVerifyInput(ctx, tmp)
+		arg0, err = ec.unmarshalNVerify2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐVerify(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5363,59 +5321,14 @@ func (ec *executionContext) field_Query_apis_args(ctx context.Context, rawArgs m
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["stages"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stages"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
+	args["stages"] = arg0
 	return args, nil
 }
 
@@ -5438,59 +5351,14 @@ func (ec *executionContext) field_Query_clients_args(ctx context.Context, rawArg
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["stages"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stages"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
+	args["stages"] = arg0
 	return args, nil
 }
 
@@ -5513,59 +5381,14 @@ func (ec *executionContext) field_Query_connections_args(ctx context.Context, ra
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["stages"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stages"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
+	args["stages"] = arg0
 	return args, nil
 }
 
@@ -5618,59 +5441,14 @@ func (ec *executionContext) field_Query_integrations_args(ctx context.Context, r
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["stages"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stages"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
+	args["stages"] = arg0
 	return args, nil
 }
 
@@ -5693,59 +5471,14 @@ func (ec *executionContext) field_Query_invitations_args(ctx context.Context, ra
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["stages"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stages"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
+	args["stages"] = arg0
 	return args, nil
 }
 
@@ -5768,59 +5501,14 @@ func (ec *executionContext) field_Query_keys_args(ctx context.Context, rawArgs m
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["stages"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stages"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
+	args["stages"] = arg0
 	return args, nil
 }
 
@@ -5876,59 +5564,14 @@ func (ec *executionContext) field_Query_permissions_args(ctx context.Context, ra
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["stages"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stages"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
+	args["stages"] = arg0
 	return args, nil
 }
 
@@ -5951,59 +5594,14 @@ func (ec *executionContext) field_Query_roles_args(ctx context.Context, rawArgs 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["stages"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stages"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
+	args["stages"] = arg0
 	return args, nil
 }
 
@@ -6026,59 +5624,14 @@ func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 map[string]interface{}
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["stages"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stages"))
 		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["project"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["project"] = arg1
-	var arg2 map[string]interface{}
-	if tmp, ok := rawArgs["sort"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sort"] = arg2
-	var arg3 map[string]interface{}
-	if tmp, ok := rawArgs["collation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collation"))
-		arg3, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["collation"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["skip"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
-		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["skip"] = arg5
+	args["stages"] = arg0
 	return args, nil
 }
 
@@ -11081,8 +10634,8 @@ func (ec *executionContext) fieldContext_Entity_findShareByUID(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Entity_findTaskByUID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Entity_findTaskByUID(ctx, field)
+func (ec *executionContext) _Entity_findTaskByUIDAndSharesAndAssignee(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Entity_findTaskByUIDAndSharesAndAssignee(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -11095,7 +10648,7 @@ func (ec *executionContext) _Entity_findTaskByUID(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Entity().FindTaskByUID(rctx, fc.Args["uid"].(string))
+		return ec.resolvers.Entity().FindTaskByUIDAndSharesAndAssignee(rctx, fc.Args["uid"].(string), fc.Args["shares"].([]string), fc.Args["assignee"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11112,7 +10665,7 @@ func (ec *executionContext) _Entity_findTaskByUID(ctx context.Context, field gra
 	return ec.marshalNTask2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐTask(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Entity_findTaskByUID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Entity_findTaskByUIDAndSharesAndAssignee(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Entity",
 		Field:      field,
@@ -11124,8 +10677,8 @@ func (ec *executionContext) fieldContext_Entity_findTaskByUID(ctx context.Contex
 				return ec.fieldContext_Task_uid(ctx, field)
 			case "assignee":
 				return ec.fieldContext_Task_assignee(ctx, field)
-			case "members":
-				return ec.fieldContext_Task_members(ctx, field)
+			case "shares":
+				return ec.fieldContext_Task_shares(ctx, field)
 			case "user":
 				return ec.fieldContext_Task_user(ctx, field)
 			case "lead":
@@ -11143,145 +10696,7 @@ func (ec *executionContext) fieldContext_Entity_findTaskByUID(ctx context.Contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Entity_findTaskByUID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Entity_findTaskByMembers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Entity_findTaskByMembers(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Entity().FindTaskByMembers(rctx, fc.Args["members"].([]string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Task)
-	fc.Result = res
-	return ec.marshalNTask2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐTask(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Entity_findTaskByMembers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Entity",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "uid":
-				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignee":
-				return ec.fieldContext_Task_assignee(ctx, field)
-			case "members":
-				return ec.fieldContext_Task_members(ctx, field)
-			case "user":
-				return ec.fieldContext_Task_user(ctx, field)
-			case "lead":
-				return ec.fieldContext_Task_lead(ctx, field)
-			case "followers":
-				return ec.fieldContext_Task_followers(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Entity_findTaskByMembers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Entity_findTaskByAssignee(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Entity_findTaskByAssignee(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Entity().FindTaskByAssignee(rctx, fc.Args["assignee"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Task)
-	fc.Result = res
-	return ec.marshalNTask2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐTask(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Entity_findTaskByAssignee(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Entity",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "uid":
-				return ec.fieldContext_Task_uid(ctx, field)
-			case "assignee":
-				return ec.fieldContext_Task_assignee(ctx, field)
-			case "members":
-				return ec.fieldContext_Task_members(ctx, field)
-			case "user":
-				return ec.fieldContext_Task_user(ctx, field)
-			case "lead":
-				return ec.fieldContext_Task_lead(ctx, field)
-			case "followers":
-				return ec.fieldContext_Task_followers(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Task", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Entity_findTaskByAssignee_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Entity_findTaskByUIDAndSharesAndAssignee_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -17453,7 +16868,7 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().CreateUser(rctx, fc.Args["input"].(model.NewUserInput))
+			return ec.resolvers.Mutation().CreateUser(rctx, fc.Args["input"].(model.NewUser))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			roles, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"ADMIN"})
@@ -17570,7 +16985,7 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateUserInput))
+		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateUser))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17664,7 +17079,7 @@ func (ec *executionContext) _Mutation_register(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Register(rctx, fc.Args["input"].(model.RegisterInput))
+		return ec.resolvers.Mutation().Register(rctx, fc.Args["input"].(model.Register))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17832,7 +17247,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx, fc.Args["input"].(model.LoginInput))
+		return ec.resolvers.Mutation().Login(rctx, fc.Args["input"].(model.Login))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17896,7 +17311,7 @@ func (ec *executionContext) _Mutation_verify(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Verify(rctx, fc.Args["input"].(model.VerifyInput))
+		return ec.resolvers.Mutation().Verify(rctx, fc.Args["input"].(model.Verify))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17948,7 +17363,7 @@ func (ec *executionContext) _Mutation_socialLogin(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SocialLogin(rctx, fc.Args["input"].(model.SocialLoginInput))
+		return ec.resolvers.Mutation().SocialLogin(rctx, fc.Args["input"].(model.SocialLogin))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -18200,7 +17615,7 @@ func (ec *executionContext) _Mutation_resetPassword(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ResetPassword(rctx, fc.Args["input"].(model.ResetPasswordInput))
+		return ec.resolvers.Mutation().ResetPassword(rctx, fc.Args["input"].(model.ResetPassword))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -18253,7 +17668,7 @@ func (ec *executionContext) _Mutation_updatePassword(ctx context.Context, field 
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().UpdatePassword(rctx, fc.Args["input"].(model.UpdatePasswordInput))
+			return ec.resolvers.Mutation().UpdatePassword(rctx, fc.Args["password"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -19970,7 +19385,7 @@ func (ec *executionContext) _Query_apis(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Apis(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
+		return ec.resolvers.Query().Apis(rctx, fc.Args["stages"].(map[string]interface{}))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -20133,7 +19548,7 @@ func (ec *executionContext) _Query_clients(ctx context.Context, field graphql.Co
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Clients(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
+			return ec.resolvers.Query().Clients(rctx, fc.Args["stages"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			roles, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"ADMIN"})
@@ -20214,7 +19629,7 @@ func (ec *executionContext) _Query_connections(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Connections(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
+		return ec.resolvers.Query().Connections(rctx, fc.Args["stages"].(map[string]interface{}))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -20690,7 +20105,7 @@ func (ec *executionContext) _Query_integrations(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Integrations(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
+		return ec.resolvers.Query().Integrations(rctx, fc.Args["stages"].(map[string]interface{}))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -20819,7 +20234,7 @@ func (ec *executionContext) _Query_invitations(ctx context.Context, field graphq
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Invitations(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
+			return ec.resolvers.Query().Invitations(rctx, fc.Args["stages"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -20969,7 +20384,7 @@ func (ec *executionContext) _Query_keys(ctx context.Context, field graphql.Colle
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Keys(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
+			return ec.resolvers.Query().Keys(rctx, fc.Args["stages"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			roles, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"admin"})
@@ -21153,7 +20568,7 @@ func (ec *executionContext) _Query_permissions(ctx context.Context, field graphq
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Permissions(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
+			return ec.resolvers.Query().Permissions(rctx, fc.Args["stages"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			roles, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"ADMIN"})
@@ -21418,7 +20833,7 @@ func (ec *executionContext) _Query_roles(ctx context.Context, field graphql.Coll
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Roles(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
+			return ec.resolvers.Query().Roles(rctx, fc.Args["stages"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			roles, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"ADMIN"})
@@ -21500,7 +20915,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Users(rctx, fc.Args["filter"].(map[string]interface{}), fc.Args["project"].(map[string]interface{}), fc.Args["sort"].(map[string]interface{}), fc.Args["collation"].(map[string]interface{}), fc.Args["limit"].(*int), fc.Args["skip"].(*int))
+			return ec.resolvers.Query().Users(rctx, fc.Args["stages"].(map[string]interface{}))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			roles, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"ADMIN"})
@@ -23068,8 +22483,8 @@ func (ec *executionContext) fieldContext_Task_assignee(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Task_members(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Task_members(ctx, field)
+func (ec *executionContext) _Task_shares(ctx context.Context, field graphql.CollectedField, obj *model.Task) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Task_shares(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -23082,7 +22497,7 @@ func (ec *executionContext) _Task_members(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Members, nil
+		return obj.Shares, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -23096,7 +22511,7 @@ func (ec *executionContext) _Task_members(ctx context.Context, field graphql.Col
 	return ec.marshalOID2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Task_members(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Task_shares(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Task",
 		Field:      field,
@@ -27427,8 +26842,8 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj interface{}) (model.LoginInput, error) {
-	var it model.LoginInput
+func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj interface{}) (model.Login, error) {
+	var it model.Login
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -28079,8 +27494,8 @@ func (ec *executionContext) unmarshalInputNewRole(ctx context.Context, obj inter
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNewUserInput(ctx context.Context, obj interface{}) (model.NewUserInput, error) {
-	var it model.NewUserInput
+func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj interface{}) (model.NewUser, error) {
+	var it model.NewUser
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -28245,8 +27660,8 @@ func (ec *executionContext) unmarshalInputNewWorkspace(ctx context.Context, obj 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputRegisterInput(ctx context.Context, obj interface{}) (model.RegisterInput, error) {
-	var it model.RegisterInput
+func (ec *executionContext) unmarshalInputRegister(ctx context.Context, obj interface{}) (model.Register, error) {
+	var it model.Register
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -28310,8 +27725,8 @@ func (ec *executionContext) unmarshalInputRegisterInput(ctx context.Context, obj
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputResetPasswordInput(ctx context.Context, obj interface{}) (model.ResetPasswordInput, error) {
-	var it model.ResetPasswordInput
+func (ec *executionContext) unmarshalInputResetPassword(ctx context.Context, obj interface{}) (model.ResetPassword, error) {
+	var it model.ResetPassword
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -28357,8 +27772,8 @@ func (ec *executionContext) unmarshalInputResetPasswordInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputSocialLoginInput(ctx context.Context, obj interface{}) (model.SocialLoginInput, error) {
-	var it model.SocialLoginInput
+func (ec *executionContext) unmarshalInputSocialLogin(ctx context.Context, obj interface{}) (model.SocialLogin, error) {
+	var it model.SocialLogin
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -28785,8 +28200,8 @@ func (ec *executionContext) unmarshalInputUpdateInvitation(ctx context.Context, 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdatePasswordInput(ctx context.Context, obj interface{}) (model.UpdatePasswordInput, error) {
-	var it model.UpdatePasswordInput
+func (ec *executionContext) unmarshalInputUpdatePassword(ctx context.Context, obj interface{}) (model.UpdatePassword, error) {
+	var it model.UpdatePassword
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -28917,14 +28332,14 @@ func (ec *executionContext) unmarshalInputUpdateRole(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj interface{}) (model.UpdateUserInput, error) {
-	var it model.UpdateUserInput
+func (ec *executionContext) unmarshalInputUpdateUser(ctx context.Context, obj interface{}) (model.UpdateUser, error) {
+	var it model.UpdateUser
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "given_name", "family_name", "password", "roles", "timezone", "locale", "picture", "status", "metadata"}
+	fieldsInOrder := [...]string{"name", "given_name", "family_name", "roles", "timezone", "locale", "picture", "status", "metadata"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -28958,15 +28373,6 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.FamilyName = data
-		case "password":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Password = data
 		case "roles":
 			var err error
 
@@ -29074,8 +28480,8 @@ func (ec *executionContext) unmarshalInputUpdateWorkspace(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputVerifyInput(ctx context.Context, obj interface{}) (model.VerifyInput, error) {
-	var it model.VerifyInput
+func (ec *executionContext) unmarshalInputVerify(ctx context.Context, obj interface{}) (model.Verify, error) {
+	var it model.Verify
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -31515,7 +30921,7 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "findTaskByUID":
+		case "findTaskByUIDAndSharesAndAssignee":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -31524,51 +30930,7 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Entity_findTaskByUID(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "findTaskByMembers":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Entity_findTaskByMembers(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "findTaskByAssignee":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Entity_findTaskByAssignee(ctx, field)
+				res = ec._Entity_findTaskByUIDAndSharesAndAssignee(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -35146,8 +34508,8 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "members":
-			out.Values[i] = ec._Task_members(ctx, field, obj)
+		case "shares":
+			out.Values[i] = ec._Task_shares(ctx, field, obj)
 		case "user":
 			field := field
 
@@ -36955,8 +36317,8 @@ func (ec *executionContext) marshalNList2ᚖgithubᚗcomᚋdailytravelᚋxᚋacc
 	return ec._List(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNLoginInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐLoginInput(ctx context.Context, v interface{}) (model.LoginInput, error) {
-	res, err := ec.unmarshalInputLoginInput(ctx, v)
+func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐLogin(ctx context.Context, v interface{}) (model.Login, error) {
+	res, err := ec.unmarshalInputLogin(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -37033,8 +36395,8 @@ func (ec *executionContext) unmarshalNNewRole2githubᚗcomᚋdailytravelᚋxᚋa
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewUserInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐNewUserInput(ctx context.Context, v interface{}) (model.NewUserInput, error) {
-	res, err := ec.unmarshalInputNewUserInput(ctx, v)
+func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐNewUser(ctx context.Context, v interface{}) (model.NewUser, error) {
+	res, err := ec.unmarshalInputNewUser(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -37141,13 +36503,13 @@ func (ec *executionContext) marshalNReaction2ᚖgithubᚗcomᚋdailytravelᚋx�
 	return ec._Reaction(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNRegisterInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐRegisterInput(ctx context.Context, v interface{}) (model.RegisterInput, error) {
-	res, err := ec.unmarshalInputRegisterInput(ctx, v)
+func (ec *executionContext) unmarshalNRegister2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐRegister(ctx context.Context, v interface{}) (model.Register, error) {
+	res, err := ec.unmarshalInputRegister(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNResetPasswordInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐResetPasswordInput(ctx context.Context, v interface{}) (model.ResetPasswordInput, error) {
-	res, err := ec.unmarshalInputResetPasswordInput(ctx, v)
+func (ec *executionContext) unmarshalNResetPassword2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐResetPassword(ctx context.Context, v interface{}) (model.ResetPassword, error) {
+	res, err := ec.unmarshalInputResetPassword(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -37165,8 +36527,8 @@ func (ec *executionContext) marshalNShare2ᚖgithubᚗcomᚋdailytravelᚋxᚋac
 	return ec._Share(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNSocialLoginInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐSocialLoginInput(ctx context.Context, v interface{}) (model.SocialLoginInput, error) {
-	res, err := ec.unmarshalInputSocialLoginInput(ctx, v)
+func (ec *executionContext) unmarshalNSocialLogin2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐSocialLogin(ctx context.Context, v interface{}) (model.SocialLogin, error) {
+	res, err := ec.unmarshalInputSocialLogin(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -37309,11 +36671,6 @@ func (ec *executionContext) unmarshalNUpdateIntegration2githubᚗcomᚋdailytrav
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdatePasswordInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUpdatePasswordInput(ctx context.Context, v interface{}) (model.UpdatePasswordInput, error) {
-	res, err := ec.unmarshalInputUpdatePasswordInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNUpdatePermission2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUpdatePermission(ctx context.Context, v interface{}) (model.UpdatePermission, error) {
 	res, err := ec.unmarshalInputUpdatePermission(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -37324,8 +36681,8 @@ func (ec *executionContext) unmarshalNUpdateRole2githubᚗcomᚋdailytravelᚋx�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUpdateUserInput(ctx context.Context, v interface{}) (model.UpdateUserInput, error) {
-	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
+func (ec *executionContext) unmarshalNUpdateUser2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐUpdateUser(ctx context.Context, v interface{}) (model.UpdateUser, error) {
+	res, err := ec.unmarshalInputUpdateUser(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -37348,8 +36705,8 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋdailytravelᚋxᚋacc
 	return ec._User(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNVerifyInput2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐVerifyInput(ctx context.Context, v interface{}) (model.VerifyInput, error) {
-	res, err := ec.unmarshalInputVerifyInput(ctx, v)
+func (ec *executionContext) unmarshalNVerify2githubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐVerify(ctx context.Context, v interface{}) (model.Verify, error) {
+	res, err := ec.unmarshalInputVerify(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

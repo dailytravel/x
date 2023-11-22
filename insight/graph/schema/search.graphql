@@ -24,14 +24,7 @@ input SearchInput {
 
 extend type Query {
   search(args: Map): Map
-  searches(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Searches
+  searches(stages: Map): Searches
 }
 
 extend type Mutation {

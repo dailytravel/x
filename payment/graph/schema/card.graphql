@@ -2,8 +2,8 @@ type Card {
   id: ID!
   name: String!
   number: String! # Caution: Storing the full card number is a security risk.
-  expMonth: Int!
-  expYear: Int!
+  exp_month: Int!
+  exp_year: Int!
   cvv: String! # Caution: Storing the CVV is a security risk and against PCI DSS compliance.
   last4: String
   brand: String
@@ -35,8 +35,8 @@ type Address {
 input NewCardInput {
   name: String!
   number: String!
-  expMonth: Int!
-  expYear: Int!
+  exp_month: Int!
+  exp_year: Int!
   cvv: String!
   billing: Map!
   metadata: Map
@@ -44,31 +44,16 @@ input NewCardInput {
 
 input UpdateCardInput {
   name: String
-  expMonth: Int
-  expYear: Int
+  exp_month: Int
+  exp_year: Int
   cvv: String
   billing: Map
   metadata: Map
 }
 
-input AddressInput {
-  street: String!
-  city: String!
-  state: String!
-  zip: String!
-  country: String!
-}
-
 extend type Query {
   card(id: ID!): Card @auth
-  cards(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Cards @auth
+  cards(stages: Map): Cards @auth
 }
 
 extend type Mutation {

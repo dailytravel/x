@@ -173,7 +173,7 @@ func (r *queryResolver) Resume(ctx context.Context, id string) (*model.Resume, e
 }
 
 // Resumes is the resolver for the resumes field.
-func (r *queryResolver) Resumes(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Resumes, error) {
+func (r *queryResolver) Resumes(ctx context.Context, stages map[string]interface{}) (*model.Resumes, error) {
 	var items []*model.Resume
 	//find all items
 	cur, err := r.db.Collection("resumes").Find(ctx, nil)

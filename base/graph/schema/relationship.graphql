@@ -1,5 +1,0 @@
-extend type Relationship @key(fields: "id") {
-  id: ID! @external
-  lists: [List]
-  tasks: [Task]
-}

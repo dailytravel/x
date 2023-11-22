@@ -31,14 +31,7 @@ input UpdateTimezone {
 }
 
 extend type Query {
-  timezones(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Timezones @api
+  timezones(stages: Map): Timezones @api
   timezone(id: ID!): Timezone! @api
 }
 

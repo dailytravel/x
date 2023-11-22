@@ -100,21 +100,21 @@ func (ec *executionContext) __resolve_entities(ctx context.Context, representati
 				list[idx[i]] = entity
 				return nil
 			}
-		case "Relationship":
-			resolverName, err := entityResolverNameForRelationship(ctx, rep)
+		case "Task":
+			resolverName, err := entityResolverNameForTask(ctx, rep)
 			if err != nil {
-				return fmt.Errorf(`finding resolver for Entity "Relationship": %w`, err)
+				return fmt.Errorf(`finding resolver for Entity "Task": %w`, err)
 			}
 			switch resolverName {
 
-			case "findRelationshipByID":
+			case "findTaskByID":
 				id0, err := ec.unmarshalNID2string(ctx, rep["id"])
 				if err != nil {
-					return fmt.Errorf(`unmarshalling param 0 for findRelationshipByID(): %w`, err)
+					return fmt.Errorf(`unmarshalling param 0 for findTaskByID(): %w`, err)
 				}
-				entity, err := ec.resolvers.Entity().FindRelationshipByID(ctx, id0)
+				entity, err := ec.resolvers.Entity().FindTaskByID(ctx, id0)
 				if err != nil {
-					return fmt.Errorf(`resolving Entity "Relationship": %w`, err)
+					return fmt.Errorf(`resolving Entity "Task": %w`, err)
 				}
 
 				list[idx[i]] = entity
@@ -226,7 +226,7 @@ func entityResolverNameForBoard(ctx context.Context, rep map[string]interface{})
 	return "", fmt.Errorf("%w for Board", ErrTypeNotFound)
 }
 
-func entityResolverNameForRelationship(ctx context.Context, rep map[string]interface{}) (string, error) {
+func entityResolverNameForTask(ctx context.Context, rep map[string]interface{}) (string, error) {
 	for {
 		var (
 			m   map[string]interface{}
@@ -238,9 +238,9 @@ func entityResolverNameForRelationship(ctx context.Context, rep map[string]inter
 		if _, ok = m["id"]; !ok {
 			break
 		}
-		return "findRelationshipByID", nil
+		return "findTaskByID", nil
 	}
-	return "", fmt.Errorf("%w for Relationship", ErrTypeNotFound)
+	return "", fmt.Errorf("%w for Task", ErrTypeNotFound)
 }
 
 func entityResolverNameForUser(ctx context.Context, rep map[string]interface{}) (string, error) {

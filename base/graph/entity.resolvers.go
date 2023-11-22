@@ -40,9 +40,29 @@ func (r *entityResolver) FindBoardByID(ctx context.Context, id string) (*model.B
 	return item, nil
 }
 
-// FindRelationshipByID is the resolver for the findRelationshipByID field.
-func (r *entityResolver) FindRelationshipByID(ctx context.Context, id string) (*model.Relationship, error) {
-	panic(fmt.Errorf("not implemented: FindRelationshipByID - findRelationshipByID"))
+// FindTaskByID is the resolver for the findTaskByID field.
+func (r *entityResolver) FindTaskByID(ctx context.Context, id string) (*model.Task, error) {
+	var item *model.Task
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": _id}
+
+	// Create a new instance of model.Task before decoding
+	item = &model.Task{}
+
+	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(item)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // FindUserByID is the resolver for the findUserByID field.

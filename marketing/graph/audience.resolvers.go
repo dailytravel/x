@@ -63,7 +63,7 @@ func (r *queryResolver) Audience(ctx context.Context, id string) (*model.Audienc
 }
 
 // Audiences is the resolver for the audiences field.
-func (r *queryResolver) Audiences(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) ([]*model.Audience, error) {
+func (r *queryResolver) Audiences(ctx context.Context, stages map[string]interface{}) ([]*model.Audience, error) {
 	panic(fmt.Errorf("not implemented: Audiences - audiences"))
 }
 

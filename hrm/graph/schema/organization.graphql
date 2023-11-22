@@ -37,14 +37,7 @@ input UpdateOrganization {
 }
 
 extend type Query {
-  organizations(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Organizations
+  organizations(stages: Map): Organizations
   organization(id: ID!): Organization
 }
 

@@ -202,7 +202,7 @@ func (r *organizationResolver) UID(ctx context.Context, obj *model.Organization)
 }
 
 // Organizations is the resolver for the organizations field.
-func (r *queryResolver) Organizations(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Organizations, error) {
+func (r *queryResolver) Organizations(ctx context.Context, stages map[string]interface{}) (*model.Organizations, error) {
 	var items []*model.Organization
 	//find all items
 	cur, err := r.db.Collection("organizations").Find(ctx, nil)

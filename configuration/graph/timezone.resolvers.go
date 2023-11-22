@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/dailytravel/x/configuration/graph/model"
-	"github.com/dailytravel/x/configuration/internal/utils"
 	"github.com/dailytravel/x/configuration/pkg/auth"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -80,43 +79,29 @@ func (r *mutationResolver) DeleteTimezones(ctx context.Context, ids []string) (m
 }
 
 // Timezones is the resolver for the timezones field.
-func (r *queryResolver) Timezones(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Timezones, error) {
-	var items []*model.Timezone
+func (r *queryResolver) Timezones(ctx context.Context, stages map[string]interface{}) (*model.Timezones, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
-	}
-
-	cursor, err := r.db.Collection("timezones").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("timezones").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Timezone
 
-	//get total count
-	count, err := r.db.Collection("timezones").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Timezones{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

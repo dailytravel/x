@@ -47,5 +47,21 @@ func (m *Workspace) Migrate() error {
 		}
 	}
 
+	filter := bson.D{}
+	if err := col.FindOne(context.Background(), filter).Err(); err != nil {
+		if err == mongo.ErrNoDocuments {
+			workspace := &model.Workspace{
+				Name:   "Default",
+				Status: "active",
+			}
+
+			if _, err := col.InsertOne(context.Background(), workspace); err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+
 	return nil
 }

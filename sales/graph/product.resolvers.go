@@ -7,9 +7,10 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/dailytravel/x/sales/graph/model"
-	"github.com/dailytravel/x/sales/internal/utils"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // CreateProduct is the resolver for the createProduct field.
@@ -47,59 +48,29 @@ func (r *productResolver) Description(ctx context.Context, obj *model.Product) (
 	panic(fmt.Errorf("not implemented: Description - description"))
 }
 
-// Notes is the resolver for the notes field.
-func (r *productResolver) Notes(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: Notes - notes"))
-}
-
-// Tips is the resolver for the tips field.
-func (r *productResolver) Tips(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: Tips - tips"))
-}
-
-// Highlights is the resolver for the highlights field.
-func (r *productResolver) Highlights(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: Highlights - highlights"))
-}
-
-// Expectation is the resolver for the expectation field.
-func (r *productResolver) Expectation(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: Expectation - expectation"))
-}
-
-// Faqs is the resolver for the faqs field.
-func (r *productResolver) Faqs(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: Faqs - faqs"))
-}
-
-// Rating is the resolver for the rating field.
-func (r *productResolver) Rating(ctx context.Context, obj *model.Product) (float64, error) {
-	panic(fmt.Errorf("not implemented: Rating - rating"))
-}
-
 // Metadata is the resolver for the metadata field.
 func (r *productResolver) Metadata(ctx context.Context, obj *model.Product) (map[string]interface{}, error) {
-	panic(fmt.Errorf("not implemented: Metadata - metadata"))
+	return obj.Metadata, nil
 }
 
 // Created is the resolver for the created field.
 func (r *productResolver) Created(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: Created - created"))
+	return time.Unix(int64(obj.Created.T), 0).Format(time.RFC3339), nil
 }
 
 // Updated is the resolver for the updated field.
 func (r *productResolver) Updated(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: Updated - updated"))
-}
-
-// Place is the resolver for the place field.
-func (r *productResolver) Place(ctx context.Context, obj *model.Product) (string, error) {
-	panic(fmt.Errorf("not implemented: Place - place"))
+	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
 // Terms is the resolver for the terms field.
 func (r *productResolver) Terms(ctx context.Context, obj *model.Product) ([]*string, error) {
 	panic(fmt.Errorf("not implemented: Terms - terms"))
+}
+
+// Place is the resolver for the place field.
+func (r *productResolver) Place(ctx context.Context, obj *model.Product) (*string, error) {
+	panic(fmt.Errorf("not implemented: Place - place"))
 }
 
 // Places is the resolver for the places field.
@@ -113,41 +84,29 @@ func (r *queryResolver) Product(ctx context.Context, id string) (*model.Product,
 }
 
 // Products is the resolver for the products field.
-func (r *queryResolver) Products(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Products, error) {
-	var items []*model.Product
+func (r *queryResolver) Products(ctx context.Context, stages map[string]interface{}) (*model.Products, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("products").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("products").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Product
 
-	//get total count
-	count, err := r.db.Collection("products").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Products{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

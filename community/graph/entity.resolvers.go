@@ -15,13 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// FindBoardByID is the resolver for the findBoardByID field.
-func (r *entityResolver) FindBoardByID(ctx context.Context, id string) (*model.Board, error) {
-	return &model.Board{
-		ID: id,
-	}, nil
-}
-
 // FindCommentByID is the resolver for the findCommentByID field.
 func (r *entityResolver) FindCommentByID(ctx context.Context, id string) (*model.Comment, error) {
 	var item *model.Comment

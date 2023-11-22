@@ -53,8 +53,6 @@ func (m *Client) Migrate() error {
 	filter := bson.M{"name": "Default"}
 	if err := col.FindOne(context.Background(), filter).Err(); err != nil {
 		if err == mongo.ErrNoDocuments {
-			// hash, _ := utils.Base64(32, false)
-			//create default client
 			client := &model.Client{
 				Name:     "Default",
 				Secret:   uuid.NewString(),

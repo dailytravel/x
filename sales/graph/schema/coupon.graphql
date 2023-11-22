@@ -2,19 +2,23 @@ type Coupon {
   id: ID!
   locale: String!
   code: String!
-  description: String!
+  name: String!
+  description: String
   type: String!
   amount: Float!
-  maxDiscount: Float
-  minPurchase: Float
+  max_discount: Float
+  min_purchase: Float
   currency: String!
-  expiration: String
-  maxUses: Int
+  max_uses: Int
   uses: Int
   metadata: Map
+  status: String
+  starts: String
+  expires: String
   created: String!
   updated: String!
   uid: ID
+  products: [Product]
 }
 
 enum DiscountType {
@@ -30,45 +34,46 @@ type Coupons {
 input NewCoupon {
   locale: String!
   code: String!
-  description: String!
+  name: String!
+  description: String
   type: String!
   amount: Float!
-  maxDiscount: Float
+  max_discount: Float
+  min_purchase: Float
   currency: String!
-  expiration: String
-  products: [ID!]
-  maxUses: Int
-  minPurchase: Float
+  max_uses: Int
+  uses: Int
   metadata: Map
+  starts: String
+  expires: String
+  uid: ID
+  products: [ID]
   status: String
 }
 
 input UpdateCoupon {
   locale: String
   code: String
+  name: String
   description: String
   type: String
   amount: Float
-  maxDiscount: Float
+  max_discount: Float
+  min_purchase: Float
   currency: String
-  expiration: String
-  products: [ID!]
-  maxUses: Int
-  minPurchase: Float
+  max_uses: Int
+  uses: Int
   metadata: Map
+  starts: String
+  expires: String
+  uid: ID
+  products: [ID]
   status: String
 }
 
 extend type Query {
   coupon(id: ID!): Coupon @auth
-  coupons(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Coupons @auth
+  coupons(stages: Map): Coupons @auth
 }
 
 extend type Mutation {

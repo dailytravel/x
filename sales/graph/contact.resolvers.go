@@ -110,19 +110,11 @@ func (r *mutationResolver) CreateContact(ctx context.Context, input model.NewCon
 	item := &model.Contact{
 		FirstName: input.FirstName,
 		LastName:  input.LastName,
-		Email:     &input.Email,
 		Phone:     input.Phone,
-		City:      input.City,
-		Zip:       input.Zip,
-		State:     input.State,
-		Source:    input.Source,
 		Language:  input.Language,
 		JobTitle:  input.JobTitle,
-		Gender:    input.Gender,
 		Rating:    input.Rating,
-		Country:   input.Country,
 		Timezone:  input.Timezone,
-		Website:   input.Website,
 		Status:    *input.Status,
 		Notes:     input.Notes,
 		Picture:   input.Picture,
@@ -196,18 +188,6 @@ func (r *mutationResolver) UpdateContact(ctx context.Context, id string, input m
 		update["phone"] = *input.Phone
 	}
 
-	if input.City != nil {
-		update["city"] = *input.City
-	}
-
-	if input.Zip != nil {
-		update["zip"] = *input.Zip
-	}
-
-	if input.State != nil {
-		update["state"] = *input.State
-	}
-
 	if input.Source != nil {
 		update["source"] = *input.Source
 	}
@@ -220,16 +200,8 @@ func (r *mutationResolver) UpdateContact(ctx context.Context, id string, input m
 		update["job_title"] = *input.JobTitle
 	}
 
-	if input.Country != nil {
-		update["country"] = *input.Country
-	}
-
 	if input.Timezone != nil {
 		update["timezone"] = *input.Timezone
-	}
-
-	if input.Website != nil {
-		update["website"] = *input.Website
 	}
 
 	if input.Status != nil {
@@ -447,41 +419,29 @@ func (r *mutationResolver) DeleteContacts(ctx context.Context, ids []string) (ma
 }
 
 // Contacts is the resolver for the contacts field.
-func (r *queryResolver) Contacts(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Contacts, error) {
-	var items []*model.Contact
+func (r *queryResolver) Contacts(ctx context.Context, stages map[string]interface{}) (*model.Contacts, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("contacts").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("contacts").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Contact
 
-	//get total count
-	count, err := r.db.Collection("contacts").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Contacts{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

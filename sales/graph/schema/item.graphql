@@ -53,14 +53,7 @@ input UpdateItem {
 }
 
 extend type Query {
-  items(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Items
+  items(stages: Map): Items
   item(id: ID!): Item
 }
 

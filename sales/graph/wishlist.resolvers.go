@@ -15,7 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // CreateWishlist is the resolver for the createWishlist field.
@@ -148,51 +147,29 @@ func (r *queryResolver) Wishlist(ctx context.Context, id string) (*model.Wishlis
 }
 
 // Wishlists is the resolver for the wishlists field.
-func (r *queryResolver) Wishlists(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Wishlists, error) {
-	var items []*model.Wishlist
+func (r *queryResolver) Wishlists(ctx context.Context, stages map[string]interface{}) (*model.Wishlists, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-
-	opts := options.Find()
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if sort != nil {
-		opts.SetSort(sort)
-	}
-	if collation != nil {
-		col := &options.Collation{
-			// you can set collation fields here...
-		}
-		opts.SetCollation(col)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("wishlist").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("wishlists").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Wishlist
 
-	//get total count
-	count, err := r.db.Collection("wishlists").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Wishlists{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

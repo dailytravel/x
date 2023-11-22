@@ -38,14 +38,7 @@ input UpdateTier {
 }
 
 extend type Query {
-  tiers(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Tiers @auth
+  tiers(stages: Map): Tiers @auth
   tier(id: ID!): Tier @auth
 }
 

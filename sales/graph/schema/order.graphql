@@ -11,6 +11,7 @@ type Order {
   status: String!
   created: String!
   updated: String!
+  shares: [ID]
 }
 
 type Orders {
@@ -27,7 +28,8 @@ input NewOrder {
   contact: ID
   items: [ID!]!
   metadata: Map
-  status: String!
+  status: String
+  shares: [ID]
 }
 
 input UpdateOrder {
@@ -40,18 +42,12 @@ input UpdateOrder {
   items: [ID!]
   metadata: Map
   status: String
+  shares: [ID]
 }
 
 extend type Query {
   order(id: ID!): Order @auth
-  orders(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Orders @auth
+  orders(stages: Map): Orders @auth
 }
 
 extend type Mutation {

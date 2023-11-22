@@ -143,7 +143,7 @@ func (r *mutationResolver) DeleteQuotes(ctx context.Context, ids []string) (map[
 }
 
 // Quotes is the resolver for the quotes field.
-func (r *queryResolver) Quotes(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Quotes, error) {
+func (r *queryResolver) Quotes(ctx context.Context, stages map[string]interface{}) (*model.Quotes, error) {
 	var items []*model.Quote
 	//find all items
 	cur, err := r.db.Collection("quotes").Find(ctx, nil)
@@ -239,6 +239,11 @@ func (r *quoteResolver) Updated(ctx context.Context, obj *model.Quote) (string, 
 // UID is the resolver for the uid field.
 func (r *quoteResolver) UID(ctx context.Context, obj *model.Quote) (string, error) {
 	return obj.ID.Hex(), nil
+}
+
+// Shares is the resolver for the shares field.
+func (r *quoteResolver) Shares(ctx context.Context, obj *model.Quote) ([]*string, error) {
+	panic(fmt.Errorf("not implemented: Shares - shares"))
 }
 
 // Quote returns QuoteResolver implementation.

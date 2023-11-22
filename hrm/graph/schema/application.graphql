@@ -40,14 +40,7 @@ input UpdateApplication {
 
 extend type Query {
   application(id: ID!): Application
-  applications(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Applications
+  applications(stages: Map): Applications
 }
 
 extend type Mutation {

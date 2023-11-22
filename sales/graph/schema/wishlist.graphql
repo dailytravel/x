@@ -31,14 +31,7 @@ input UpdateWishlist {
 
 extend type Query {
   wishlist(id: ID!): Wishlist @auth
-  wishlists(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Wishlists
+  wishlists(stages: Map): Wishlists
 }
 
 extend type Mutation {

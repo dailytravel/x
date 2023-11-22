@@ -1,5 +1,4 @@
 extend type File @key(fields: "id") {
   id: ID! @external
   comments: [Comment]
-  shares: [Share]
 }

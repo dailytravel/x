@@ -51,14 +51,7 @@ input UpdatePackage {
 
 extend type Query {
   package(id: ID!): Package
-  packages(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Packages
+  packages(stages: Map): Packages
 }
 
 extend type Mutation {

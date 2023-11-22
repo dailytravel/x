@@ -31,14 +31,7 @@ input UpdateIntegration {
 }
 
 extend type Query {
-  integrations(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Integrations
+  integrations(stages: Map): Integrations
   integration(id: ID!): Integration
 }
 

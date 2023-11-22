@@ -8,6 +8,14 @@ import (
 	"strconv"
 )
 
+type Address struct {
+	Street  *string `json:"street,omitempty"`
+	City    *string `json:"city,omitempty"`
+	State   *string `json:"state,omitempty"`
+	Zip     *string `json:"zip,omitempty"`
+	Country *string `json:"country,omitempty"`
+}
+
 type Balances struct {
 	Count int        `json:"count"`
 	Data  []*Balance `json:"data,omitempty"`
@@ -31,18 +39,6 @@ type Contacts struct {
 type Coupons struct {
 	Data  []*Coupon `json:"data,omitempty"`
 	Count int       `json:"count"`
-}
-
-type Email struct {
-	Personal *string `json:"personal,omitempty"`
-	Work     *string `json:"work,omitempty"`
-	Other    *string `json:"other,omitempty"`
-}
-
-type EmailInput struct {
-	Personal *string `json:"personal,omitempty"`
-	Work     *string `json:"work,omitempty"`
-	Other    *string `json:"other,omitempty"`
 }
 
 type Items struct {
@@ -78,11 +74,9 @@ type NewCompany struct {
 	Industry    *string                `json:"industry,omitempty"`
 	Employees   *int                   `json:"employees,omitempty"`
 	Revenue     *float64               `json:"revenue,omitempty"`
-	City        *string                `json:"city,omitempty"`
-	State       *string                `json:"state,omitempty"`
-	Zip         *string                `json:"zip,omitempty"`
-	Country     *string                `json:"country,omitempty"`
-	Timezone    *string                `json:"timezone,omitempty"`
+	Currency    *string                `json:"currency,omitempty"`
+	Address     map[string]interface{} `json:"address,omitempty"`
+	Email       *string                `json:"email,omitempty"`
 	Phone       *string                `json:"phone,omitempty"`
 	Website     *string                `json:"website,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
@@ -90,46 +84,47 @@ type NewCompany struct {
 }
 
 type NewContact struct {
-	Company   *string                `json:"company,omitempty"`
-	UID       *string                `json:"uid,omitempty"`
-	FirstName *string                `json:"firstName,omitempty"`
-	LastName  *string                `json:"lastName,omitempty"`
-	Picture   *string                `json:"picture,omitempty"`
-	Email     string                 `json:"email"`
-	Phone     *string                `json:"phone,omitempty"`
-	Street    *string                `json:"street,omitempty"`
-	City      *string                `json:"city,omitempty"`
-	State     *string                `json:"state,omitempty"`
-	Zip       *string                `json:"zip,omitempty"`
-	Country   *string                `json:"country,omitempty"`
-	Website   *string                `json:"website,omitempty"`
-	Birthday  *string                `json:"birthday,omitempty"`
-	JobTitle  *string                `json:"jobTitle,omitempty"`
-	Gender    *string                `json:"gender,omitempty"`
-	Timezone  *string                `json:"timezone,omitempty"`
-	Language  *string                `json:"language,omitempty"`
-	Source    string                 `json:"source"`
-	Rating    *int                   `json:"rating,omitempty"`
-	Notes     *string                `json:"notes,omitempty"`
-	Stage     *string                `json:"stage,omitempty"`
-	Status    *string                `json:"status,omitempty"`
-	Labels    []*string              `json:"labels,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	FirstName    *string                `json:"first_name,omitempty"`
+	LastName     *string                `json:"last_name,omitempty"`
+	Email        *string                `json:"email,omitempty"`
+	Phone        *string                `json:"phone,omitempty"`
+	Picture      *string                `json:"picture,omitempty"`
+	Address      map[string]interface{} `json:"address,omitempty"`
+	Birthday     *string                `json:"birthday,omitempty"`
+	Company      *string                `json:"company,omitempty"`
+	JobTitle     *string                `json:"job_title,omitempty"`
+	Timezone     *string                `json:"timezone,omitempty"`
+	Language     *string                `json:"language,omitempty"`
+	Source       *string                `json:"source,omitempty"`
+	Subscribed   *bool                  `json:"subscribed,omitempty"`
+	Rating       *int                   `json:"rating,omitempty"`
+	Notes        *string                `json:"notes,omitempty"`
+	Status       *string                `json:"status,omitempty"`
+	Labels       []*string              `json:"labels,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	LastActivity *string                `json:"last_activity,omitempty"`
+	Created      string                 `json:"created"`
+	Updated      string                 `json:"updated"`
+	UID          *string                `json:"uid,omitempty"`
 }
 
 type NewCoupon struct {
 	Locale      string                 `json:"locale"`
 	Code        string                 `json:"code"`
-	Description string                 `json:"description"`
+	Name        string                 `json:"name"`
+	Description *string                `json:"description,omitempty"`
 	Type        string                 `json:"type"`
 	Amount      float64                `json:"amount"`
-	MaxDiscount *float64               `json:"maxDiscount,omitempty"`
+	MaxDiscount *float64               `json:"max_discount,omitempty"`
+	MinPurchase *float64               `json:"min_purchase,omitempty"`
 	Currency    string                 `json:"currency"`
-	Expiration  *string                `json:"expiration,omitempty"`
-	Products    []string               `json:"products,omitempty"`
-	MaxUses     *int                   `json:"maxUses,omitempty"`
-	MinPurchase *float64               `json:"minPurchase,omitempty"`
+	MaxUses     *int                   `json:"max_uses,omitempty"`
+	Uses        *int                   `json:"uses,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Starts      *string                `json:"starts,omitempty"`
+	Expires     *string                `json:"expires,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
+	Products    []*string              `json:"products,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 }
 
@@ -168,7 +163,8 @@ type NewOrder struct {
 	Contact     *string                `json:"contact,omitempty"`
 	Items       []string               `json:"items"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Status      string                 `json:"status"`
+	Status      *string                `json:"status,omitempty"`
+	Shares      []*string              `json:"shares,omitempty"`
 }
 
 type NewPackage struct {
@@ -186,29 +182,19 @@ type NewPackage struct {
 }
 
 type NewProduct struct {
-	UID         string                   `json:"uid"`
-	Locale      string                   `json:"locale"`
-	Type        string                   `json:"type"`
-	Slug        string                   `json:"slug"`
-	Name        string                   `json:"name"`
-	Description string                   `json:"description"`
-	Duration    int                      `json:"duration"`
-	Notes       string                   `json:"notes"`
-	Images      []map[string]interface{} `json:"images"`
-	Tips        string                   `json:"tips"`
-	Highlights  string                   `json:"highlights"`
-	Expectation string                   `json:"expectation"`
-	Faqs        string                   `json:"faqs"`
-	Reviews     int                      `json:"reviews"`
-	Rating      float64                  `json:"rating"`
-	Booked      int                      `json:"booked"`
-	Reviewable  bool                     `json:"reviewable"`
-	Price       float64                  `json:"price"`
-	Discount    float64                  `json:"discount"`
-	Currency    string                   `json:"currency"`
-	Metadata    map[string]interface{}   `json:"metadata,omitempty"`
-	Status      string                   `json:"status"`
-	Place       string                   `json:"place"`
+	UID         *string                `json:"uid,omitempty"`
+	Locale      string                 `json:"locale"`
+	Type        string                 `json:"type"`
+	Slug        string                 `json:"slug"`
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Duration    string                 `json:"duration"`
+	Reviewable  bool                   `json:"reviewable"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      string                 `json:"status"`
+	Terms       []*string              `json:"terms,omitempty"`
+	Place       *string                `json:"place,omitempty"`
+	Places      []*string              `json:"places,omitempty"`
 }
 
 type NewPromotion struct {
@@ -237,6 +223,7 @@ type NewQuote struct {
 	Billing     map[string]interface{} `json:"billing"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
+	Shares      []*string              `json:"shares,omitempty"`
 }
 
 type NewReward struct {
@@ -292,20 +279,6 @@ type Packages struct {
 	Data  []*Package `json:"data,omitempty"`
 }
 
-type Phone struct {
-	Mobile *string `json:"mobile,omitempty"`
-	Work   *string `json:"work,omitempty"`
-	Home   *string `json:"home,omitempty"`
-	Other  *string `json:"other,omitempty"`
-}
-
-type PhoneInput struct {
-	Mobile *string `json:"mobile,omitempty"`
-	Work   *string `json:"work,omitempty"`
-	Home   *string `json:"home,omitempty"`
-	Other  *string `json:"other,omitempty"`
-}
-
 type Products struct {
 	Count int        `json:"count"`
 	Data  []*Product `json:"data,omitempty"`
@@ -353,11 +326,8 @@ type UpdateCompany struct {
 	Industry    *string                `json:"industry,omitempty"`
 	Employees   *int                   `json:"employees,omitempty"`
 	Revenue     *float64               `json:"revenue,omitempty"`
-	City        *string                `json:"city,omitempty"`
-	Zip         *string                `json:"zip,omitempty"`
-	State       *string                `json:"state,omitempty"`
-	Country     *string                `json:"country,omitempty"`
-	Timezone    *string                `json:"timezone,omitempty"`
+	Address     map[string]interface{} `json:"address,omitempty"`
+	Email       *string                `json:"email,omitempty"`
 	Phone       *string                `json:"phone,omitempty"`
 	Website     *string                `json:"website,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
@@ -365,46 +335,47 @@ type UpdateCompany struct {
 }
 
 type UpdateContact struct {
-	Company   *string                `json:"company,omitempty"`
-	UID       *string                `json:"uid,omitempty"`
-	FirstName *string                `json:"firstName,omitempty"`
-	LastName  *string                `json:"lastName,omitempty"`
-	Picture   *string                `json:"picture,omitempty"`
-	Email     *string                `json:"email,omitempty"`
-	Phone     *string                `json:"phone,omitempty"`
-	Street    *string                `json:"street,omitempty"`
-	City      *string                `json:"city,omitempty"`
-	State     *string                `json:"state,omitempty"`
-	Zip       *string                `json:"zip,omitempty"`
-	Country   *string                `json:"country,omitempty"`
-	Website   *string                `json:"website,omitempty"`
-	Birthday  *string                `json:"birthday,omitempty"`
-	JobTitle  *string                `json:"jobTitle,omitempty"`
-	Gender    *string                `json:"gender,omitempty"`
-	Timezone  *string                `json:"timezone,omitempty"`
-	Language  *string                `json:"language,omitempty"`
-	Source    *string                `json:"source,omitempty"`
-	Rating    *int                   `json:"rating,omitempty"`
-	Notes     *string                `json:"notes,omitempty"`
-	Stage     *string                `json:"stage,omitempty"`
-	Status    *string                `json:"status,omitempty"`
-	Labels    []*string              `json:"labels,omitempty"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	FirstName    *string                `json:"first_name,omitempty"`
+	LastName     *string                `json:"last_name,omitempty"`
+	Email        *string                `json:"email,omitempty"`
+	Phone        *string                `json:"phone,omitempty"`
+	Picture      *string                `json:"picture,omitempty"`
+	Address      map[string]interface{} `json:"address,omitempty"`
+	Birthday     *string                `json:"birthday,omitempty"`
+	Company      *string                `json:"company,omitempty"`
+	JobTitle     *string                `json:"job_title,omitempty"`
+	Timezone     *string                `json:"timezone,omitempty"`
+	Language     *string                `json:"language,omitempty"`
+	Source       *string                `json:"source,omitempty"`
+	Subscribed   *bool                  `json:"subscribed,omitempty"`
+	Rating       *int                   `json:"rating,omitempty"`
+	Notes        *string                `json:"notes,omitempty"`
+	Status       *string                `json:"status,omitempty"`
+	Labels       []*string              `json:"labels,omitempty"`
+	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	LastActivity *string                `json:"last_activity,omitempty"`
+	Created      string                 `json:"created"`
+	Updated      string                 `json:"updated"`
+	UID          string                 `json:"uid"`
 }
 
 type UpdateCoupon struct {
 	Locale      *string                `json:"locale,omitempty"`
 	Code        *string                `json:"code,omitempty"`
+	Name        *string                `json:"name,omitempty"`
 	Description *string                `json:"description,omitempty"`
 	Type        *string                `json:"type,omitempty"`
 	Amount      *float64               `json:"amount,omitempty"`
-	MaxDiscount *float64               `json:"maxDiscount,omitempty"`
+	MaxDiscount *float64               `json:"max_discount,omitempty"`
+	MinPurchase *float64               `json:"min_purchase,omitempty"`
 	Currency    *string                `json:"currency,omitempty"`
-	Expiration  *string                `json:"expiration,omitempty"`
-	Products    []string               `json:"products,omitempty"`
-	MaxUses     *int                   `json:"maxUses,omitempty"`
-	MinPurchase *float64               `json:"minPurchase,omitempty"`
+	MaxUses     *int                   `json:"max_uses,omitempty"`
+	Uses        *int                   `json:"uses,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Starts      *string                `json:"starts,omitempty"`
+	Expires     *string                `json:"expires,omitempty"`
+	UID         *string                `json:"uid,omitempty"`
+	Products    []*string              `json:"products,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 }
 
@@ -444,6 +415,7 @@ type UpdateOrder struct {
 	Items       []string               `json:"items,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
+	Shares      []*string              `json:"shares,omitempty"`
 }
 
 type UpdatePackage struct {
@@ -461,29 +433,18 @@ type UpdatePackage struct {
 }
 
 type UpdateProduct struct {
-	UID         *string                  `json:"uid,omitempty"`
-	Locale      *string                  `json:"locale,omitempty"`
-	Type        *string                  `json:"type,omitempty"`
-	Slug        *string                  `json:"slug,omitempty"`
-	Name        *string                  `json:"name,omitempty"`
-	Description *string                  `json:"description,omitempty"`
-	Duration    *int                     `json:"duration,omitempty"`
-	Notes       *string                  `json:"notes,omitempty"`
-	Images      []map[string]interface{} `json:"images,omitempty"`
-	Tips        *string                  `json:"tips,omitempty"`
-	Highlights  *string                  `json:"highlights,omitempty"`
-	Expectation *string                  `json:"expectation,omitempty"`
-	Faqs        *string                  `json:"faqs,omitempty"`
-	Reviews     *int                     `json:"reviews,omitempty"`
-	Rating      *float64                 `json:"rating,omitempty"`
-	Booked      *int                     `json:"booked,omitempty"`
-	Price       *float64                 `json:"price,omitempty"`
-	Discount    *float64                 `json:"discount,omitempty"`
-	Currency    *string                  `json:"currency,omitempty"`
-	Reviewable  *bool                    `json:"reviewable,omitempty"`
-	Metadata    map[string]interface{}   `json:"metadata,omitempty"`
-	Status      *string                  `json:"status,omitempty"`
-	Place       *string                  `json:"place,omitempty"`
+	Locale      *string                `json:"locale,omitempty"`
+	Type        *string                `json:"type,omitempty"`
+	Slug        *string                `json:"slug,omitempty"`
+	Name        *string                `json:"name,omitempty"`
+	Description *string                `json:"description,omitempty"`
+	Duration    *string                `json:"duration,omitempty"`
+	Reviewable  *bool                  `json:"reviewable,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
+	Status      *string                `json:"status,omitempty"`
+	Terms       []*string              `json:"terms,omitempty"`
+	Place       *string                `json:"place,omitempty"`
+	Places      []*string              `json:"places,omitempty"`
 }
 
 type UpdatePromotion struct {
@@ -511,6 +472,7 @@ type UpdateQuote struct {
 	Billing     map[string]interface{} `json:"billing,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
+	Shares      []*string              `json:"shares,omitempty"`
 }
 
 type UpdateReward struct {

@@ -288,45 +288,29 @@ func (r *queryResolver) Job(ctx context.Context, id string) (*model.Job, error) 
 }
 
 // Jobs is the resolver for the jobs field.
-func (r *queryResolver) Jobs(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Jobs, error) {
-	var items []*model.Job
+func (r *queryResolver) Jobs(ctx context.Context, stages map[string]interface{}) (*model.Jobs, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	_filter := utils.Filter(filter)
-	opts := utils.Sort(sort)
-
-	if project != nil {
-		opts.SetProjection(project)
-	}
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	cursor, err := r.db.Collection("jobs").Find(ctx, _filter, opts)
+	cursor, err := r.db.Collection("jobs").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	for cursor.Next(ctx) {
-		item := &model.Job{}
-		if err := cursor.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
+	var items []*model.Job
 
-	//get total count
-	count, err := r.db.Collection("jobs").CountDocuments(ctx, _filter, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Jobs{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

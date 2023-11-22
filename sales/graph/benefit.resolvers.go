@@ -14,7 +14,6 @@ import (
 	"github.com/dailytravel/x/sales/pkg/auth"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ID is the resolver for the id field.
@@ -217,55 +216,29 @@ func (r *mutationResolver) DeleteBenefits(ctx context.Context, ids []string) (ma
 }
 
 // Benefits is the resolver for the benefits field.
-func (r *queryResolver) Benefits(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Benefits, error) {
-	var items []*model.Benefit
+func (r *queryResolver) Benefits(ctx context.Context, stages map[string]interface{}) (*model.Benefits, error) {
+	pipeline := bson.A{}
 
-	// Convert map to bson.M which is a type alias for map[string]interface{}
-	filterBson := bson.M(filter)
-
-	opts := options.Find()
-
-	if project != nil {
-		opts.SetProjection(project)
+	// Add additional stages to the pipeline
+	for key, value := range stages {
+		stage := bson.D{{Key: key, Value: value}}
+		pipeline = append(pipeline, stage)
 	}
 
-	if sort != nil {
-		opts.SetSort(sort)
-	}
-
-	if collation != nil {
-		col := &options.Collation{
-			// you can set collation fields here...
-		}
-		opts.SetCollation(col)
-	}
-
-	if limit != nil {
-		opts.SetLimit(int64(*limit))
-	}
-
-	if skip != nil {
-		opts.SetSkip(int64(*skip))
-	}
-
-	cursor, err := r.db.Collection("benefits").Find(ctx, filterBson, opts)
+	cursor, err := r.db.Collection("benefits").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	if err = cursor.All(ctx, &items); err != nil {
-		return nil, err
-	}
+	var items []*model.Benefit
 
-	//get total count
-	count, err := r.db.Collection("benefits").CountDocuments(ctx, filterBson, nil)
-	if err != nil {
+	if err := cursor.All(ctx, &items); err != nil {
 		return nil, err
 	}
 
 	return &model.Benefits{
-		Count: int(count),
+		Count: int(cursor.RemainingBatchLength()),
 		Data:  items,
 	}, nil
 }

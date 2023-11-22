@@ -44,7 +44,7 @@ func (r *taskResolver) Lead(ctx context.Context, obj *model.Task) (*model.User, 
 	var item *model.User
 
 	filter := bson.M{"_id": _id}
-	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+	if err := r.db.Collection("users").FindOne(ctx, filter).Decode(&item); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil // Return nil if no user is found, rather than an error.
 		}
@@ -59,11 +59,11 @@ func (r *taskResolver) Followers(ctx context.Context, obj *model.Task) ([]*model
 	var items []*model.User
 	var ids []primitive.ObjectID
 
-	if len(obj.Members) == 0 {
+	if len(obj.Shares) == 0 {
 		return nil, nil // No IDs, return empty result
 	}
 
-	for _, id := range obj.Members {
+	for _, id := range obj.Shares {
 		_id, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
 			return nil, nil

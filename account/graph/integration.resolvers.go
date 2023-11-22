@@ -131,7 +131,7 @@ func (r *mutationResolver) DeleteIntegrations(ctx context.Context, ids []string)
 }
 
 // Integrations is the resolver for the integrations field.
-func (r *queryResolver) Integrations(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Integrations, error) {
+func (r *queryResolver) Integrations(ctx context.Context, stages map[string]interface{}) (*model.Integrations, error) {
 	var items []*model.Integration
 	//find all items
 	cur, err := r.db.Collection("integrations").Find(ctx, nil)

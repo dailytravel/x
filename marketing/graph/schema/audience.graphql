@@ -30,14 +30,7 @@ input UpdateAudience {
 
 extend type Query {
   audience(id: ID!): Audience @auth(roles: [ADMIN])
-  audiences(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): [Audience] @auth(roles: [ADMIN])
+  audiences(stages: Map): [Audience] @auth(roles: [ADMIN])
 }
 
 extend type Mutation {

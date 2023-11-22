@@ -73,7 +73,7 @@ func (r *queryResolver) Time(ctx context.Context, id string) (*model.Phase, erro
 }
 
 // Times is the resolver for the times field.
-func (r *queryResolver) Times(ctx context.Context, filter map[string]interface{}, project map[string]interface{}, sort map[string]interface{}, collation map[string]interface{}, limit *int, skip *int) (*model.Times, error) {
+func (r *queryResolver) Times(ctx context.Context, stages map[string]interface{}) (*model.Times, error) {
 	panic(fmt.Errorf("not implemented: Times - times"))
 }
 

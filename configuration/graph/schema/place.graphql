@@ -77,14 +77,7 @@ input UpdateLocation {
 
 extend type Query {
   place(id: ID!): Place
-  places(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Places
+  places(stages: Map): Places
 }
 
 extend type Mutation {

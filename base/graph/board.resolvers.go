@@ -316,14 +316,27 @@ func (r *queryResolver) Boards(ctx context.Context, stages map[string]interface{
 		return nil, err
 	}
 
+	// Check board.uid == uid or (board.collaborators.uid == uid and board.collaborators.board == boards._id)
 	pipeline := bson.A{
-		bson.D{{Key: "$match", Value: bson.D{
-			{Key: "shares.object._id", Value: bson.D{{Key: "$in", Value: bson.A{"$_id"}}}},
-			{Key: "shares.object.type", Value: "boards"},
-			{Key: "shares.uid", Value: uid},
-		}}},
+		bson.M{
+			"$match": bson.M{
+				"$and": []interface{}{
+					bson.M{"status": bson.M{"$ne": "ARCHIVED"}},
+					bson.M{"$or": bson.A{
+						bson.M{"uid": uid},
+						bson.M{
+							"$and": bson.A{
+								bson.M{"collaborators.uid": uid},
+								bson.M{"collaborators.board": "$_id"},
+							},
+						},
+					}},
+				},
+			},
+		},
 	}
 
+	// Add additional stages to the pipeline
 	for key, value := range stages {
 		stage := bson.D{{Key: key, Value: value}}
 		pipeline = append(pipeline, stage)

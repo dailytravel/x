@@ -120,33 +120,6 @@ func (r *userResolver) Reactions(ctx context.Context, obj *model.User) ([]*model
 	return items, nil
 }
 
-// Shares is the resolver for the shares field.
-func (r *userResolver) Shares(ctx context.Context, obj *model.User) ([]*model.Share, error) {
-	var items []*model.Share
-
-	uid, err := primitive.ObjectIDFromHex(obj.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	filter := bson.M{"uid": uid}
-	//find all items
-	cur, err := r.db.Collection("shares").Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	for cur.Next(ctx) {
-		var item *model.Share
-		if err := cur.Decode(&item); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
-
-	return items, nil
-}
-
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 

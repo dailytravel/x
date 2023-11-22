@@ -6,25 +6,14 @@ type Product @key(fields: "id") {
   slug: String!
   name: String!
   description: String!
-  duration: Int! # in hours
-  notes: String!
-  tips: String!
-  highlights: String!
-  expectation: String!
-  faqs: String!
-  reviews: Int!
-  rating: Float!
-  booked: Int!
+  duration: String!
   reviewable: Boolean!
-  price: Float!
-  discount: Float!
-  currency: String!
   metadata: Map
   status: String!
   created: String!
   updated: String!
-  place: ID!
   terms: [ID]
+  place: ID
   places: [ID]
 }
 
@@ -41,67 +30,39 @@ type Products {
 }
 
 input NewProduct {
-  uid: ID!
+  uid: ID
   locale: String!
   type: String!
   slug: String!
   name: String!
   description: String!
-  duration: Int! # in hours
-  notes: String!
-  images: [Map!]!
-  tips: String!
-  highlights: String!
-  expectation: String!
-  faqs: String!
-  reviews: Int!
-  rating: Float!
-  booked: Int!
+  duration: String!
   reviewable: Boolean!
-  price: Float!
-  discount: Float!
-  currency: String!
   metadata: Map
   status: String!
-  place: ID!
+  terms: [ID]
+  place: ID
+  places: [ID]
 }
 
 input UpdateProduct {
-  uid: ID
   locale: String
   type: String
   slug: String
   name: String
   description: String
-  duration: Int # in hours
-  notes: String
-  images: [Map!]
-  tips: String
-  highlights: String
-  expectation: String
-  faqs: String
-  reviews: Int
-  rating: Float
-  booked: Int
-  price: Float
-  discount: Float
-  currency: String
+  duration: String
   reviewable: Boolean
   metadata: Map
   status: String
+  terms: [ID]
   place: ID
+  places: [ID]
 }
 
 extend type Query {
   product(id: ID!): Product
-  products(
-    filter: Map
-    project: Map
-    sort: Map
-    collation: Map
-    limit: Int
-    skip: Int
-  ): Products
+  products(stages: Map): Products
 }
 
 extend type Mutation {
