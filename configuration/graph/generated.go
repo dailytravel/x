@@ -179,6 +179,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Country            func(childComplexity int, code string) int
 		Currencies         func(childComplexity int, stages map[string]interface{}) int
 		Currency           func(childComplexity int, code string) int
 		Global             func(childComplexity int, name string) int
@@ -361,6 +362,7 @@ type QueryResolver interface {
 	Locales(ctx context.Context, stages map[string]interface{}) (*model.Locales, error)
 	Locale(ctx context.Context, code string) (*model.Locale, error)
 	Place(ctx context.Context, id string) (*model.Place, error)
+	Country(ctx context.Context, code string) (*model.Place, error)
 	Places(ctx context.Context, stages map[string]interface{}) (*model.Places, error)
 	Term(ctx context.Context, id string) (*model.Term, error)
 	Terms(ctx context.Context, stages map[string]interface{}) (*model.Terms, error)
@@ -1174,6 +1176,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Places.Data(childComplexity), true
+
+	case "Query.country":
+		if e.complexity.Query.Country == nil {
+			break
+		}
+
+		args, err := ec.field_Query_country_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Country(childComplexity, args["code"].(string)), true
 
 	case "Query.currencies":
 		if e.complexity.Query.Currencies == nil {
@@ -2534,6 +2548,21 @@ func (ec *executionContext) field_Query__entities_args(ctx context.Context, rawA
 		}
 	}
 	args["representations"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_country_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["code"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["code"] = arg0
 	return args, nil
 }
 
@@ -8256,6 +8285,90 @@ func (ec *executionContext) fieldContext_Query_place(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_country(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_country(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Country(rctx, fc.Args["code"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Place)
+	fc.Result = res
+	return ec.marshalOPlace2ᚖgithubᚗcomᚋdailytravelᚋxᚋconfigurationᚋgraphᚋmodelᚐPlace(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_country(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Place_id(ctx, field)
+			case "parent":
+				return ec.fieldContext_Place_parent(ctx, field)
+			case "locale":
+				return ec.fieldContext_Place_locale(ctx, field)
+			case "type":
+				return ec.fieldContext_Place_type(ctx, field)
+			case "slug":
+				return ec.fieldContext_Place_slug(ctx, field)
+			case "name":
+				return ec.fieldContext_Place_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Place_description(ctx, field)
+			case "location":
+				return ec.fieldContext_Place_location(ctx, field)
+			case "reviewable":
+				return ec.fieldContext_Place_reviewable(ctx, field)
+			case "popular":
+				return ec.fieldContext_Place_popular(ctx, field)
+			case "order":
+				return ec.fieldContext_Place_order(ctx, field)
+			case "status":
+				return ec.fieldContext_Place_status(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Place_metadata(ctx, field)
+			case "created":
+				return ec.fieldContext_Place_created(ctx, field)
+			case "updated":
+				return ec.fieldContext_Place_updated(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_country_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_places(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_places(ctx, field)
 	if err != nil {
@@ -8465,28 +8578,8 @@ func (ec *executionContext) _Query_timezones(ctx context.Context, field graphql.
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Timezones(rctx, fc.Args["stages"].(map[string]interface{}))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Api == nil {
-				return nil, errors.New("directive api is not implemented")
-			}
-			return ec.directives.Api(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.Timezones); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/dailytravel/x/configuration/graph/model.Timezones`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Timezones(rctx, fc.Args["stages"].(map[string]interface{}))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8543,28 +8636,8 @@ func (ec *executionContext) _Query_timezone(ctx context.Context, field graphql.C
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Timezone(rctx, fc.Args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Api == nil {
-				return nil, errors.New("directive api is not implemented")
-			}
-			return ec.directives.Api(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.Timezone); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/dailytravel/x/configuration/graph/model.Timezone`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Timezone(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -16031,6 +16104,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_place(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "country":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_country(ctx, field)
 				return res
 			}
 

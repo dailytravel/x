@@ -82,18 +82,20 @@ type NewPortfolio struct {
 }
 
 type NewTask struct {
-	User     *string                `json:"user,omitempty"`
-	Parent   *string                `json:"parent,omitempty"`
-	Assignee *string                `json:"assignee,omitempty"`
-	Shares   []string               `json:"shares,omitempty"`
-	Name     string                 `json:"name"`
-	Notes    *string                `json:"notes,omitempty"`
-	Priority *string                `json:"priority,omitempty"`
-	Start    *string                `json:"start,omitempty"`
-	End      *string                `json:"end,omitempty"`
-	Order    *int                   `json:"order,omitempty"`
-	Status   *string                `json:"status,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	User      *string                `json:"user,omitempty"`
+	Parent    *string                `json:"parent,omitempty"`
+	Assignee  *string                `json:"assignee,omitempty"`
+	Shares    []string               `json:"shares,omitempty"`
+	Name      string                 `json:"name"`
+	Notes     *string                `json:"notes,omitempty"`
+	Priority  *string                `json:"priority,omitempty"`
+	Start     *string                `json:"start,omitempty"`
+	End       *string                `json:"end,omitempty"`
+	Order     *int                   `json:"order,omitempty"`
+	List      string                 `json:"list"`
+	Completed *bool                  `json:"completed,omitempty"`
+	Status    *string                `json:"status,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type NewTime struct {
@@ -164,18 +166,20 @@ type UpdatePortfolio struct {
 }
 
 type UpdateTask struct {
-	User     *string                `json:"user,omitempty"`
-	Parent   *string                `json:"parent,omitempty"`
-	Assignee *string                `json:"assignee,omitempty"`
-	Shares   []string               `json:"shares,omitempty"`
-	Name     *string                `json:"name,omitempty"`
-	Notes    *string                `json:"notes,omitempty"`
-	Priority *string                `json:"priority,omitempty"`
-	Start    *string                `json:"start,omitempty"`
-	End      *string                `json:"end,omitempty"`
-	Order    *int                   `json:"order,omitempty"`
-	Status   *string                `json:"status,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	User      *string                `json:"user,omitempty"`
+	Parent    *string                `json:"parent,omitempty"`
+	Assignee  *string                `json:"assignee,omitempty"`
+	Shares    []string               `json:"shares,omitempty"`
+	Name      *string                `json:"name,omitempty"`
+	Notes     *string                `json:"notes,omitempty"`
+	Priority  *string                `json:"priority,omitempty"`
+	Start     *string                `json:"start,omitempty"`
+	End       *string                `json:"end,omitempty"`
+	Order     *int                   `json:"order,omitempty"`
+	List      *string                `json:"list,omitempty"`
+	Completed *bool                  `json:"completed,omitempty"`
+	Status    *string                `json:"status,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateTime struct {

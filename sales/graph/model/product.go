@@ -15,19 +15,20 @@ import (
 )
 
 type Product struct {
-	Model       `bson:",inline"`
-	UID         primitive.ObjectID    `json:"uid" bson:"uid"`
-	Place       primitive.ObjectID    `json:"place" bson:"place"`
-	Locale      string                `json:"locale" bson:"locale"`
-	Slug        string                `json:"slug" bson:"slug"`
-	Type        string                `json:"type" bson:"type"`
-	Name        primitive.M           `json:"name" bson:"name"`
-	Description primitive.M           `json:"description" bson:"description"`
-	Duration    string                `json:"duration" bson:"duration"`
-	Reviewable  bool                  `json:"reviewable" bson:"reviewable"`
-	Status      string                `json:"status" bson:"status"`
-	Terms       []*primitive.ObjectID `json:"terms,omitempty" bson:"terms,omitempty"`
-	Places      []*primitive.ObjectID `json:"places,omitempty" bson:"places,omitempty"`
+	Model           `bson:",inline"`
+	UID             primitive.ObjectID    `json:"uid" bson:"uid"`
+	Place           primitive.ObjectID    `json:"place" bson:"place"`
+	Locale          string                `json:"locale" bson:"locale"`
+	Slug            string                `json:"slug" bson:"slug"`
+	Type            string                `json:"type" bson:"type"`
+	Name            primitive.M           `json:"name" bson:"name"`
+	Description     primitive.M           `json:"description" bson:"description"`
+	Duration        string                `json:"duration" bson:"duration"`
+	Reviewable      bool                  `json:"reviewable" bson:"reviewable"`
+	Status          string                `json:"status" bson:"status"`
+	Terms           []*primitive.ObjectID `json:"terms,omitempty" bson:"terms,omitempty"`
+	Places          []*primitive.ObjectID `json:"places,omitempty" bson:"places,omitempty"`
+	Recommendations []*string             `json:"recommendations,omitempty" bson:"recommendations,omitempty"`
 }
 
 func (Product) IsEntity() {}
@@ -55,6 +56,7 @@ func (i *Product) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "duration", Value: 1}}},
+		{Keys: bson.D{{Key: "recommendations", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "created ", Value: 1}}},
 		{Keys: bson.D{{Key: "updated ", Value: 1}}},

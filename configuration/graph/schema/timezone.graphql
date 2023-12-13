@@ -31,8 +31,8 @@ input UpdateTimezone {
 }
 
 extend type Query {
-  timezones(stages: Map): Timezones @api
-  timezone(id: ID!): Timezone! @api
+  timezones(stages: Map): Timezones
+  timezone(id: ID!): Timezone!
 }
 
 extend type Mutation {

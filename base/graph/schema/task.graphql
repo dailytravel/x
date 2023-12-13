@@ -12,6 +12,7 @@ type Task @key(fields: "id") {
   status: String!
   metadata: Map
   uid: ID!
+  list: ID!
   assignee: ID
   shares: [ID!]
   created: String!
@@ -40,6 +41,7 @@ input NewTask {
   start: String
   end: String
   order: Int
+  list: ID!
   completed: Boolean
   status: String
   metadata: Map
@@ -56,6 +58,7 @@ input UpdateTask {
   start: String
   end: String
   order: Int
+  list: ID
   completed: Boolean
   status: String
   metadata: Map

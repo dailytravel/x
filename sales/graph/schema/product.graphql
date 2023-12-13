@@ -15,6 +15,7 @@ type Product @key(fields: "id") {
   terms: [ID]
   place: ID
   places: [ID]
+  recommendations: [String] #country codes
 }
 
 enum ProductStatus {

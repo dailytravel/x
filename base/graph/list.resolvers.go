@@ -39,10 +39,6 @@ func (r *listResolver) Metadata(ctx context.Context, obj *model.List) (map[strin
 
 // Tasks is the resolver for the tasks field.
 func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Task, error) {
-	if len(obj.Tasks) == 0 {
-		return []*model.Task{}, nil
-	}
-
 	uid, err := utils.UID(ctx)
 	if err != nil {
 		return nil, err
@@ -55,7 +51,7 @@ func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Tas
 		{
 			"$match": bson.M{
 				"$and": []interface{}{
-					bson.M{"_id": bson.M{"$in": obj.Tasks}},
+					bson.M{"list": obj.ID},
 					bson.M{"status": bson.M{"$ne": "ARCHIVED"}},
 					bson.M{"$or": []interface{}{
 						bson.M{"uid": uid},
@@ -67,7 +63,9 @@ func (r *listResolver) Tasks(ctx context.Context, obj *model.List) ([]*model.Tas
 		{
 			"$addFields": bson.M{
 				"order": bson.M{
-					"$indexOfArray": []interface{}{obj.Tasks, "$_id"},
+					"$indexOfArray": []interface{}{
+						obj.Metadata["tasks"], "$_id",
+					},
 				},
 			},
 		},
@@ -128,20 +126,6 @@ func (r *mutationResolver) CreateList(ctx context.Context, input model.NewList) 
 		item.Order = *input.Order
 	}
 
-	if input.Tasks != nil {
-		var taskIDs []primitive.ObjectID // Create a slice to collect converted task IDs
-
-		for _, task := range input.Tasks {
-			_id, err := primitive.ObjectIDFromHex(*task)
-			if err != nil {
-				return nil, err
-			}
-			taskIDs = append(taskIDs, _id) // Collect the converted IDs
-		}
-
-		item.Tasks = taskIDs // Assign the collected IDs to item.Tasks
-	}
-
 	if input.Metadata != nil {
 		if item.Metadata == nil {
 			item.Metadata = make(map[string]interface{})
@@ -197,20 +181,6 @@ func (r *mutationResolver) UpdateList(ctx context.Context, id string, input mode
 
 	if input.Status != nil {
 		item.Status = *input.Status
-	}
-
-	if input.Tasks != nil {
-		var taskIDs []primitive.ObjectID // Create a slice to collect converted task IDs
-
-		for _, task := range input.Tasks {
-			_id, err := primitive.ObjectIDFromHex(*task)
-			if err != nil {
-				return nil, err
-			}
-			taskIDs = append(taskIDs, _id) // Collect the converted IDs
-		}
-
-		item.Tasks = taskIDs // Assign the collected IDs to item.Tasks
 	}
 
 	if input.Metadata != nil {

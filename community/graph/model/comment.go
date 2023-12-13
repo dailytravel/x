@@ -9,17 +9,18 @@ import (
 )
 
 type Comment struct {
-	Model       `bson:",inline"`
-	UID         *primitive.ObjectID `bson:"uid" json:"uid"`
-	Parent      *primitive.ObjectID `json:"parent,omitempty" bson:"parent,omitempty"`
-	Object      Object              `json:"object" bson:"object"`
-	Name        *string             `json:"name,omitempty" bson:"name,omitempty"`
-	Email       *string             `json:"email,omitempty" bson:"email,omitempty"`
-	Locale      string              `json:"locale,omitempty" bson:"locale,omitempty"`
-	Body        primitive.M         `json:"body,omitempty" bson:"body,omitempty"`
-	Rating      int                 `json:"rating,omitempty" bson:"rating,omitempty"`
-	Recommended bool                `json:"recommended,omitempty" bson:"recommended,omitempty"`
-	Status      string              `json:"status" bson:"status"`
+	Model      `bson:",inline"`
+	UID        *primitive.ObjectID  `bson:"uid" json:"uid"`
+	Parent     *primitive.ObjectID  `json:"parent,omitempty" bson:"parent,omitempty"`
+	Object     Object               `json:"object" bson:"object"`
+	Locale     string               `json:"locale,omitempty" bson:"locale,omitempty"`
+	Subject    *string              `json:"subject,omitempty" bson:"subject,omitempty"`
+	Body       primitive.M          `json:"body,omitempty" bson:"body,omitempty"`
+	Rating     int                  `json:"rating,omitempty" bson:"rating,omitempty"`
+	Recommends bool                 `json:"recommends,omitempty" bson:"recommends,omitempty"`
+	Status     string               `json:"status" bson:"status"`
+	Response   *string              `json:"response,omitempty" bson:"response,omitempty"`
+	Responded  *primitive.Timestamp `json:"responded,omitempty" bson:"responded,omitempty"`
 }
 
 func (Comment) IsEntity() {}
@@ -46,7 +47,7 @@ func (i *Comment) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "object._id", Value: 1}, {Key: "object.collection", Value: 1}}},
 		{Keys: bson.D{{Key: "uid", Value: 1}}},
 		{Keys: bson.D{{Key: "parent", Value: 1}}},
-		{Keys: bson.D{{Key: "recommended", Value: 1}}},
+		{Keys: bson.D{{Key: "recommends", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "created", Value: 1}}},
 		{Keys: bson.D{{Key: "updated", Value: 1}}},

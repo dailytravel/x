@@ -49,8 +49,6 @@ type NewComment struct {
 	Object      map[string]interface{} `json:"object"`
 	Locale      string                 `json:"locale"`
 	UID         *string                `json:"uid,omitempty"`
-	Name        *string                `json:"name,omitempty"`
-	Email       *string                `json:"email,omitempty"`
 	Body        *string                `json:"body,omitempty"`
 	Rating      *int                   `json:"rating,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
@@ -155,11 +153,9 @@ type UpdateComment struct {
 	Parent      *string                `json:"parent,omitempty"`
 	Locale      string                 `json:"locale"`
 	UID         *string                `json:"uid,omitempty"`
-	Name        *string                `json:"name,omitempty"`
-	Email       *string                `json:"email,omitempty"`
 	Body        *string                `json:"body,omitempty"`
 	Rating      *int                   `json:"rating,omitempty"`
-	Recommended *bool                  `json:"recommended,omitempty"`
+	Recommends  *bool                  `json:"recommends,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	Status      *string                `json:"status,omitempty"`
 	Attachments []*string              `json:"attachments,omitempty"`

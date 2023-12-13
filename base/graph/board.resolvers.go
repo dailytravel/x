@@ -60,7 +60,9 @@ func (r *boardResolver) Lists(ctx context.Context, obj *model.Board) ([]*model.L
 
 	opts := options.Find().SetSort(bson.M{"order": 1})
 
-	cursor, err := r.db.Collection("lists").Find(ctx, bson.M{"board": obj.ID}, opts)
+	cursor, err := r.db.Collection("lists").Find(ctx, bson.M{"board": obj.ID, "status": bson.M{
+		"$ne": "ARCHIVED",
+	}}, opts)
 	if err != nil {
 		return nil, err
 	}

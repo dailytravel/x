@@ -68,22 +68,23 @@ type ComplexityRoot struct {
 	}
 
 	Comment struct {
-		Body        func(childComplexity int) int
-		Children    func(childComplexity int) int
-		Created     func(childComplexity int) int
-		Email       func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Locale      func(childComplexity int) int
-		Metadata    func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Object      func(childComplexity int) int
-		Parent      func(childComplexity int) int
-		Rating      func(childComplexity int) int
-		Reactions   func(childComplexity int) int
-		Recommended func(childComplexity int) int
-		Status      func(childComplexity int) int
-		UID         func(childComplexity int) int
-		Updated     func(childComplexity int) int
+		Body       func(childComplexity int) int
+		Children   func(childComplexity int) int
+		Created    func(childComplexity int) int
+		ID         func(childComplexity int) int
+		Locale     func(childComplexity int) int
+		Metadata   func(childComplexity int) int
+		Object     func(childComplexity int) int
+		Parent     func(childComplexity int) int
+		Rating     func(childComplexity int) int
+		Reactions  func(childComplexity int) int
+		Recommends func(childComplexity int) int
+		Responded  func(childComplexity int) int
+		Response   func(childComplexity int) int
+		Status     func(childComplexity int) int
+		Subject    func(childComplexity int) int
+		UID        func(childComplexity int) int
+		Updated    func(childComplexity int) int
 	}
 
 	Comments struct {
@@ -332,6 +333,7 @@ type CommentResolver interface {
 	Reactions(ctx context.Context, obj *model.Comment) ([]*model.Reaction, error)
 	Created(ctx context.Context, obj *model.Comment) (string, error)
 	Updated(ctx context.Context, obj *model.Comment) (string, error)
+	Responded(ctx context.Context, obj *model.Comment) (*string, error)
 }
 type ConversationResolver interface {
 	ID(ctx context.Context, obj *model.Conversation) (string, error)
@@ -514,13 +516,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.Created(childComplexity), true
 
-	case "Comment.email":
-		if e.complexity.Comment.Email == nil {
-			break
-		}
-
-		return e.complexity.Comment.Email(childComplexity), true
-
 	case "Comment.id":
 		if e.complexity.Comment.ID == nil {
 			break
@@ -541,13 +536,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Comment.Metadata(childComplexity), true
-
-	case "Comment.name":
-		if e.complexity.Comment.Name == nil {
-			break
-		}
-
-		return e.complexity.Comment.Name(childComplexity), true
 
 	case "Comment.object":
 		if e.complexity.Comment.Object == nil {
@@ -577,12 +565,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.Reactions(childComplexity), true
 
-	case "Comment.recommended":
-		if e.complexity.Comment.Recommended == nil {
+	case "Comment.recommends":
+		if e.complexity.Comment.Recommends == nil {
 			break
 		}
 
-		return e.complexity.Comment.Recommended(childComplexity), true
+		return e.complexity.Comment.Recommends(childComplexity), true
+
+	case "Comment.responded":
+		if e.complexity.Comment.Responded == nil {
+			break
+		}
+
+		return e.complexity.Comment.Responded(childComplexity), true
+
+	case "Comment.response":
+		if e.complexity.Comment.Response == nil {
+			break
+		}
+
+		return e.complexity.Comment.Response(childComplexity), true
 
 	case "Comment.status":
 		if e.complexity.Comment.Status == nil {
@@ -590,6 +592,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Comment.Status(childComplexity), true
+
+	case "Comment.subject":
+		if e.complexity.Comment.Subject == nil {
+			break
+		}
+
+		return e.complexity.Comment.Subject(childComplexity), true
 
 	case "Comment.uid":
 		if e.complexity.Comment.UID == nil {
@@ -3376,8 +3385,8 @@ func (ec *executionContext) fieldContext_Comment_locale(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Comment_name(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Comment_name(ctx, field)
+func (ec *executionContext) _Comment_subject(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_subject(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3390,7 +3399,7 @@ func (ec *executionContext) _Comment_name(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
+		return obj.Subject, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3404,48 +3413,7 @@ func (ec *executionContext) _Comment_name(ctx context.Context, field graphql.Col
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Comment_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Comment",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Comment_email(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Comment_email(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Email, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Comment_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Comment_subject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Comment",
 		Field:      field,
@@ -3543,8 +3511,8 @@ func (ec *executionContext) fieldContext_Comment_rating(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Comment_recommended(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Comment_recommended(ctx, field)
+func (ec *executionContext) _Comment_recommends(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_recommends(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3557,7 +3525,7 @@ func (ec *executionContext) _Comment_recommended(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Recommended, nil
+		return obj.Recommends, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3571,7 +3539,7 @@ func (ec *executionContext) _Comment_recommended(ctx context.Context, field grap
 	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Comment_recommended(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Comment_recommends(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Comment",
 		Field:      field,
@@ -3579,6 +3547,47 @@ func (ec *executionContext) fieldContext_Comment_recommended(ctx context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Comment_response(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_response(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Response, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_response(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3711,16 +3720,16 @@ func (ec *executionContext) fieldContext_Comment_parent(ctx context.Context, fie
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -3737,6 +3746,8 @@ func (ec *executionContext) fieldContext_Comment_parent(ctx context.Context, fie
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -3786,16 +3797,16 @@ func (ec *executionContext) fieldContext_Comment_children(ctx context.Context, f
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -3812,6 +3823,8 @@ func (ec *executionContext) fieldContext_Comment_children(ctx context.Context, f
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -4006,6 +4019,47 @@ func (ec *executionContext) fieldContext_Comment_updated(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Comment_responded(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_responded(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Comment().Responded(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_responded(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Comments_count(ctx context.Context, field graphql.CollectedField, obj *model.Comments) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comments_count(ctx, field)
 	if err != nil {
@@ -4092,16 +4146,16 @@ func (ec *executionContext) fieldContext_Comments_data(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -4118,6 +4172,8 @@ func (ec *executionContext) fieldContext_Comments_data(ctx context.Context, fiel
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -4211,16 +4267,16 @@ func (ec *executionContext) fieldContext_Contact_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -4237,6 +4293,8 @@ func (ec *executionContext) fieldContext_Contact_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -4843,16 +4901,16 @@ func (ec *executionContext) fieldContext_Conversation_comments(ctx context.Conte
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -4869,6 +4927,8 @@ func (ec *executionContext) fieldContext_Conversation_comments(ctx context.Conte
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -5034,16 +5094,16 @@ func (ec *executionContext) fieldContext_Entity_findCommentByID(ctx context.Cont
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -5060,6 +5120,8 @@ func (ec *executionContext) fieldContext_Entity_findCommentByID(ctx context.Cont
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -5800,16 +5862,16 @@ func (ec *executionContext) fieldContext_Expense_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -5826,6 +5888,8 @@ func (ec *executionContext) fieldContext_Expense_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -5919,16 +5983,16 @@ func (ec *executionContext) fieldContext_File_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -5945,6 +6009,8 @@ func (ec *executionContext) fieldContext_File_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -6461,16 +6527,16 @@ func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Cont
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -6487,6 +6553,8 @@ func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Cont
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -6567,16 +6635,16 @@ func (ec *executionContext) fieldContext_Mutation_updateComment(ctx context.Cont
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -6593,6 +6661,8 @@ func (ec *executionContext) fieldContext_Mutation_updateComment(ctx context.Cont
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -9294,16 +9364,16 @@ func (ec *executionContext) fieldContext_Place_reviews(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -9320,6 +9390,8 @@ func (ec *executionContext) fieldContext_Place_reviews(ctx context.Context, fiel
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -9413,16 +9485,16 @@ func (ec *executionContext) fieldContext_Post_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -9439,6 +9511,8 @@ func (ec *executionContext) fieldContext_Post_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -9546,16 +9620,16 @@ func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -9572,6 +9646,8 @@ func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, fiel
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -10967,16 +11043,16 @@ func (ec *executionContext) fieldContext_Quote_comments(ctx context.Context, fie
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -10993,6 +11069,8 @@ func (ec *executionContext) fieldContext_Quote_comments(ctx context.Context, fie
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -12185,16 +12263,16 @@ func (ec *executionContext) fieldContext_Task_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -12211,6 +12289,8 @@ func (ec *executionContext) fieldContext_Task_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -12932,16 +13012,16 @@ func (ec *executionContext) fieldContext_User_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_uid(ctx, field)
 			case "locale":
 				return ec.fieldContext_Comment_locale(ctx, field)
-			case "name":
-				return ec.fieldContext_Comment_name(ctx, field)
-			case "email":
-				return ec.fieldContext_Comment_email(ctx, field)
+			case "subject":
+				return ec.fieldContext_Comment_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_Comment_body(ctx, field)
 			case "rating":
 				return ec.fieldContext_Comment_rating(ctx, field)
-			case "recommended":
-				return ec.fieldContext_Comment_recommended(ctx, field)
+			case "recommends":
+				return ec.fieldContext_Comment_recommends(ctx, field)
+			case "response":
+				return ec.fieldContext_Comment_response(ctx, field)
 			case "status":
 				return ec.fieldContext_Comment_status(ctx, field)
 			case "metadata":
@@ -12958,6 +13038,8 @@ func (ec *executionContext) fieldContext_User_comments(ctx context.Context, fiel
 				return ec.fieldContext_Comment_created(ctx, field)
 			case "updated":
 				return ec.fieldContext_Comment_updated(ctx, field)
+			case "responded":
+				return ec.fieldContext_Comment_responded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
 		},
@@ -14841,7 +14923,7 @@ func (ec *executionContext) unmarshalInputNewComment(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "object", "locale", "uid", "name", "email", "body", "rating", "metadata", "status", "attachments"}
+	fieldsInOrder := [...]string{"parent", "object", "locale", "uid", "body", "rating", "metadata", "status", "attachments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14884,24 +14966,6 @@ func (ec *executionContext) unmarshalInputNewComment(ctx context.Context, obj in
 				return it, err
 			}
 			it.UID = data
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "email":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Email = data
 		case "body":
 			var err error
 
@@ -15397,7 +15461,7 @@ func (ec *executionContext) unmarshalInputUpdateComment(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"parent", "locale", "uid", "name", "email", "body", "rating", "recommended", "metadata", "status", "attachments"}
+	fieldsInOrder := [...]string{"parent", "locale", "uid", "body", "rating", "recommends", "metadata", "status", "attachments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15431,24 +15495,6 @@ func (ec *executionContext) unmarshalInputUpdateComment(ctx context.Context, obj
 				return it, err
 			}
 			it.UID = data
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
-		case "email":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Email = data
 		case "body":
 			var err error
 
@@ -15467,15 +15513,15 @@ func (ec *executionContext) unmarshalInputUpdateComment(ctx context.Context, obj
 				return it, err
 			}
 			it.Rating = data
-		case "recommended":
+		case "recommends":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recommended"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("recommends"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Recommended = data
+			it.Recommends = data
 		case "metadata":
 			var err error
 
@@ -15978,10 +16024,8 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "name":
-			out.Values[i] = ec._Comment_name(ctx, field, obj)
-		case "email":
-			out.Values[i] = ec._Comment_email(ctx, field, obj)
+		case "subject":
+			out.Values[i] = ec._Comment_subject(ctx, field, obj)
 		case "body":
 			field := field
 
@@ -16020,8 +16064,10 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "rating":
 			out.Values[i] = ec._Comment_rating(ctx, field, obj)
-		case "recommended":
-			out.Values[i] = ec._Comment_recommended(ctx, field, obj)
+		case "recommends":
+			out.Values[i] = ec._Comment_recommends(ctx, field, obj)
+		case "response":
+			out.Values[i] = ec._Comment_response(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._Comment_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -16244,6 +16290,39 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "responded":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Comment_responded(ctx, field, obj)
 				return res
 			}
 

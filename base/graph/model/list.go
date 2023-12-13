@@ -14,7 +14,6 @@ type List struct {
 	Board  primitive.ObjectID   `json:"board" bson:"board"`
 	Name   string               `json:"name" bson:"name"`
 	Order  int                  `json:"order" bson:"order"`
-	Tasks  []primitive.ObjectID `json:"tasks,omitempty" bson:"tasks,omitempty"`
 	Status string               `json:"status" bson:"status"`
 }
 
@@ -38,7 +37,6 @@ func (i *List) Collection() string {
 func (i *List) Index() []mongo.IndexModel {
 	return []mongo.IndexModel{
 		{Keys: bson.D{{Key: "board", Value: 1}}},
-		{Keys: bson.D{{Key: "tasks", Value: 1}}},
 		{Keys: bson.D{{Key: "name", Value: "text"}}},
 		{Keys: bson.D{{Key: "order", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},

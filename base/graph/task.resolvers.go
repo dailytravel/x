@@ -442,6 +442,11 @@ func (r *taskResolver) UID(ctx context.Context, obj *model.Task) (string, error)
 	return obj.UID.Hex(), nil
 }
 
+// List is the resolver for the list field.
+func (r *taskResolver) List(ctx context.Context, obj *model.Task) (string, error) {
+	panic(fmt.Errorf("not implemented: List - list"))
+}
+
 // Assignee is the resolver for the assignee field.
 func (r *taskResolver) Assignee(ctx context.Context, obj *model.Task) (*string, error) {
 	if obj.Assignee == nil {

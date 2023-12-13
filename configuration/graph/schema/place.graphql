@@ -77,6 +77,7 @@ input UpdateLocation {
 
 extend type Query {
   place(id: ID!): Place
+  country(code: String!): Place
   places(stages: Map): Places
 }
 

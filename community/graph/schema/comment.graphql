@@ -2,11 +2,11 @@ type Comment @key(fields: "id") {
   id: ID!
   uid: ID
   locale: String!
-  name: String
-  email: String
+  subject: String
   body: String!
   rating: Int
-  recommended: Boolean
+  recommends: Boolean
+  response: String
   status: String!
   metadata: Map
   parent: Comment
@@ -15,6 +15,7 @@ type Comment @key(fields: "id") {
   reactions: [Reaction]
   created: String!
   updated: String!
+  responded: String
 }
 
 type Comments {
@@ -27,8 +28,6 @@ input NewComment {
   object: Map!
   locale: String!
   uid: ID
-  name: String
-  email: String
   body: String
   rating: Int
   metadata: Map
@@ -40,11 +39,9 @@ input UpdateComment {
   parent: ID
   locale: String!
   uid: ID
-  name: String
-  email: String
   body: String
   rating: Int
-  recommended: Boolean
+  recommends: Boolean
   metadata: Map
   status: String
   attachments: [ID]

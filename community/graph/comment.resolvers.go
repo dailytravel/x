@@ -119,6 +119,11 @@ func (r *commentResolver) Updated(ctx context.Context, obj *model.Comment) (stri
 	return time.Unix(int64(obj.Updated.T), 0).Format(time.RFC3339), nil
 }
 
+// Responded is the resolver for the responded field.
+func (r *commentResolver) Responded(ctx context.Context, obj *model.Comment) (*string, error) {
+	panic(fmt.Errorf("not implemented: Responded - responded"))
+}
+
 // CreateComment is the resolver for the createComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewComment) (*model.Comment, error) {
 	uid, err := utils.UID(ctx)
@@ -133,8 +138,6 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 
 	item := &model.Comment{
 		UID:    uid,
-		Name:   input.Name,
-		Email:  input.Email,
 		Locale: input.Locale,
 		Object: model.Object{
 			ID:   _id,
@@ -178,14 +181,6 @@ func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input m
 	err = r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item)
 	if err != nil {
 		return nil, err
-	}
-
-	if input.Name != nil {
-		item.Name = input.Name
-	}
-
-	if input.Email != nil {
-		item.Email = input.Email
 	}
 
 	if input.Body != nil {

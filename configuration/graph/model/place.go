@@ -82,6 +82,7 @@ func (i *Place) Index() []mongo.IndexModel {
 		},
 		// Additional basic indices for frequently queried fields
 		{Keys: bson.D{{Key: "slug", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
+		{Keys: bson.D{{Key: "metadata.code", Value: 1}}, Options: options.Index().SetUnique(true).SetSparse(true)},
 		{Keys: bson.D{{Key: "parent", Value: 1}}},
 		{Keys: bson.D{{Key: "type", Value: 1}}},
 		{Keys: bson.D{{Key: "locale", Value: 1}}},

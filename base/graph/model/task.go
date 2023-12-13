@@ -14,6 +14,7 @@ type Task struct {
 	UID       primitive.ObjectID    `json:"uid" bson:"uid"`
 	Assignee  *primitive.ObjectID   `json:"assignee,omitempty" bson:"assignee,omitempty"`
 	Parent    *primitive.ObjectID   `json:"parent,omitempty" bson:"parent,omitempty"`
+	List      *primitive.ObjectID   `json:"list,omitempty" bson:"list,omitempty"`
 	Name      string                `json:"name" bson:"name"`
 	Notes     *string               `json:"notes,omitempty" bson:"notes,omitempty"`
 	Priority  *string               `json:"priority,omitempty" bson:"priority,omitempty"`
@@ -49,6 +50,7 @@ func (i *Task) Index() []mongo.IndexModel {
 		{Keys: bson.D{{Key: "name", Value: "text"}, {Key: "notes", Value: "text"}}, Options: options.Index().SetWeights(bson.M{"name": 2, "notes": 1})},
 		{Keys: bson.D{{Key: "uid", Value: 1}}},
 		{Keys: bson.D{{Key: "parent", Value: 1}}},
+		{Keys: bson.D{{Key: "list", Value: 1}}},
 		{Keys: bson.D{{Key: "priority", Value: 1}}},
 		{Keys: bson.D{{Key: "status", Value: 1}}},
 		{Keys: bson.D{{Key: "start", Value: 1}}},

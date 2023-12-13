@@ -252,6 +252,22 @@ func (r *queryResolver) Place(ctx context.Context, id string) (*model.Place, err
 	return item, nil
 }
 
+// Country is the resolver for the country field.
+func (r *queryResolver) Country(ctx context.Context, code string) (*model.Place, error) {
+	var item *model.Place
+
+	filter := bson.M{"metadata.code": code}
+
+	if err := r.db.Collection(item.Collection()).FindOne(ctx, filter).Decode(&item); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("no document found for filter %v", filter)
+		}
+		return nil, err
+	}
+
+	return item, nil
+}
+
 // Places is the resolver for the places field.
 func (r *queryResolver) Places(ctx context.Context, stages map[string]interface{}) (*model.Places, error) {
 	pipeline := bson.A{}
