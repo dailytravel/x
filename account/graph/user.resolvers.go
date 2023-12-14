@@ -207,7 +207,7 @@ func (r *mutationResolver) Register(ctx context.Context, input model.Register) (
 	}
 
 	// Generate a new access token
-	accessToken, err := r.generateTokens(ctx, user, jwt.MapClaims{
+	accessToken, err := r.generateTokens(ctx, jwt.MapClaims{
 		"jti":      token.ID.Hex(),
 		"sub":      user.ID.Hex(),
 		"email":    user.Email,
@@ -410,7 +410,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 	}
 
 	// Generate a new access token
-	accessToken, err := r.generateTokens(ctx, user, jwt.MapClaims{
+	accessToken, err := r.generateTokens(ctx, jwt.MapClaims{
 		"jti":      token.ID.Hex(),
 		"sub":      user.ID.Hex(),
 		"email":    user.Email,
@@ -419,12 +419,12 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 		"timezone": user.Timezone,
 		"picture":  user.Picture,
 		"roles":    user.Roles,
-		"scope":    "*",
+		"scope":    "verify_otp",
 		"aud":      api.Identifier,
 		"iss":      "https://api.trip.express/graphql",
 		"azp":      client.ID.Hex(),
 		"iat":      time.Now().Unix(),
-		"exp":      time.Now().Add(time.Duration(time.Second * time.Duration(api.Expiration))).Unix(),
+		"exp":      time.Now().Add(time.Duration(time.Second * 60)).Unix(),
 	})
 
 	if err != nil {
@@ -441,7 +441,12 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 }
 
 // Verify 2FA is the resolver for the verify field.
-func (r *mutationResolver) Verify(ctx context.Context, input model.Verify) (map[string]interface{}, error) {
+func (r *mutationResolver) Verify(ctx context.Context, input model.Verify) (*model.AuthPayload, error) {
+	claims := auth.Auth(ctx)
+	if claims == nil {
+		return nil, fmt.Errorf("not authenticated")
+	}
+
 	// Retrieve the token's ID from the cache (e.g., Redis).
 	tokenID, err := r.redis.Get(ctx, input.Code).Result()
 	if err == redis.Nil {
@@ -463,20 +468,53 @@ func (r *mutationResolver) Verify(ctx context.Context, input model.Verify) (map[
 		return nil, fmt.Errorf("error fetching token: %s", err.Error())
 	}
 
-	// Update the token value to indicate successful authentication.
-	_, err = r.db.Collection("tokens").UpdateOne(ctx, token.ID, bson.M{
-		"$set": bson.M{
-			"authenticated": true,
-			"last_used":     primitive.Timestamp{T: uint32(time.Now().Unix())},
+	uid, err := primitive.ObjectIDFromHex(claims["sub"].(string))
+	if err != nil {
+		return nil, fmt.Errorf("invalid user ID")
+	}
+
+	clientID, err := primitive.ObjectIDFromHex(claims["azp"].(string))
+	if err != nil {
+		return nil, fmt.Errorf("invalid client ID")
+	}
+
+	api, err := r.getAPIByIdentifier(ctx, claims["aud"].(string))
+	if err != nil {
+		return nil, fmt.Errorf("api not found: %v", err)
+	}
+
+	token, err = r.insertToken(ctx, &model.Token{
+		UID:    uid,
+		Client: clientID,
+		Token:  uuid.New().String(),
+		Expires: primitive.Timestamp{
+			T: uint32(time.Now().Add(time.Hour * 24 * 90).Unix()),
+			I: 0,
 		},
+		ClientIP:  *auth.ClientIP(ctx),
+		UserAgent: *auth.UserAgent(ctx),
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to update token data: %s", err.Error())
+		return nil, fmt.Errorf("failed to insert token: %v", err)
 	}
 
-	return map[string]interface{}{
-		"message": "2FA successfully verified.",
+	claims["jti"] = token.ID.Hex()
+	claims["exp"] = time.Now().Add(time.Duration(time.Second * time.Duration(api.Expiration))).Unix()
+	claims["scope"] = "*"
+
+	// Generate a new access token
+	accessToken, err := r.generateTokens(ctx, claims)
+	if err != nil {
+		return nil, fmt.Errorf("error generating tokens: %v", err)
+	}
+
+	// Return the access token and refresh token
+	return &model.AuthPayload{
+		AccessToken:  accessToken,
+		RefreshToken: pointer.String(token.Token),
+		TokenType:    pointer.String("Bearer"),
+		ExpiresIn:    pointer.Int(int(api.Expiration)),
 	}, nil
 }
 
@@ -570,7 +608,7 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLo
 	}
 
 	// Generate a new access token
-	accessToken, err := r.generateTokens(ctx, user, jwt.MapClaims{
+	accessToken, err := r.generateTokens(ctx, jwt.MapClaims{
 		"jti":      token.ID.Hex(),
 		"sub":      user.ID.Hex(),
 		"email":    user.Email,
@@ -579,12 +617,13 @@ func (r *mutationResolver) SocialLogin(ctx context.Context, input model.SocialLo
 		"timezone": user.Timezone,
 		"picture":  user.Picture,
 		"roles":    user.Roles,
-		"scope":    "*",
+		"scope":    "verify_otp",
 		"aud":      api.Identifier,
 		"iss":      "https://api.trip.express/graphql",
 		"azp":      client.ID.Hex(),
 		"iat":      time.Now().Unix(),
-		"exp":      time.Now().Add(time.Duration(time.Second * time.Duration(api.Expiration))).Unix(),
+		"exp":      time.Now().Add(time.Duration(time.Second * 60)).Unix(),
+		// "exp":      time.Now().Add(time.Duration(time.Second * time.Duration(api.Expiration))).Unix(),
 	})
 
 	if err != nil {
@@ -635,7 +674,7 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, token string) (*mod
 	}
 
 	// Generate a new access token
-	accessToken, err := r.generateTokens(ctx, user, jwt.MapClaims{
+	accessToken, err := r.generateTokens(ctx, jwt.MapClaims{
 		"jti":      _token.ID.Hex(),
 		"sub":      user.ID.Hex(),
 		"email":    user.Email,

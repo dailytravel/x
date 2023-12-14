@@ -137,7 +137,7 @@ extend type Mutation {
   verifyEmail(token: String!): Map
   verifyPhone(token: String!): Map
   login(input: Login!): AuthPayload
-  verify(input: Verify!): Map
+  verify(input: Verify!): AuthPayload
   socialLogin(input: SocialLogin!): AuthPayload
   refreshToken(token: String!): AuthPayload
   logout(all: Boolean): Map @auth

@@ -100,7 +100,7 @@ func (r *Resolver) insertCredentials(ctx context.Context, docs []interface{}) er
 	return nil
 }
 
-func (r *Resolver) generateTokens(ctx context.Context, u *model.User, claims jwt.MapClaims) (*string, error) {
+func (r *Resolver) generateTokens(ctx context.Context, claims jwt.MapClaims) (*string, error) {
 	k, err := r.getCurrentKey(ctx)
 	if err != nil {
 		return nil, err

@@ -764,7 +764,7 @@ type MutationResolver interface {
 	VerifyEmail(ctx context.Context, token string) (map[string]interface{}, error)
 	VerifyPhone(ctx context.Context, token string) (map[string]interface{}, error)
 	Login(ctx context.Context, input model.Login) (*model.AuthPayload, error)
-	Verify(ctx context.Context, input model.Verify) (map[string]interface{}, error)
+	Verify(ctx context.Context, input model.Verify) (*model.AuthPayload, error)
 	SocialLogin(ctx context.Context, input model.SocialLogin) (*model.AuthPayload, error)
 	RefreshToken(ctx context.Context, token string) (*model.AuthPayload, error)
 	Logout(ctx context.Context, all *bool) (map[string]interface{}, error)
@@ -17320,9 +17320,9 @@ func (ec *executionContext) _Mutation_verify(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(*model.AuthPayload)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOAuthPayload2ᚖgithubᚗcomᚋdailytravelᚋxᚋaccountᚋgraphᚋmodelᚐAuthPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_verify(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17332,7 +17332,19 @@ func (ec *executionContext) fieldContext_Mutation_verify(ctx context.Context, fi
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
+			switch field.Name {
+			case "access_token":
+				return ec.fieldContext_AuthPayload_access_token(ctx, field)
+			case "refresh_token":
+				return ec.fieldContext_AuthPayload_refresh_token(ctx, field)
+			case "expires_in":
+				return ec.fieldContext_AuthPayload_expires_in(ctx, field)
+			case "token_type":
+				return ec.fieldContext_AuthPayload_token_type(ctx, field)
+			case "user":
+				return ec.fieldContext_AuthPayload_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AuthPayload", field.Name)
 		},
 	}
 	defer func() {

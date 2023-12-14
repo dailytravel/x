@@ -1,16 +1,17 @@
 type Item {
   id: ID!
   uid: ID!
-  package: Package!
+  product: Product!
+  package: String!
   locale: String!
   type: String!
-  code: String!
   name: String!
   description: String
   quantity: Int!
   price: Float!
   discount: Float
   currency: String!
+  coupon: String
   metadata: Map
   status: String
   created: String!
@@ -23,21 +24,7 @@ type Items {
 }
 
 input NewItem {
-  package: ID!
-  locale: String!
-  type: String!
-  code: String!
-  name: String!
-  description: String
-  quantity: Int!
-  price: Float!
-  discount: Float
-  currency: String!
-  metadata: Map
-  status: String
-}
-
-input UpdateItem {
+  product: ID!
   package: ID
   locale: String
   type: String
@@ -48,6 +35,24 @@ input UpdateItem {
   price: Float
   discount: Float
   currency: String
+  coupon: String
+  metadata: Map
+  status: String
+}
+
+input UpdateItem {
+  product: ID
+  package: ID
+  locale: String
+  type: String
+  code: String
+  name: String
+  description: String
+  quantity: Int
+  price: Float
+  discount: Float
+  currency: String
+  coupon: String
   metadata: Map
   status: String
 }
